@@ -1,0 +1,18 @@
+<policies>
+    <inbound>
+        <rate-limit calls="5" renewal-period="60" />
+        <!--
+		<rate-limit-by-key calls="1" renewal-period="1" counter-key="context.Subscription.Id" />
+		-->
+        <base />
+    </inbound>
+    <outbound>
+        <base />
+    </outbound>
+    <backend>
+        <base />
+    </backend>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

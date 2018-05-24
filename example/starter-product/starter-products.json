@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "APIMServiceName": {
+            "type": "string"
+        },
+        "starterProductID": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/products",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('starterProductID'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "displayName": "Starter Product",
+                "description": "Subscribers have need to buy my company product to get access to the API. Administrator approval is required.",
+                "terms": null,
+                "subscriptionRequired": true,
+                "approvalRequired": true,
+                "subscriptionsLimit": 1,
+                "state": "notPublished"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/policies",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('starterProductID'), '/policy')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "policyContent": "https://raw.githubusercontent.com/miaojiang/APIMDevOps/master/starter-product-policy.xml",
+                "contentFormat": "rawxml-link"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('APIMServiceName'), parameters('starterProductID'))]"
+            ]
+        }
+    ],
+    "outputs": {}
+}

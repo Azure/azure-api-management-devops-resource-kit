@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "APIMServiceName": {
+            "type": "string"
+        },
+        "httpBinApiID": {
+            "type": "string"
+        },
+        "starterProductID": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('httpBinApiID'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "contentFormat": "swagger-link-json",
+                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/http-bin.openapi.json",
+                "path": "confapi"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/apis",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('starterProductID'), '/', parameters('httpBinApiID'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "contentFormat": "swagger-link-json",
+                "contentValue": "https://raw.githubusercontent.com/miaojiang/APIMDevOps/master/conference.json",
+                "path": "confapi"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/policies",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('httpBinApiID'), '/policy')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "policyContent": "https://raw.githubusercontent.com/miaojiang/APIMDevOps/master/conf-api-policy.xml",
+                "contentFormat": "rawxml-link"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID'))]"
+            ]
+        }
+    ]
+}
