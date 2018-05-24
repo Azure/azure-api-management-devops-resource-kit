@@ -21,8 +21,8 @@
             "scale": null,
             "properties": {
                 "contentFormat": "swagger-link-json",
-                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/http-bin.openapi.json",
-                "path": "confapi"
+                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/http-bin.openapi.json?token=AHwNf-fyk9UJzyi445nAnYjH5jDKAY3Nks5bEIchwA%3D%3D",
+                "path": "httpbin"
             }
         },
         {
@@ -32,8 +32,8 @@
             "scale": null,
             "properties": {
                 "contentFormat": "swagger-link-json",
-                "contentValue": "https://raw.githubusercontent.com/miaojiang/APIMDevOps/master/conference.json",
-                "path": "confapi"
+                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/http-bin.openapi.json?token=AHwNf-fyk9UJzyi445nAnYjH5jDKAY3Nks5bEIchwA%3D%3D",
+                "path": "httpbin"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID'))]"
@@ -44,7 +44,7 @@
             "name": "[concat(parameters('APIMServiceName'), '/', parameters('httpBinApiID'), '/policy')]",
             "apiVersion": "2018-01-01",
             "properties": {
-                "policyContent": "https://raw.githubusercontent.com/miaojiang/APIMDevOps/master/conf-api-policy.xml",
+                "policyContent": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/http-bin-api-policy.xml?token=AHwNf3DTkFBL5qxWDNiQJERperDVTXk_ks5bEIdpwA%3D%3D",
                 "contentFormat": "rawxml-link"
             },
             "dependsOn": [
