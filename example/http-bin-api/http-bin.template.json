@@ -21,7 +21,7 @@
             "scale": null,
             "properties": {
                 "contentFormat": "swagger-link-json",
-                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/rev1/http-bin.openapi.json?token=AHwNfyXTfC1nB08mbS2moBTgn1snUJHlks5bFvI2wA%3D%3D",
+                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/http-bin.openapi.json?token=AHwNf4TbofvIO9vxHH19Ed9e8BpuHGGRks5bFw_WwA%3D%3D",
                 "path": "httpbin"
             }
         },
@@ -32,7 +32,7 @@
             "scale": null,
             "properties": {
                 "contentFormat": "swagger-link-json",
-                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/rev1/http-bin.openapi.json?token=AHwNfyXTfC1nB08mbS2moBTgn1snUJHlks5bFvI2wA%3D%3D",
+                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/http-bin.openapi.json?token=AHwNf4TbofvIO9vxHH19Ed9e8BpuHGGRks5bFw_WwA%3D%3D",
                 "path": "httpbin"
             },
             "dependsOn": [
@@ -44,7 +44,7 @@
             "name": "[concat(parameters('APIMServiceName'), '/', parameters('httpBinApiID'), '/policy')]",
             "apiVersion": "2018-01-01",
             "properties": {
-                "policyContent": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/rev1/http-bin.policy.xml?token=AHwNf1IlqP2ocZYai0GYlTToS4ujIOTQks5bFvN8wA%3D%3D",
+                "policyContent": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/http-bin.policy.xml?token=AHwNf-cYeNm9HX7ncFSLAakIzRVXbxBbks5bFw__wA%3D%3D",
                 "contentFormat": "rawxml-link"
             },
             "dependsOn": [
