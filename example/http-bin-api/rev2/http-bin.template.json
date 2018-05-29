@@ -34,7 +34,7 @@
                 "contentFormat": "rawxml-link"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID'))]"
+                "[concat(resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID')), ';rev=2')]"
             ]
         },
         {
@@ -45,7 +45,10 @@
             "properties": {
                 "apiId": "[concat(resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID')), ';rev=2')]",
                 "notes": "adding an API release"
-            }
+            },
+            "dependsOn": [
+                "[concat(resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID')), ';rev=2', '/policy')]"
+            ]
         }
     ]
 }
