@@ -26,6 +26,8 @@
                 <!-- allow any -->
                 <header>*</header>
             </allowed-headers>
+
+            <rate-limit-by-key calls="5" renewal-period="15" counter-key="@(context.Subscription.Id)"/>
         </cors>
     </inbound>
     <backend>
