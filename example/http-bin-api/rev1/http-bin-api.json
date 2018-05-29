@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "APIMServiceName": {
+            "type": "string"
+        },
+        "httpBinApiID": {
+            "type": "string"
+        },
+        "starterProductID": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('httpBinApiID'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "contentFormat": "swagger-link-json",
+                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/rev1/http-bin.openapi.json?token=AHwNf-fyk9UJzyi445nAnYjH5jDKAY3Nks5bEIchwA%3D%3D",
+                "path": "httpbin"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/apis",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('starterProductID'), '/', parameters('httpBinApiID'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "contentFormat": "swagger-link-json",
+                "contentValue": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/rev1/http-bin.openapi.json?token=AHwNf-fyk9UJzyi445nAnYjH5jDKAY3Nks5bEIchwA%3D%3D",
+                "path": "httpbin"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/policies",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('httpBinApiID'), '/policy')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "policyContent": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/http-bin-api/rev1/1http-bin-api-policy.xml?token=AHwNf3DTkFBL5qxWDNiQJERperDVTXk_ks5bEIdpwA%3D%3D",
+                "contentFormat": "rawxml-link"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/releases",
+            "name": "[concat(parameters('APIMServiceName'), '/', parameters('httpBinApiID'), '/release1')]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "apiId": "[concat(resourceId('Microsoft.ApiManagement/service/apis', parameters('APIMServiceName'), parameters('httpBinApiID')), ';rev=1')]",
+                "notes": "adding an API release"
+            }
+        }
+    ]
+}
