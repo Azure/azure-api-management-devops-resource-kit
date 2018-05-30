@@ -7,7 +7,6 @@
     },
     "host": "httpbin.org",
     "schemes": [
-        "http",
         "https"
     ],
     "paths": {
