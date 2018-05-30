@@ -36,7 +36,7 @@
             "apiVersion": "2018-01-01",
             "properties": {
                 "policyContent":
-                    "https://raw.githubusercontent.com/vladvino/azure-api-management-devops-example/master/product-starter/policy.xml",
+                    "https://raw.githubusercontent.com/vladvino/azure-api-management-devops-example/master/example/product-starter/product-starter.policy.xml",
                 "contentFormat": "rawxml-link"
             },
             "dependsOn": [
