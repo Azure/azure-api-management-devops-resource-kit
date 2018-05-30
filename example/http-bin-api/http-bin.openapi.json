@@ -7,8 +7,7 @@
     },
     "host": "httpbin.org",
     "schemes": [
-        "http",
-        "https"
+        "http"
     ],
     "paths": {
         "/status/{code}": {
