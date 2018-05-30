@@ -24,7 +24,7 @@
             "properties": {
                 "contentFormat": "swagger-link-json",
                 "contentValue":
-                    "https://raw.githubusercontent.com/vladvino/azure-api-management-devops-example/master/example/api-httpbin/api-httpbin.openapi.json",
+                    "https://raw.githubusercontent.com/azure/azure-api-management-devops-example/master/example/api-httpbin/api-httpbin.openapi.json",
                 "path": "httpbin"
             }
         },
