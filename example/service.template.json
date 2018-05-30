@@ -1,8 +1,9 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema":
+        "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "APIMServiceName": {
+        "ApimServiceName": {
             "type": "string"
         },
         "publisherEmail": {
@@ -21,11 +22,7 @@
         },
         "sku": {
             "type": "string",
-            "allowedValues": [
-                "Developer",
-                "Standard",
-                "Premium"
-            ],
+            "allowedValues": ["Developer", "Standard", "Premium"],
             "defaultValue": "Developer",
             "metadata": {
                 "description": "The pricing tier of this API Management service"
@@ -35,14 +32,15 @@
             "type": "int",
             "defaultValue": 1,
             "metadata": {
-                "description": "The instance  size of this API Management service."
+                "description":
+                    "The instance  size of this API Management service."
             }
         }
     },
     "resources": [
         {
             "apiVersion": "2018-01-01",
-            "name": "[parameters('APIMServiceName')]",
+            "name": "[parameters('ApimServiceName')]",
             "type": "Microsoft.ApiManagement/service",
             "location": "[resourceGroup().location]",
             "tags": {},

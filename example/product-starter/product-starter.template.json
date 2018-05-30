@@ -1,0 +1,48 @@
+{
+    "$schema":
+        "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ApimServiceName": {
+            "type": "string"
+        },
+        "starterProductId": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/products",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/', parameters('starterProductId'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "displayName": "Starter",
+                "description":
+                    "Include 3 APIs. Limited to 1 subscription per developer. Throttled at 3 calls per 10 second.",
+                "terms": null,
+                "subscriptionRequired": true,
+                "approvalRequired": true,
+                "subscriptionsLimit": 1,
+                "state": "published"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/policies",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/', parameters('starterProductId'), '/policy')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "policyContent":
+                    "https://raw.githubusercontent.com/vladvino/azure-api-management-devops-example/master/product-starter/policy.xml",
+                "contentFormat": "rawxml-link"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), parameters('starterProductId'))]"
+            ]
+        }
+    ],
+    "outputs": {}
+}
