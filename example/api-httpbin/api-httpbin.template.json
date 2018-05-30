@@ -46,7 +46,7 @@
             "apiVersion": "2018-01-01",
             "properties": {
                 "policyContent":
-                    "https://raw.githubusercontent.com/vladvino/azure-api-management-devops-example/master/example/api-httpbin/api-httpbin.policy.xml",
+                    "https://raw.githubusercontent.com/azure/azure-api-management-devops-example/master/example/api-httpbin/api-httpbin.policy.xml",
                 "contentFormat": "rawxml-link"
             },
             "dependsOn": [
