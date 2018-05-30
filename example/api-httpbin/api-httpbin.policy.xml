@@ -20,7 +20,7 @@
             </allowed-origins>
             <allowed-methods>
                 <!-- allow any -->
-                <method>GET</method>
+                <method>POST</method>
             </allowed-methods>
             <allowed-headers>
                 <!-- allow any -->
