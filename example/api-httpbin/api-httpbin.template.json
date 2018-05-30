@@ -1,0 +1,57 @@
+{
+    "$schema":
+        "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ApimServiceName": {
+            "type": "string"
+        },
+        "httpBinApiId": {
+            "type": "string"
+        },
+        "starterProductId": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/', parameters('httpBinApiId'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "contentFormat": "swagger-link-json",
+                "contentValue":
+                    "https://raw.githubusercontent.com/vladvino/azure-api-management-devops-example/master/example/api-httpbin/api-httpbin.openapi.json",
+                "path": "httpbin"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/apis",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/', parameters('starterProductId'), '/', parameters('httpBinApiId'))]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), parameters('httpBinApiId'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/policies",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/', parameters('httpBinApiId'), '/policy')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "policyContent":
+                    "https://raw.githubusercontent.com/vladvino/azure-api-management-devops-example/master/example/api-httpbin/api.httpbin.policy.xml",
+                "contentFormat": "rawxml-link"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), parameters('httpBinApiId'))]"
+            ]
+        }
+    ]
+}
