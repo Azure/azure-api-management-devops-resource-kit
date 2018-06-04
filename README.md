@@ -12,7 +12,7 @@ In this repository, we propose an approach for the problem along with examples a
 
 The proposed approach is shown in the below picture.
 
-![alt](apim-devops.png)
+![alt](APIM-DevOps.png)
 
 In this example, there are two deployment environments: _Development_ and _Production_, each environment has its own APIM instance. _API developers_ have access to the _Development_ instance and can use it for developing and testing their APIs. The _Production_ instance is managed by a designated team called the _API publishers_.
 
