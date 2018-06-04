@@ -2,29 +2,28 @@
     "swagger": "2.0",
     "info": {
         "title": "httpbin.org",
-        "description": "API Management facade for a very handy and free online HTTP tool.",
+        "description":
+            "API Management facade for a very handy and free online HTTP tool.",
         "version": "1.0"
     },
     "host": "httpbin.org",
-    "schemes": [
-        "https"
-    ],
+    "schemes": ["https"],
     "paths": {
         "/status/{code}": {
             "get": {
                 "description": "Returns provided HTTP Status code.",
                 "operationId": "/status",
-                "parameters": [{
-                    "name": "code",
-                    "in": "path",
-                    "description": "HTTP code to return.",
-                    "required": true,
-                    "type": "number",
-                    "default": 200,
-                    "enum": [
-                        200
-                    ]
-                }],
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "HTTP code to return.",
+                        "required": true,
+                        "type": "number",
+                        "default": 200,
+                        "enum": [200]
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -88,17 +87,17 @@
             "get": {
                 "description": "Delays responding for n–10 seconds.",
                 "operationId": "/delay",
-                "parameters": [{
-                    "name": "seconds",
-                    "in": "path",
-                    "description": "",
-                    "required": true,
-                    "type": "string",
-                    "default": 2,
-                    "enum": [
-                        2
-                    ]
-                }],
+                "parameters": [
+                    {
+                        "name": "seconds",
+                        "in": "path",
+                        "description": "",
+                        "required": true,
+                        "type": "string",
+                        "default": 2,
+                        "enum": [2]
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -106,17 +105,17 @@
             "get": {
                 "operationId": "/cache",
                 "description": "Sets a Cache-Control header for n seconds.",
-                "parameters": [{
-                    "name": "maxAge",
-                    "in": "path",
-                    "description": "",
-                    "required": true,
-                    "type": "string",
-                    "default": 10,
-                    "enum": [
-                        10
-                    ]
-                }],
+                "parameters": [
+                    {
+                        "name": "maxAge",
+                        "in": "path",
+                        "description": "",
+                        "required": true,
+                        "type": "string",
+                        "default": 10,
+                        "enum": [10]
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -145,14 +144,16 @@
             "get": {
                 "operationId": "/base64",
                 "description": "Decodes base64url-encoded string.",
-                "parameters": [{
-                    "name": "value",
-                    "in": "path",
-                    "description": "Base64 encoded string.",
-                    "required": true,
-                    "type": "string",
-                    "default": "aGVsbG8gd29ybGQNCg%3D%3D"
-                }],
+                "parameters": [
+                    {
+                        "name": "value",
+                        "in": "path",
+                        "description": "Base64 encoded string.",
+                        "required": true,
+                        "type": "string",
+                        "default": "aGVsbG8gd29ybGQNCg%3D%3D"
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -173,7 +174,8 @@
         "/response-headers": {
             "get": {
                 "operationId": "/response-headers",
-                "description": "Returns key-value query parameters as response headers.",
+                "description":
+                    "Returns key-value query parameters as response headers.",
                 "responses": {}
             }
         },
@@ -181,14 +183,16 @@
             "get": {
                 "operationId": "/bytes",
                 "description": "Generates n random bytes of binary data",
-                "parameters": [{
-                    "name": "number",
-                    "in": "path",
-                    "description": "Number of bytes to return.",
-                    "required": true,
-                    "type": "string",
-                    "default": "1024"
-                }],
+                "parameters": [
+                    {
+                        "name": "number",
+                        "in": "path",
+                        "description": "Number of bytes to return.",
+                        "required": true,
+                        "type": "string",
+                        "default": "1024"
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -196,14 +200,16 @@
             "get": {
                 "operationId": "/redirect-to",
                 "description": "302 redirects to a URL provided in query",
-                "parameters": [{
-                    "name": "url",
-                    "in": "query",
-                    "description": "Redirect target",
-                    "required": true,
-                    "type": "string",
-                    "default": "http://example.com"
-                }],
+                "parameters": [
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "description": "Redirect target",
+                        "required": true,
+                        "type": "string",
+                        "default": "http://example.com"
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -211,14 +217,16 @@
             "get": {
                 "operationId": "/stream",
                 "description": "Streams min(number, 100) lines.",
-                "parameters": [{
-                    "name": "number",
-                    "in": "path",
-                    "description": "Number of lines to stream.",
-                    "required": true,
-                    "type": "number",
-                    "default": "10"
-                }],
+                "parameters": [
+                    {
+                        "name": "number",
+                        "in": "path",
+                        "description": "Number of lines to stream.",
+                        "required": true,
+                        "type": "number",
+                        "default": "10"
+                    }
+                ],
                 "responses": {}
             }
         }
