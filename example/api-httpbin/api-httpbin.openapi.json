@@ -7,11 +7,11 @@
         "version": "1.0"
     },
     "host": "httpbin.org",
-    "schemes": ["http", "https"],
+    "schemes": ["https"],
     "paths": {
         "/status/{code}": {
             "get": {
-                "description": "Returns provided HTTP Status code. ",
+                "description": "Returns provided HTTP Status code.",
                 "operationId": "/status",
                 "parameters": [
                     {
