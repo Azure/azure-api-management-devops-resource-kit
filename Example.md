@@ -33,4 +33,4 @@ Deploy the `api-httpbin` _API template_ to create an API in the APIM instance:
 
 `az group deployment create --resource-group apim-rg --template-file ./example/api-httpbin/api-httpbin.template.json --parameters ./example/api-httpbin/api-httpbin.parameters.json`
 
-It is of interest this command uses an Open API (swagger) specification `api-httpbin.openapi.json` file when creating the API.
+It is of interest the command to create the `api-httpbin` API uses an Open API (swagger) specification `api-httpbin.openapi.json` file when creating the API.
