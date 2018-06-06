@@ -17,21 +17,19 @@ Deployment failed. Correlation ID: {
 
 ## Instructions
 
-1. Login to your Azure subscription as follows:
+Login to your Azure subscription:
 
 `az login`
 
-2. Create a new resource group `apim-rg` that will be used to deploy an APIM instance:
+Create a new resource group `apim-rg` that will be used to deploy an APIM instance:
 
 `az group create -n apim-rg -l westeurope`
 
-3. Deploy the _service template_ to create a new APIM _instance_: 
+Deploy the _service template_ to host the APIM _instance_ (Note this command can take several minutes to complete): 
 
 `az group deployment create --resource-group apim-rg --template-file ./example/service.template.json --parameters ./example/service.parameters.json`
 
-_Note this command can take several minutes to complete_
-
-4. Deploy the `api-httpbin` _API template_ to create an API in the APIM instance:
+Deploy the `api-httpbin` _API template_ to create an API in the APIM instance:
 
 `az group deployment create --resource-group apim-rg --template-file ./example/api-httpbin/api-httpbin.template.json --parameters ./example/api-httpbin/api-httpbin.parameters.json`
 
