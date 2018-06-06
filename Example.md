@@ -25,7 +25,7 @@ Create a new resource group `apim-rg` that will be used to deploy an APIM instan
 
 `az group create -n apim-rg -l westeurope`
 
-Deploy the _service template_ to host the APIM _instance_ (Note this command can take several minutes to complete): 
+Deploy the _service template_ to host the APIM _instance_ (note this command can take several minutes to complete): 
 
 `az group deployment create --resource-group apim-rg --template-file ./example/service.template.json --parameters ./example/service.parameters.json`
 
