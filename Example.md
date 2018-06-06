@@ -1,8 +1,8 @@
-# Example deployment using the Azure CLI.
+# Example deployment using the Azure CLI
 
 The following instructions demonstrate how to deploy the contents of this example repository using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
-### Changing the `ApimServiceName` template parameter
+#### Changing the `ApimServiceName` template parameter
 
 Note that throughout the following steps, the ARM template parameter `ApimServiceName` will need to be unique. If you use the default of `contosoapim-dev` that is used in these templates you will get the following error:
 
