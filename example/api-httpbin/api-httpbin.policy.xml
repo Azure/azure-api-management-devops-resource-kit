@@ -20,11 +20,11 @@
             </allowed-origins>
             <allowed-methods>
                 <!-- allow any -->
-                <method>*</method>
+                <method>GET</method>
             </allowed-methods>
             <allowed-headers>
                 <!-- allow any -->
-                <header>GET</header>
+                <header>*</header>
             </allowed-headers>
         </cors>
     </inbound>
