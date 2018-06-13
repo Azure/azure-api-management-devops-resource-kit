@@ -24,7 +24,7 @@
             </allowed-methods>
             <allowed-headers>
                 <!-- allow any -->
-                <header>*</header>
+                <header>GET</header>
             </allowed-headers>
         </cors>
     </inbound>
