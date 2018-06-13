@@ -7,7 +7,7 @@
         "version": "1.0"
     },
     "host": "httpbin.org",
-    "schemes": ["https"],
+    "schemes": ["https", "http"],
     "paths": {
         "/status/{code}": {
             "get": {
