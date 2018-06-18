@@ -24,7 +24,7 @@
                 "displayName": "HTTP Bin API",
                 "apiRevision": "1",
                 "description": "API Management facade for a very handy and free online HTTP tool",
-                "serviceUrl": "httpbin.org",
+                "serviceUrl": "https://httpbin.org",
                 "path": "httpbin",
                 "protocols": [
                     "https"
