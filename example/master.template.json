@@ -159,6 +159,44 @@
              "[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
              "[resourceId('Microsoft.Resources/deployments', 'usersTemplate')]"
             ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "httpBinVersionSetTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/api-httpbin/api-httpbin.version-set.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
+               }
+            },
+            "dependsOn": [
+             "[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]"
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "httpBinV1Template",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/api-httpbin/v1/api-httpbin.v1.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
+                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+               }
+            },
+            "dependsOn": [
+            "[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'httpBinVersionSetTemplate')]"
+            ]
          }
     ],
     "outputs": {}
