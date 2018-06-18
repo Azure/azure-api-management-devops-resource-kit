@@ -1,0 +1,23 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "ApimServiceName": {
+        "type": "string"
+      }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/subscriptions",
+            "name": "[concat(parameters('ApimServiceName'), '/53c765632095310385070001')]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "userId": "[resourceId('Microsoft.ApiManagement/service/users', parameters('ApimServiceName'), 'john-doe-contoso-com')]",
+                "productId": "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]",
+                "displayName": "Starter product subscription",
+                "state": "active"
+            }
+        }
+    ]
+}
