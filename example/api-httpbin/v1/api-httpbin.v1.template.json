@@ -32,7 +32,7 @@
                 "authenticationSettings": null,
                 "subscriptionKeyParameterNames": null,
                 "apiVersion": "v1",
-                "apiVersionSet": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset-httpbin-api')]"
+                "apiVersionSetId": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset-httpbin-api')]"
             }
         },
         {
@@ -54,8 +54,12 @@
                     }
                 ],
                 "policies": null
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+            ]
         },
+
         {
             "type": "Microsoft.ApiManagement/service/apis/operations",
             "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI/post')]",
@@ -75,7 +79,10 @@
                     }
                 ],
                 "policies": null
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+            ]
         },
         {
             "type": "Microsoft.ApiManagement/service/products/apis",
