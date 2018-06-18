@@ -9,6 +9,8 @@
     - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.
     - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.
     - Policies are applied in the order of their appearance, from the top down.
+
+    This is the policy document for v1 of the API.
 -->
 <policies>
     <inbound>
@@ -20,7 +22,7 @@
             </allowed-origins>
             <allowed-methods>
                 <!-- allow any -->
-                <method>GET</method>
+                <method>*</method>
             </allowed-methods>
             <allowed-headers>
                 <!-- allow any -->

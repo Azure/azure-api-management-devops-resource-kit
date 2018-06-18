@@ -1,0 +1,68 @@
+{
+    "$schema":
+        "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ApimServiceName": {
+            "type": "string"
+        },
+        "repoBaseUrl":{
+            "type": "string",
+            "metadata": {
+                "description": "Base URL of the repository"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/httpBinAPI')]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "apiVersion": "v1",
+                "apiVersionSet": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset-httpbin-api')]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/httpBinAPI')]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {
+                "apiVersion": "v1",
+                "apiVersionSet": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset-httpbin-api')]",
+                "contentFormat": "swagger-link-json",
+                "contentValue": "[concat(parameters('repoBaseUrl'), '/api-httpbin/v1/api-httpbin.openapi.xml')]",
+                "path": "httpbin"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/apis",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/starter/httpBinAPI')]",
+            "apiVersion": "2018-01-01",
+            "scale": null,
+            "properties": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/policies",
+            "name":
+                "[concat(parameters('ApimServiceName'), '/httpBinAPI/policy')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "policyContent": "[concat(parameters('repoBaseUrl'), '/api-httpbin/v1/api-httpbin.policy.xml')]",
+                "contentFormat": "rawxml-link"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+            ]
+        }
+    ]
+}

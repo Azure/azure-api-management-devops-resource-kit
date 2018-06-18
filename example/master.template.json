@@ -148,7 +148,7 @@
             "properties": {
               "mode": "Incremental",
               "templateLink": {
-                 "uri":"[concat(parameters('repoBaseUrl'), '/subscrptions.template.json')]",
+                 "uri":"[concat(parameters('repoBaseUrl'), '/subscriptions.template.json')]",
                  "contentVersion":"1.0.0.0"
               },
               "parameters": {
