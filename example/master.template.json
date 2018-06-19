@@ -197,6 +197,27 @@
             "[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
              "[resourceId('Microsoft.Resources/deployments', 'httpBinVersionSetTemplate')]"
             ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "httpBinV2Template",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/api-httpbin/v2/api-httpbin.v2.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
+                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+               }
+            },
+            "dependsOn": [
+            "[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'httpBinVersionSetTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'httpBinV1Template')]"
+            ]
          }
     ],
     "outputs": {}
