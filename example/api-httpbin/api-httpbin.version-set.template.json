@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ApimServiceName": {
+          "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('ApimServiceName'), '/versionset-httpbin-api')]",
+            "type": "Microsoft.ApiManagement/service/api-version-sets",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "description": "Version set for HTTP bin API",
+                "versionQueryName": "api-version",
+                "displayName": "Versioned HTTP bin API",
+                "versioningScheme": "query"
+            }
+        }
+    ]
+}

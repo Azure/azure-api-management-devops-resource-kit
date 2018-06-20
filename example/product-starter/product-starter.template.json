@@ -6,8 +6,11 @@
         "ApimServiceName": {
             "type": "string"
         },
-        "starterProductId": {
-            "type": "string"
+        "repoBaseUrl":{
+            "type": "string",
+            "metadata": {
+                "description": "Base URL of the repository"
+            }
         }
     },
     "variables": {},
@@ -15,7 +18,7 @@
         {
             "type": "Microsoft.ApiManagement/service/products",
             "name":
-                "[concat(parameters('ApimServiceName'), '/', parameters('starterProductId'))]",
+                "[concat(parameters('ApimServiceName'), '/starter')]",
             "apiVersion": "2018-01-01",
             "scale": null,
             "properties": {
@@ -32,15 +35,24 @@
         {
             "type": "Microsoft.ApiManagement/service/products/policies",
             "name":
-                "[concat(parameters('ApimServiceName'), '/', parameters('starterProductId'), '/policy')]",
+                "[concat(parameters('ApimServiceName'), '/starter/policy')]",
             "apiVersion": "2018-01-01",
             "properties": {
-                "policyContent":
-                    "https://raw.githubusercontent.com/azure/azure-api-management-devops-example/master/example/product-starter/product-starter.policy.xml",
+                "policyContent": "[concat(parameters('repoBaseUrl'), '/product-starter/product-starter.policy.xml')]",
                 "contentFormat": "rawxml-link"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), parameters('starterProductId'))]"
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/groups",
+            "name": "[concat(parameters('ApimServiceName'), '/starter/contosogroup' )]",
+            "apiVersion": "2017-03-01",
+            "scale": null,
+            "properties": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
             ]
         }
     ],
