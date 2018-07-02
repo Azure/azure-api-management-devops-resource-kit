@@ -18,7 +18,7 @@ In this example, there are two deployment environments: _Development_ and _Produ
 
 The key in this proposed solution is to keep all your APIM configurations in Azure Resource Manager (ARM) templates under your SCM systems. In this example, we use GIT. There is a _Publisher repository_ that contains all the configurations of the _Production_ instance. _API developers_ can fork and clone the _Publisher repository_ and then start working on their APIs in their own repository.
 
-There are two types of ARM templates: the _Shared templates_ contain all the configurations related to an APIM instance (e.g., sku type, custom URL) and shared resources (e.g., users, groups, products). For each API, there is an _API Template_ that contains all the configurations related to the API and its sub-resources (e.g., API definition, operations, policies).
+There are three types of ARM templates: the _Service template_ contains all the configurations related to the APIM instance (e.g., sku type, custom URL). The _Shared templates_ contain shared resources (e.g., groups, products). For each API, there is an _API template_ that contains all the configurations related to the API and its sub-resources (e.g., API definition, operations, policies).
 
 Finally, The _Master template_ ties everything together by linking to all templates and deploy them in order. Therefore, if you want to deploy everything to an APIM instance, you can simply deploy the _Master template_. A beautiful thing is that each template can also be deployed individually. For example, if you just want to deploy a single API. 
 
