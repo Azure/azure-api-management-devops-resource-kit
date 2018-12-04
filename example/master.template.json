@@ -1,0 +1,224 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "repoBaseUrl":{
+            "type": "string",
+            "metadata": {
+                "description": "Base URL of the repository"
+            }
+        },
+        "ApimServiceName": {
+            "type": "string",
+            "metadata": {
+                "description" : "The name of the API Management"
+            }
+        },
+        "publisherEmail": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The email address of the owner of the service"
+            }
+        },
+        "publisherName": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The name of the owner of the service"
+            }
+        },
+        "sku": {
+            "type": "string",
+            "allowedValues": ["Developer", "Standard", "Premium"],
+            "defaultValue": "Developer",
+            "metadata": {
+                "description": "The pricing tier of this API Management service"
+            }
+        },
+        "skuCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description":
+                    "The instance  size of this API Management service."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "serviceTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/service.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }, 
+                "PublisherName": {"value": "[parameters('PublisherName')]" },
+                "PublisherEmail": {"value": "[parameters('PublisherEmail')]" },
+                "sku": {"value": "[parameters('sku')]" },
+                 "skuCount": {"value": "[parameters('skuCount')]" }
+               }
+            }
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "usersTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/users.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
+               }
+            },
+            "dependsOn": [
+             "[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]"
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "groupsTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/groups.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
+               }
+            },
+            "dependsOn": [
+             "[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]",
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "productStarterTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/product-starter/product-starter.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
+                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+               }
+            },
+            "dependsOn": [
+             "[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'groupsTemplate')]"
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "groupsUsersTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/groupsUsers.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
+               }
+            },
+            "dependsOn": [
+             "[resourceId('Microsoft.Resources/deployments', 'groupsTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'usersTemplate')]"
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "subscriptionsTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/subscriptions.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
+               }
+            },
+            "dependsOn": [
+             "[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'usersTemplate')]"
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "httpBinVersionSetTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/api-httpbin/api-httpbin.version-set.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
+               }
+            },
+            "dependsOn": [
+             "[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]"
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "httpBinV1Template",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/api-httpbin/v1/api-httpbin.v1.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
+                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+               }
+            },
+            "dependsOn": [
+            "[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'httpBinVersionSetTemplate')]"
+            ]
+         },
+         {
+            "apiVersion": "2017-05-10",
+            "name": "httpBinV2Template",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                 "uri":"[concat(parameters('repoBaseUrl'), '/api-httpbin/v2/api-httpbin.v2.template.json')]",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
+                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+               }
+            },
+            "dependsOn": [
+            "[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'httpBinVersionSetTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'httpBinV1Template')]"
+            ]
+         }
+    ],
+    "outputs": {}
+}
