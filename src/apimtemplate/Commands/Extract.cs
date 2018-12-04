@@ -5,7 +5,7 @@ using Colors.Net;
 
 namespace APIManagement.Template
 {
-    internal class ExtractCommand : CommandLineApplication
+    public class ExtractCommand : CommandLineApplication
     {
         public ExtractCommand()
         {

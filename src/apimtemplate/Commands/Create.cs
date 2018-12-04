@@ -5,7 +5,7 @@ using Colors.Net;
 
 namespace APIManagement.Template
 {
-    internal class CreateCommand : CommandLineApplication
+    public class CreateCommand : CommandLineApplication
     {
         public CreateCommand()
         {
