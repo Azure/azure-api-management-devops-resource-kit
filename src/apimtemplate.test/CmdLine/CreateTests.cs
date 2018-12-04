@@ -1,11 +1,10 @@
 using System;
 using Xunit;
-using APIManagement.Template;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace apimtemplate.test
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class Create
+    public class CreateTests
     {
 
         [Fact]

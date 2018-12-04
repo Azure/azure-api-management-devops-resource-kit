@@ -1,12 +1,11 @@
 using System;
 using Xunit;
-using APIManagement.Template;
 using McMaster.Extensions.CommandLineUtils;
 
 
-namespace apimtemplate.test
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class Extract
+    public class ExtractTests
     {
         [Fact]
         public void ShouldFailWithUnknownCommand()

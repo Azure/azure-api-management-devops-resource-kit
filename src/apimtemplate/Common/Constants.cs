@@ -1,6 +1,6 @@
 using System;
 
-namespace APIManagement.Template
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     internal static class Constants
     {

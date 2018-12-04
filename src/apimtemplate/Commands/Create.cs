@@ -3,7 +3,7 @@ using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.HelpText;
 using Colors.Net;
 
-namespace APIManagement.Template
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class CreateCommand : CommandLineApplication
     {

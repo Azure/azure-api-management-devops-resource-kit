@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Colors.Net;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace APIManagement.Template
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class AppArgs
     {
