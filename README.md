@@ -32,6 +32,8 @@ Once the changes are merged successfully, then _API publishers_ can deploy them 
 
 With this approach, it is easy to migrate changes from one environment to another. Also, since different API development teams will be working on different sets of API templates and files, it also prevents them from colliding with each other.
 
+We have provided an [example](Example.md) on how to use this approach and deploy using the Azure CLI.
+
 We realize our customers bring a wide range of engineering cultures and existing automation solutions. The approach proposed here is not meant to be a one-size-fits-all solution. That's the reason we created this repository and open sourced everything, so that you can extend and custom the solution.
 
 If you have any questions or feedback, please raise issues in the repository or email us at apimgmt at microsoft dotcom. We also started an [FAQ page](./FAQ.md) to answer most common questions. 
