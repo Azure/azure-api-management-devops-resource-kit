@@ -144,7 +144,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             }
             else if (parameter.Examples != null)
             {
-                return JsonConvert.SerializeObject(parameter.Examples.First().Value);
+                return JsonConvert.SerializeObject(parameter.Examples.SingleOrDefault().Value);
             }
             else
             {

@@ -24,22 +24,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             CommandOption apiVersion = this.Option("--apiVersion <apiVersion>", "API version", CommandOptionType.SingleValue);
             CommandOption apiVersionSetId = this.Option("--apiVersionSetId <apiVersionSetId>", "API version set id", CommandOptionType.SingleValue);
             CommandOption productIds = this.Option("--productIds <productIds>", "Product ids to associate the API with", CommandOptionType.MultipleValue);
-
-            // convert command options to CLIArguments class
-            CLICreatorArguments cliArguments = new CLICreatorArguments()
-            {
-                openAPISpecFile = openAPISpecFile.Value(),
-                openAPISpecURL = openAPISpecURL.Value(),
-                outputLocation = outputLocation.Value(),
-                xmlPolicyFile = xmlPolicyFile.Value(),
-                xmlPolicyURL = xmlPolicyURL.Value(),
-                linked = linked.HasValue(),
-                path = path.Value(),
-                apiRevision = apiRevision.Value(),
-                apiVersion = apiVersion.Value(),
-                apiVersionSetId = apiVersionSetId.Value(),
-                productIds = productIds.Values
-            };
             
             this.HelpOption();
 
@@ -52,6 +36,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator();
                     TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
+
+                    // convert command options to CLIArguments class
+                    CLICreatorArguments cliArguments = new CLICreatorArguments()
+                    {
+                        openAPISpecFile = openAPISpecFile.Value(),
+                        openAPISpecURL = openAPISpecURL.Value(),
+                        outputLocation = outputLocation.Value(),
+                        xmlPolicyFile = xmlPolicyFile.Value(),
+                        xmlPolicyURL = xmlPolicyURL.Value(),
+                        linked = linked.HasValue(),
+                        path = path.Value(),
+                        apiRevision = apiRevision.Value(),
+                        apiVersion = apiVersion.Value(),
+                        apiVersionSetId = apiVersionSetId.Value(),
+                        productIds = productIds.Values
+                    };
 
                     // create OpenApiDocument
                     OpenApiDocument doc = new OpenApiDocument();
