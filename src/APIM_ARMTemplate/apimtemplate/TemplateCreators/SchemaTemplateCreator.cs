@@ -11,6 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             List<SchemaTemplate> schemaTemplates = new List<SchemaTemplate>();
             foreach (KeyValuePair<string, OpenApiSchema> definition in doc.Components.Schemas)
             {
+                // create a new schema template for each definition found in the spec
                 SchemaTemplate schema = new SchemaTemplate()
                 {
                     name = definition.Key,

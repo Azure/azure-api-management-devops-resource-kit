@@ -24,6 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public void WriteTagTemplatesToFile(List<TagTemplate> tagTemplates, string location)
         {
+            // give each tag template a unique file name using count
             int templateNumber = 0;
             foreach(TagTemplate tagTemplate in tagTemplates)
             {
@@ -33,6 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public void WriteTagDescriptionTemplatesToFile(List<TagDescriptionTemplate> tagDescriptionTemplates, string location)
         {
+            // give each tag description template a unique file name using count
             int templateNumber = 0;
             foreach (TagDescriptionTemplate tagDescriptionTemplate in tagDescriptionTemplates)
             {

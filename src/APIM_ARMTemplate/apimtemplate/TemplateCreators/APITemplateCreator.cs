@@ -93,6 +93,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 authorizationServerId = "",
                 scope = ""
             };
+            // iterate through different flows, set serverId and scope once auth flow is found
             if (scheme.Flows.Implicit != null)
             {
                 oAuth2.authorizationServerId = scheme.Flows.Implicit.AuthorizationUrl != null ? scheme.Flows.Implicit.AuthorizationUrl.ToString() : "";
@@ -118,6 +119,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public async Task<string> CreateOpenAPISpecContentsAsync(CLICreatorArguments cliArguments)
         {
+            // return contents of supplied Open API Spec file
             if (cliArguments.openAPISpecFile != null)
             {
                 return File.ReadAllText(cliArguments.openAPISpecFile);
@@ -144,6 +146,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public APITemplateSubscriptionKeyParameterNames CreateSubscriptionKeyParameterNames(OpenApiDocument doc)
         {
+            // subscription key parameter names are found in security requirements, organized by parameter location
             string header = "";
             string query = "";
             foreach (OpenApiSecurityRequirement requirement in doc.SecurityRequirements)
@@ -186,6 +189,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public string[] CreateProtocols(OpenApiDocument doc)
         {
+            // schemes from Open API spec are concatenated onto the host during OpenApiDocument conversion, each becoming a different Server object. Split the strings to pull the protocols
             List<string> protocols = new List<string>();
             foreach (OpenApiServer server in doc.Servers)
             {

@@ -10,6 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             List<TagTemplate> tagTemplates = new List<TagTemplate>();
             foreach (OpenApiTag tag in doc.Tags)
             {
+                // create a new tag template for each tag found in the spec
                 TagTemplate tagSchema = new TagTemplate()
                 {
                     name = tag.Name,
@@ -26,6 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             List<TagDescriptionTemplate> tagDescriptionTemplates = new List<TagDescriptionTemplate>();
             foreach (OpenApiTag tag in doc.Tags)
             {
+                // create a new tag description template for each tag found in the spec
                 TagDescriptionTemplate tagDescriptionSchema = new TagDescriptionTemplate()
                 {
                     name = tag.Name,

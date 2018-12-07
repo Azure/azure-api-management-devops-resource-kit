@@ -29,7 +29,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                             templateParameters = CreateTemplateParameters(operation.Value.Parameters).ToArray(),
                             responses = CreateOperationResponses(operation.Value.Responses).ToArray(),
                             request = CreateOperationRequest(operation.Value),
-
                             //unfinished
                             policies = null
                         }
@@ -46,7 +45,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             OperationTemplateRequest request = new OperationTemplateRequest()
             {
                 description = operation.RequestBody != null ? operation.RequestBody.Description : null,
+                // request parameters with parameter location query
                 queryParameters = CreateTemplateParameters(operation.Parameters.Where(p => p.In == ParameterLocation.Query).ToList()).ToArray(),
+                // request parameters with parameter location header
                 headers = CreateTemplateParameters(operation.Parameters.Where(p => p.In == ParameterLocation.Header).ToList()).ToArray(),
                 representations = operation.RequestBody != null ? CreateRepresentations(operation.RequestBody.Content).ToArray() : null
             };
@@ -74,6 +75,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             List<OperationTemplateRepresentation> representations = new List<OperationTemplateRepresentation>();
             foreach (KeyValuePair<string, OpenApiMediaType> pair in content)
             {
+                // use representation examples to create values and default value
                 OpenApiParameterHeaderIntersection param = new OpenApiParameterHeaderIntersection()
                 {
                     Example = pair.Value.Example,
@@ -123,6 +125,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             List<OperationTemplateParameter> headers = new List<OperationTemplateParameter>();
             foreach (KeyValuePair<string, OpenApiHeader> pair in headerPairs)
             {
+                // use header examples to create values and default value
                 OpenApiParameterHeaderIntersection param = new OpenApiParameterHeaderIntersection()
                 {
                     Example = pair.Value.Example,
@@ -147,6 +150,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             List<OperationTemplateParameter> templateParameters = new List<OperationTemplateParameter>();
             foreach (OpenApiParameter parameter in parameters)
             {
+                // use parameter examples to create values and default value
                 OpenApiParameterHeaderIntersection param = new OpenApiParameterHeaderIntersection()
                 {
                     Example = parameter.Example,
@@ -171,11 +175,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             List<string> values = new List<string>();
             if (parameter.Example != null)
             {
+                // add example property to values
                 values.Add(JsonConvert.SerializeObject(parameter.Example));
 
             }
             foreach (KeyValuePair<string, OpenApiExample> example in parameter.Examples)
             {
+                // add each example in examples list property to values
                 values.Add(JsonConvert.SerializeObject(example.Value));
             }
             return values;
@@ -185,11 +191,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             if (parameter.Example != null)
             {
+                // use example property for default value if given
                 return JsonConvert.SerializeObject(parameter.Example);
 
             }
             else if (parameter.Examples != null)
             {
+                // use first example in examples list property for default value if example property is not given
                 return JsonConvert.SerializeObject(parameter.Examples.SingleOrDefault().Value);
             }
             else
@@ -199,11 +207,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         }
     }
 
+    // used to create parameter values
     public class OpenApiParameterHeaderIntersection {
         public IOpenApiAny Example { get; set; }
         public IDictionary<string, OpenApiExample> Examples { get; set; }
     }
 
+    // used to give compiler known object structure in order to create form parameters
     public class OperationSchemaExample
     {
         public object Value { get; set; }

@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // list command options
             CommandOption openAPISpecFile = this.Option("--openAPISpecFile <openAPISpecFile>", "Open API spec file location", CommandOptionType.SingleValue);
             CommandOption openAPISpecURL = this.Option("--openAPISpecURL <openAPISpecURL>", "Open API spec remote url", CommandOptionType.SingleValue);
-            CommandOption outputLocation = this.Option("--outputLocation <outputLocation>", "Template output location", CommandOptionType.SingleValue);
+            CommandOption outputLocation = this.Option("--outputLocation <outputLocation>", "Template output location", CommandOptionType.SingleValue).IsRequired();
             CommandOption xmlPolicyFile = this.Option("--xmlPolicyFile <xmlPolicyFile>", "XML policy file location", CommandOptionType.SingleValue);
             CommandOption xmlPolicyURL = this.Option("--xmlPolicyURL <xmlPolicyURL>", "XML policy remote url", CommandOptionType.SingleValue);
             CommandOption linked = this.Option("--linked <linked>", "Creates linked templates versus inlined into a single file", CommandOptionType.SingleValue);
@@ -34,9 +34,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             this.OnExecute(async () =>
             {
+                // ensure required parameters have been passed in
                 if ((openAPISpecFile.HasValue() || openAPISpecURL.HasValue()) && outputLocation.HasValue())
                 {
-                    // required parameters have been passed in
                     // convert command options to CLIArguments class
                     CLICreatorArguments cliArguments = new CLICreatorArguments()
                     {
@@ -58,19 +58,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
                     if (apiVersionSet.HasValue() && AttemptAPIVersionSetConversion(cliArguments) != null)
                     {
-                        // unable to convert version set argument into object
+                        // unable to convert version set argument into object, would cause failure down the line
                         ColoredConsole.Error.WriteLine("Incorrect API Version Set object structure");
                         return 0;
                     }
                     else
                     {
+                        // required parameters have been supplied and versionSet has correct object structure
+                        
                         // initialize helper classes
                         OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
                         ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
                         APITemplateCreator apiTemplateCreator = new APITemplateCreator();
                         TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
 
-                        // create OpenApiDocument
+                        // create OpenApiDocument from Open API spec file
                         OpenApiDocument doc = new OpenApiDocument();
                         if (cliArguments.openAPISpecFile != null)
                         {
