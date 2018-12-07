@@ -27,16 +27,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                             description = operation.Value.Description,
                             displayName = operation.Value.Summary,
                             templateParameters = CreateTemplateParameters(operation.Value.Parameters).ToArray(),
-
-                            //unfinished
                             responses = CreateOperationResponses(operation.Value.Responses).ToArray(),
                             request = CreateOperationRequest(operation.Value),
+
+                            //unfinished
                             policies = null
                         }
                     };
                     operationTemplates.Add(op);
                 }
             }
+            
             return operationTemplates;
         }
 
@@ -47,9 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 description = operation.RequestBody != null ? operation.RequestBody.Description : null,
                 queryParameters = CreateTemplateParameters(operation.Parameters.Where(p => p.In == ParameterLocation.Query).ToList()).ToArray(),
                 headers = CreateTemplateParameters(operation.Parameters.Where(p => p.In == ParameterLocation.Header).ToList()).ToArray(),
-
-                //unfinished
-                representations = null
+                representations = operation.RequestBody != null ? CreateRepresentations(operation.RequestBody.Content).ToArray() : null
             };
             return request;
         }
@@ -64,12 +63,36 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     statusCode = response.Key,
                     description = response.Value.Description,
                     headers = CreateResponseHeaders(response.Value.Headers).ToArray(),
-
-                    //unfinished
-                    representations = null
+                    representations = CreateRepresentations(response.Value.Content).ToArray()
                 };
             }
             return responses;
+        }
+
+        public List<OperationTemplateRepresentation> CreateRepresentations(IDictionary<string, OpenApiMediaType> content)
+        {
+            List<OperationTemplateRepresentation> representations = new List<OperationTemplateRepresentation>();
+            foreach (KeyValuePair<string, OpenApiMediaType> pair in content)
+            {
+                OpenApiParameterHeaderIntersection param = new OpenApiParameterHeaderIntersection()
+                {
+                    Example = pair.Value.Example,
+                    Examples = pair.Value.Examples
+                };
+                OperationTemplateRepresentation representation = new OperationTemplateRepresentation()
+                {
+                    contentType = pair.Key,
+                    sample = JsonConvert.SerializeObject(CreateParameterDefaultValue(param)),
+                    // schema has not yet been created, id is null
+                    schemaId = null,
+                    typeName = pair.Value.Schema != null ? pair.Value.Schema.Type : null,
+                    // content type is neither application/x-www-form-urlencoded or multipart/form-data, form parameters are null
+                    formParameters = null
+                };
+                representations.Add(representation);
+            }
+            return representations;
+
         }
 
         public List<OperationTemplateParameter> CreateResponseHeaders(IDictionary<string, OpenApiHeader> headerPairs)
