@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.OpenApi.Models;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -30,13 +31,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     apiRevision = cliArguments.apiRevision ?? "",
                     apiVersionSetId = cliArguments.apiVersionSetId ?? "",
                     path = cliArguments.path ?? "",
+                    authenticationSettings = CreateAuthenticationSettings(doc),
                     // assumptions
                     type = "http",
                     apiType = "http",
                     wsdlSelector = null,
 
                     // unfinished
-                    authenticationSettings = CreateAuthenticationSettings(doc),
                     apiRevisionDescription = null,
                     apiVersionDescription = null,
                     apiVersionSet = null
@@ -58,31 +59,62 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public APITemplateAuthenticationSettings CreateAuthenticationSettings(OpenApiDocument doc)
         {
-            //unfinished
+            // initialize subscriptionKeyRequired with value from IsSubscriptionRequired
             APITemplateAuthenticationSettings authenticationSettings = new APITemplateAuthenticationSettings()
             {
-                subscriptionKeyRequired = false
+                subscriptionKeyRequired = IsSubscriptionRequired(doc)
             };
             foreach (OpenApiSecurityScheme securityScheme in doc.Components.SecuritySchemes.Values)
             {
                 if (securityScheme.Type == SecuritySchemeType.OAuth2)
                 {
-                    authenticationSettings.oAuth2 = new APITemplateOAuth2()
-                    {
-                        authorizationServerId = null,
-                        scope = null
-                    };
+                    authenticationSettings.oAuth2 = CreateOAuth2(securityScheme);
                 }
                 else if (securityScheme.Type == SecuritySchemeType.OpenIdConnect)
                 {
+                    // the bearer format property only appears in Open API specs for SecuritySchemeType.Http and will never appear for OpenIDConnect
                     authenticationSettings.openid = new APITemplateOpenID()
                     {
-                        openidProviderId = null,
+                        openidProviderId = securityScheme.OpenIdConnectUrl.ToString(),
                         bearerTokenSendingMethods = new string[] { }
                     };
                 }
+                else if (securityScheme.Type == SecuritySchemeType.ApiKey)
+                {
+                    authenticationSettings.subscriptionKeyRequired = true;
+                }
             };
             return authenticationSettings;
+        }
+
+        public APITemplateOAuth2 CreateOAuth2(OpenApiSecurityScheme scheme)
+        {
+            APITemplateOAuth2 oAuth2 = new APITemplateOAuth2()
+            {
+                authorizationServerId = "",
+                scope = ""
+            };
+            if (scheme.Flows.Implicit != null)
+            {
+                oAuth2.authorizationServerId = scheme.Flows.Implicit.AuthorizationUrl != null ? scheme.Flows.Implicit.AuthorizationUrl.ToString() : "";
+                oAuth2.scope = scheme.Flows.Implicit.Scopes != null && scheme.Flows.Implicit.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.Implicit.Scopes.Keys.FirstOrDefault() : "";
+            }
+            else if (scheme.Flows.AuthorizationCode != null)
+            {
+                oAuth2.authorizationServerId = scheme.Flows.AuthorizationCode.AuthorizationUrl != null ? scheme.Flows.AuthorizationCode.AuthorizationUrl.ToString() : "";
+                oAuth2.scope = scheme.Flows.AuthorizationCode.Scopes != null && scheme.Flows.AuthorizationCode.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.AuthorizationCode.Scopes.Keys.FirstOrDefault() : "";
+            }
+            else if (scheme.Flows.ClientCredentials != null)
+            {
+                oAuth2.authorizationServerId = scheme.Flows.ClientCredentials.AuthorizationUrl != null ? scheme.Flows.ClientCredentials.AuthorizationUrl.ToString() : "";
+                oAuth2.scope = scheme.Flows.ClientCredentials.Scopes != null && scheme.Flows.ClientCredentials.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.ClientCredentials.Scopes.Keys.FirstOrDefault() : "";
+            }
+            else if (scheme.Flows.Password != null)
+            {
+                oAuth2.authorizationServerId = scheme.Flows.Password.AuthorizationUrl != null ? scheme.Flows.Password.AuthorizationUrl.ToString() : "";
+                oAuth2.scope = scheme.Flows.Password.Scopes != null && scheme.Flows.Password.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.Password.Scopes.Keys.FirstOrDefault() : "";
+            }
+            return oAuth2;
         }
 
         public async Task<string> CreateOpenAPISpecContentsAsync(CLICreatorArguments cliArguments)
