@@ -86,13 +86,36 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // schema has not yet been created, id is null
                     schemaId = null,
                     typeName = pair.Value.Schema != null ? pair.Value.Schema.Type : null,
-                    // content type is neither application/x-www-form-urlencoded or multipart/form-data, form parameters are null
                     formParameters = null
+                };
+                // if content type is neither application/x-www-form-urlencoded or multipart/form-data form parameters are null
+                if (pair.Value.Schema != null && (pair.Key == "application/x-www-form-urlencoded" || pair.Key == "multipart/form-data"))
+                {
+                    representation.formParameters = CreateFormParameters(pair.Value.Schema).ToArray();
                 };
                 representations.Add(representation);
             }
             return representations;
 
+        }
+
+        public List<OperationTemplateParameter> CreateFormParameters(OpenApiSchema schema)
+        {
+            List<OperationTemplateParameter> formParameters = new List<OperationTemplateParameter>();
+            if(schema.Example != null)
+            {
+                foreach (KeyValuePair<string, OperationSchemaExample> pair in schema.Example as Dictionary<string, OperationSchemaExample>)
+                {
+                    OperationTemplateParameter formParameter = new OperationTemplateParameter()
+                    {
+                        name = pair.Key,
+                        required = schema.Required.FirstOrDefault(val => val == pair.Key) != null,
+                        defaultValue = (JsonConvert.SerializeObject(pair.Value.Value))
+                    };
+                    formParameters.Add(formParameter);
+                };
+            }
+            return formParameters;
         }
 
         public List<OperationTemplateParameter> CreateResponseHeaders(IDictionary<string, OpenApiHeader> headerPairs)
@@ -179,5 +202,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     public class OpenApiParameterHeaderIntersection {
         public IOpenApiAny Example { get; set; }
         public IDictionary<string, OpenApiExample> Examples { get; set; }
+    }
+
+    public class OperationSchemaExample
+    {
+        public object Value { get; set; }
     }
 }
