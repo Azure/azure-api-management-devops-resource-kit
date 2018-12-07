@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "apimtemplate": {
+      "commandName": "Project",
+      "commandLineArgs": "create --outputLocation=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\GeneratedTemplates\" --openAPISpecFile=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExampleSpecs\\tags.json\" --apiVersionSet=\"\"{\\\"id\\\":\\\"1\\\",\\\"description\\\":\\\"d\\\",\\\"versioningScheme\\\":\\\"s\\\",\\\"versionQueryName\\\":\\\"q\\\",\\\"versionHeaderName\\\":\\\"v\\\"}\"\""
+    }
+  }
+}

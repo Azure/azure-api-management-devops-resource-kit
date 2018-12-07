@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -31,16 +32,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     apiRevision = cliArguments.apiRevision ?? "",
                     apiVersionSetId = cliArguments.apiVersionSetId ?? "",
                     path = cliArguments.path ?? "",
+                    apiRevisionDescription = cliArguments.apiRevisionDescription ?? "",
+                    apiVersionDescription = cliArguments.apiVersionDescription ?? "",
+                    apiVersionSet = cliArguments.apiVersionSet != null ? JsonConvert.DeserializeObject<APITemplateVersionSet>(cliArguments.apiVersionSet) : null,
                     authenticationSettings = CreateAuthenticationSettings(doc),
                     // assumptions
                     type = "http",
                     apiType = "http",
-                    wsdlSelector = null,
-
-                    // unfinished
-                    apiRevisionDescription = null,
-                    apiVersionDescription = null,
-                    apiVersionSet = null
+                    wsdlSelector = null
                 }
             };
 
