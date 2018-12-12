@@ -40,6 +40,12 @@ We realize our customers bring a wide range of engineering cultures and existing
 
 If you have any questions or feedback, please raise issues in the repository or email us at apimgmt at microsoft dotcom. We also started an [FAQ page](./FAQ.md) to answer most common questions. 
 
+## License
+
+This project is licensed under [the MIT License](LICENSE)
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
