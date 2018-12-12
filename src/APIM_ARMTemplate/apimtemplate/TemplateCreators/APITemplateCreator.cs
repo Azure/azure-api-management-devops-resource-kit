@@ -12,6 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     {
         public async Task<APITemplate> CreateAPITemplateAsync(OpenApiDocument doc, CLICreatorArguments cliArguments)
         {
+            YAMLReader yamlReader = new YAMLReader();
             // create api schema with properties
             APITemplate apiSchema = new APITemplate()
             {
@@ -34,8 +35,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     path = cliArguments.path ?? "",
                     apiRevisionDescription = cliArguments.apiRevisionDescription ?? "",
                     apiVersionDescription = cliArguments.apiVersionDescription ?? "",
-                    apiVersionSet = cliArguments.apiVersionSet != null ? JsonConvert.DeserializeObject<APITemplateVersionSet>(cliArguments.apiVersionSet) : null,
-                    authenticationSettings = CreateAuthenticationSettings(doc),
+                    apiVersionSet = cliArguments.apiVersionSetFile != null ? yamlReader.ConvertYAMLFileToAPIVersionSet(cliArguments.apiVersionSetFile) : null,
+                    authenticationSettings = cliArguments.authenticationSettingsFile != null ? yamlReader.ConvertYAMLFileToAuthenticationSettings(cliArguments.authenticationSettingsFile) : null,
                     // assumptions
                     type = "http",
                     apiType = "http",
@@ -54,67 +55,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             apiSchema.resources = resources.ToArray();
 
             return apiSchema;
-        }
-
-        public APITemplateAuthenticationSettings CreateAuthenticationSettings(OpenApiDocument doc)
-        {
-            // initialize subscriptionKeyRequired with value from IsSubscriptionRequired
-            APITemplateAuthenticationSettings authenticationSettings = new APITemplateAuthenticationSettings()
-            {
-                subscriptionKeyRequired = IsSubscriptionRequired(doc)
-            };
-            foreach (OpenApiSecurityScheme securityScheme in doc.Components.SecuritySchemes.Values)
-            {
-                if (securityScheme.Type == SecuritySchemeType.OAuth2)
-                {
-                    authenticationSettings.oAuth2 = CreateOAuth2(securityScheme);
-                }
-                else if (securityScheme.Type == SecuritySchemeType.OpenIdConnect)
-                {
-                    // the bearer format property only appears in Open API specs for SecuritySchemeType.Http and will never appear for OpenIDConnect
-                    authenticationSettings.openid = new APITemplateOpenID()
-                    {
-                        openidProviderId = securityScheme.OpenIdConnectUrl.ToString(),
-                        bearerTokenSendingMethods = new string[] { }
-                    };
-                }
-                else if (securityScheme.Type == SecuritySchemeType.ApiKey)
-                {
-                    authenticationSettings.subscriptionKeyRequired = true;
-                }
-            };
-            return authenticationSettings;
-        }
-
-        public APITemplateOAuth2 CreateOAuth2(OpenApiSecurityScheme scheme)
-        {
-            APITemplateOAuth2 oAuth2 = new APITemplateOAuth2()
-            {
-                authorizationServerId = "",
-                scope = ""
-            };
-            // iterate through different flows, set serverId and scope once auth flow is found
-            if (scheme.Flows.Implicit != null)
-            {
-                oAuth2.authorizationServerId = scheme.Flows.Implicit.AuthorizationUrl != null ? scheme.Flows.Implicit.AuthorizationUrl.ToString() : "";
-                oAuth2.scope = scheme.Flows.Implicit.Scopes != null && scheme.Flows.Implicit.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.Implicit.Scopes.Keys.FirstOrDefault() : "";
-            }
-            else if (scheme.Flows.AuthorizationCode != null)
-            {
-                oAuth2.authorizationServerId = scheme.Flows.AuthorizationCode.AuthorizationUrl != null ? scheme.Flows.AuthorizationCode.AuthorizationUrl.ToString() : "";
-                oAuth2.scope = scheme.Flows.AuthorizationCode.Scopes != null && scheme.Flows.AuthorizationCode.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.AuthorizationCode.Scopes.Keys.FirstOrDefault() : "";
-            }
-            else if (scheme.Flows.ClientCredentials != null)
-            {
-                oAuth2.authorizationServerId = scheme.Flows.ClientCredentials.AuthorizationUrl != null ? scheme.Flows.ClientCredentials.AuthorizationUrl.ToString() : "";
-                oAuth2.scope = scheme.Flows.ClientCredentials.Scopes != null && scheme.Flows.ClientCredentials.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.ClientCredentials.Scopes.Keys.FirstOrDefault() : "";
-            }
-            else if (scheme.Flows.Password != null)
-            {
-                oAuth2.authorizationServerId = scheme.Flows.Password.AuthorizationUrl != null ? scheme.Flows.Password.AuthorizationUrl.ToString() : "";
-                oAuth2.scope = scheme.Flows.Password.Scopes != null && scheme.Flows.Password.Scopes.Keys.FirstOrDefault() != null ? oAuth2.scope = scheme.Flows.Password.Scopes.Keys.FirstOrDefault() : "";
-            }
-            return oAuth2;
         }
 
         public async Task<string> CreateOpenAPISpecContentsAsync(CLICreatorArguments cliArguments)

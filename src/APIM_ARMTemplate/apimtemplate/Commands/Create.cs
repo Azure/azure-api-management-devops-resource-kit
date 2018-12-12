@@ -26,7 +26,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             CommandOption apiRevisionDescription = this.Option("--apiRevisionDescription <apiVersionSetId>", "Description of the API revision", CommandOptionType.SingleValue);
             CommandOption apiVersion = this.Option("--apiVersion <apiVersion>", "API version", CommandOptionType.SingleValue);
             CommandOption apiVersionDescription = this.Option("--apiVersionDescription <apiVersionSetId>", "Description of the API version", CommandOptionType.SingleValue);
-            CommandOption apiVersionSet = this.Option("--apiVersionSet <apiVersionSetId>", "Serialized JSON object that follows the ApiVersionSetContractDetails object schema - https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis#ApiVersionSetContractDetails", CommandOptionType.SingleValue);
+            CommandOption apiVersionSetFile = this.Option("--apiVersionSetFile <apiVersionSetId>", "YAML file with object that follows the ApiVersionSetContractDetails object schema - https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis#ApiVersionSetContractDetails", CommandOptionType.SingleValue);
+            CommandOption authenticationSettingsFile = this.Option("--authenticationSettingsFile <apiVersionSetId>", "YAML file with object that follows the AuthenticationSettingsContract object schema - https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis#AuthenticationSettingsContract", CommandOptionType.SingleValue);
             CommandOption apiVersionSetId = this.Option("--apiVersionSetId <apiVersionSetId>", "API version set id", CommandOptionType.SingleValue);
             CommandOption productIds = this.Option("--productIds <productIds>", "Product ids to associate the API with", CommandOptionType.MultipleValue);
 
@@ -51,21 +52,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                         apiRevisionDescription = apiRevisionDescription.Value(),
                         apiVersion = apiVersion.Value(),
                         apiVersionDescription = apiVersionDescription.Value(),
-                        apiVersionSet = apiVersionSet.Value(),
+                        apiVersionSetFile = apiVersionSetFile.Value(),
                         apiVersionSetId = apiVersionSetId.Value(),
+                        authenticationSettingsFile = authenticationSettingsFile.Value(),
                         productIds = productIds.Values
                     };
 
-                    if (apiVersionSet.HasValue() && AttemptAPIVersionSetConversion(cliArguments) != null)
+                    if (apiVersionSetFile.HasValue() && AttemptAPIVersionSetConversion(cliArguments) != null)
                     {
                         // unable to convert version set argument into object, would cause failure down the line
-                        ColoredConsole.Error.WriteLine("Incorrect API Version Set object structure");
+                        ColoredConsole.Error.WriteLine("Incorrect apiVersionSet object structure");
+                        return 0;
+                    }
+                    else if (authenticationSettingsFile.HasValue() && AttemptAuthenticationSettingsConversion(cliArguments) != null)
+                    {
+                        // unable to convert version set argument into object, would cause failure down the line
+                        ColoredConsole.Error.WriteLine("Incorrect authenticationSettings object structure");
                         return 0;
                     }
                     else
                     {
                         // required parameters have been supplied and versionSet has correct object structure
-                        
+
                         // initialize helper classes
                         OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
                         ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
@@ -111,7 +119,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             try
             {
-                JsonConvert.DeserializeObject<APITemplateVersionSet>(cliArguments.apiVersionSet);
+                YAMLReader yamlReader = new YAMLReader();
+                APITemplateVersionSet versionSet = yamlReader.ConvertYAMLFileToAPIVersionSet(cliArguments.apiVersionSetFile);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+        }
+
+        public Exception AttemptAuthenticationSettingsConversion(CLICreatorArguments cliArguments)
+        {
+            try
+            {
+                YAMLReader yamlReader = new YAMLReader();
+                APITemplateAuthenticationSettings authenticationSettings = yamlReader.ConvertYAMLFileToAuthenticationSettings(cliArguments.authenticationSettingsFile);
                 return null;
             }
             catch (Exception ex)

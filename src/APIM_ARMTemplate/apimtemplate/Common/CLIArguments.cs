@@ -15,10 +15,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string path { get; set; }
         public string apiVersion { get; set; }
         public string apiVersionDescription { get; set; }
-        public string apiVersionSet { get; set; }
+        public string apiVersionSetFile { get; set; }
         public string apiVersionSetId { get; set; }
         public string apiRevision { get; set; }
         public string apiRevisionDescription { get; set; }
+        public string authenticationSettingsFile { get; set; }
         public List<string> productIds { get; set; }
     }
 }

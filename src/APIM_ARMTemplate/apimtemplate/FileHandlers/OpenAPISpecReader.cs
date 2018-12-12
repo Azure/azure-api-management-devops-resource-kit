@@ -17,9 +17,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             return doc;
         }
 
-        public OpenApiDocument ConvertLocalFileToOpenAPISpec(string jsonFile)
+        public OpenApiDocument ConvertLocalFileToOpenAPISpec(string jsonFileLocation)
         {
-            JObject jObject = JObject.Parse(File.ReadAllText(jsonFile));
+            JObject jObject = JObject.Parse(File.ReadAllText(jsonFileLocation));
             string json = JsonConvert.SerializeObject(jObject);
             OpenApiDocument document = ConvertToOpenAPISpec(json);
             return document;
