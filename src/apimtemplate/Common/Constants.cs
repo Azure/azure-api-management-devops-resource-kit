@@ -11,6 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public const string CreateDescription = "Create an API Management instance from files";
         public const string ExtractName = "extract";
         public const string ExtractDescription = "Extract an existing API Management instance";
-        
+
+        public const string azParameters = "account get-access-token --query \"accessToken\" --output json";
     }
 }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "apimtemplate": {
+      "commandName": "Project",
+      "commandLineArgs": "extract --name apim-extractor"
+    }
+  }
+}
