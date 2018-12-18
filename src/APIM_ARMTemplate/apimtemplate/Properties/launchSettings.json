@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "create --outputLocation=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\GeneratedTemplates\" --openAPISpecFile=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExampleInputs\\openAPISpecs\\tags.json\" --apiVersionSetFile=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExampleInputs\\apiVersionSets\\valid.yml\""
+      "commandLineArgs": "create --outputLocation=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\GeneratedTemplates\" --openAPISpecFile=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExampleInputs\\openAPISpecs\\tags.json\" --apiVersionSetFile=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExampleInputs\\apiVersionSets\\valid.yml\" --authenticationSettingsFile=\"C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExampleInputs\\authenticationSettings\\valid.yml\""
     }
   }
 }

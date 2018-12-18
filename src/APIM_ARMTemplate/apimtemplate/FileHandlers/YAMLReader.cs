@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Readers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -93,6 +94,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 }
             }
             return apiVersionSet;
+        }
+
+        public Exception AttemptAPIVersionSetConversion(CLICreatorArguments cliArguments)
+        {
+            try
+            {
+                APITemplateVersionSet versionSet = ConvertYAMLFileToAPIVersionSet(cliArguments.apiVersionSetFile);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+        }
+
+        public Exception AttemptAuthenticationSettingsConversion(CLICreatorArguments cliArguments)
+        {
+            try
+            {
+                APITemplateAuthenticationSettings authenticationSettings = ConvertYAMLFileToAuthenticationSettings(cliArguments.authenticationSettingsFile);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
         }
     }
 }

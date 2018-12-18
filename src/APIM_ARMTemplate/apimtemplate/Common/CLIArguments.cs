@@ -20,6 +20,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string apiRevision { get; set; }
         public string apiRevisionDescription { get; set; }
         public string authenticationSettingsFile { get; set; }
-        public List<string> productIds { get; set; }
     }
 }

@@ -21,25 +21,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             WriteJSONToFile(JObject.FromObject(template), String.Concat(location, @"\APITemplate.json"));
         }
-
-        public void WriteTagTemplatesToFile(List<TagTemplate> tagTemplates, string location)
-        {
-            // give each tag template a unique file name using count
-            int templateNumber = 0;
-            foreach(TagTemplate tagTemplate in tagTemplates)
-            {
-                WriteJSONToFile(JObject.FromObject(tagTemplate), String.Concat(location, $@"\TagTemplate{++templateNumber}.json"));
-            }
-        }
-
-        public void WriteTagDescriptionTemplatesToFile(List<TagDescriptionTemplate> tagDescriptionTemplates, string location)
-        {
-            // give each tag description template a unique file name using count
-            int templateNumber = 0;
-            foreach (TagDescriptionTemplate tagDescriptionTemplate in tagDescriptionTemplates)
-            {
-                WriteJSONToFile(JObject.FromObject(tagDescriptionTemplate), String.Concat(location, $@"\TagDescriptionTemplate{++templateNumber}.json"));
-            }
-        }
     }
 }
