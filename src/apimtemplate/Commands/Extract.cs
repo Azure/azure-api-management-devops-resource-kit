@@ -30,8 +30,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 {
                     Console.WriteLine($"Create command executed with name {apimname.Value()}");
 
-                    string requestUrl = string.Concat("https://management.azure.com/providers/Microsoft.ApiManagement/operations?api-version=2018-06-01-preview");//, "/groups", "?api-version=", "2018-06-01-preview");
-
+                    string requestUrl = "https://management.azure.com/subscriptions/cabe3525-a754-4bf7-9af4-1a9746604527/resourceGroups/apim-extractor/providers/Microsoft.ApiManagement/service/apim-extractor/apis/odaibert-logicapp/products?api-version=2018-06-01-preview";
+                                          
                     using (HttpClient httpClient = new HttpClient())
                     {
                         var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
