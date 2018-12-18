@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class ExtractCommand : CommandLineApplication
@@ -58,4 +57,3 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         }
     }
 }
- 
