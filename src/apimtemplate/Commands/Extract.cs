@@ -1,8 +1,6 @@
 using System;
 using McMaster.Extensions.CommandLineUtils;
 using Colors.Net;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
