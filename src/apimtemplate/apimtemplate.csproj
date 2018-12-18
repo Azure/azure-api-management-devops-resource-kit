@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="microsoft.gpg" />
+    <None Remove="packages-microsoft-prod.deb" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Colors.Net" Version="1.1.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />
     <PackageReference Include="Microsoft.Azure.Management.ApiManagement" Version="4.0.6-preview" />
