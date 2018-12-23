@@ -5,10 +5,10 @@
         "ApimServiceName": {
             "type": "string"
         },
-        "ApplicationInsightsInstanceName": {
+        "ApplicationInsightsLocation": {
             "type": "string"
         },
-        "ApplicationInsightsInstrumentationKey": {
+        "ApplicationInsightsInstanceName": {
             "type": "string"
         },
         "SamplingRate": {
@@ -18,6 +18,17 @@
     "variables": {},
     "resources": [
         {
+            "name": "[parameters('ApplicationInsightsInstanceName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2015-05-01",
+            "location": "[parameters('ApplicationInsightsLocation')]",
+            "tags": {},
+            "kind": "other",
+            "properties": {
+              "Application_Type": "other"
+            }
+        },
+        {
             "type": "Microsoft.ApiManagement/service/loggers",
             "name": "[concat(parameters('ApimServiceName'), '/', parameters('ApplicationInsightsInstanceName'))]",
             "apiVersion": "2018-06-01-preview",
@@ -25,7 +36,7 @@
               "loggerType": "applicationInsights",
               "description": "Logger resources to APIM",
               "credentials": {
-                  "instrumentationKey": "[parameters('ApplicationInsightsInstrumentationKey')]"
+                  "instrumentationKey": "[reference(resourceId('Microsoft.Insights/components', parameters('ApplicationInsightsInstanceName')), '2015-05-01').InstrumentationKey]"
               }
             }
         },
