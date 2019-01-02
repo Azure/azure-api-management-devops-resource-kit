@@ -17,52 +17,45 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             this.OnExecute(async () =>
             {
-                if (configFile.HasValue())
+                // convert config file to CreatorConfig class
+                YAMLReader yamlReader = new YAMLReader();
+                CreatorConfig creatorConfig = yamlReader.ConvertConfigYAMLToCreatorConfig(configFile.Value());
+
+                // ensure required parameters have been passed in
+                if (creatorConfig.outputLocation == null)
                 {
-                    // convert config file to CreatorConfig class
-                    YAMLReader yamlReader = new YAMLReader();
-                    CreatorConfig creatorConfig = yamlReader.ConvertConfigYAMLToCreatorConfig(configFile.Value());
-
-                    // ensure required parameters have been passed in
-                    if (creatorConfig.outputLocation == null)
-                    {
-                        ColoredConsole.Error.WriteLine("Output location is required");
-                    }
-                    else if (creatorConfig.version == null)
-                    {
-                        ColoredConsole.Error.WriteLine("Version is required");
-                    }
-                    else if (creatorConfig.api == null)
-                    {
-                        ColoredConsole.Error.WriteLine("API configuration is required");
-                    }
-                    else if (creatorConfig.api.openApiSpec == null)
-                    {
-                        ColoredConsole.Error.WriteLine("Open API Spec is required");
-                    }
-                    else if (creatorConfig.api.suffix == null)
-                    {
-                        ColoredConsole.Error.WriteLine("API suffix is required");
-                    }
-                    else
-                    {
-                        // required parameters have been supplied
-
-                        // initialize helper classes
-                        APITemplateCreator apiTemplateCreator = new APITemplateCreator();
-                        ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
-
-                        // create templates from provided configuration
-                        APITemplate apiTemplate = await apiTemplateCreator.CreateAPITemplateAsync(creatorConfig);
-
-                        // write templates to outputLocation
-                        armTemplateWriter.WriteAPITemplateToFile(apiTemplate, creatorConfig.outputLocation);
-                        ColoredConsole.WriteLine("Templates written to output location");
-                    }
+                    throw new CommandParsingException(this, "Output location is required");
+                }
+                else if (creatorConfig.version == null)
+                {
+                    throw new CommandParsingException(this, "Version is required");
+                }
+                else if (creatorConfig.api == null)
+                {
+                    throw new CommandParsingException(this, "API configuration is required");
+                }
+                else if (creatorConfig.api.openApiSpec == null)
+                {
+                    throw new CommandParsingException(this, "Open API Spec is required");
+                }
+                else if (creatorConfig.api.suffix == null)
+                {
+                    throw new CommandParsingException(this, "API suffix is required");
                 }
                 else
                 {
-                    ColoredConsole.Error.WriteLine("Config file is required");
+                    // required parameters have been supplied
+
+                    // initialize helper classes
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator();
+                    ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
+
+                    // create templates from provided configuration
+                    APITemplate apiTemplate = await apiTemplateCreator.CreateAPITemplateAsync(creatorConfig);
+
+                    // write templates to outputLocation
+                    armTemplateWriter.WriteAPITemplateToFile(apiTemplate, creatorConfig.outputLocation);
+                    ColoredConsole.WriteLine("Templates written to output location");
                 }
                 return 0;
             });

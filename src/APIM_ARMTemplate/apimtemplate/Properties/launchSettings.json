@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "create --configFile=C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExampleInputs\\configs\\configs.yml"
+      "commandLineArgs": "create --configFile .\\Creator\\Configurations\\Examples\\valid.yml"
     }
   }
 }
