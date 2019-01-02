@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Collections.Generic;
-using Microsoft.OpenApi.Models;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class APITemplateCreator
     {
-        public async Task<APITemplate> CreateAPITemplateAsync(OpenApiDocument doc, CLICreatorArguments cliArguments)
+        public async Task<APITemplate> CreateAPITemplateAsync(CreatorConfig creatorConfig)
         {
             YAMLReader yamlReader = new YAMLReader();
             // create api schema with properties
@@ -21,46 +20,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
-                    contentValue = await CreateOpenAPISpecContentsAsync(cliArguments),
+                    contentValue = await yamlReader.RetrieveLocationContents(creatorConfig.api.openApiSpec),
                     // supplied via optional arguments
-                    apiVersion = cliArguments.apiVersion ?? "",
-                    apiRevision = cliArguments.apiRevision ?? "",
-                    apiVersionSetId = cliArguments.apiVersionSetId ?? "",
-                    path = cliArguments.path ?? "",
-                    apiRevisionDescription = cliArguments.apiRevisionDescription ?? "",
-                    apiVersionDescription = cliArguments.apiVersionDescription ?? "",
-                    apiVersionSet = cliArguments.apiVersionSetFile != null ? yamlReader.ConvertYAMLFileToAPIVersionSet(cliArguments.apiVersionSetFile) : null,
-                    authenticationSettings = cliArguments.authenticationSettingsFile != null ? yamlReader.ConvertYAMLFileToAuthenticationSettings(cliArguments.authenticationSettingsFile) : null
+                    apiVersion = creatorConfig.api.apiVersion ?? "",
+                    apiRevision = creatorConfig.api.revision ?? "",
+                    apiVersionSetId = creatorConfig.api.versionSetId ?? "",
+                    path = creatorConfig.api.suffix ?? "",
+                    apiRevisionDescription = creatorConfig.api.revisionDescription ?? "",
+                    apiVersionDescription = creatorConfig.api.apiVersionDescription ?? "",
+                    apiVersionSet = creatorConfig.apiVersionSet ?? null,
+                    authenticationSettings = creatorConfig.api.authenticationSettings ?? null
                 }
             };
             return apiSchema;
-        }
-
-        public async Task<string> CreateOpenAPISpecContentsAsync(CLICreatorArguments cliArguments)
-        {
-            // return contents of supplied Open API Spec file
-            if (cliArguments.openAPISpecFile != null)
-            {
-                return File.ReadAllText(cliArguments.openAPISpecFile);
-            }
-            else if (cliArguments.openAPISpecURL != null)
-            {
-                HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync(cliArguments.openAPISpecURL);
-                if (response.IsSuccessStatusCode)
-                {
-                    string json = await response.Content.ReadAsStringAsync();
-                    return json;
-                }
-                else
-                {
-                    return "";
-                }
-            }
-            else
-            {
-                return "";
-            }
         }
     }
 }
