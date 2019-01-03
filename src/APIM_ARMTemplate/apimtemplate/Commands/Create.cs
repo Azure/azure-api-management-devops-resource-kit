@@ -19,8 +19,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             this.OnExecute(async () =>
             {
                 // convert config file to CreatorConfig class
-                YAMLReader yamlReader = new YAMLReader();
-                CreatorConfig creatorConfig = yamlReader.ConvertConfigYAMLToCreatorConfig(configFile.Value());
+                FileReader fileReader = new FileReader();
+                CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
 
                 // ensure required parameters have been passed in
                 if (creatorConfig.outputLocation == null)
@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // create templates from provided configuration
                     APIVersionSetTemplate apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     APITemplate initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
-                    APITemplate subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplateAsync(creatorConfig);
+                    APITemplate subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
 
                     // write templates to outputLocation
                     if (apiVersionSetTemplate != null) {

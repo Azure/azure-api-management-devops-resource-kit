@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     {
         public async Task<APITemplate> CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
         {
-            YAMLReader yamlReader = new YAMLReader();
+            FileReader fileReader = new FileReader();
             // create api schema with properties
             APITemplate apiSchema = new APITemplate()
             {
@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
-                    contentValue = await yamlReader.RetrieveLocationContents(creatorConfig.api.openApiSpec),
+                    contentValue = await fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec),
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix ?? ""
                 }
@@ -28,9 +28,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             return apiSchema;
         }
 
-        public APITemplate CreateSubsequentAPITemplateAsync(CreatorConfig creatorConfig)
+        public APITemplate CreateSubsequentAPITemplate(CreatorConfig creatorConfig)
         {
-            YAMLReader yamlReader = new YAMLReader();
             // create api schema with properties
             APITemplate apiSchema = new APITemplate()
             {
