@@ -1,6 +1,7 @@
 using McMaster.Extensions.CommandLineUtils;
 using Colors.Net;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -50,19 +51,35 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // initialize helper classes
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator();
+                    PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator();
                     ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
 
                     // create templates from provided configuration
                     APIVersionSetTemplate apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     APITemplate initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
                     APITemplate subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
+                    PolicyTemplate apiPolicyTemplate = creatorConfig.api.policy != null ? await policyTemplateCreator.CreateAPIPolicyAsync(creatorConfig) : null;
+                    List<PolicyTemplate> operationPolicyTemplates = await policyTemplateCreator.CreateOperationPolicies(creatorConfig);
 
                     // write templates to outputLocation
-                    if (apiVersionSetTemplate != null) {
+                    if (apiVersionSetTemplate != null)
+                    {
                         armTemplateWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, @"\APIVersionSetTemplate.json"));
                     }
                     armTemplateWriter.WriteJSONToFile(initialAPITemplate, String.Concat(creatorConfig.outputLocation, @"\InitialAPITemplate.json"));
                     armTemplateWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, @"\SubsequentAPITemplate.json"));
+                    if (apiPolicyTemplate != null)
+                    {
+                        armTemplateWriter.WriteJSONToFile(apiPolicyTemplate, String.Concat(creatorConfig.outputLocation, @"\APIPolicyTemplate.json"));
+                    }
+                    if (operationPolicyTemplates.Count > 0)
+                    {
+                        int count = 0;
+                        foreach (PolicyTemplate operationPolicyTemplate in operationPolicyTemplates)
+                        {
+                            armTemplateWriter.WriteJSONToFile(apiPolicyTemplate, String.Concat(creatorConfig.outputLocation, $@"\OperationPolicyTemplate-{++count}.json"));
+                        }
+                    }
                     ColoredConsole.WriteLine("Templates written to output location");
                 }
                 return 0;

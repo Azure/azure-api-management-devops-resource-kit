@@ -8,7 +8,7 @@ apiVersionSet:
     versionHeaderName: versionHeader
 api:
   openApiSpec: https://serverlessohmanagementapi.trafficmanager.net/api/definition
-  policy: conf-api-policy.xml
+  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\ExampleInputs\policies\apipolicy.xml
   suffix: conf
   versionSetId: 1b3dee
   apiVersion: v2
@@ -17,9 +17,9 @@ api:
   revisionDescription: rDesc
   operations:
     getSessions: 
-      policy: conf-api-get-sessions-policy.xml
+      policy: https://lucasyamlblob.blob.core.windows.net/yaml/apipolicy.xml
     postSessions: 
-      policy: https://contoso.com/conf-api-post-sessions-policy.xml
+      policy: https://lucasyamlblob.blob.core.windows.net/yaml/apipolicy.xml
   authenticationSettings:
     subscriptionKeyRequired: false
     oAuth2:

@@ -75,7 +75,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 }
                 else
                 {
-                    return "";
+                    throw new Exception($"Unable to retrieve contents from ${fileLocation}");
                 }
             };
         }

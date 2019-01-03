@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     {
         public APIVersionSetTemplate CreateAPIVersionSetTemplate(CreatorConfig creatorConfig)
         {
-            // create api schema with properties
+            // create apiVersionSet schema with properties
             APIVersionSetTemplate apiVersionSetTemplate = new APIVersionSetTemplate()
             {
                 type = "Microsoft.ApiManagement/service/api-version-sets",
