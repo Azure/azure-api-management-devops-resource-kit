@@ -47,13 +47,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // required parameters have been supplied
 
                     // initialize helper classes
+                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator();
                     ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
 
                     // create templates from provided configuration
+                    APIVersionSetTemplate apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     APITemplate apiTemplate = await apiTemplateCreator.CreateAPITemplateAsync(creatorConfig);
 
                     // write templates to outputLocation
+                    armTemplateWriter.WriteAPIVersionSetTemplateToFile(apiVersionSetTemplate, creatorConfig.outputLocation);
                     armTemplateWriter.WriteAPITemplateToFile(apiTemplate, creatorConfig.outputLocation);
                     ColoredConsole.WriteLine("Templates written to output location");
                 }

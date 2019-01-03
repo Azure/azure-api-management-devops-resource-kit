@@ -21,5 +21,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             WriteJSONToFile(JObject.FromObject(template), String.Concat(location, @"\APITemplate.json"));
         }
+
+        public void WriteAPIVersionSetTemplateToFile(APIVersionSetTemplate template, string location)
+        {
+            WriteJSONToFile(JObject.FromObject(template), String.Concat(location, @"\APIVersionSetTemplate.json"));
+        }
     }
 }

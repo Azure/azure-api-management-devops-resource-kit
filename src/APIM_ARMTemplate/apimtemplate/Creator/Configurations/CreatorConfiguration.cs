@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     public class CreatorConfig
     {
         public string version { get; set; }
-        public APITemplateVersionSet apiVersionSet { get; set; }
+        public APIVersionSetConfig apiVersionSet { get; set; }
         public APIConfig api { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
@@ -33,6 +33,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public Dictionary<string, OperationsConfig> operations { get; set; }
         public APITemplateAuthenticationSettings authenticationSettings { get; set; }
         public string products { get; set; }
+    }
+
+    public class APIVersionSetConfig : APIVersionSetProperties
+    {
+        public string id { get; set; }
     }
 
     public class OperationsConfig

@@ -28,7 +28,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     path = creatorConfig.api.suffix ?? "",
                     apiRevisionDescription = creatorConfig.api.revisionDescription ?? "",
                     apiVersionDescription = creatorConfig.api.apiVersionDescription ?? "",
-                    apiVersionSet = creatorConfig.apiVersionSet ?? null,
+                    apiVersionSet = creatorConfig.apiVersionSet != null ? new APITemplateVersionSet()
+                    {
+                        id = creatorConfig.apiVersionSet.id,
+                        description = creatorConfig.apiVersionSet.description,
+                        versionHeaderName = creatorConfig.apiVersionSet.versionHeaderName,
+                        versionQueryName = creatorConfig.apiVersionSet.versionQueryName,
+                        versioningScheme = creatorConfig.apiVersionSet.versioningScheme
+                    } : null,
                     authenticationSettings = creatorConfig.api.authenticationSettings ?? null
                 }
             };
