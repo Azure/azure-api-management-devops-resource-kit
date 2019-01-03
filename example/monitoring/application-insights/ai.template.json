@@ -77,6 +77,5 @@
                 "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), parameters('ApplicationInsightsInstanceName'))]"
             ]
         }
-
     ]
 }
