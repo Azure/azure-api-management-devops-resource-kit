@@ -1,0 +1,28 @@
+version: 0.0.1
+apiVersionSet:
+    id: 1b3dee
+    description: a description
+    versioningScheme: Query
+    versionQueryName: versionQuery
+    versionHeaderName: versionHeader
+api:
+  policy: conf-api-policy.xml
+  suffix: conf
+  versionSetId: 1b3dee
+  apiVersion: v2
+  apiVersionDescription: vDesc
+  revision: 2
+  revisionDescription: rDesc
+  operations:
+    getSessions: 
+      policy: conf-api-get-sessions-policy.xml
+    postSessions: 
+      policy: https://contoso.com/conf-api-post-sessions-policy.xml
+  authenticationSettings:
+    subscriptionKeyRequired: false
+    oAuth2:
+        authorizationServerId: serverId
+        scope: scope
+  products: starter, plantinum
+outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
+linked: true

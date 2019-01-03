@@ -1,0 +1,9 @@
+version: 0.0.1
+apiVersionSet:
+    id: 1b3dee
+    description: a description
+    versioningScheme: Query
+    versionQueryName: versionQuery
+    versionHeaderName: versionHeader
+outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
+linked: true

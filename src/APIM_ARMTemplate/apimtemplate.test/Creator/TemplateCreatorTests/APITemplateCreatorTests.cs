@@ -1,6 +1,6 @@
-﻿using System;
+﻿using System.IO;
 using Xunit;
-using McMaster.Extensions.CommandLineUtils;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
