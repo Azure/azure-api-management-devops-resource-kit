@@ -1,5 +1,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using Colors.Net;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -53,11 +54,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
                     // create templates from provided configuration
                     APIVersionSetTemplate apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
-                    APITemplate apiTemplate = await apiTemplateCreator.CreateAPITemplateAsync(creatorConfig);
+                    APITemplate initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
+                    APITemplate subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplateAsync(creatorConfig);
 
                     // write templates to outputLocation
-                    armTemplateWriter.WriteAPIVersionSetTemplateToFile(apiVersionSetTemplate, creatorConfig.outputLocation);
-                    armTemplateWriter.WriteAPITemplateToFile(apiTemplate, creatorConfig.outputLocation);
+                    if (apiVersionSetTemplate != null) {
+                        armTemplateWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, @"\APIVersionSetTemplate.json"));
+                    }
+                    armTemplateWriter.WriteJSONToFile(initialAPITemplate, String.Concat(creatorConfig.outputLocation, @"\InitialAPITemplate.json"));
+                    armTemplateWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, @"\SubsequentAPITemplate.json"));
                     ColoredConsole.WriteLine("Templates written to output location");
                 }
                 return 0;

@@ -8,23 +8,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class ARMTemplateWriter
     {
-        public void WriteJSONToFile(JObject json, string location)
+        public void WriteJSONToFile(object template, string location)
         {
+            JObject json = JObject.FromObject(template);
             using (StreamWriter file = File.CreateText(location))
             using (JsonTextWriter writer = new JsonTextWriter(file))
             {
                 json.WriteTo(writer);
             }
-        }
-
-        public void WriteAPITemplateToFile(APITemplate template, string location)
-        {
-            WriteJSONToFile(JObject.FromObject(template), String.Concat(location, @"\APITemplate.json"));
-        }
-
-        public void WriteAPIVersionSetTemplateToFile(APIVersionSetTemplate template, string location)
-        {
-            WriteJSONToFile(JObject.FromObject(template), String.Concat(location, @"\APIVersionSetTemplate.json"));
         }
     }
 }
