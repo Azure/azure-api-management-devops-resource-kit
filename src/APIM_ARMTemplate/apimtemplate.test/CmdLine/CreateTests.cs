@@ -1,6 +1,7 @@
 using System;
 using Xunit;
 using McMaster.Extensions.CommandLineUtils;
+using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -11,7 +12,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public CreateTests()
         {
-            this.configExamplesFolder = @"..\..\..\..\apimtemplate\Creator\Configurations\Examples\";
+            this.configExamplesFolder = String.Concat("..", Path.DirectorySeparatorChar,
+                   "..", Path.DirectorySeparatorChar,
+                   "..", Path.DirectorySeparatorChar,
+                   "..", Path.DirectorySeparatorChar,
+                   "apimtemplate", Path.DirectorySeparatorChar,
+                   "Creator", Path.DirectorySeparatorChar,
+                   "Configurations", Path.DirectorySeparatorChar,
+                   "Examples", Path.DirectorySeparatorChar);
         }
 
         [Fact]
