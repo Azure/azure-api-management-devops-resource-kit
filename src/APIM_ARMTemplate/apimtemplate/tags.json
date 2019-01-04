@@ -1,0 +1,241 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "An API used to manage batches of data sent to Storage Accounts, Event Hubs, and Ratings Functions for Challenges 6, 7, and 8.",
+    "version": "1.0.1",
+    "title": "Serverless OpenHack Data Generation API"
+  },
+  "host": "serverlessohmanagementapi.trafficmanager.net",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "Challenge 6",
+      "description": "Endpoints used for OpenHack Challenge 6"
+    },
+    {
+      "name": "Challenge 7",
+      "description": "Endpoints used for OpenHack Challenge 7"
+    },
+    {
+      "name": "Challenge 8",
+      "description": "Endpoints used for OpenHack Challenge 8"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/team/registerStorageAccount": {
+      "post": {
+        "tags": [
+          "Challenge 6"
+        ],
+        "summary": "Receive batches of files in a Storage Account",
+        "description": "Registers a team to begin receiving batches of files in the supplied Storage Account. Warning: Updating the endpoint will overwrite existing endpoint registrations for your table.",
+        "operationId": "register",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "challengeSixRegistration",
+            "description": "Storage Account Information",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/ChallengeSixRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid Parameters"
+          }
+        }
+      }
+    },
+    "/team/registerEventHub": {
+      "post": {
+        "tags": [
+          "Challenge 7"
+        ],
+        "summary": "Receive batches of events in an Event Hub",
+        "description": "Registers a team to begin receiving batches of events in the supplied Event Hub.  Warning: Updating the endpoint will overwrite existing endpoint registrations for your table.",
+        "operationId": "advance7",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "challengeSevenRegistration",
+            "description": "Event Hub Information",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/ChallengeSevenRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid Parameters"
+          }
+        }
+      }
+    },
+    "/team/boost/{teamTableNumber}": {
+      "post": {
+        "tags": [
+          "Challenge 7"
+        ],
+        "summary": "Boost the rate that batches of events are sent to a team's registered Event Hub",
+        "description": "Registers a team to receive batches of events sent at much higher rates to their previously registered Event Hub.",
+        "operationId": "boostOn",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "teamTableNumber",
+            "in": "path",
+            "description": "ID that was used for registration",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/team/registerRatingEndpoint": {
+      "post": {
+        "tags": [
+          "Challenge 8"
+        ],
+        "summary": "Send generated ratings to a specific /api/CreateRating endpoint",
+        "description": "A randomly generated rating is send to the registered endpoint every six seconds.  Warning: Updating the endpoint will overwrite existing endpoint registrations for your table.",
+        "operationId": "advance8",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "challenge8registration",
+            "description": "Rating Endpoint Information",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/ChallengeEightRegistration"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid Parameters"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ChallengeSixRegistration": {
+      "type": "object",
+      "required": [
+        "blobContainerName",
+        "storageAccountConnectionString",
+        "teamTableNumber"
+      ],
+      "properties": {
+        "teamTableNumber": {
+          "type": "integer",
+          "example": 1
+        },
+        "storageAccountConnectionString": {
+          "type": "string",
+          "example": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        },
+        "blobContainerName": {
+          "type": "string",
+          "example": "challengeSixBlob"
+        }
+      },
+      "example": {
+        "storageAccountConnectionString": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "teamTableNumber": 1,
+        "blobContainerName": "challengeSixBlob"
+      }
+    },
+    "ChallengeSevenRegistration": {
+      "type": "object",
+      "required": [
+        "eventHubConnectionString",
+        "eventHubName",
+        "teamTableNumber"
+      ],
+      "properties": {
+        "teamTableNumber": {
+          "type": "integer",
+          "example": 1
+        },
+        "eventHubConnectionString": {
+          "type": "string",
+          "example": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        },
+        "eventHubName": {
+          "type": "string",
+          "example": "challengeSevenEventHub"
+        }
+      },
+      "example": {
+        "teamTableNumber": 1,
+        "eventHubConnectionString": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "eventHubName": "challengeSevenEventHub"
+      }
+    },
+    "ChallengeEightRegistration": {
+      "type": "object",
+      "required": [
+        "ratingEndpoint",
+        "teamTableNumber"
+      ],
+      "properties": {
+        "teamTableNumber": {
+          "type": "integer",
+          "example": 1
+        },
+        "ratingEndpoint": {
+          "type": "string",
+          "example": "{Function App Url}/api/CreateRating"
+        }
+      },
+      "example": {
+        "teamTableNumber": 1,
+        "ratingEndpoint": "{Function App Url}/api/CreateRating"
+      }
+    }
+  }
+}

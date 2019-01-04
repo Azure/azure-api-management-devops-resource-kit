@@ -1,0 +1,6 @@
+apiVersionSet:
+    id: 1b3dee
+    descriptions: a description
+    versioningScheme: Query
+    versionQueryName: versionQuery
+    versionHeaderName: versionHeader

@@ -1,0 +1,9 @@
+authenticationSettings:
+    subscriptionKeyRequired: false
+    openid: 
+        openidProviderId: serverId
+        bearerTokenSendingMethods: method
+    oAuth2:
+        authorizationServerId: serverId
+        scope: scope
+      
