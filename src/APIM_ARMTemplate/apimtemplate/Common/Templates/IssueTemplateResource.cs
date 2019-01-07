@@ -4,13 +4,10 @@ using System.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class IssueTemplate : APITemplateResource
+    public class IssueTemplateResource : APITemplateSubResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public IssueTemplateProperties properties { get; set; }
-        public IssueTemplateResource[] resources { get; set; }
+        public IssueTemplateSubResource[] resources { get; set; }
     }
 
     public class IssueTemplateProperties
@@ -23,11 +20,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string apiId { get; set; }
     }
 
-    public class IssueTemplateAttachment : IssueTemplateResource
+    public class IssueTemplateAttachment : IssueTemplateSubResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public IssueTemplateAttachmentProperties properties { get; set; }
     }
 
@@ -38,11 +32,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string content { get; set; }
     }
 
-    public class IssueTemplateComment : IssueTemplateResource
+    public class IssueTemplateComment : IssueTemplateSubResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public IssueTemplateCommentProperties properties { get; set; }
     }
 
@@ -53,5 +44,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string userId { get; set; }
     }
 
-    public abstract class IssueTemplateResource { }
+    public abstract class IssueTemplateSubResource { 
+        public string name { get; set; }
+        public string type { get; set; }
+        public string apiVersion { get; set; }}
 }

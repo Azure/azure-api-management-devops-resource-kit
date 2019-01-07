@@ -4,11 +4,8 @@ using System.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class APIVersionSetTemplate
+    public class APIVersionSetTemplateResource : TemplateResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public APIVersionSetProperties properties { get; set; }
     }
 

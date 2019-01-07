@@ -10,10 +10,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     public class APITemplateCreator
     {
 
-        public APITemplate CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
+        public Template CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
         {
-            // create api schema with properties
-            APITemplate apiSchema = new APITemplate()
+            Template apiTemplate = new Template()
+            {
+                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                contentVersion = "1.0.0.0",
+                parameters = { },
+                variables = { },
+                resources = new TemplateResource[] { },
+                outputs = { }
+            };
+
+            List<TemplateResource> resources = new List<TemplateResource>();
+            // create api resource with properties
+            APITemplateResource apiTemplateResource = new APITemplateResource()
             {
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-06-01-preview",
@@ -36,14 +47,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     authenticationSettings = creatorConfig.api.authenticationSettings ?? null
                 }
             };
-            return apiSchema;
+            resources.Add(apiTemplateResource);
+
+            apiTemplate.resources = resources.ToArray();
+            return apiTemplate;
         }
 
-        public async Task<APITemplate> CreateSubsequentAPITemplate(CreatorConfig creatorConfig)
+        public async Task<Template> CreateSubsequentAPITemplate(CreatorConfig creatorConfig)
         {
+            Template apiTemplate = new Template()
+            {
+                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                contentVersion = "1.0.0.0",
+                parameters = { },
+                variables = { },
+                resources = new TemplateResource[] { },
+                outputs = { }
+            };
+
             FileReader fileReader = new FileReader();
-            // create api schema with properties
-            APITemplate apiSchema = new APITemplate()
+            List<TemplateResource> resources = new List<TemplateResource>();
+            // create api resource with properties
+            APITemplateResource apiTemplateResource = new APITemplateResource()
             {
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-06-01-preview",
@@ -55,7 +80,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     path = creatorConfig.api.suffix ?? ""
                 }
             };
-            return apiSchema;
+            resources.Add(apiTemplateResource);
+
+            apiTemplate.resources = resources.ToArray();
+            return apiTemplate;
         }
     }
 }

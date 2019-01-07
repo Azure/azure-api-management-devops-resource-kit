@@ -55,11 +55,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
 
                     // create templates from provided configuration
-                    APIVersionSetTemplate apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
-                    APITemplate initialAPITemplate = apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
-                    APITemplate subsequentAPITemplate = await apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
-                    PolicyTemplate apiPolicyTemplate = creatorConfig.api.policy != null ? await policyTemplateCreator.CreateAPIPolicyAsync(creatorConfig) : null;
-                    List<PolicyTemplate> operationPolicyTemplates = await policyTemplateCreator.CreateOperationPolicies(creatorConfig);
+                    Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
+                    Template initialAPITemplate = apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
+                    Template subsequentAPITemplate = await apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
+                    Template apiPolicyTemplate = creatorConfig.api.policy != null ? await policyTemplateCreator.CreateAPIPolicyAsync(creatorConfig) : null;
+                    List<Template> operationPolicyTemplates = await policyTemplateCreator.CreateOperationPolicies(creatorConfig);
 
                     // write templates to outputLocation
                     if (apiVersionSetTemplate != null)
@@ -75,9 +75,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     if (operationPolicyTemplates.Count > 0)
                     {
                         int count = 0;
-                        foreach (PolicyTemplate operationPolicyTemplate in operationPolicyTemplates)
+                        foreach (Template operationPolicyTemplate in operationPolicyTemplates)
                         {
-                            armTemplateWriter.WriteJSONToFile(apiPolicyTemplate, String.Concat(creatorConfig.outputLocation, $@"\OperationPolicyTemplate-{++count}.json"));
+                            armTemplateWriter.WriteJSONToFile(operationPolicyTemplate, String.Concat(creatorConfig.outputLocation, $@"\OperationPolicyTemplate-{++count}.json"));
                         }
                     }
                     ColoredConsole.WriteLine("Templates written to output location");

@@ -4,11 +4,8 @@ using System.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class SchemaTemplate : APITemplateResource
+    public class SchemaTemplateResource : APITemplateSubResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public SchemaTemplateProperties properties { get; set; }
     }
 

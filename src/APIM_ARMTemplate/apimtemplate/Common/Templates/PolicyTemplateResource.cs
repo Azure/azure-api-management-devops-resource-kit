@@ -5,11 +5,8 @@ using System.Text;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
 
-    public class PolicyTemplate : APITemplateResource
+    public class PolicyTemplateResource : APITemplateSubResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public PolicyTemplateProperties properties { get; set; }
     }
 

@@ -4,13 +4,10 @@ using System.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class OperationTemplate : APITemplateResource
+    public class OperationTemplateResource : APITemplateSubResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public OperationTemplateProperties properties { get; set; }
-        public PolicyTemplate[] resources { get; set; }
+        public PolicyTemplateResource[] resources { get; set; }
     }
 
     public class OperationTemplateProperties

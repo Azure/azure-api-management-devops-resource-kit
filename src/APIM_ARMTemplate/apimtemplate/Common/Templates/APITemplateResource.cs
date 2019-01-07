@@ -4,13 +4,10 @@ using System.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class APITemplate
+    public class APITemplateResource: TemplateResource
     {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
         public APITemplateProperties properties { get; set; }
-        public APITemplateResource[] resources { get; set; }
+        public APITemplateSubResource[] resources { get; set; }
     }
 
     public class APITemplateProperties
@@ -76,6 +73,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string[] bearerTokenSendingMethods { get; set; }
     }
 
-    public abstract class APITemplateResource { }
+    public abstract class APITemplateSubResource : TemplateResource { }
 
 }
