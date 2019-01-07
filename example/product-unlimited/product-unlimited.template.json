@@ -37,8 +37,8 @@
             "name": "[concat(parameters('ApimServiceName'), '/unlimited/policy')]",
             "apiVersion": "2018-01-01",
             "properties": {
-                "policyContent": "[concat(parameters('repoBaseUrl'), '/product-starter/product-starter.policy.xml')]",
-                "contentFormat": "xml-link"
+                "policyContent": "[concat(parameters('repoBaseUrl'), '/product-unlimited/product-unlimited.policy.xml')]",
+                "contentFormat": "rawxml-link"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'unlimited')]"
