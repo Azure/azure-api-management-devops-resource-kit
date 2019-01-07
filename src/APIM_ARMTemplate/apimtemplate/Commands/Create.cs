@@ -56,8 +56,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
                     // create templates from provided configuration
                     APIVersionSetTemplate apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
-                    APITemplate initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
-                    APITemplate subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
+                    APITemplate initialAPITemplate = apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
+                    APITemplate subsequentAPITemplate = await apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
                     PolicyTemplate apiPolicyTemplate = creatorConfig.api.policy != null ? await policyTemplateCreator.CreateAPIPolicyAsync(creatorConfig) : null;
                     List<PolicyTemplate> operationPolicyTemplates = await policyTemplateCreator.CreateOperationPolicies(creatorConfig);
 

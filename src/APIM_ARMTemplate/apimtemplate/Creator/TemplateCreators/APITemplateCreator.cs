@@ -9,26 +9,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class APITemplateCreator
     {
-        public async Task<APITemplate> CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
-        {
-            FileReader fileReader = new FileReader();
-            // create api schema with properties
-            APITemplate apiSchema = new APITemplate()
-            {
-                type = "Microsoft.ApiManagement/service/apis",
-                apiVersion = "2018-06-01-preview",
-                properties = new APITemplateProperties()
-                {
-                    contentFormat = "swagger-json",
-                    contentValue = await fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec),
-                    // supplied via optional arguments
-                    path = creatorConfig.api.suffix ?? ""
-                }
-            };
-            return apiSchema;
-        }
 
-        public APITemplate CreateSubsequentAPITemplate(CreatorConfig creatorConfig)
+        public APITemplate CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
         {
             // create api schema with properties
             APITemplate apiSchema = new APITemplate()
@@ -52,6 +34,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                         versioningScheme = creatorConfig.apiVersionSet.versioningScheme
                     } : null,
                     authenticationSettings = creatorConfig.api.authenticationSettings ?? null
+                }
+            };
+            return apiSchema;
+        }
+
+        public async Task<APITemplate> CreateSubsequentAPITemplate(CreatorConfig creatorConfig)
+        {
+            FileReader fileReader = new FileReader();
+            // create api schema with properties
+            APITemplate apiSchema = new APITemplate()
+            {
+                type = "Microsoft.ApiManagement/service/apis",
+                apiVersion = "2018-06-01-preview",
+                properties = new APITemplateProperties()
+                {
+                    contentFormat = "swagger-json",
+                    contentValue = await fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec),
+                    // supplied via optional arguments
+                    path = creatorConfig.api.suffix ?? ""
                 }
             };
             return apiSchema;
