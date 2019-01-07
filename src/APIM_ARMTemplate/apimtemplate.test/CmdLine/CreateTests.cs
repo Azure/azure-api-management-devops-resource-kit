@@ -18,8 +18,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                    "..", Path.DirectorySeparatorChar,
                    "apimtemplate", Path.DirectorySeparatorChar,
                    "Creator", Path.DirectorySeparatorChar,
-                   "Configurations", Path.DirectorySeparatorChar,
-                   "Examples", Path.DirectorySeparatorChar);
+                   "ExampleFiles", Path.DirectorySeparatorChar,
+                   "YAMLConfigs", Path.DirectorySeparatorChar);
         }
 
         [Fact]

@@ -7,8 +7,8 @@ apiVersionSet:
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
-  openApiSpec: https://serverlessohmanagementapi.trafficmanager.net/api/definition
-  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\ExampleInputs\policies\apipolicy.xml
+  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\dataGenAPIDefinition.json
+  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
   suffix: conf
   versionSetId: 1b3dee
   apiVersion: v2
@@ -17,9 +17,9 @@ api:
   revisionDescription: rDesc
   operations:
     getSessions: 
-      policy: https://lucasyamlblob.blob.core.windows.net/yaml/apipolicy.xml
+      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
     postSessions: 
-      policy: https://lucasyamlblob.blob.core.windows.net/yaml/apipolicy.xml
+      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
   authenticationSettings:
     subscriptionKeyRequired: false
     oAuth2:

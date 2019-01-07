@@ -6,8 +6,8 @@ apiVersionSet:
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
-  openApiSpec: https://serverlessohmanagementapi.trafficmanager.net/api/definition
-  policy: conf-api-policy.xml
+  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\dataGenAPIDefinition.json
+  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
   suffix: conf
   versionSetId: 1b3dee
   apiVersion: v2
@@ -16,9 +16,9 @@ api:
   revisionDescription: rDesc
   operations:
     getSessions: 
-      policy: conf-api-get-sessions-policy.xml
+      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
     postSessions: 
-      policy: https://contoso.com/conf-api-post-sessions-policy.xml
+      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
   authenticationSettings:
     subscriptionKeyRequired: false
     oAuth2:
