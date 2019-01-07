@@ -9,18 +9,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class APITemplateCreator
     {
+        private TemplateCreator templateCreator;
+        private FileReader fileReader;
+
+        public APITemplateCreator(TemplateCreator templateCreator, FileReader fileReader)
+        {
+            this.templateCreator = templateCreator;
+            this.fileReader = fileReader;
+        }
 
         public Template CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
         {
-            Template apiTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = { },
-                variables = { },
-                resources = new TemplateResource[] { },
-                outputs = { }
-            };
+            Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
@@ -55,17 +55,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public async Task<Template> CreateSubsequentAPITemplate(CreatorConfig creatorConfig)
         {
-            Template apiTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = { },
-                variables = { },
-                resources = new TemplateResource[] { },
-                outputs = { }
-            };
+            Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
 
-            FileReader fileReader = new FileReader();
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
@@ -75,7 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
-                    contentValue = await fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec),
+                    contentValue = await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec),
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix ?? ""
                 }

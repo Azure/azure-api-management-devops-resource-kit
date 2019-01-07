@@ -9,20 +9,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class APIVersionSetTemplateCreator
     {
+        private TemplateCreator templateCreator;
+
+        public APIVersionSetTemplateCreator(TemplateCreator templateCreator)
+        {
+            this.templateCreator = templateCreator;
+        }
+
         public Template CreateAPIVersionSetTemplate(CreatorConfig creatorConfig)
         {
-            Template apiVersionSetTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = { },
-                variables = { },
-                resources = new TemplateResource[] { },
-                outputs = { }
-            };
+            Template apiVersionSetTemplate = this.templateCreator.CreateEmptyTemplate();
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            // create apiVersionSet schema with properties
+            // create apiVersionSet resource with properties
             APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
             {
                 type = "Microsoft.ApiManagement/service/api-version-sets",

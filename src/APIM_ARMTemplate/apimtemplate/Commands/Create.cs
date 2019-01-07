@@ -49,9 +49,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // required parameters have been supplied
 
                     // initialize helper classes
-                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator();
-                    PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator();
+                    TemplateCreator templateCreator = new TemplateCreator();
+                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(templateCreator, fileReader);
+                    PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(templateCreator, fileReader);
                     ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
 
                     // create templates from provided configuration

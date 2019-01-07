@@ -9,22 +9,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class PolicyTemplateCreator
     {
+        private TemplateCreator templateCreator;
+        private FileReader fileReader;
+
+        public PolicyTemplateCreator(TemplateCreator templateCreator, FileReader fileReader)
+        {
+            this.templateCreator = templateCreator;
+            this.fileReader = fileReader;
+        }
 
         public async Task<Template> CreateAPIPolicyAsync(CreatorConfig creatorConfig)
         {
-            Template policyTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = { },
-                variables = { },
-                resources = new TemplateResource[] { },
-                outputs = { }
-            };
+            Template policyTemplate = this.templateCreator.CreateEmptyTemplate();
 
-            FileReader fileReader = new FileReader();
             List<TemplateResource> resources = new List<TemplateResource>();
-            // create api schema with properties
+            // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
                 type = "Microsoft.ApiManagement/service/apis/policies",
@@ -32,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "xml",
-                    policyContent = await fileReader.RetrieveLocationContentsAsync(creatorConfig.api.policy)
+                    policyContent = await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.policy)
                 }
             };
             resources.Add(policyTemplateResource);
@@ -43,19 +42,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public async Task<Template> CreateOperationPolicyAsync(KeyValuePair<string, OperationsConfig> policyPair)
         {
-            Template policyTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = { },
-                variables = { },
-                resources = new TemplateResource[] { },
-                outputs = { }
-            };
+            Template policyTemplate = this.templateCreator.CreateEmptyTemplate();
 
-            FileReader fileReader = new FileReader();
             List<TemplateResource> resources = new List<TemplateResource>();
-            // create api schema with properties
+            // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
                 type = "Microsoft.ApiManagement/service/apis/operations/policies",
@@ -63,7 +53,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "xml",
-                    policyContent = await fileReader.RetrieveLocationContentsAsync(policyPair.Value.policy)
+                    policyContent = await this.fileReader.RetrieveLocationContentsAsync(policyPair.Value.policy)
                 }
             };
             resources.Add(policyTemplateResource);
