@@ -52,6 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     TemplateCreator templateCreator = new TemplateCreator();
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(templateCreator, fileReader);
+                    ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(templateCreator);
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(templateCreator, fileReader);
                     ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
 
@@ -59,6 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template initialAPITemplate = apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
                     Template subsequentAPITemplate = await apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
+                    Template productAPITemplate = productAPITemplateCreator.CreateProductAPITemplate(creatorConfig);
                     Template apiPolicyTemplate = creatorConfig.api.policy != null ? await policyTemplateCreator.CreateAPIPolicyAsync(creatorConfig) : null;
                     List<Template> operationPolicyTemplates = await policyTemplateCreator.CreateOperationPolicies(creatorConfig);
 
@@ -69,6 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     }
                     armTemplateWriter.WriteJSONToFile(initialAPITemplate, String.Concat(creatorConfig.outputLocation, @"\InitialAPITemplate.json"));
                     armTemplateWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, @"\SubsequentAPITemplate.json"));
+                    armTemplateWriter.WriteJSONToFile(productAPITemplate, String.Concat(creatorConfig.outputLocation, @"\ProductAPITemplate.json"));
                     if (apiPolicyTemplate != null)
                     {
                         armTemplateWriter.WriteJSONToFile(apiPolicyTemplate, String.Concat(creatorConfig.outputLocation, @"\APIPolicyTemplate.json"));

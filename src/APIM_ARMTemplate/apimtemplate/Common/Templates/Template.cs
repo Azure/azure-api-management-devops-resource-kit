@@ -31,5 +31,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string name { get; set; }
         public string type { get; set; }
         public string apiVersion { get; set; }
+        public string scale { get; set; }
     }
 }
