@@ -24,6 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create apiVersionSet resource with properties
             APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
             {
+                name = "versionset",
                 type = "Microsoft.ApiManagement/service/api-version-sets",
                 apiVersion = "2018-06-01-preview",
                 properties = new APIVersionSetProperties()

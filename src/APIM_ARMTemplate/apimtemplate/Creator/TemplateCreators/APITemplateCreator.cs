@@ -26,6 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
+                name = "api",
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()
@@ -63,6 +64,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             object deserializedFileContents = JsonConvert.DeserializeObject<object>(await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec));
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
+                name = "api",
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()

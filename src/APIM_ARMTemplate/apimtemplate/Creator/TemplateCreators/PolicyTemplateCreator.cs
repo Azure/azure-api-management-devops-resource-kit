@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Collections.Generic;
-using System.Net.Http;
+using System;
 using System.Threading.Tasks;
 using System.Linq;
 using Newtonsoft.Json;
@@ -26,6 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
+                name = "apipolicy",
                 type = "Microsoft.ApiManagement/service/apis/policies",
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
@@ -48,6 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
+                name = String.Concat("operationpolicy-", policyPair.Key),
                 type = "Microsoft.ApiManagement/service/apis/operations/policies",
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()

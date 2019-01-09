@@ -59,7 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             Uri uriResult;
             bool isUrl = Uri.TryCreate(fileLocation, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-            // return contents of supplied Open API Spec file
+            // return contents of supplied file
             if (!isUrl)
             {
                 return File.ReadAllText(fileLocation);

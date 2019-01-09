@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
 using Newtonsoft.Json;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -16,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             this.templateCreator = templateCreator;
         }
 
-        public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
+        public Template CreateProductAPITemplate(string productID)
         {
             Template productAPITemplate = this.templateCreator.CreateEmptyTemplate();
 
@@ -24,6 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create products/apis resource with properties
             ProductAPITemplateResource productAPITemplateResource = new ProductAPITemplateResource()
             {
+                name = String.Concat("productapi-", productID),
                 type = "Microsoft.ApiManagement/service/products/apis",
                 apiVersion = "2018-06-01-preview",
                 properties = new ProductAPITemplateProperties()
@@ -32,6 +34,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             productAPITemplate.resources = resources.ToArray();
             return productAPITemplate;
+        }
+
+        public List<Template> CreateProductAPITemplates(CreatorConfig creatorConfig)
+        {
+            List<Template> productAPITemplates = new List<Template>();
+            string[] productIDs = creatorConfig.api.products.Split(", ");
+            foreach (string productID in productIDs)
+            {
+                Template productAPITemplate = this.CreateProductAPITemplate(productID);
+                productAPITemplates.Add(productAPITemplate);
+            }
+            return productAPITemplates;
         }
     }
 }
