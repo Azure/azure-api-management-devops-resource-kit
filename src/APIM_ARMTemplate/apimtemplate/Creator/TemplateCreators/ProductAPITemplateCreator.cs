@@ -21,11 +21,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             Template productAPITemplate = this.templateCreator.CreateEmptyTemplate();
 
+            // add parameters
+            productAPITemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+            
             List<TemplateResource> resources = new List<TemplateResource>();
             // create products/apis resource with properties
             ProductAPITemplateResource productAPITemplateResource = new ProductAPITemplateResource()
             {
-                name = String.Concat("productapi-", productID),
+                name = $"[concat(parameters('ApimServiceName'), '/{String.Concat("productapi-", productID)}')]",
                 type = "Microsoft.ApiManagement/service/products/apis",
                 apiVersion = "2018-06-01-preview",
                 properties = new ProductAPITemplateProperties()

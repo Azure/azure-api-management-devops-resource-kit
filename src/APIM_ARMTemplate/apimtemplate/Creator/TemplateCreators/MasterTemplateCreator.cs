@@ -10,49 +10,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     public class MasterTemplateCreator
     {
         private TemplateCreator templateCreator;
+        private FileNameGenerator fileNameGenerator;
 
-        public MasterTemplateCreator(TemplateCreator templateCreator)
+        public MasterTemplateCreator(TemplateCreator templateCreator, FileNameGenerator fileNameGenerator)
         {
             this.templateCreator = templateCreator;
+            this.fileNameGenerator = fileNameGenerator;
         }
 
-        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters()
-        {
-            Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
-            TemplateParameterProperties repoBaseUrlProperties = new TemplateParameterProperties()
-            {
-                value = ".",
-                metadata = new TemplateParameterMetadata()
-                {
-                    description = "Base URL of the repository"
-                }
-            };
-            parameters.Add("repoBaseUrl", repoBaseUrlProperties);
-            return parameters;
-        }
-
-        public MasterTemplateResource CreateMasterTemplateResource(string name, string uriLink, string[] dependsOn)
-        {            
-            MasterTemplateResource masterTemplateResource = new MasterTemplateResource()
-            {
-                name = name,
-                type = "Microsoft.Resources/deployments",
-                apiVersion = "2018-06-01-preview",
-                properties = new MasterTemplateProperties()
-                {
-                    mode = "Incremental",
-                    templateLink = new MasterTemplateLink()
-                    {
-                        uri = uriLink,
-                        contentVersion = "1.0.0.0"
-                    }
-                },
-                dependsOn = dependsOn
-            };
-            return masterTemplateResource;
-        }
-
-        public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
+        public Template CreateLinkedMasterTemplate(CreatorConfig creatorConfig,
+            Template apiVersionSetTemplate,
             Template initialAPITemplate,
             Template subsequentAPITemplate,
             List<Template> productAPITemplates,
@@ -63,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
 
             // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters();
+            masterTemplate.parameters = this.CreateMasterTemplateParameters(creatorConfig);
 
             // add links to all resources
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -81,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             resources.Add(this.CreateMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
 
             //subsequent API
-            string subsequentAPIUri = $"[concat(parameters('repoBaseUrl'), '{creatorFileNames.initialAPI}')]";
+            string subsequentAPIUri = $"[concat(parameters('repoBaseUrl'), '{creatorFileNames.subsequentAPI}')]";
             string[] subsequentAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'initialAPITemplate')]" } : new string[] { };
             resources.Add(this.CreateMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
 
@@ -92,13 +59,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 string[] apiPolicyDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'subsequentAPITemplate')]" } : new string[] { };
                 resources.Add(this.CreateMasterTemplateResource("apiPolicyTemplate", apiPolicyUri, apiPolicyDependsOn));
             }
+
             // productAPIs
             if (productAPITemplates.Count > 0)
             {
                 foreach (Template productAPITemplate in productAPITemplates)
                 {
-                    string productAPIName = $"productAPI-{productAPITemplate.resources[0].name.Split("-")[1]}Template";
-                    string productAPIUri = $"[concat(parameters('repoBaseUrl'), '{creatorFileNames.productAPIs.GetValueOrDefault(productAPITemplate.resources[0].name)}')]";
+                    KeyValuePair<string, string> filePair = this.fileNameGenerator.RetrieveFileNameForProductAPITemplate(productAPITemplate, creatorConfig);
+                    string productAPIName = $"productAPI-{filePair.Key}Template";
+                    string productAPIUri = $"[concat(parameters('repoBaseUrl'), '{filePair.Value}')]";
                     string[] productAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'subsequentAPITemplate')]" } : new string[] { };
                     resources.Add(this.CreateMasterTemplateResource(productAPIName, productAPIUri, productAPIDependsOn));
                 }
@@ -109,8 +78,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 foreach (Template operationPolicyTemplate in operationPolicyTemplates)
                 {
-                    string operationPolicyName = $"operationPolicy-{operationPolicyTemplate.resources[0].name.Split("-")[1]}Template";
-                    string operationPolicyUri = $"[concat(parameters('repoBaseUrl'), '{creatorFileNames.productAPIs.GetValueOrDefault(operationPolicyTemplate.resources[0].name)}')]";
+                    KeyValuePair<string, string> filePair = this.fileNameGenerator.RetrieveFileNameForOperationPolicyTemplate(operationPolicyTemplate, creatorConfig);
+                    string operationPolicyName = $"operationPolicy-{filePair.Key}Template";
+                    string operationPolicyUri = $"[concat(parameters('repoBaseUrl'), '{filePair.Value}')]";
                     string[] operationPolicyDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'subsequentAPITemplate')]" } : new string[] { };
                     resources.Add(this.CreateMasterTemplateResource(operationPolicyName, operationPolicyUri, operationPolicyDependsOn));
                 }
@@ -118,6 +88,55 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
+        }
+
+        public MasterTemplateResource CreateMasterTemplateResource(string name, string uriLink, string[] dependsOn)
+        {
+            MasterTemplateResource masterTemplateResource = new MasterTemplateResource()
+            {
+                name = name,
+                type = "Microsoft.Resources/deployments",
+                apiVersion = "2018-06-01-preview",
+                properties = new MasterTemplateProperties()
+                {
+                    mode = "Incremental",
+                    templateLink = new MasterTemplateLink()
+                    {
+                        uri = uriLink,
+                        contentVersion = "1.0.0.0"
+                    },
+                    parameters = new Dictionary<string, TemplateParameterProperties>
+                    {
+                        { "ApimServiceName", new TemplateParameterProperties(){ value = "[parameters('ApimServiceName')]" } }
+                    }
+                },
+                dependsOn = dependsOn
+            };
+            return masterTemplateResource;
+        }
+
+        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(CreatorConfig creatorConfig)
+        {
+            Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
+            TemplateParameterProperties repoBaseUrlProperties = new TemplateParameterProperties()
+            {
+                value = ".",
+                metadata = new TemplateParameterMetadata()
+                {
+                    description = "Base URL of the repository"
+                }
+            };
+            parameters.Add("repoBaseUrl", repoBaseUrlProperties);
+            TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
+            {
+                value = creatorConfig.apimServiceName,
+                metadata = new TemplateParameterMetadata()
+                {
+                    description = "Name of the API Management"
+                }
+            };
+            parameters.Add("ApimServiceName", apimServiceNameProperties);
+            return parameters;
         }
     }
 }

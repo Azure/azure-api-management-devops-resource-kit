@@ -22,11 +22,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             Template policyTemplate = this.templateCreator.CreateEmptyTemplate();
 
+            // add parameters
+            policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
             List<TemplateResource> resources = new List<TemplateResource>();
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = "apipolicy",
+                name = "[concat(parameters('ApimServiceName'), '/apipolicy')]",
                 type = "Microsoft.ApiManagement/service/apis/policies",
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
@@ -45,11 +51,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             Template policyTemplate = this.templateCreator.CreateEmptyTemplate();
 
+            // add parameters
+            policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
             List<TemplateResource> resources = new List<TemplateResource>();
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = String.Concat("operationpolicy-", policyPair.Key),
+                name = $"[concat(parameters('ApimServiceName'), '/{String.Concat("operationpolicy-", policyPair.Key)}')]",
                 type = "Microsoft.ApiManagement/service/apis/operations/policies",
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()

@@ -53,14 +53,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // required parameters have been supplied
 
                     // initialize helper classes
+                    FileNameGenerator fileNameGenerator = new FileNameGenerator();
                     TemplateCreator templateCreator = new TemplateCreator();
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(templateCreator, fileReader);
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(templateCreator);
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(templateCreator, fileReader);
-                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
+                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator, fileNameGenerator);
                     ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
-                    FileNameGenerator fileNameGenerator = new FileNameGenerator();
 
                     // create templates from provided configuration
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
@@ -69,8 +69,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     List<Template> productAPITemplates = productAPITemplateCreator.CreateProductAPITemplates(creatorConfig);
                     Template apiPolicyTemplate = creatorConfig.api.policy != null ? await policyTemplateCreator.CreateAPIPolicyAsync(creatorConfig) : null;
                     List<Template> operationPolicyTemplates = await policyTemplateCreator.CreateOperationPolicies(creatorConfig);
-                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorFileNames(apiVersionSetTemplate, initialAPITemplate, subsequentAPITemplate, productAPITemplates, apiPolicyTemplate, operationPolicyTemplates);
-                    Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate, subsequentAPITemplate, productAPITemplates, apiPolicyTemplate, operationPolicyTemplates, creatorFileNames);
+                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorFileNames(apiVersionSetTemplate, initialAPITemplate, subsequentAPITemplate, productAPITemplates, apiPolicyTemplate, operationPolicyTemplates, creatorConfig);
+                    Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, apiVersionSetTemplate, initialAPITemplate, subsequentAPITemplate, productAPITemplates, apiPolicyTemplate, operationPolicyTemplates, creatorFileNames);
 
                     // write templates to outputLocation
                     if (apiVersionSetTemplate != null)
@@ -87,14 +87,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     {
                         foreach (Template operationPolicyTemplate in operationPolicyTemplates)
                         {
-                            armTemplateWriter.WriteJSONToFile(operationPolicyTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.operationPolicies.GetValueOrDefault(operationPolicyTemplate.resources[0].name)));
+                            string name = fileNameGenerator.RetrieveFileNameForOperationPolicyTemplate(operationPolicyTemplate, creatorConfig).Value;
+                            armTemplateWriter.WriteJSONToFile(operationPolicyTemplate, String.Concat(creatorConfig.outputLocation, name));
                         }
                     }
                     if (productAPITemplates.Count > 0)
                     {
                         foreach (Template productAPITemplate in productAPITemplates)
                         {
-                            armTemplateWriter.WriteJSONToFile(productAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.productAPIs.GetValueOrDefault(productAPITemplate.resources[0].name)));
+                            string name = fileNameGenerator.RetrieveFileNameForProductAPITemplate(productAPITemplate, creatorConfig).Value;
+                            armTemplateWriter.WriteJSONToFile(productAPITemplate, String.Concat(creatorConfig.outputLocation, name));
                         }
                     }
                     armTemplateWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, @"/", "master.template.json"));

@@ -22,11 +22,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
 
+            // add parameters
+            apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = "api",
+                name = "[concat(parameters('ApimServiceName'), '/api')]",
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()
@@ -37,14 +43,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     apiVersionSetId = creatorConfig.api.versionSetId ?? "",
                     apiRevisionDescription = creatorConfig.api.revisionDescription ?? "",
                     apiVersionDescription = creatorConfig.api.apiVersionDescription ?? "",
-                    apiVersionSet = creatorConfig.apiVersionSet != null ? new APITemplateVersionSet()
-                    {
-                        id = creatorConfig.apiVersionSet.id,
-                        description = creatorConfig.apiVersionSet.description,
-                        versionHeaderName = creatorConfig.apiVersionSet.versionHeaderName,
-                        versionQueryName = creatorConfig.apiVersionSet.versionQueryName,
-                        versioningScheme = creatorConfig.apiVersionSet.versioningScheme
-                    } : null,
                     authenticationSettings = creatorConfig.api.authenticationSettings ?? null
                 }
             };
@@ -58,13 +56,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
 
+            // add parameters
+            apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
             // used to escape characters in json file
             object deserializedFileContents = JsonConvert.DeserializeObject<object>(await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec));
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = "api",
+                name = "[concat(parameters('ApimServiceName'), '/api')]",
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()

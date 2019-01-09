@@ -20,11 +20,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             Template apiVersionSetTemplate = this.templateCreator.CreateEmptyTemplate();
 
+            // add parameters
+            apiVersionSetTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
             List<TemplateResource> resources = new List<TemplateResource>();
             // create apiVersionSet resource with properties
             APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
             {
-                name = "versionset",
+                name = "[concat(parameters('ApimServiceName'), '/versionset')]",
                 type = "Microsoft.ApiManagement/service/api-version-sets",
                 apiVersion = "2018-06-01-preview",
                 properties = new APIVersionSetProperties()
