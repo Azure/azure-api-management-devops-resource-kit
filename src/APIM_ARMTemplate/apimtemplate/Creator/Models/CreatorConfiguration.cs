@@ -12,6 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     public class CreatorConfig
     {
         public string version { get; set; }
+        public string apimServiceName { get; set; }
         public APIVersionSetConfig apiVersionSet { get; set; }
         public APIConfig api { get; set; }
         public string outputLocation { get; set; }

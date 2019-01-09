@@ -1,5 +1,4 @@
 version: 0.0.1
-apimServiceName: "myService"
 apiVersionSet:
     id: 1b3dee
     displayName: myAPIVersionSet
@@ -27,4 +26,5 @@ api:
         authorizationServerId: serverId
         scope: scope
   products: starter, plantinum
+outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
 linked: true

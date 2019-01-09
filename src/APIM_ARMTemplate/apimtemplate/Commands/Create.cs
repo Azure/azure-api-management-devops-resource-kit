@@ -32,6 +32,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 {
                     throw new CommandParsingException(this, "Version is required");
                 }
+                else if (creatorConfig.apimServiceName == null)
+                {
+                    throw new CommandParsingException(this, "APIM service name is required");
+                }
                 else if (creatorConfig.api == null)
                 {
                     throw new CommandParsingException(this, "API configuration is required");

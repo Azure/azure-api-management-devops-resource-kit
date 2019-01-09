@@ -58,6 +58,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         }
 
         [Fact]
+        public void ShouldFailWithInvalidAPIMServiceName()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidAPIMServiceName.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("APIM service name is required", ex.Message);
+        }
+
+        [Fact]
         public void ShouldFailWithInvalidAPIConfiguration()
         {
             var createCommand = new CreateCommand();

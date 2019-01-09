@@ -1,4 +1,5 @@
 version: 0.0.1
+apimServiceName: "myService"
 apiVersionSet:
     id: 1b3dee
     displayName: myAPIVersionSet
