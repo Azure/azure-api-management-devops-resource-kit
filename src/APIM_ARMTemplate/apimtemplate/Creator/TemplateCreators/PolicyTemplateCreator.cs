@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
-                    contentFormat = "xml",
+                    contentFormat = "rawxml",
                     policyContent = await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.policy)
                 }
             };
@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
-                    contentFormat = "xml",
+                    contentFormat = "rawxml",
                     policyContent = await this.fileReader.RetrieveLocationContentsAsync(policyPair.Value.policy)
                 }
             };

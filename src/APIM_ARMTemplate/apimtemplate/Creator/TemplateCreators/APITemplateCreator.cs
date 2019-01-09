@@ -59,6 +59,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
+            // used to escape characters in json file
+            object deserializedFileContents = JsonConvert.DeserializeObject<object>(await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec));
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
                 type = "Microsoft.ApiManagement/service/apis",
@@ -66,7 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
-                    contentValue = await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec),
+                    contentValue = JsonConvert.SerializeObject(deserializedFileContents),
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix ?? ""
                 }
