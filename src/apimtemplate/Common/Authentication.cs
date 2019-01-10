@@ -9,11 +9,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class Authentication
     {
-        public async Task<string> GetAccessToken()
+        public async Task<(string azToken, string azSubscriptionId)> GetAccessToken()
         {
-            (bool cliSucceeded, string cliToken) = await TryGetAzCliToken();
+            (bool cliTokenSucceeded, string cliToken) = await TryGetAzCliToken();
+            (bool cliSubscriptionIdSucceeded, string cliSubscriptionId) = await TryGetAzSubscriptionId();
 
-            if (cliSucceeded) return cliToken;
+            if (cliTokenSucceeded || cliSubscriptionIdSucceeded)
+            {
+                return (cliToken, cliSubscriptionId);
+            }
 
             throw new Exception("Unable to connect to Azure. Make sure you have the `az` CLI or Azure PowerShell installed and logged in and try again");
         }
@@ -21,8 +25,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         private async Task<(bool succeeded, string token)> TryGetAzCliToken()
         {
             var az = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? new Executable("cmd", "/c az " + Constants.azParameters)
-                : new Executable("az", Constants.azParameters);
+                ? new Executable("cmd", "/c az " + Constants.azAccessToken)
+                : new Executable("az", Constants.azAccessToken);
 
             var stdout = new StringBuilder();
             var stderr = new StringBuilder();
@@ -36,7 +40,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 return (false, stdout.ToString().Trim(' ', '\n', '\r', '"'));
             }
         }
+        private async Task<(bool succeeded, string token)> TryGetAzSubscriptionId()
+        {
+            var az = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? new Executable("cmd", "/c az " + Constants.azSubscriptionId)
+                : new Executable("az", Constants.azSubscriptionId);
 
+            var stdout = new StringBuilder();
+            var stderr = new StringBuilder();
+            var completed = az.RunAsync(o => stdout.AppendLine(o), e => stderr.AppendLine(e));
+
+            if (await completed == 0)
+                return (true, stdout.ToString().Trim(' ', '\n', '\r', '"'));
+            else
+            {
+                ColoredConsole.WriteLine(($"Unable to fetch subscription id from az cli. Error: {stderr.ToString().Trim(' ', '\n', '\r')}"));
+                return (false, stdout.ToString().Trim(' ', '\n', '\r', '"'));
+            }
+        }
     }
-
 }

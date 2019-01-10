@@ -10,7 +10,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         [Fact]
         public void ShouldFailWithUnknownCommand()
         {
+            //arrange - do all your instatiation and configuration
 
+            //act - execute
+
+            //assert
             var createCommand = new ExtractCommand();
 
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute("test"));

@@ -1,8 +1,9 @@
 using System;
 using McMaster.Extensions.CommandLineUtils;
 using Colors.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -13,45 +14,45 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             this.Name = Constants.ExtractName;
             this.Description = Constants.ExtractDescription;
 
-            var apimname = this.Option("--name <apimname>", "API Management name", CommandOptionType.SingleValue).IsRequired();
-
-            var auth = new Authentication();
-
-            var aztoken = auth.GetAccessToken().Result;
+            var apiManagementName = this.Option("--name <apimname>", "API Management name", CommandOptionType.SingleValue).IsRequired();
 
             this.HelpOption();
-
-            this.OnExecute(async () =>
+                 
+            this.OnExecute(() =>
             {
-                if (apimname.HasValue())
+                if (apiManagementName.HasValue()) throw new Exception("Missing parameter(s)."); //Validade if is better exception or not
+
+                string resourceGroup = "APIM-Extractor"; //change to get from commandline parameter
+                string apimname;
+                string apis;
+                int count;
+
+                Api api = new Api();
+                JObject oApis;
+
+                apimname = apiManagementName.Values[0].ToString();
+                apis = api.GetAPIs(apimname, resourceGroup).Result;
+                oApis = JObject.Parse(apis);
+                count = oApis["value"].Count<object>();
+
+                Console.WriteLine("{0} API's found!", count);
+
+                for (int i = 0; i < count; i++)
                 {
-                    Console.WriteLine($"Create command executed with name {apimname.Value()}");
-
-                    string requestUrl = "https://management.azure.com/subscriptions/cabe3525-a754-4bf7-9af4-1a9746604527/resourceGroups/apim-extractor/providers/Microsoft.ApiManagement/service/apim-extractor/apis/odaibert-logicapp/products?api-version=2018-06-01-preview";
-                                          
-                    using (HttpClient httpClient = new HttpClient())
-                    {
-                        var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", aztoken);
-
-                        HttpResponseMessage response = await httpClient.SendAsync(request);
-
-                        response.EnsureSuccessStatusCode();
-
-                        string responseBody = await response.Content.ReadAsStringAsync();
-
-                        ColoredConsole.Write(responseBody.ToString());
-                        Console.ReadKey();
-                    }
+                    Console.WriteLine(oApis);
+                    string apiname = (string)oApis["value"][i]["name"];
+                    ColoredConsole.WriteLine(apiname);
+                    ColoredConsole.WriteLine(api.GetAPIOperations(apimname, resourceGroup, apiname).Result);
                 }
-                else
-                {
-                    ColoredConsole.Error.WriteLine("API Management name passed in");
-                }
+                Console.ReadKey();
+
                 return 0;
             });
-
+        }
+        private static string FormatJSON(string json)
+        {
+            dynamic parsedJson = JsonConvert.DeserializeObject(json);
+            return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
         }
     }
 }
