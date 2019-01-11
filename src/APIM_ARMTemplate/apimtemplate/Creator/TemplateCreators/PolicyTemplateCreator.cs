@@ -9,81 +9,57 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class PolicyTemplateCreator
     {
-        private TemplateCreator templateCreator;
         private FileReader fileReader;
 
-        public PolicyTemplateCreator(TemplateCreator templateCreator, FileReader fileReader)
+        public PolicyTemplateCreator(FileReader fileReader)
         {
-            this.templateCreator = templateCreator;
             this.fileReader = fileReader;
         }
 
-        public async Task<Template> CreateAPIPolicyAsync(CreatorConfig creatorConfig)
+        public async Task<PolicyTemplateResource> CreateAPIPolicyTemplateResourceAsync(CreatorConfig creatorConfig, string[] dependsOn)
         {
-            Template policyTemplate = this.templateCreator.CreateEmptyTemplate();
-
-            // add parameters
-            policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
-            {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
-            };
-
-            List<TemplateResource> resources = new List<TemplateResource>();
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = "[concat(parameters('ApimServiceName'), '/apipolicy')]",
+                name = "[concat(parameters('ApimServiceName'), '/api/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/policies",
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
                     policyContent = await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.policy)
-                }
+                },
+                dependsOn = dependsOn
             };
-            resources.Add(policyTemplateResource);
-
-            policyTemplate.resources = resources.ToArray();
-            return policyTemplate;
+            return policyTemplateResource;
         }
 
-        public async Task<Template> CreateOperationPolicyAsync(KeyValuePair<string, OperationsConfig> policyPair)
+        public async Task<PolicyTemplateResource> CreateOperationPolicyTemplateResourceAsync(KeyValuePair<string, OperationsConfig> policyPair, string[] dependsOn)
         {
-            Template policyTemplate = this.templateCreator.CreateEmptyTemplate();
-
-            // add parameters
-            policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
-            {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
-            };
-
-            List<TemplateResource> resources = new List<TemplateResource>();
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{String.Concat("operationpolicy-", policyPair.Key)}')]",
+                name = $"[concat(parameters('ApimServiceName'), '/api/{policyPair.Key}/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/operations/policies",
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
                     policyContent = await this.fileReader.RetrieveLocationContentsAsync(policyPair.Value.policy)
-                }
+                },
+                dependsOn = dependsOn
             };
-            resources.Add(policyTemplateResource);
-
-            policyTemplate.resources = resources.ToArray();
-            return policyTemplate;
+            return policyTemplateResource;
         }
 
-        public async Task<List<Template>> CreateOperationPolicies(CreatorConfig creatorConfig)
+        public async Task<List<PolicyTemplateResource>> CreateOperationPolicyTemplateResourcesAsync(CreatorConfig creatorConfig, string[] dependsOn)
         {
-            List<Template> policyTemplates = new List<Template>();
+            List<PolicyTemplateResource> policyTemplateResources = new List<PolicyTemplateResource>();
             foreach (KeyValuePair<string, OperationsConfig> pair in creatorConfig.api.operations)
             {
-                policyTemplates.Add(await this.CreateOperationPolicyAsync(pair));
+                policyTemplateResources.Add(await this.CreateOperationPolicyTemplateResourceAsync(pair, dependsOn));
             }
-            return policyTemplates;
+            return policyTemplateResources;
         }
     }
 }

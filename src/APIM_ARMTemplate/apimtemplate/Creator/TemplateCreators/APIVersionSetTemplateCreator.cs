@@ -40,7 +40,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     versionHeaderName = creatorConfig.apiVersionSet.versionHeaderName,
                     versionQueryName = creatorConfig.apiVersionSet.versionQueryName,
                     versioningScheme = creatorConfig.apiVersionSet.versioningScheme,
-                }
+                },
+                dependsOn = new string[] { }
             };
             resources.Add(apiVersionSetTemplateResource);
 

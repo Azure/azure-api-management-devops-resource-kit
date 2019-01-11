@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +7,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class Template
     {
+        [JsonProperty(PropertyName = "$schema")]
         public string schema { get; set; }
         public string contentVersion { get; set; }
         public Dictionary<string, TemplateParameterProperties> parameters { get; set; }
@@ -32,5 +34,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string type { get; set; }
         public string apiVersion { get; set; }
         public string scale { get; set; }
+        public string[] dependsOn { get; set; }
     }
 }
