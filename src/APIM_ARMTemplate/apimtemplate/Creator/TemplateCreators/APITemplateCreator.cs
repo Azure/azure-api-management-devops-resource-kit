@@ -32,9 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
             };
 
-            string subsequentAPIName = "[concat(parameters('ApimServiceName'), '/api')]";
-            string subsequentAPIType = "Microsoft.ApiManagement/service/apis";
-            string[] dependsOnSubsequentAPI = new string[] { $"[resourceId('{subsequentAPIType}', '{subsequentAPIName}')]" };
+            string[] dependsOnSubsequentAPI = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'subsequent-api')]" };
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
@@ -58,9 +56,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = "[concat(parameters('ApimServiceName'), '/api')]",
+                name = "[concat(parameters('ApimServiceName'), '/initial-api')]",
                 type = "Microsoft.ApiManagement/service/apis",
-                apiVersion = "2018-11-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()
                 {
                     // supplied via optional arguments
@@ -68,13 +66,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     apiRevision = creatorConfig.api.revision,
                     apiRevisionDescription = creatorConfig.api.revisionDescription,
                     apiVersionDescription = creatorConfig.api.apiVersionDescription,
-                    authenticationSettings = creatorConfig.api.authenticationSettings
+                    authenticationSettings = creatorConfig.api.authenticationSettings,
+                    path = creatorConfig.api.suffix,
+                    displayName = "api",
+                    protocols = new string[] {"http" }
                 },
-                dependsOn = new string[] { }
+                // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
+                dependsOn = creatorConfig.linked == true ? new string[] { } : new string[] { $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]" }
             };
             if(creatorConfig.apiVersionSet != null)
             {
-                apiTemplateResource.properties.apiVersionSetId = "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset')]";
+                apiTemplateResource.properties.apiVersionSetId = "[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]";
             }
             return apiTemplateResource;
         }
@@ -84,21 +86,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create api resource with properties
             // used to escape characters in json file
             object deserializedFileContents = JsonConvert.DeserializeObject<object>(await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec));
-            string subsequentAPIName = "[concat(parameters('ApimServiceName'), '/api')]";
+            string subsequentAPIName = "[concat(parameters('ApimServiceName'), '/subsequent-api')]";
             string subsequentAPIType = "Microsoft.ApiManagement/service/apis";
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
                 name = subsequentAPIName,
                 type = subsequentAPIType,
-                apiVersion = "2018-11-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
                     contentValue = JsonConvert.SerializeObject(deserializedFileContents),
                     // supplied via optional arguments
-                    path = creatorConfig.api.suffix ?? ""
+                    path = creatorConfig.api.suffix
                 },
-                dependsOn = new string[] { $"[resourceId('{subsequentAPIType}', '{subsequentAPIName}')]" }
+                dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'initial-api')]" }
         };
             return apiTemplateResource;
         }

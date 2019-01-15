@@ -21,9 +21,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = "[concat(parameters('ApimServiceName'), '/api/policy')]",
+                name = "[concat(parameters('ApimServiceName'), '/subsequent-api/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/policies",
-                apiVersion = "2018-11-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
@@ -39,9 +39,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/api/{policyPair.Key}/policy')]",
+                name = $"[concat(parameters('ApimServiceName'), '/subsequent-api/{policyPair.Key}/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/operations/policies",
-                apiVersion = "2018-11-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",

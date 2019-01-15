@@ -7,7 +7,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     public class MasterTemplateResource : TemplateResource
     {
         public MasterTemplateProperties properties { get; set; }
-        public string[] dependsOn { get; set; }
     }
 
     public class MasterTemplateProperties

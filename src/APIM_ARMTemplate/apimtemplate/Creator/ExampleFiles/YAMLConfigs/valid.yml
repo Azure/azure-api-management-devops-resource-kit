@@ -1,5 +1,5 @@
 version: 0.0.1
-apimServiceName: "testing-grounds"
+apimServiceName: testing-grounds
 apiVersionSet:
     displayName: myAPIVersionSet
     description: a description
@@ -7,7 +7,7 @@ apiVersionSet:
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
-  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\dataGenAPIDefinition.json
+  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json
   policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
   suffix: conf
   apiVersion: v2
@@ -15,15 +15,10 @@ api:
   revision: 2
   revisionDescription: rDesc
   operations:
-    getSessions: 
+    addPet: 
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
-    postSessions: 
+    deletePet: 
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
-  authenticationSettings:
-    subscriptionKeyRequired: false
-    oAuth2:
-        authorizationServerId: serverId
-        scope: scope
   products: starter, plantinum
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
-linked: true
+linked: false
