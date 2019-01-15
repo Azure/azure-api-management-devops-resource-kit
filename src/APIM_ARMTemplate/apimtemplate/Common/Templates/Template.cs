@@ -22,7 +22,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string[] allowedValues { get; set; }
         public string defaultValue { get; set; }
         public string value { get; set; }
-        public int minLength { get; set; }
     }
 
     public class TemplateParameterMetadata {

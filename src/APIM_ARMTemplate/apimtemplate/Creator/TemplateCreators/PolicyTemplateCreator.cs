@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = "[concat(parameters('ApimServiceName'), '/api/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/policies",
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-11-01",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
@@ -41,7 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = $"[concat(parameters('ApimServiceName'), '/api/{policyPair.Key}/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/operations/policies",
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-11-01",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",

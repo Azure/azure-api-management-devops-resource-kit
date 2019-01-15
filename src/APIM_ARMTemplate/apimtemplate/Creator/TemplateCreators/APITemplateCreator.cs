@@ -60,19 +60,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = "[concat(parameters('ApimServiceName'), '/api')]",
                 type = "Microsoft.ApiManagement/service/apis",
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-11-01",
                 properties = new APITemplateProperties()
                 {
                     // supplied via optional arguments
-                    apiVersion = creatorConfig.api.apiVersion ?? "",
-                    apiRevision = creatorConfig.api.revision ?? "",
-                    apiVersionSetId = creatorConfig.api.versionSetId ?? "",
-                    apiRevisionDescription = creatorConfig.api.revisionDescription ?? "",
-                    apiVersionDescription = creatorConfig.api.apiVersionDescription ?? "",
-                    authenticationSettings = creatorConfig.api.authenticationSettings ?? null
+                    apiVersion = creatorConfig.api.apiVersion,
+                    apiRevision = creatorConfig.api.revision,
+                    apiRevisionDescription = creatorConfig.api.revisionDescription,
+                    apiVersionDescription = creatorConfig.api.apiVersionDescription,
+                    authenticationSettings = creatorConfig.api.authenticationSettings
                 },
                 dependsOn = new string[] { }
             };
+            if(creatorConfig.apiVersionSet != null)
+            {
+                apiTemplateResource.properties.apiVersionSetId = "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset')]";
+            }
             return apiTemplateResource;
         }
 
@@ -87,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = subsequentAPIName,
                 type = subsequentAPIType,
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-11-01",
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",

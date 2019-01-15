@@ -1,6 +1,5 @@
 apimServiceName: "myService"
 apiVersionSet:
-    id: 1b3dee
     displayName: myAPIVersionSet
     description: a description
     versioningScheme: Query
@@ -10,7 +9,6 @@ api:
   openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\dataGenAPIDefinition.json
   policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
   suffix: conf
-  versionSetId: 1b3dee
   apiVersion: v2
   apiVersionDescription: vDesc
   revision: 2

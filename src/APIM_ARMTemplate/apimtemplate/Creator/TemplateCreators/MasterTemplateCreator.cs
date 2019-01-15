@@ -18,15 +18,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             this.fileNameGenerator = fileNameGenerator;
         }
 
-        public Template CreateLinkedMasterTemplate(CreatorConfig creatorConfig,
-            Template apiVersionSetTemplate,
+        public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
             Template apiTemplate,
             CreatorFileNames creatorFileNames)
         {
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
 
             // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters(creatorConfig);
+            masterTemplate.parameters = this.CreateMasterTemplateParameters();
 
             // add links to all resources
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -53,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = name,
                 type = "Microsoft.Resources/deployments",
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-11-01",
                 properties = new MasterTemplateProperties()
                 {
                     mode = "Incremental",
@@ -72,12 +71,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             return masterTemplateResource;
         }
 
-        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(CreatorConfig creatorConfig)
+        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters()
         {
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties repoBaseUrlProperties = new TemplateParameterProperties()
             {
-                value = ".",
                 metadata = new TemplateParameterMetadata()
                 {
                     description = "Base URL of the repository"
@@ -87,7 +85,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             parameters.Add("repoBaseUrl", repoBaseUrlProperties);
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
-                value = creatorConfig.apimServiceName,
                 metadata = new TemplateParameterMetadata()
                 {
                     description = "Name of the API Management"
@@ -96,6 +93,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             };
             parameters.Add("ApimServiceName", apimServiceNameProperties);
             return parameters;
+        }
+
+        public Template CreateMasterTemplateParameterValues(CreatorConfig creatorConfig)
+        {
+            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
+
+            // add parameters
+            Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
+            TemplateParameterProperties repoBaseUrlProperties = new TemplateParameterProperties()
+            {
+                value = "."
+            };
+            parameters.Add("repoBaseUrl", repoBaseUrlProperties);
+            TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
+            {
+                value = creatorConfig.apimServiceName
+            };
+            parameters.Add("ApimServiceName", apimServiceNameProperties);
+            masterTemplate.parameters = parameters;
+            return masterTemplate;
         }
     }
 }
