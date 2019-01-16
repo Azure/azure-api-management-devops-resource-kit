@@ -1,12 +1,14 @@
 {
-    "$schema":
-        "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "ApimServiceName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The name of the API Management"
+            }
         },
-        "repoBaseUrl":{
+        "repoBaseUrl": {
             "type": "string",
             "metadata": {
                 "description": "Base URL of the repository"
@@ -17,14 +19,12 @@
     "resources": [
         {
             "type": "Microsoft.ApiManagement/service/products",
-            "name":
-                "[concat(parameters('ApimServiceName'), '/starter')]",
+            "name": "[concat(parameters('ApimServiceName'), '/unlimited')]",
             "apiVersion": "2018-01-01",
             "scale": null,
             "properties": {
-                "displayName": "Starter",
-                "description":
-                    "Include 3 APIs. Limited to 1 subscription per developer. Throttled at 3 calls per 10 second.",
+                "displayName": "Unlimited",
+                "description": "Subscribers have completely unlimited access to the API. Administrator approval is required.",
                 "terms": null,
                 "subscriptionRequired": true,
                 "approvalRequired": true,
@@ -34,25 +34,24 @@
         },
         {
             "type": "Microsoft.ApiManagement/service/products/policies",
-            "name":
-                "[concat(parameters('ApimServiceName'), '/starter/policy')]",
+            "name": "[concat(parameters('ApimServiceName'), '/unlimited/policy')]",
             "apiVersion": "2018-01-01",
             "properties": {
-                "policyContent": "[concat(parameters('repoBaseUrl'), '/product-starter/product-starter.policy.xml')]",
+                "policyContent": "[concat(parameters('repoBaseUrl'), '/products/product-unlimited.policy.xml')]",
                 "contentFormat": "rawxml-link"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'unlimited')]"
             ]
         },
         {
             "type": "Microsoft.ApiManagement/service/products/groups",
-            "name": "[concat(parameters('ApimServiceName'), '/starter/contosogroup' )]",
+            "name": "[concat(parameters('ApimServiceName'), '/unlimited/contosogroup' )]",
             "apiVersion": "2017-03-01",
             "scale": null,
             "properties": {},
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'unlimited')]"
             ]
         }
     ],
