@@ -10,12 +10,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class ProductAPITemplateCreator
     {
-        public ProductAPITemplateResource CreateProductAPITemplateResource(string productID, string[] dependsOn)
+        public ProductAPITemplateResource CreateProductAPITemplateResource(string productID, string apiName, string[] dependsOn)
         {
             // create products/apis resource with properties
             ProductAPITemplateResource productAPITemplateResource = new ProductAPITemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{productID}/subsequent-api')]",
+                name = $"[concat(parameters('ApimServiceName'), '/{productID}/{apiName}')]",
                 type = "Microsoft.ApiManagement/service/products/apis",
                 apiVersion = "2018-06-01-preview",
                 properties = new ProductAPITemplateProperties(),
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             string[] productIDs = creatorConfig.api.products.Split(", ");
             foreach (string productID in productIDs)
             {
-                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, dependsOn);
+                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, creatorConfig.api.name, dependsOn);
                 productAPITemplates.Add(productAPITemplate);
             }
             return productAPITemplates;
