@@ -26,6 +26,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 if (!apiManagementName.HasValue()) throw new Exception("Missing parameter <apimname>.");
                 if (!resourceGroupName.HasValue()) throw new Exception("Missing parameter <resourceGroup>.");
 
+               // TemplateCreator templateCreator = new TemplateCreator();
+                
                 string resourceGroup = resourceGroupName.Values[0].ToString();
                 string apimname = apiManagementName.Values[0].ToString();
                 Api api = new Api();
@@ -35,7 +37,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
                 ConsoleColor lastColor = Console.ForegroundColor; 
                 Console.ForegroundColor = ConsoleColor.Green;
-
                 Console.WriteLine("{0} API's found!", count);
                 Console.ForegroundColor = lastColor;
 
@@ -46,6 +47,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     Console.WriteLine(oApis);
                     string apiname = (string)oApis["value"][i]["name"];
                     ColoredConsole.WriteLine(apiname);
+
+                    ReadFile();
+
+
                     ColoredConsole.WriteLine(api.GetAPIOperations(apimname, resourceGroup, apiname).Result);
                 }
                 Console.ReadKey();
@@ -58,7 +63,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             dynamic parsedJson = JsonConvert.DeserializeObject(json);
             return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
         }
-
         public static void DownloadFile(string sourceURL, string destinationPath)
         {
             long fileSize = 0;
