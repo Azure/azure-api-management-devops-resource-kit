@@ -10,18 +10,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     public class MasterTemplateCreator
     {
         private TemplateCreator templateCreator;
-        private FileNameGenerator fileNameGenerator;
 
-        public MasterTemplateCreator(TemplateCreator templateCreator, FileNameGenerator fileNameGenerator)
+        public MasterTemplateCreator(TemplateCreator templateCreator)
         {
             this.templateCreator = templateCreator;
-            this.fileNameGenerator = fileNameGenerator;
         }
 
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
             Template apiTemplate,
             CreatorFileNames creatorFileNames)
         {
+            // create empty template
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
 
             // add parameters
@@ -50,12 +49,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             Template apiTemplate,
             CreatorFileNames creatorFileNames)
         {
+            // create empty template
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
 
             // add parameters
             masterTemplate.parameters = this.CreateMasterTemplateParameters(false);
 
-            // add links to all resources
+            // add all resources directly
             List<TemplateResource> resources = new List<TemplateResource>();
 
             // apiVersionSet
@@ -98,6 +98,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(bool linked)
         {
+            // used to create the parameter metatadata, etc (not value) for use in file with resources
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
@@ -125,6 +126,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public Template CreateMasterTemplateParameterValues(CreatorConfig creatorConfig)
         {
+            // used to create the parameter values for use in parameters file
+            // create empty template
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
 
             // add parameters
@@ -138,11 +141,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 TemplateParameterProperties repoBaseUrlProperties = new TemplateParameterProperties()
                 {
-                    metadata = new TemplateParameterMetadata()
-                    {
-                        description = "Base URL of the repository"
-                    },
-                    type = "string"
+                    value = ""
                 };
                 parameters.Add("repoBaseUrl", repoBaseUrlProperties);
             }

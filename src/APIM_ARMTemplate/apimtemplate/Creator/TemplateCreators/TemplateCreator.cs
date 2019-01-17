@@ -11,6 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     {
         public Template CreateEmptyTemplate()
         {
+            // creates empty template for use in all other template creators
             Template template = new Template()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",

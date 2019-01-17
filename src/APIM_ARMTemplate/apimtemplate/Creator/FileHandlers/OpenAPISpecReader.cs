@@ -15,6 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     {
         public OpenApiDocument ConvertToOpenAPISpec(string json)
         {
+            // converts json string into OpenApiDocument class
             OpenApiStringReader reader = new OpenApiStringReader();
             OpenApiDocument doc = reader.Read(json, out var diagnostic);
             return doc;
@@ -46,6 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public async Task<OpenApiDocument> ConvertOpenAPISpecToDoc(string openApiSpecFileLocation)
         {
+            // determine whether file location is local file path or remote url and convert appropriately
             Uri uriResult;
             bool isUrl = Uri.TryCreate(openApiSpecFileLocation, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             if (isUrl)

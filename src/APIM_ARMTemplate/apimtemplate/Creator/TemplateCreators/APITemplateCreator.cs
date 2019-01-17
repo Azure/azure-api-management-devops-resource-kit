@@ -25,9 +25,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public async Task<Template> CreateAPITemplateAsync(CreatorConfig creatorConfig)
         {
+            // create empty template
             Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
-            OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
-            OpenApiDocument doc = await openAPISpecReader.ConvertOpenAPISpecToDoc(creatorConfig.api.openApiSpec);
 
             // add parameters
             apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
@@ -40,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
-            APITemplateResource initialAPITemplateResource = this.CreateInitialAPITemplateResource(creatorConfig, doc);
+            APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResource(creatorConfig);
             APITemplateResource subsequentAPITemplateResource = await this.CreateSubsequentAPITemplateResourceAsync(creatorConfig);
             PolicyTemplateResource apiPolicyResource = await this.policyTemplateCreator.CreateAPIPolicyTemplateResourceAsync(creatorConfig, dependsOnSubsequentAPI);
             List<PolicyTemplateResource> operationPolicyResources = await this.policyTemplateCreator.CreateOperationPolicyTemplateResourcesAsync(creatorConfig, dependsOnSubsequentAPI);
@@ -55,8 +54,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             return apiTemplate;
         }
 
-        public APITemplateResource CreateInitialAPITemplateResource(CreatorConfig creatorConfig, OpenApiDocument doc)
+        public async Task<APITemplateResource> CreateInitialAPITemplateResource(CreatorConfig creatorConfig)
         {
+            // protocols can be pulled by converting the OpenApiSpec into the OpenApiDocument class
+            OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
+            OpenApiDocument doc = await openAPISpecReader.ConvertOpenAPISpecToDoc(creatorConfig.api.openApiSpec);
+
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
@@ -88,10 +91,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public async Task<APITemplateResource> CreateSubsequentAPITemplateResourceAsync(CreatorConfig creatorConfig)
         {
             // create api resource with properties
-            // used to escape characters in json file
-            object deserializedFileContents = JsonConvert.DeserializeObject<object>(await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.openApiSpec));
             string subsequentAPIName = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]";
             string subsequentAPIType = "Microsoft.ApiManagement/service/apis";
+            object deserializedFileContents = JsonConvert.DeserializeObject<object>(await this.fileReader.RetrieveJSONContentsAsync(creatorConfig.api.openApiSpec));
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
                 name = subsequentAPIName,

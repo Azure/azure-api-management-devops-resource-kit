@@ -53,17 +53,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // required parameters have been supplied
 
                     // initialize helper classes
-                    FileNameGenerator fileNameGenerator = new FileNameGenerator();
+                    FileWriter fileWriter = new FileWriter();
                     TemplateCreator templateCreator = new TemplateCreator();
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, templateCreator, policyTemplateCreator, productAPITemplateCreator);
-                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator, fileNameGenerator);
-                    ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
+                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
 
                     // create templates from provided configuration
-                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorFileNames();
+                    CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorFileNames();
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template apiTemplate = await apiTemplateCreator.CreateAPITemplateAsync(creatorConfig);
                     if(creatorConfig.linked == true)
@@ -74,17 +73,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                         // write templates to outputLocation
                         if (apiVersionSetTemplate != null)
                         {
-                            armTemplateWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", creatorFileNames.apiVersionSet));
+                            fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", creatorFileNames.apiVersionSet));
                         }
-                        armTemplateWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", creatorFileNames.api));
-                        armTemplateWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", "master.template.json"));
-                        armTemplateWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, @"/linked/", "master.parameters.json"));
+                        fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", creatorFileNames.api));
+                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", "master.template.json"));
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, @"/linked/", "master.parameters.json"));
                     } else
                     {
                         Template masterTemplate = masterTemplateCreator.CreateUnlinkedMasterTemplate(apiVersionSetTemplate, apiTemplate, creatorFileNames);
                         Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-                        armTemplateWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, @"/unlinked/", "master.template.json"));
-                        armTemplateWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, @"/unlinked/", "master.parameters.json"));
+                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, @"/unlinked/", "master.template.json"));
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, @"/unlinked/", "master.parameters.json"));
                     }
 
                     ColoredConsole.WriteLine("Templates written to output location");

@@ -5,13 +5,13 @@ using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class ARMTemplateWriterTests
+    public class FileWriterTests
     {
         [Fact]
         public void ShouldWriteJSONToFile()
         {
             // arrange
-            ARMTemplateWriter armTemplateWriter = new ARMTemplateWriter();
+            FileWriter fileWriter = new FileWriter();
             string location = String.Concat("..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 File.Delete(location);
             }
             // write new 
-            armTemplateWriter.WriteJSONToFile(testJSON, location);
+            fileWriter.WriteJSONToFile(testJSON, location);
 
             // assert
             Assert.True(File.Exists(location));

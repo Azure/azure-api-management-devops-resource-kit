@@ -27,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
-                    policyContent = await this.fileReader.RetrieveLocationContentsAsync(creatorConfig.api.policy)
+                    policyContent = await this.fileReader.RetrieveJSONContentsAsync(creatorConfig.api.policy)
                 },
                 dependsOn = dependsOn
             };
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
-                    policyContent = await this.fileReader.RetrieveLocationContentsAsync(policyPair.Value.policy)
+                    policyContent = await this.fileReader.RetrieveJSONContentsAsync(policyPair.Value.policy)
                 },
                 dependsOn = dependsOn
             };
@@ -54,6 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public async Task<List<PolicyTemplateResource>> CreateOperationPolicyTemplateResourcesAsync(CreatorConfig creatorConfig, string[] dependsOn)
         {
+            // create a policy resource for each policy listed in the config file and its associated provided xml file
             List<PolicyTemplateResource> policyTemplateResources = new List<PolicyTemplateResource>();
             foreach (KeyValuePair<string, OperationsConfig> pair in creatorConfig.api.operations)
             {

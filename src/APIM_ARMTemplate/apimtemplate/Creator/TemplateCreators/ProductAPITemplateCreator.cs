@@ -26,6 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         public List<ProductAPITemplateResource> CreateProductAPITemplateResources(CreatorConfig creatorConfig, string[] dependsOn)
         {
+            // create a products/apis association resource for each product provided in the config file
             List<ProductAPITemplateResource> productAPITemplates = new List<ProductAPITemplateResource>();
             string[] productIDs = creatorConfig.api.products.Split(", ");
             foreach (string productID in productIDs)
