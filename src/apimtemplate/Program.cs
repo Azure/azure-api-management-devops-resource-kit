@@ -29,10 +29,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 
                 app.OnExecute(() => {
                     ColoredConsole.Error.WriteLine("No commands specified, please specify a command");
-                    app.ShowHelp();                    
+                    app.ShowHelp();
                     return 1;
                 });
-
+                
                 return app.Execute(args);
             }
             catch (Exception e)

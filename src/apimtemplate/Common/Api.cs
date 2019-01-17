@@ -19,7 +19,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
+        }
+        public async Task<string> GetAPIDetails(string ApiManagementName, string ResourceGroupName, string ApiName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
 
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
         }
         public async Task<string> GetAPIs(string ApiManagementName, string ResourceGroupName)
         {
@@ -27,9 +35,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?api-version={4}",
                 baseUrl, azSubId, ResourceGroupName, ApiManagementName, Constants.APIVersion);
-
+          
             return await CallApiManagement(azToken, requestUrl);
-
         }
         private static async Task<string> CallApiManagement(string azToken, string requestUrl)
         {

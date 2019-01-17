@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public const string APIVersion = "2018-06-01-preview";
 
         public const string azAccessToken = "account get-access-token --query \"accessToken\" --output json";
-        public const string azSubscriptionId = "account get-access-token --query \"subscription\" --output json";
+        public const string azSubscriptionId = "account show --query id -o json";
         internal static string deploymentSchema;
         internal static string deploymenParameterSchema;
     }

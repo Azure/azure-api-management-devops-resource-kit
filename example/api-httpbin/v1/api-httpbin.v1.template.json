@@ -31,7 +31,7 @@
                 ],
                 "authenticationSettings": null,
                 "subscriptionKeyParameterNames": null,
-                "apiVersion": "v1",
+                "apiVersion": "v2",
                 "apiVersionSetId": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset-httpbin-api')]"
             }
         },

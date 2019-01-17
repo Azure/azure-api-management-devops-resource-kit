@@ -15,9 +15,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             //act - execute
 
             //assert
-            var createCommand = new ExtractCommand();
+            var extractCommand = new ExtractCommand();
 
-            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute("test"));
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => extractCommand.Execute("test"));
             //Console.WriteLine(ex.Message);
             Assert.Contains("Unrecognized command or argument 'test'", ex.Message);
         }

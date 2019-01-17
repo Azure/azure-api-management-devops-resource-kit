@@ -1,5 +1,4 @@
 ﻿using Colors.Net;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             (bool cliTokenSucceeded, string cliToken) = await TryGetAzCliToken();
             (bool cliSubscriptionIdSucceeded, string cliSubscriptionId) = await TryGetAzSubscriptionId();
 
-            if (cliTokenSucceeded || cliSubscriptionIdSucceeded)
+            if (cliTokenSucceeded && cliSubscriptionIdSucceeded)
             {
                 return (cliToken, cliSubscriptionId);
             }
@@ -24,27 +23,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         private async Task<(bool succeeded, string token)> TryGetAzCliToken()
         {
-            var az = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? new Executable("cmd", "/c az " + Constants.azAccessToken)
-                : new Executable("az", Constants.azAccessToken);
-
-            var stdout = new StringBuilder();
-            var stderr = new StringBuilder();
-            var completed = az.RunAsync(o => stdout.AppendLine(o), e => stderr.AppendLine(e));
-
-            if (await completed == 0)
-                return (true, stdout.ToString().Trim(' ', '\n', '\r', '"'));            
-            else
-            {
-                ColoredConsole.WriteLine(($"Unable to fetch access token from az cli. Error: {stderr.ToString().Trim(' ', '\n', '\r')}"));
-                return (false, stdout.ToString().Trim(' ', '\n', '\r', '"'));
-            }
+            return await ExecuteCommand(Constants.azAccessToken);
         }
+
         private async Task<(bool succeeded, string token)> TryGetAzSubscriptionId()
         {
+            return await ExecuteCommand(Constants.azSubscriptionId);
+        }
+
+        private static async Task<(bool succeeded, string token)> ExecuteCommand(string commandParameters)
+        {
             var az = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? new Executable("cmd", "/c az " + Constants.azSubscriptionId)
-                : new Executable("az", Constants.azSubscriptionId);
+                ? new Executable("cmd", "/c az " + commandParameters)
+                : new Executable("az", commandParameters);
 
             var stdout = new StringBuilder();
             var stderr = new StringBuilder();
@@ -54,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 return (true, stdout.ToString().Trim(' ', '\n', '\r', '"'));
             else
             {
-                ColoredConsole.WriteLine(($"Unable to fetch subscription id from az cli. Error: {stderr.ToString().Trim(' ', '\n', '\r')}"));
+                ColoredConsole.WriteLine(($"Unable to fetch access token from az cli. Error: {stderr.ToString().Trim(' ', '\n', '\r')}"));
                 return (false, stdout.ToString().Trim(' ', '\n', '\r', '"'));
             }
         }
