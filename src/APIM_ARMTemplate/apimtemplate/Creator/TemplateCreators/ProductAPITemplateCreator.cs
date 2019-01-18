@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{productID}/{apiName}')]",
                 type = "Microsoft.ApiManagement/service/products/apis",
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-01-01",
                 properties = new ProductAPITemplateProperties(),
                 dependsOn = dependsOn
             };

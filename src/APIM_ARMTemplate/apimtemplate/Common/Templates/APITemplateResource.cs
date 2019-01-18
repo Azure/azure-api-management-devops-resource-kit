@@ -21,7 +21,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string apiRevisionDescription { get; set; }
         public string apiVersionDescription { get; set; }
         public string apiVersionSetId { get; set; }
-        public bool subscriptionRequired { get; set; }
+        // subscriptionRequired is not available for version 2018-01-01
+        //public bool subscriptionRequired { get; set; }
         public string displayName { get; set; }
         public string serviceUrl { get; set; }
         public string path { get; set; }

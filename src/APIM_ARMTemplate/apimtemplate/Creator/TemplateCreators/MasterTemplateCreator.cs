@@ -32,12 +32,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // apiVersionSet
             if (apiVersionSetTemplate != null)
             {
-                string apiVersionSetUri = $"[concat(parameters('repoBaseUrl'), '{creatorFileNames.apiVersionSet}')]";
+                string apiVersionSetUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.apiVersionSet}')]";
                 resources.Add(this.CreateMasterTemplateResource("versionSetTemplate", apiVersionSetUri, new string[] { }));
             }
 
             //api
-            string initialAPIUri = $"[concat(parameters('repoBaseUrl'), '{creatorFileNames.api}')]";
+            string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.api}')]";
             string[] initialAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
             resources.Add(this.CreateMasterTemplateResource("apiTemplate", initialAPIUri, initialAPIDependsOn));
 
@@ -77,7 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = name,
                 type = "Microsoft.Resources/deployments",
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-01-01",
                 properties = new MasterTemplateProperties()
                 {
                     mode = "Incremental",
@@ -111,7 +111,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             parameters.Add("ApimServiceName", apimServiceNameProperties);
             if(linked == true)
             {
-                TemplateParameterProperties repoBaseUrlProperties = new TemplateParameterProperties()
+                TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
                     metadata = new TemplateParameterMetadata()
                     {
@@ -119,7 +119,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     },
                     type = "string"
                 };
-                parameters.Add("repoBaseUrl", repoBaseUrlProperties);
+                parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
             }
             return parameters;
         }
@@ -139,11 +139,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             parameters.Add("ApimServiceName", apimServiceNameProperties);
             if (creatorConfig.linked == true)
             {
-                TemplateParameterProperties repoBaseUrlProperties = new TemplateParameterProperties()
+                TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
-                    value = ""
+                    value = creatorConfig.linkedTemplatesBaseUrl
                 };
-                parameters.Add("repoBaseUrl", repoBaseUrlProperties);
+                parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
             }
             masterTemplate.parameters = parameters;
             return masterTemplate;

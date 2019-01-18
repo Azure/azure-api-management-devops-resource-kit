@@ -17,6 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public APIConfig api { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
+        public string linkedTemplatesBaseUrl { get; set; }
     }
 
     public class APIConfig

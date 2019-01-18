@@ -22,4 +22,5 @@ api:
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
   products: starter, platinum
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
-linked: true
+linked: false
+linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml

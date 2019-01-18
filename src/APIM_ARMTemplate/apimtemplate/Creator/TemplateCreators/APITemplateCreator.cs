@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}-initial')]",
                 type = "Microsoft.ApiManagement/service/apis",
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-01-01",
                 properties = new APITemplateProperties()
                 {
                     // supplied via optional arguments
@@ -98,7 +98,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 name = subsequentAPIName,
                 type = subsequentAPIType,
-                apiVersion = "2018-06-01-preview",
+                apiVersion = "2018-01-01",
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
