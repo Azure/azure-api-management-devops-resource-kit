@@ -1,5 +1,5 @@
 version: 0.0.1
-apimServiceName: "myService"
+apimServiceName: testapimlucas
 apiVersionSet:
     displayName: myAPIVersionSet
     description: a description
@@ -7,22 +7,24 @@ apiVersionSet:
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
-  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\dataGenAPIDefinition.json
+  name: myAPI
+  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json
   policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
-  apiVersion: v2
-  apiVersionDescription: vDesc
-  revision: 2
-  revisionDescription: rDesc
+  apiVersion: v1
+  apiVersionDescription: My first version
+  revision: 1
+  revisionDescription: My first revision
   operations:
-    getSessions: 
+    addPet: 
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
-    postSessions: 
+    deletePet: 
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
   authenticationSettings:
     subscriptionKeyRequired: false
     oAuth2:
         authorizationServerId: serverId
         scope: scope
-  products: starter, plantinum
+  products: starter, platinum
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
-linked: true
+linked: false
+linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml

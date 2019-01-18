@@ -1,5 +1,5 @@
 version: 0.0.1
-apimServiceName: "myService"
+apimServiceName: testapimlucas
 apiVersionSet:
     displayName: myAPIVersionSet
     description: a description
@@ -7,4 +7,3 @@ apiVersionSet:
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
-linked: true

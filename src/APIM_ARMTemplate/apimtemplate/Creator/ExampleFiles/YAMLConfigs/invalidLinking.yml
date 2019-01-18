@@ -1,4 +1,5 @@
 version: 0.0.1
+apimServiceName: testapimlucas
 apiVersionSet:
     displayName: myAPIVersionSet
     description: a description
@@ -26,5 +27,4 @@ api:
         scope: scope
   products: starter, platinum
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
-linked: false
-linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml
+linked: true

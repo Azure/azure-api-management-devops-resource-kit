@@ -48,6 +48,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 {
                     throw new CommandParsingException(this, "API suffix is required");
                 }
+                else if (creatorConfig.api.name == null)
+                {
+                    throw new CommandParsingException(this, "API name is required");
+                }
+                else if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
+                {
+                    throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
+                }
                 else
                 {
                     // required parameters have been supplied

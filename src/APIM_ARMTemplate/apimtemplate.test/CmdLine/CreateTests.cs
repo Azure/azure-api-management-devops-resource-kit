@@ -94,6 +94,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         }
 
         [Fact]
+        public void ShouldFailWithInvalidAPIName()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidAPIName.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("API name is required", ex.Message);
+        }
+
+        [Fact]
+        public void ShouldFailWithInvalidLinking()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidLinking.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("LinkTemplatesBaseUrl is required for linked templates", ex.Message);
+        }
+
+        [Fact]
         public void ShouldNotFailWithValidConfig()
         {
             var createCommand = new CreateCommand();

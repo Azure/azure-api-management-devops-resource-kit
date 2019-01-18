@@ -7,19 +7,24 @@ apiVersionSet:
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
-  name: ijustdidthis
+  name: myAPI
   openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json
   policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
   suffix: conf
-  apiVersion: v2
-  apiVersionDescription: vDesc
-  revision: 2
-  revisionDescription: rDesc
+  apiVersion: v1
+  apiVersionDescription: My first version
+  revision: 1
+  revisionDescription: My first revision
   operations:
     addPet: 
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
     deletePet: 
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
+  authenticationSettings:
+    subscriptionKeyRequired: false
+    oAuth2:
+        authorizationServerId: serverId
+        scope: scope
   products: starter, platinum
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
 linked: false
