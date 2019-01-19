@@ -48,9 +48,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     string apiname = (string)oApis["value"][i]["name"];
                     ColoredConsole.WriteLine(apiname);
 
-                    ReadFile();
-
-
                     ColoredConsole.WriteLine(api.GetAPIOperations(apimname, resourceGroup, apiname).Result);
                 }
                 Console.ReadKey();

@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class TemplateCreator
+    public class ExtractTemplateCreator
     {
-        public Template CreateEmptyTemplate()
+        public Template ExtractorCreateEmptyTemplate()
         {
             // creates empty template for use in all other template creators
             Template template = new Template()

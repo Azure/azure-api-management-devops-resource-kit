@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class Template
+    public class ExtractorTemplate
     {
         [JsonProperty(PropertyName = "$schema")]
         public string schema { get; set; }
@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public object outputs { get; set; }
     }
 
-    public class TemplateParameterProperties
+    public class ExtractorTemplateParameterProperties
     {
         public string type { get; set; }
         public TemplateParameterMetadata metadata { get; set; }
@@ -25,12 +25,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string value { get; set; }
     }
 
-    public class TemplateParameterMetadata
+    public class ExtractorTemplateParameterMetadata
     {
         public string description { get; set; }
     }
 
-    public class TemplateResource
+    public class ExtractorTemplateResource
     {
         public string name { get; set; }
         public string type { get; set; }
