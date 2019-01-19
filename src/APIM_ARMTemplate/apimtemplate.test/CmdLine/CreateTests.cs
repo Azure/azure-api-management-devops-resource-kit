@@ -110,13 +110,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("LinkTemplatesBaseUrl is required for linked templates", ex.Message);
         }
-
-        [Fact]
-        public void ShouldNotFailWithValidConfig()
-        {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "valid.yml") };
-            createCommand.Execute(args);
-        }
     }
 }
