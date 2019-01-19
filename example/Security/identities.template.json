@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    },
+    "ClientID": {
+      "type": "string"
+    },
+    "ClientSecret": {
+      "type": "string"
+    },
+    "IdentityType": {
+      "type": "string",
+      "allowedValues": [
+        "facebook",
+        "google",
+        "microsoft",
+        "twitter"
+      ]
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service/identityProviders",
+      "name": "[concat(parameters('ApimServiceName'), '/',parameters('IdentityType'))]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "clientId": "[parameters('ClientID')]",
+        "clientSecret": "[parameters('ClientSecret')]",
+        "type": "[parameters('IdentityType')]"
+      }
+    }
+  ]
+} 

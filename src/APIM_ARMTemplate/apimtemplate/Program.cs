@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Colors.Net;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -15,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public static int Main(string[] args)
         {
             try
-            {
+            {   
                 var app = new CommandLineApplication() 
                 {
                     Name = Constants.AppShortName,
@@ -32,17 +33,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     app.ShowHelp();
                     return 1;
                 });
-                
                 return app.Execute(args);
             }
             catch (Exception e)
             {
                 ColoredConsole.Error.WriteLine(e.Message);
-                Console.ReadKey();
                 return 1;
             }
         }
-
-
     }
 }

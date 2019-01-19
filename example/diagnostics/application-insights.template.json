@@ -1,0 +1,82 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ApimServiceName": {
+            "type": "string"
+        },
+        "ApplicationInsightsLocation": {
+            "type": "string"
+        },
+        "ApplicationInsightsInstanceName": {
+            "type": "string"
+        },
+        "SamplingRate": {
+            "type": "int"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('ApplicationInsightsInstanceName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2015-05-01",
+            "location": "[parameters('ApplicationInsightsLocation')]",
+            "tags": {},
+            "kind": "other",
+            "properties": {
+              "Application_Type": "other"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/loggers",
+            "name": "[concat(parameters('ApimServiceName'), '/', parameters('ApplicationInsightsInstanceName'))]",
+            "apiVersion": "2018-06-01-preview",
+            "properties": {
+              "loggerType": "applicationInsights",
+              "description": "Logger resources to APIM",
+              "credentials": {
+                  "instrumentationKey": "[reference(resourceId('Microsoft.Insights/components', parameters('ApplicationInsightsInstanceName')), '2015-05-01').InstrumentationKey]"
+              }
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/diagnostics",
+            "name": "[concat(parameters('ApimServiceName'), '/applicationinsights')]",
+            "apiVersion": "2018-06-01-preview",
+            "properties": {
+                "alwaysLog": "allErrors",
+                "loggerId": "[concat('/loggers/', parameters('ApplicationInsightsInstanceName'))]",
+                "sampling": {
+                "samplingType": "fixed",
+                "percentage": "[parameters('SamplingRate')]"
+                },
+                "frontend": {
+                    "request": {
+                      "headers": [],
+                      "body": {}
+                    },
+                    "response": {
+                      "headers": [],
+                      "body": {}
+                    }
+                  },
+                  "backend": {
+                    "request": {
+                      "headers": [],
+                      "body": {}
+                    },
+                    "response": {
+                      "headers": [],
+                      "body": {}
+                    }
+                  },
+                "enableHttpCorrelationHeaders": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), parameters('ApplicationInsightsInstanceName'))]"
+            ]
+        }
+
+    ]
+}

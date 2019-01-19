@@ -3,6 +3,7 @@
     "apimtemplate": {
       "commandName": "Project",
       "commandLineArgs": "extract  --name apim-extractor --resourceGroup APIM-Extractor"
+      
     }
   }
 }

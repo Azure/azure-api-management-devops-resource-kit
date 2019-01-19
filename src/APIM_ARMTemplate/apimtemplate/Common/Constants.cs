@@ -17,5 +17,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public const string azSubscriptionId = "account show --query id -o json";
         internal static string deploymentSchema;
         internal static string deploymenParameterSchema;
+        
     }
 }
