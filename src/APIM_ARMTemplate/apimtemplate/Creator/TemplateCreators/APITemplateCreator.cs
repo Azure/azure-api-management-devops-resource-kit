@@ -1,12 +1,9 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using Newtonsoft.Json;
 using Microsoft.OpenApi.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator
 {
     public class APITemplateCreator
     {

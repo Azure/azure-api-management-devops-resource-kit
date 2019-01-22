@@ -1,11 +1,7 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
-using Newtonsoft.Json;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator
 {
     public class PolicyTemplateCreator
     {

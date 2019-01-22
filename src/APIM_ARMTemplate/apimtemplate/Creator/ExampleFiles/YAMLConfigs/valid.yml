@@ -1,31 +1,31 @@
-version: 0.0.1
-apimServiceName: testapimlucas
-apiVersionSet:
+version: 0.0.1   # Required
+apimServiceName: testapimlucas   # Required, must match name of an apim service deployed in the specified resource group
+apiVersionSet:   # Optional
     displayName: myAPIVersionSet
     description: a description
     versioningScheme: Query
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
-  name: myAPI
-  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json
-  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
-  suffix: conf
-  apiVersion: v1
-  apiVersionDescription: My first version
-  revision: 1
-  revisionDescription: My first revision
-  operations:
-    addPet: 
-      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
-    deletePet: 
-      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
-  authenticationSettings:
+  name: myAPI   # Required
+  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json    # Required, can be url or local file
+  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml   # Optional, can be url or local file
+  suffix: conf   # Required
+  apiVersion: v1   # Optional
+  apiVersionDescription: My first version   # Optional
+  revision: 1   # Optional
+  revisionDescription: My first revision   # Optional
+  operations:   # Optional
+    addPet: # Must match the operationId property of a path's operations
+      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml   # Optional, can be url or local file
+    deletePet:  # Must match the operationId property of a path's operations
+      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml   # Optional, can be url or local file
+  authenticationSettings:   # Optional
     subscriptionKeyRequired: false
     oAuth2:
         authorizationServerId: serverId
         scope: scope
-  products: starter, platinum
-outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
-linked: false
-linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml
+  products: starter, platinum    # Optional, adds api to the specified products
+outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates   # Required, folder the creator will write the templates to
+linked: true   # Optional
+linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml   # Required if 'linked' property is set to true
