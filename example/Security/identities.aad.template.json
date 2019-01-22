@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    },
+    "ClientID": {
+      "type": "string"
+    },
+    "ClientSecret": {
+      "type": "string"
+    },
+    "allowedTenants": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service/identityProviders",
+      "name": "[concat(parameters('ApimServiceName'), '/aad')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "clientId": "[parameters('ClientID')]",
+        "clientSecret": "[parameters('ClientSecret')]",
+        "type": "aad",
+        "allowedTenants": [
+          "[parameters('allowedTenants')]"
+        ]
+      }
+    }
+  ]
+} 
