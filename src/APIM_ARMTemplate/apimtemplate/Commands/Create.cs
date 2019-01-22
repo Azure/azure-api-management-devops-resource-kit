@@ -81,17 +81,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                         // write templates to outputLocation
                         if (apiVersionSetTemplate != null)
                         {
-                            fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", creatorFileNames.apiVersionSet));
+                            fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSet));
                         }
-                        fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", creatorFileNames.api));
-                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, @"/linked/", "master.template.json"));
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, @"/linked/", "master.parameters.json"));
+                        fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.api));
+                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, "/master.template.json"));
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, "/master.parameters.json"));
                     } else
                     {
                         Template masterTemplate = masterTemplateCreator.CreateUnlinkedMasterTemplate(apiVersionSetTemplate, apiTemplate, creatorFileNames);
                         Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, @"/unlinked/", "master.template.json"));
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, @"/unlinked/", "master.parameters.json"));
+                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, "/master.template.json"));
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, "/master.parameters.json"));
                     }
 
                     ColoredConsole.WriteLine("Templates written to output location");
