@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class APIVersionSetTemplateCreator
     {

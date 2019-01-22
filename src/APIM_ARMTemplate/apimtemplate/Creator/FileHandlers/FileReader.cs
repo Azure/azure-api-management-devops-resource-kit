@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class FileReader
     {

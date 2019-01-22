@@ -27,5 +27,5 @@ api:
         scope: scope
   products: starter, platinum    # Optional, adds api to the specified products
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates   # Required, folder the creator will write the templates to
-linked: true   # Optional
+linked: false   # Optional
 linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml   # Required if 'linked' property is set to true

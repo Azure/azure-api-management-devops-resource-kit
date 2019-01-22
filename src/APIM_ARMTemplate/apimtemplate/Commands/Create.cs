@@ -1,7 +1,7 @@
 using McMaster.Extensions.CommandLineUtils;
 using Colors.Net;
 using System;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {

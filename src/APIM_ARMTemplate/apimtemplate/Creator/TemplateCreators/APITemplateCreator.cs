@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Microsoft.OpenApi.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class APITemplateCreator
     {

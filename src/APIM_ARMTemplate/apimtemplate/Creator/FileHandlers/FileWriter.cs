@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class FileWriter
     {

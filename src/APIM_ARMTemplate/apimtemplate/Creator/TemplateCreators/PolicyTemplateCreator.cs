@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class PolicyTemplateCreator
     {
