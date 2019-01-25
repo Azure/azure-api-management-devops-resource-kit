@@ -23,7 +23,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return new CreatorFileNames()
             {
                 apiVersionSet = $@"/versionset.template.json",
-                api = $@"/api.template.json",
+                initialAPI = $@"/initialAPI.template.json",
+                subsequentAPI = $@"/subsequentAPI.template.json",
                 master = @"/master.template.json"
             };
         }

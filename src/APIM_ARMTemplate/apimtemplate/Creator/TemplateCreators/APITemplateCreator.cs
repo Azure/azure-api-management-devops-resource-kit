@@ -20,7 +20,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.productAPITemplateCreator = productAPITemplateCreator;
         }
 
-        public async Task<Template> CreateAPITemplateAsync(CreatorConfig creatorConfig)
+        public async Task<Template> CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
+        {
+            // create empty template
+            Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
+
+            // add parameters
+            apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
+            List<TemplateResource> resources = new List<TemplateResource>();
+            // create api resource with properties
+            APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResource(creatorConfig);
+            resources.Add(initialAPITemplateResource);
+
+            apiTemplate.resources = resources.ToArray();
+            return apiTemplate;
+        }
+
+        public async Task<Template> CreateSubsequentAPITemplateAsync(CreatorConfig creatorConfig)
         {
             // create empty template
             Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
@@ -36,12 +56,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource with properties
-            APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResource(creatorConfig);
             APITemplateResource subsequentAPITemplateResource = await this.CreateSubsequentAPITemplateResourceAsync(creatorConfig);
             PolicyTemplateResource apiPolicyResource = await this.policyTemplateCreator.CreateAPIPolicyTemplateResourceAsync(creatorConfig, dependsOnSubsequentAPI);
             List<PolicyTemplateResource> operationPolicyResources = await this.policyTemplateCreator.CreateOperationPolicyTemplateResourcesAsync(creatorConfig, dependsOnSubsequentAPI);
             List<ProductAPITemplateResource> productAPIResources = this.productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOnSubsequentAPI);
-            resources.Add(initialAPITemplateResource);
             resources.Add(subsequentAPITemplateResource);
             resources.Add(apiPolicyResource);
             resources.AddRange(operationPolicyResources);
@@ -60,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}-initial')]",
+                name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]",
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-01-01",
                 properties = new APITemplateProperties()
@@ -112,7 +130,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix
                 },
-                dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{creatorConfig.api.name}-initial')]" }
+                dependsOn = new string[] { }
             };
             return apiTemplateResource;
         }

@@ -12,7 +12,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         }
 
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
-            Template apiTemplate,
+            Template initialAPITemplate,
+            Template subsequentAPITemplate,
             CreatorFileNames creatorFileNames)
         {
             // create empty template
@@ -32,9 +33,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
 
             //api
-            string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.api}')]";
+            string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.initialAPI}')]";
             string[] initialAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
-            resources.Add(this.CreateMasterTemplateResource("apiTemplate", initialAPIUri, initialAPIDependsOn));
+            resources.Add(this.CreateMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
+
+            string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.subsequentAPI}')]";
+            string[] subsequentAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'initialAPITemplate')]" } : new string[] { };
+            resources.Add(this.CreateMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
