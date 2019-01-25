@@ -76,11 +76,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     protocols = this.CreateProtocols(doc)
                 },
                 // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
-                dependsOn = creatorConfig.linked == true ? new string[] { } : new string[] { $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]" }
+                dependsOn = new string[] { }
             };
+            if (creatorConfig.linked == false && creatorConfig.apiVersionSet != null)
+            {
+                apiTemplateResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]" };
+            }
             if (creatorConfig.apiVersionSet != null)
             {
                 apiTemplateResource.properties.apiVersionSetId = "[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]";
+            }
+            else if (creatorConfig.api.apiVersionSetId != null)
+            {
+                apiTemplateResource.properties.apiVersionSetId = $"{creatorConfig.api.apiVersionSetId}";
+
             }
             return apiTemplateResource;
         }

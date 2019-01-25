@@ -28,6 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string suffix { get; set; }
         public string apiVersion { get; set; }
         public string apiVersionDescription { get; set; }
+        public string apiVersionSetId { get; set; }
         public string revision { get; set; }
         public string revisionDescription { get; set; }
         public Dictionary<string, OperationsConfig> operations { get; set; }
