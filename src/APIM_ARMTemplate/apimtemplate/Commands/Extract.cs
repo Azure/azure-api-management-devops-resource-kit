@@ -2,6 +2,7 @@ using System;
 using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -37,9 +38,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     CreatorConfig creatorConfig = new CreatorConfig
                     {
                         version = "1.0.0",
-                        outputLocation = @"c:\\projs\\",
+                        outputLocation = @"",
                         apimServiceName = apimname,
-                        api = apiConfig                        
+                        api = apiConfig
                     };
                     creatorConfig.api.openApiSpec = null;
                     creatorConfig.api.name = extractedAPI.value[i].name;
@@ -72,12 +73,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     FileWriter fileWriter = new FileWriter();
                     CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorFileNames();
 
-                    Console.WriteLine("Writing API Version Set File for {0} API ...", extractedAPI.value[i].name);
-                    fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, extractedAPI.value[i].name, "-", creatorFileNames.apiVersionSet));
+                    if (extractedAPI.value[i].properties.apiVersionSetId != null)
+                    {
+                        Console.WriteLine("Writing API Version Set File for {0} API ...", extractedAPI.value[i].name);
+                        fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, extractedAPI.value[i].name, "-", creatorFileNames.apiVersionSet));
+                    }
+                    else Console.WriteLine("{0} has no API version set.", extractedAPI.value[i].name);
+
                     Console.WriteLine("Writing API File for {0} API ...", extractedAPI.value[i].name);
                     fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, extractedAPI.value[i].name, "-", creatorFileNames.api));
-                    
                 }
+                Console.WriteLine("All files are saved on {0} folder! Press any key.", Directory.GetCurrentDirectory());
                 Console.ReadKey();
                 return 0;
             });
