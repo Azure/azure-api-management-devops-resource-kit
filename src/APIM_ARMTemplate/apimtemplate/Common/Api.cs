@@ -38,6 +38,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
           
             return await CallApiManagement(azToken, requestUrl);
         }
+        public async Task<string> GetAPIVersionSet(string ApiManagementName, string ResourceGroupName, string APIVersionSetId)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+                                                                                       
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/api-version-sets/{4}?api-version={5}",
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, APIVersionSetId ,Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
         private static async Task<string> CallApiManagement(string azToken, string requestUrl)
         {
             using (HttpClient httpClient = new HttpClient())

@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class ExtractTemplateCreator
+    public class TemplateCreator
     {
-        public Template ExtractorCreateEmptyTemplate()
+        public Template CreateEmptyTemplate()
         {
             // creates empty template for use in all other template creators
             Template template = new Template()

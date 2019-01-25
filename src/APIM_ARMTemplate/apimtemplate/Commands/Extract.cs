@@ -1,13 +1,9 @@
 using System;
-using System.IO;
-using System.Net;
 using McMaster.Extensions.CommandLineUtils;
-using Colors.Net;
-using Newtonsoft.Json.Linq;
-using System.Linq;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class ExtractCommand : CommandLineApplication
     {
@@ -20,89 +16,71 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             var resourceGroupName = this.Option("--resourceGroup <resourceGroup>", "Resource Group name", CommandOptionType.SingleValue);
 
             this.HelpOption();
-                 
-            this.OnExecute(() =>
+
+            this.OnExecute(async () =>
             {
                 if (!apiManagementName.HasValue()) throw new Exception("Missing parameter <apimname>.");
                 if (!resourceGroupName.HasValue()) throw new Exception("Missing parameter <resourceGroup>.");
 
-               // TemplateCreator templateCreator = new TemplateCreator();
-                
                 string resourceGroup = resourceGroupName.Values[0].ToString();
                 string apimname = apiManagementName.Values[0].ToString();
                 Api api = new Api();
                 string apis = api.GetAPIs(apimname, resourceGroup).Result;
-                JObject oApis = JObject.Parse(apis);
-                int count = oApis["value"].Count<object>();
 
-                ConsoleColor lastColor = Console.ForegroundColor; 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("{0} API's found!", count);
-                Console.ForegroundColor = lastColor;
+                ExtractedAPI extractedAPI = JsonConvert.DeserializeObject<ExtractedAPI>(apis);
+                Console.WriteLine("{0} API's found!", extractedAPI.value.Count.ToString());
 
-                DownloadFile("https://github.com/odaibert/apim_templates/blob/master/API.json", "API.json");
-
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < extractedAPI.value.Count; i++)
                 {
-                    Console.WriteLine(oApis);
-                    string apiname = (string)oApis["value"][i]["name"];
-                    ColoredConsole.WriteLine(apiname);
+                    APIConfig apiConfig = new APIConfig();
 
-                    ColoredConsole.WriteLine(api.GetAPIOperations(apimname, resourceGroup, apiname).Result);
+                    CreatorConfig creatorConfig = new CreatorConfig
+                    {
+                        version = "1.0.0",
+                        outputLocation = @"c:\\projs\\",
+                        apimServiceName = apimname,
+                        api = apiConfig                        
+                    };
+                    creatorConfig.api.openApiSpec = null;
+                    creatorConfig.api.name = extractedAPI.value[i].name;
+                    creatorConfig.api.apiVersion = extractedAPI.value[i].properties.apiVersion;
+                    creatorConfig.api.apiVersionDescription = extractedAPI.value[i].properties.apiVersionDescription;
+                    creatorConfig.api.suffix = extractedAPI.value[i].properties.path;
+                    creatorConfig.linked = false;
+
+                    if (extractedAPI.value[i].properties.apiVersionSetId != null)
+                    {
+                        string APIVersionSetFull = extractedAPI.value[i].properties.apiVersionSetId;
+                        string APIVersionSetId = APIVersionSetFull.Substring(APIVersionSetFull.LastIndexOf('/') + 1);
+                        APIVersionSetId = api.GetAPIVersionSet(apimname, resourceGroup, APIVersionSetId).Result;
+                        APIVersionSetTemplateResource apiv = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(APIVersionSetId);
+
+                        creatorConfig.apiVersionSet = apiv.properties;
+                    }
+
+                    TemplateCreator templateCreator = new TemplateCreator();
+                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
+                    ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
+                    //PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(templateCreator);
+                    //MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
+
+                    // create templates from provided configuration
+                    Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
+                    Template apiTemplate = await apiTemplateCreator.CreateAPITemplateAsync(creatorConfig);
+
+                    FileWriter fileWriter = new FileWriter();
+                    CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorFileNames();
+
+                    Console.WriteLine("Writing API Version Set File for {0} API ...", extractedAPI.value[i].name);
+                    fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, extractedAPI.value[i].name, "-", creatorFileNames.apiVersionSet));
+                    Console.WriteLine("Writing API File for {0} API ...", extractedAPI.value[i].name);
+                    fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, extractedAPI.value[i].name, "-", creatorFileNames.api));
+                    
                 }
                 Console.ReadKey();
-
                 return 0;
             });
         }
-        private static string FormatJSON(string json)
-        {
-            dynamic parsedJson = JsonConvert.DeserializeObject(json);
-            return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
-        }
-        public static void DownloadFile(string sourceURL, string destinationPath)
-        {
-            long fileSize = 0;
-            int bufferSize = 1024;
-            bufferSize *= 1000;
-            long existLen = 0;
-            if (File.Exists(destinationPath))
-            {
-                FileInfo destinationFileInfo = new FileInfo(destinationPath);
-                existLen = destinationFileInfo.Length;
-            }
-
-
-            FileStream saveFileStream;
-            if (existLen > 0)
-                saveFileStream = new FileStream(destinationPath,
-                                                          FileMode.Append,
-                                                          FileAccess.Write,
-                                                          FileShare.ReadWrite);
-            else
-                saveFileStream = new FileStream(destinationPath,
-                                                          FileMode.Create,
-                                                          FileAccess.Write,
-                                                          FileShare.ReadWrite);
-
-            HttpWebRequest httpReq;
-            HttpWebResponse httpRes;
-            httpReq = (HttpWebRequest)WebRequest.Create(sourceURL);
-            httpReq.AddRange((int)existLen);
-            Stream resStream;
-            httpRes = (HttpWebResponse)httpReq.GetResponse();
-            resStream = httpRes.GetResponseStream();
-
-            fileSize = httpRes.ContentLength;
-
-            int byteSize;
-            byte[] downBuffer = new byte[bufferSize];
-
-            while ((byteSize = resStream.Read(downBuffer, 0, downBuffer.Length)) > 0)
-            {
-                saveFileStream.Write(downBuffer, 0, byteSize);
-            }
-        }
-
     }
 }

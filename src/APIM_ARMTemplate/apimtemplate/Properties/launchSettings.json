@@ -2,8 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --name apim-extractor --resourceGroup APIM-Extractor"
-      
+      "commandLineArgs": "extract  --name odaibert-deploy2 --resourceGroup APIM-Extractor"
     }
   }
 }
