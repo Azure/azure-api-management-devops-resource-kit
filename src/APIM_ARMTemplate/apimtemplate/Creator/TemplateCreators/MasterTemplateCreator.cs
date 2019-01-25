@@ -45,9 +45,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return masterTemplate;
         }
 
-        public Template CreateUnlinkedMasterTemplate(Template apiVersionSetTemplate,
-            Template apiTemplate,
-            CreatorFileNames creatorFileNames)
+        public Template CreateInitialUnlinkedMasterTemplate(Template apiVersionSetTemplate,
+            Template initialAPITemplate)
         {
             // create empty template
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
@@ -65,7 +64,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
 
             //api
-            resources.AddRange(apiTemplate.resources);
+            resources.AddRange(initialAPITemplate.resources);
+
+            masterTemplate.resources = resources.ToArray();
+            return masterTemplate;
+        }
+
+        public Template CreateSubsequentUnlinkedMasterTemplate(Template subequentAPITemplate)
+        {
+            // create empty template
+            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
+
+            // add parameters
+            masterTemplate.parameters = this.CreateMasterTemplateParameters(false);
+
+            // add all resources directly
+            List<TemplateResource> resources = new List<TemplateResource>();
+
+            //api
+            resources.AddRange(subequentAPITemplate.resources);
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;

@@ -1,7 +1,7 @@
 version: 0.0.1   # Required
-apimServiceName: LucasLinked2   # Required, must match name of an apim service deployed in the specified resource group
+apimServiceName: LucasUnlinked2   # Required, must match name of an apim service deployed in the specified resource group
 apiVersionSet:   # Optional
-    displayName: myAPIVersionSet
+    displayName: swaggerPetstoreVersionSet
     description: a description
     versioningScheme: Query
     versionQueryName: versionQuery
@@ -23,5 +23,5 @@ api:
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml   # Optional, can be url or local file
   products: starter, platinum    # Optional, adds api to the specified products
 outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates   # Required, folder the creator will write the templates to
-linked: true   # Optional
+linked: false   # Optional
 linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml   # Required if 'linked' property is set to true
