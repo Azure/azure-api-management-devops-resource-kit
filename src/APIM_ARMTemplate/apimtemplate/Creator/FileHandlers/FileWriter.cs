@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.IO;
-using System.Collections.Generic;
-using System;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class FileWriter
     {
@@ -26,7 +23,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             return new CreatorFileNames()
             {
                 apiVersionSet = $@"/versionset.template.json",
-                api = $@"/api.template.json",
+                initialAPI = $@"/initialAPI.template.json",
+                subsequentAPI = $@"/subsequentAPI.template.json",
                 master = @"/master.template.json"
             };
         }

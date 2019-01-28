@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class CLICreatorArguments
     {
@@ -30,6 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string suffix { get; set; }
         public string apiVersion { get; set; }
         public string apiVersionDescription { get; set; }
+        public string apiVersionSetId { get; set; }
         public string revision { get; set; }
         public string revisionDescription { get; set; }
         public Dictionary<string, OperationsConfig> operations { get; set; }

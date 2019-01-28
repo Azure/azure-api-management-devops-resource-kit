@@ -1,12 +1,9 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using Newtonsoft.Json;
 using Microsoft.OpenApi.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class APITemplateCreator
     {
@@ -23,7 +20,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             this.productAPITemplateCreator = productAPITemplateCreator;
         }
 
-        public async Task<Template> CreateAPITemplateAsync(CreatorConfig creatorConfig)
+        public async Task<Template> CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
+        {
+            // create empty template
+            Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
+
+            // add parameters
+            apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
+            List<TemplateResource> resources = new List<TemplateResource>();
+            // create api resource w/ metadata
+            APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResource(creatorConfig);
+            resources.Add(initialAPITemplateResource);
+
+            apiTemplate.resources = resources.ToArray();
+            return apiTemplate;
+        }
+
+        public async Task<Template> CreateSubsequentAPITemplateAsync(CreatorConfig creatorConfig)
         {
             // create empty template
             Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
@@ -38,13 +55,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             string[] dependsOnSubsequentAPI = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            // create api resource with properties
-            APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResource(creatorConfig);
+            // create api resource w/ swagger content and policies
             APITemplateResource subsequentAPITemplateResource = await this.CreateSubsequentAPITemplateResourceAsync(creatorConfig);
             PolicyTemplateResource apiPolicyResource = await this.policyTemplateCreator.CreateAPIPolicyTemplateResourceAsync(creatorConfig, dependsOnSubsequentAPI);
             List<PolicyTemplateResource> operationPolicyResources = await this.policyTemplateCreator.CreateOperationPolicyTemplateResourcesAsync(creatorConfig, dependsOnSubsequentAPI);
             List<ProductAPITemplateResource> productAPIResources = this.productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOnSubsequentAPI);
-            resources.Add(initialAPITemplateResource);
             resources.Add(subsequentAPITemplateResource);
             resources.Add(apiPolicyResource);
             resources.AddRange(operationPolicyResources);
@@ -63,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}-initial')]",
+                name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]",
                 type = "Microsoft.ApiManagement/service/apis",
                 apiVersion = "2018-01-01",
                 properties = new APITemplateProperties()
@@ -79,11 +94,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     protocols = this.CreateProtocols(doc)
                 },
                 // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
-                dependsOn = creatorConfig.linked == true ? new string[] { } : new string[] { $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]" }
+                dependsOn = new string[] { }
             };
+            // if the template is linked and a version set was created, the initial api depends on it
+            if (creatorConfig.linked == false && creatorConfig.apiVersionSet != null)
+            {
+                apiTemplateResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]" };
+            }
+            // set the version set id
             if (creatorConfig.apiVersionSet != null)
             {
                 apiTemplateResource.properties.apiVersionSetId = "[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]";
+            }
+            else if (creatorConfig.api.apiVersionSetId != null)
+            {
+                apiTemplateResource.properties.apiVersionSetId = $"{creatorConfig.api.apiVersionSetId}";
+
             }
             return apiTemplateResource;
         }
@@ -106,13 +132,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix
                 },
-                dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{creatorConfig.api.name}-initial')]" }
+                dependsOn = new string[] { }
             };
             return apiTemplateResource;
         }
 
         public string[] CreateProtocols(OpenApiDocument doc)
         {
+            // pull protocols from swagger OpenApiDocument
             List<string> protocols = new List<string>();
             foreach (OpenApiServer server in doc.Servers)
             {

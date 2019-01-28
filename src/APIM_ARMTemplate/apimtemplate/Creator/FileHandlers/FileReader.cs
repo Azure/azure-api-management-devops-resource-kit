@@ -1,15 +1,11 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class FileReader
     {
