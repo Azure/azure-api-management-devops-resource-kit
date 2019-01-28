@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            // create api resource with properties
+            // create api resource w/ metadata
             APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResource(creatorConfig);
             resources.Add(initialAPITemplateResource);
 
@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] dependsOnSubsequentAPI = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            // create api resource with properties
+            // create api resource w/ swagger content and policies
             APITemplateResource subsequentAPITemplateResource = await this.CreateSubsequentAPITemplateResourceAsync(creatorConfig);
             PolicyTemplateResource apiPolicyResource = await this.policyTemplateCreator.CreateAPIPolicyTemplateResourceAsync(creatorConfig, dependsOnSubsequentAPI);
             List<PolicyTemplateResource> operationPolicyResources = await this.policyTemplateCreator.CreateOperationPolicyTemplateResourcesAsync(creatorConfig, dependsOnSubsequentAPI);
@@ -96,7 +96,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
                 dependsOn = new string[] { }
             };
-            // if there is a linked template and a version set was created, the initial api depends on it
+            // if the template is linked and a version set was created, the initial api depends on it
             if (creatorConfig.linked == false && creatorConfig.apiVersionSet != null)
             {
                 apiTemplateResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]" };
@@ -139,6 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public string[] CreateProtocols(OpenApiDocument doc)
         {
+            // pull protocols from swagger OpenApiDocument
             List<string> protocols = new List<string>();
             foreach (OpenApiServer server in doc.Servers)
             {

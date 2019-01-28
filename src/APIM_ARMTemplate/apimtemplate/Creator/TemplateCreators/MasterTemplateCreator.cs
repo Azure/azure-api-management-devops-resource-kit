@@ -29,17 +29,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (apiVersionSetTemplate != null)
             {
                 string apiVersionSetUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.apiVersionSet}')]";
-                resources.Add(this.CreateMasterTemplateResource("versionSetTemplate", apiVersionSetUri, new string[] { }));
+                resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, new string[] { }));
             }
 
             //api
             string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.initialAPI}')]";
             string[] initialAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
-            resources.Add(this.CreateMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
+            resources.Add(this.CreateLinkedMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
 
             string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.subsequentAPI}')]";
             string[] subsequentAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'initialAPITemplate')]" } : new string[] { };
-            resources.Add(this.CreateMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
+            resources.Add(this.CreateLinkedMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
@@ -88,7 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return masterTemplate;
         }
 
-        public MasterTemplateResource CreateMasterTemplateResource(string name, string uriLink, string[] dependsOn)
+        public MasterTemplateResource CreateLinkedMasterTemplateResource(string name, string uriLink, string[] dependsOn)
         {
             MasterTemplateResource masterTemplateResource = new MasterTemplateResource()
             {
@@ -116,6 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(bool linked)
         {
             // used to create the parameter metatadata, etc (not value) for use in file with resources
+            // add parameters with metatdata properties
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
@@ -147,7 +148,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create empty template
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
 
-            // add parameters
+            // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
