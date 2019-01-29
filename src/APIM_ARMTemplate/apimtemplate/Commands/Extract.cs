@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string apimname = apiManagementName.Values[0].ToString();
                 Api api = new Api();
                 string apis = api.GetAPIs(apimname, resourceGroup).Result;
-                
+
                 ExtractedAPI extractedAPI = JsonConvert.DeserializeObject<ExtractedAPI>(apis);
                 Console.WriteLine("{0} API's found!", extractedAPI.value.Count.ToString());
                 FileReader fileReader = new FileReader();
@@ -55,16 +55,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Dictionary<string, OperationsConfig> operationsDic = new Dictionary<string, OperationsConfig>();
                     //operation list
                     string operations = api.GetAPIOperations(apimname, resourceGroup, creatorConfig.api.name).Result;
-                    var o = JsonConvert.DeserializeObject<Operation.Operation>(operations);
-                    OperationsConfig op = new OperationsConfig();
-                    foreach (var item in o.value)
+                    var oOperations = JsonConvert.DeserializeObject<Operation.Operation>(operations);
+
+                    //get operation policy                    
+                    for (int o = 0; o < oOperations.value.Count; o++)
                     {
-                        string pol = api.GetOperationPolicy(apimname, resourceGroup, creatorConfig.api.name, item.name).Result;
-                        var p = JsonConvert.DeserializeObject<Operation.Operation>(pol);
-                        operationsDic.Add(item.name, p.value[0].properties.policyContent);
-                        creatorConfig.api.operations = operationsDic; 
-                      
+                        string operationName = oOperations.value[o].name;
+                        string policies = api.GetOperationPolicy(apimname, resourceGroup, creatorConfig.api.name, operationName).Result;
+                        var oPolicies = JsonConvert.DeserializeObject<Operation.Operation>(policies);
+                        OperationsConfig operationsConfig = new OperationsConfig();
+
+                        for (int oc = 0; oc < oPolicies.value.Count; oc++)
+                        {
+                            operationsConfig.policy = oPolicies.value[oc].properties.policyContent;
+                            operationsDic.Add(operationName, operationsConfig);
+                        }                        
                     }
+
+                    creatorConfig.api.operations = operationsDic; 
 
                     if (extractedAPI.value[i].properties.apiVersionSetId != null)
                     {
@@ -81,7 +89,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
-                    PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator();
+                    PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(creatorConfig);
                     APITemplateCreatorEx apiTemplateCreator = new APITemplateCreatorEx(templateCreator, policyTemplateCreator, productAPITemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
 
@@ -98,21 +106,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         // write templates to outputLocation
                         if (apiVersionSetTemplate != null)
                         {
-                            fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSet));
+                            fileWriter.WriteJSONToFile(apiVersionSetTemplate, string.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSet));
                         }
-                        fileWriter.WriteJSONToFile(initialAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.initialAPI));
-                        fileWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.subsequentAPI));
-                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, "/master.template.json"));
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, "/master.parameters.json"));
+                        fileWriter.WriteJSONToFile(initialAPITemplate, string.Concat(creatorConfig.outputLocation, creatorFileNames.initialAPI));
+                        fileWriter.WriteJSONToFile(subsequentAPITemplate, string.Concat(creatorConfig.outputLocation, creatorFileNames.subsequentAPI));
+                        fileWriter.WriteJSONToFile(masterTemplate, string.Concat(creatorConfig.outputLocation, "/master.template.json"));
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, string.Concat(creatorConfig.outputLocation, "/master.parameters.json"));
                     }
                     else
                     {
                         Template initialMasterTemplate = masterTemplateCreator.CreateInitialUnlinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate);
                         Template subsequentMasterTemplate = masterTemplateCreator.CreateSubsequentUnlinkedMasterTemplate(subsequentAPITemplate);
                         Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-                        fileWriter.WriteJSONToFile(initialMasterTemplate, String.Concat(creatorConfig.outputLocation, creatorConfig.api.name , "-master1.template.json"));
-                        fileWriter.WriteJSONToFile(subsequentMasterTemplate, String.Concat(creatorConfig.outputLocation, creatorConfig.api.name, "-master2.template.json"));
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorConfig.api.name, "-master.parameters.json"));
+                        fileWriter.WriteJSONToFile(initialMasterTemplate, string.Concat(creatorConfig.outputLocation, creatorConfig.api.name , "-master1.template.json"));
+                        fileWriter.WriteJSONToFile(subsequentMasterTemplate, string.Concat(creatorConfig.outputLocation, creatorConfig.api.name, "-master2.template.json"));
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, string.Concat(creatorConfig.outputLocation, creatorConfig.api.name, "-master.parameters.json"));
                     }                    
                 }
                 Console.WriteLine("Templates written to output location");

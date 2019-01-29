@@ -6,14 +6,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
     public class PolicyTemplateCreator
     {
         private FileReader fileReader;
+        CreatorConfig creatorConfig;
 
         public PolicyTemplateCreator(FileReader fileReader)
         {
             this.fileReader = fileReader;
         }
-        public PolicyTemplateCreator()
+        public PolicyTemplateCreator(CreatorConfig creatorConfig)
         {
-    
+            this.creatorConfig = creatorConfig;
         }
         public async Task<PolicyTemplateResource> CreateAPIPolicyTemplateResourceAsync(CreatorConfig creatorConfig, string[] dependsOn)
         {
@@ -26,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
-                    policyContent = await this.fileReader.RetrieveJSONContentsAsync(creatorConfig.api.policy)
+                    policyContent = creatorConfig.api.policy
                 },
                 dependsOn = dependsOn
             };
@@ -44,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = "rawxml",
-                    policyContent = await this.fileReader.RetrieveJSONContentsAsync(policyPair.Value.policy)
+                    policyContent = policyPair.Value.policy
                 },
                 dependsOn = dependsOn
             };
