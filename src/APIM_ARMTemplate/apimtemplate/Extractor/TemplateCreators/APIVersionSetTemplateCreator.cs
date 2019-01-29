@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
 using Newtonsoft.Json;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {

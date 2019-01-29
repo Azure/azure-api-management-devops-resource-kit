@@ -1,12 +1,8 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
@@ -37,7 +33,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         CreatorConfig yamlObject = JsonConvert.DeserializeObject<CreatorConfig>(jsonText);
                         return yamlObject;
                     }
-                } else {
+                }
+                else
+                {
                     throw new Exception("Unable to fetch remote config YAML file.");
                 }
             }

@@ -1,10 +1,4 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Linq;
-using Newtonsoft.Json;
-
+﻿
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class TemplateCreator

@@ -20,6 +20,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             return await CallApiManagement(azToken, requestUrl);
         }
+        public async Task<string> GetOperationPolicy(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationId)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/policies?api-version={6}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationId, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
         public async Task<string> GetAPIDetails(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();

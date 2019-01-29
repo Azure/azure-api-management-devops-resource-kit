@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Newtonsoft.Json;
 using System.IO;
-using System.Collections.Generic;
-using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -25,9 +23,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // generate useable object with file names for consistency throughout project
             return new CreatorFileNames()
             {
-                apiVersionSet = $@"versionset.template.json",
-                api = $@"api.template.json",
-                master = @"master.template.json"
+                apiVersionSet = $@"/versionset.template.json",
+                initialAPI = $@"/initialAPI.template.json",
+                subsequentAPI = $@"/subsequentAPI.template.json",
+                master = @"/master.template.json"
             };
         }
     }
