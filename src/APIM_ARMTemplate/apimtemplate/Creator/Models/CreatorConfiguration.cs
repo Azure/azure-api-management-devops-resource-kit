@@ -11,11 +11,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         public string version { get; set; }
         public string apimServiceName { get; set; }
-        public APIVersionSetProperties apiVersionSet { get; set; }
+        public APIVersionSetConfig apiVersionSet { get; set; }
         public APIConfig api { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
+    }
+
+    public class APIVersionSetConfig: APIVersionSetProperties
+    {
+        public string id { get; set; }
     }
 
     public class APIConfig

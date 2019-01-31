@@ -1,6 +1,7 @@
 version: 0.0.1   # Required
 apimServiceName: Lucas2   # Required, must match name of an apim service deployed in the specified resource group
 apiVersionSet:   # Optional
+    id: myAPIVersionSetID
     displayName: swaggerPetstoreVersionSetLinked
     description: a description
     versioningScheme: Query
