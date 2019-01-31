@@ -19,8 +19,8 @@ To get a subscription key for accessing APIs, a subscription is required. A subs
 	New-AzureRmResourceGroupDeployment -Name 'contoso-deployment' -ResourceGroupName <resource-group> -TemplateFile "subscriptions.*.template.json" -TemplateParameterFile "subscriptions.*.parameters.json"
 ```
 
-	**Note:**
-	1. Replace `<resource-group>` & parameter values that pertain to your environment in corresponding parameters file.
-	2. Currently, Subscriptions for all APIs or an individual API is available in the API Management Consumption tier only.
+**Note:**
+1. Replace `<resource-group>` & parameter values that pertain to your environment in corresponding parameters file.
+2. Currently, Subscriptions for all APIs or an individual API is available in the API Management Consumption tier only.
 
 Refer: [Subscriptions in Azure API Management](https://docs.microsoft.com/en-us/azure/api-management/api-management-subscriptions) for more details.
