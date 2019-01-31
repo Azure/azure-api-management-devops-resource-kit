@@ -60,15 +60,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource w/ swagger content and policies
             APITemplateResource subsequentAPITemplateResource = this.CreateSubsequentAPITemplateResource(creatorConfig);
-            PolicyTemplateResource apiPolicyResource = this.policyTemplateCreator.CreateAPIPolicyTemplateResource(creatorConfig, dependsOnSubsequentAPI);
-            List<PolicyTemplateResource> operationPolicyResources = this.policyTemplateCreator.CreateOperationPolicyTemplateResources(creatorConfig, dependsOnSubsequentAPI);
-            List<ProductAPITemplateResource> productAPIResources = this.productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOnSubsequentAPI);
-            DiagnosticTemplateResource diagnosticTemplateResource = this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(creatorConfig, dependsOnSubsequentAPI);
+            PolicyTemplateResource apiPolicyResource = creatorConfig.api.policy != null ? this.policyTemplateCreator.CreateAPIPolicyTemplateResource(creatorConfig, dependsOnSubsequentAPI) : null;
+            List<PolicyTemplateResource> operationPolicyResources = creatorConfig.api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(creatorConfig, dependsOnSubsequentAPI) : null;
+            List<ProductAPITemplateResource> productAPIResources = creatorConfig.api.products != null ? this.productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOnSubsequentAPI) : null;
+            DiagnosticTemplateResource diagnosticTemplateResource = creatorConfig.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(creatorConfig, dependsOnSubsequentAPI) : null;
             resources.Add(subsequentAPITemplateResource);
-            resources.Add(apiPolicyResource);
-            resources.AddRange(operationPolicyResources);
-            resources.AddRange(productAPIResources);
-            resources.Add(diagnosticTemplateResource);
+            // add resources if not null
+            if (apiPolicyResource != null) resources.Add(apiPolicyResource);
+            if (operationPolicyResources != null) resources.AddRange(operationPolicyResources);
+            if (productAPIResources != null) resources.AddRange(productAPIResources);
+            if (diagnosticTemplateResource != null) resources.Add(diagnosticTemplateResource);
 
             apiTemplate.resources = resources.ToArray();
             return apiTemplate;
@@ -136,7 +137,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = "2018-01-01",
                 properties = new APITemplateProperties()
                 {
-                    contentFormat = isUrl ? "swagger-link-json": "swagger-json",
+                    contentFormat = isUrl ? "swagger-link-json" : "swagger-json",
                     contentValue = isUrl ? creatorConfig.api.openApiSpec : JsonConvert.SerializeObject(deserializedFileContents),
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix

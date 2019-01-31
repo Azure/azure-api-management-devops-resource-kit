@@ -14,12 +14,13 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 version: 0.0.1   # Required
 apimServiceName: testapimlucas   # Required, must match name of an apim service deployed in the specified resource group
 apiVersionSet:   # Optional
+    id: myAPIVersionSetID
     displayName: myAPIVersionSet
     description: a description
     versioningScheme: Query
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
-api:
+api:   # Required
   name: myAPI   # Required
   openApiSpec: ./swaggerPetstore.json   # Required, can be url or local file
   policy: ./apiPolicyHeaders.xml   # Optional, can be url or local file
@@ -40,6 +41,35 @@ api:
         authorizationServerId: serverId
         scope: scope
   products: starter, platinum    # Optional, adds api to the specified products
+diagnostic:   # Optional
+  alwaysLog: allErrors
+  loggerId: /loggers/applicationinsights,
+  sampling:
+    samplingType: fixed
+    percentage: 50
+  frontend: 
+    request:
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+    response: 
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+  backend: 
+    request:
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+    response: 
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+  enableHttpCorrelationHeaders: true
 outputLocation: C:\Users\user1\Desktop\GeneratedTemplates   # Required, folder the utility will write the templates to
 linked: true   # Optional
 linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml   # Required if 'linked' property is set to true

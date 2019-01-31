@@ -23,7 +23,7 @@ api:
     deletePet:  # Must match the operationId property of a path's operations
       policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml   # Optional, can be url or local file
   products: starter, platinum    # Optional, adds api to the specified products
-diagnostic:
+diagnostic: # Optional
     alwaysLog: allErrors
     loggerId: /loggers/applicationinsights,
     sampling:

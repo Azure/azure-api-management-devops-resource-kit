@@ -71,12 +71,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
 
                     // create templates from provided configuration
-                    CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorFileNames();
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
                     Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
                     if (creatorConfig.linked == true)
                     {
+                        CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorLinkedFileNames();
+
+                        // create linked master template
                         Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate, subsequentAPITemplate, creatorFileNames);
                         Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
@@ -91,9 +93,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                         fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, "/master.parameters.json"));
                     } else
                     {
+                        // create unlinked master template
                         Template initialMasterTemplate = masterTemplateCreator.CreateInitialUnlinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate);
                         Template subsequentMasterTemplate = masterTemplateCreator.CreateSubsequentUnlinkedMasterTemplate(subsequentAPITemplate);
                         Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+
+                        // write templates to outputLocation
                         fileWriter.WriteJSONToFile(initialMasterTemplate, String.Concat(creatorConfig.outputLocation, "/master1.template.json"));
                         fileWriter.WriteJSONToFile(subsequentMasterTemplate, String.Concat(creatorConfig.outputLocation, "/master2.template.json"));
                         fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, "/master.parameters.json"));

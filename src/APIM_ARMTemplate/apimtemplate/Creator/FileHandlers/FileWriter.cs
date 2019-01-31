@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             File.WriteAllText(location, jsonString);
         }
 
-        public CreatorFileNames GenerateCreatorFileNames()
+        public CreatorFileNames GenerateCreatorLinkedFileNames()
         {
             // generate useable object with file names for consistency throughout project
             return new CreatorFileNames()
