@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Colors.Net;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;

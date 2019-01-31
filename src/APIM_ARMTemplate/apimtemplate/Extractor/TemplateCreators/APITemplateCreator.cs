@@ -129,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
-                    contentValue = null,//JsonConvert.SerializeObject(deserializedFileContents),
+                    contentValue = "{\"swagger\":\"2.0\"}", //JsonConvert.SerializeObject(deserializedFileContents),
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix
                 },

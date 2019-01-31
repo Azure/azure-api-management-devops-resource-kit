@@ -4,13 +4,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "publisherEmail": {
-            "value": "odaibert@microsoft.com"
+            "value": "admin@contoso.com"
         },
         "publisherName": {
-            "value": "odaibert"
+            "value": "Contoso"
         },
         "ApimServiceName": {
-            "value": "odaibert-deploy2"
+            "value": "contosoapim-dev"
         }
     }
 }
