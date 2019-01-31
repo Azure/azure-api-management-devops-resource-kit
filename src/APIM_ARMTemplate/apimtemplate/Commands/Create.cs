@@ -73,7 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorFileNames();
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
-                    Template subsequentAPITemplate = await apiTemplateCreator.CreateSubsequentAPITemplateAsync(creatorConfig);
+                    Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
                     if (creatorConfig.linked == true)
                     {
                         Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate, subsequentAPITemplate, creatorFileNames);

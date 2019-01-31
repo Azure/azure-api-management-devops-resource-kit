@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
@@ -12,8 +13,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.fileReader = fileReader;
         }
 
-        public async Task<PolicyTemplateResource> CreateAPIPolicyTemplateResourceAsync(CreatorConfig creatorConfig, string[] dependsOn)
+        public PolicyTemplateResource CreateAPIPolicyTemplateResource(CreatorConfig creatorConfig, string[] dependsOn)
         {
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(creatorConfig.api.policy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
@@ -22,16 +25,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = "2018-01-01",
                 properties = new PolicyTemplateProperties()
                 {
-                    contentFormat = "rawxml",
-                    policyContent = await this.fileReader.RetrieveJSONContentsAsync(creatorConfig.api.policy)
+                    contentFormat = isUrl ? "rawxml-link" : "rawxml",
+                    policyContent = isUrl ? creatorConfig.api.policy : this.fileReader.RetrieveLocalFileContents(creatorConfig.api.policy)
                 },
                 dependsOn = dependsOn
             };
             return policyTemplateResource;
         }
 
-        public async Task<PolicyTemplateResource> CreateOperationPolicyTemplateResourceAsync(KeyValuePair<string, OperationsConfig> policyPair, string apiName, string[] dependsOn)
+        public PolicyTemplateResource CreateOperationPolicyTemplateResource(KeyValuePair<string, OperationsConfig> policyPair, string apiName, string[] dependsOn)
         {
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(policyPair.Value.policy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
@@ -40,21 +45,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = "2018-01-01",
                 properties = new PolicyTemplateProperties()
                 {
-                    contentFormat = "rawxml",
-                    policyContent = await this.fileReader.RetrieveJSONContentsAsync(policyPair.Value.policy)
+                    contentFormat = isUrl ? "rawxml-link" : "rawxml",
+                    policyContent = isUrl ? policyPair.Value.policy : this.fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
                 },
                 dependsOn = dependsOn
             };
             return policyTemplateResource;
         }
 
-        public async Task<List<PolicyTemplateResource>> CreateOperationPolicyTemplateResourcesAsync(CreatorConfig creatorConfig, string[] dependsOn)
+        public List<PolicyTemplateResource> CreateOperationPolicyTemplateResources(CreatorConfig creatorConfig, string[] dependsOn)
         {
             // create a policy resource for each policy listed in the config file and its associated provided xml file
             List<PolicyTemplateResource> policyTemplateResources = new List<PolicyTemplateResource>();
             foreach (KeyValuePair<string, OperationsConfig> pair in creatorConfig.api.operations)
             {
-                policyTemplateResources.Add(await this.CreateOperationPolicyTemplateResourceAsync(pair, creatorConfig.api.name, dependsOn));
+                policyTemplateResources.Add(this.CreateOperationPolicyTemplateResource(pair, creatorConfig.api.name, dependsOn));
             }
             return policyTemplateResources;
         }

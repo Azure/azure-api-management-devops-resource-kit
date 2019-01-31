@@ -56,29 +56,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
         }
 
-        public async Task<string> RetrieveJSONContentsAsync(string fileLocation)
+        public string RetrieveLocalFileContents(string fileLocation)
         {
-            Uri uriResult;
-            bool isUrl = Uri.TryCreate(fileLocation, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-            // return contents of supplied file
-            if (!isUrl)
-            {
-                return File.ReadAllText(fileLocation);
-            }
-            else
-            {
-                HttpClient client = new HttpClient();
-                HttpResponseMessage response = await client.GetAsync(uriResult);
-                if (response.IsSuccessStatusCode)
-                {
-                    string json = await response.Content.ReadAsStringAsync();
-                    return json;
-                }
-                else
-                {
-                    throw new Exception($"Unable to retrieve contents from ${fileLocation}");
-                }
-            };
+            return File.ReadAllText(fileLocation);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -33,14 +34,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource w/ metadata
-            APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResource(creatorConfig);
+            APITemplateResource initialAPITemplateResource = await this.CreateInitialAPITemplateResourceAsync(creatorConfig);
             resources.Add(initialAPITemplateResource);
 
             apiTemplate.resources = resources.ToArray();
             return apiTemplate;
         }
 
-        public async Task<Template> CreateSubsequentAPITemplateAsync(CreatorConfig creatorConfig)
+        public Template CreateSubsequentAPITemplate(CreatorConfig creatorConfig)
         {
             // create empty template
             Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
@@ -56,9 +57,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource w/ swagger content and policies
-            APITemplateResource subsequentAPITemplateResource = await this.CreateSubsequentAPITemplateResourceAsync(creatorConfig);
-            PolicyTemplateResource apiPolicyResource = await this.policyTemplateCreator.CreateAPIPolicyTemplateResourceAsync(creatorConfig, dependsOnSubsequentAPI);
-            List<PolicyTemplateResource> operationPolicyResources = await this.policyTemplateCreator.CreateOperationPolicyTemplateResourcesAsync(creatorConfig, dependsOnSubsequentAPI);
+            APITemplateResource subsequentAPITemplateResource = this.CreateSubsequentAPITemplateResource(creatorConfig);
+            PolicyTemplateResource apiPolicyResource = this.policyTemplateCreator.CreateAPIPolicyTemplateResource(creatorConfig, dependsOnSubsequentAPI);
+            List<PolicyTemplateResource> operationPolicyResources = this.policyTemplateCreator.CreateOperationPolicyTemplateResources(creatorConfig, dependsOnSubsequentAPI);
             List<ProductAPITemplateResource> productAPIResources = this.productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOnSubsequentAPI);
             resources.Add(subsequentAPITemplateResource);
             resources.Add(apiPolicyResource);
@@ -69,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return apiTemplate;
         }
 
-        public async Task<APITemplateResource> CreateInitialAPITemplateResource(CreatorConfig creatorConfig)
+        public async Task<APITemplateResource> CreateInitialAPITemplateResourceAsync(CreatorConfig creatorConfig)
         {
             // protocols can be pulled by converting the OpenApiSpec into the OpenApiDocument class
             OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
@@ -115,12 +116,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return apiTemplateResource;
         }
 
-        public async Task<APITemplateResource> CreateSubsequentAPITemplateResourceAsync(CreatorConfig creatorConfig)
+        public APITemplateResource CreateSubsequentAPITemplateResource(CreatorConfig creatorConfig)
         {
             // create api resource with properties
             string subsequentAPIName = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]";
             string subsequentAPIType = "Microsoft.ApiManagement/service/apis";
-            object deserializedFileContents = JsonConvert.DeserializeObject<object>(await this.fileReader.RetrieveJSONContentsAsync(creatorConfig.api.openApiSpec));
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(creatorConfig.api.openApiSpec, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            // used to escape sequences in local swagger json
+            object deserializedFileContents = isUrl ? null : JsonConvert.DeserializeObject<object>(this.fileReader.RetrieveLocalFileContents(creatorConfig.api.openApiSpec));
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
                 name = subsequentAPIName,
@@ -128,8 +132,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = "2018-01-01",
                 properties = new APITemplateProperties()
                 {
-                    contentFormat = "swagger-json",
-                    contentValue = JsonConvert.SerializeObject(deserializedFileContents),
+                    contentFormat = isUrl ? "swagger-link-json": "swagger-json",
+                    contentValue = isUrl ? creatorConfig.api.openApiSpec : JsonConvert.SerializeObject(deserializedFileContents),
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix
                 },
