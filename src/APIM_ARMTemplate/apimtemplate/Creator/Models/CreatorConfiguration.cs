@@ -13,6 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string apimServiceName { get; set; }
         public APIVersionSetConfig apiVersionSet { get; set; }
         public APIConfig api { get; set; }
+        public DiagnosticTemplateProperties diagnostic { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }

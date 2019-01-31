@@ -12,13 +12,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         private TemplateCreator templateCreator;
         private PolicyTemplateCreator policyTemplateCreator;
         private ProductAPITemplateCreator productAPITemplateCreator;
+        private DiagnosticTemplateCreator diagnosticTemplateCreator;
 
-        public APITemplateCreator(FileReader fileReader, TemplateCreator templateCreator, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator)
+        public APITemplateCreator(FileReader fileReader, TemplateCreator templateCreator, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator)
         {
             this.fileReader = fileReader;
             this.templateCreator = templateCreator;
             this.policyTemplateCreator = policyTemplateCreator;
             this.productAPITemplateCreator = productAPITemplateCreator;
+            this.diagnosticTemplateCreator = diagnosticTemplateCreator;
         }
 
         public async Task<Template> CreateInitialAPITemplateAsync(CreatorConfig creatorConfig)
@@ -61,10 +63,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             PolicyTemplateResource apiPolicyResource = this.policyTemplateCreator.CreateAPIPolicyTemplateResource(creatorConfig, dependsOnSubsequentAPI);
             List<PolicyTemplateResource> operationPolicyResources = this.policyTemplateCreator.CreateOperationPolicyTemplateResources(creatorConfig, dependsOnSubsequentAPI);
             List<ProductAPITemplateResource> productAPIResources = this.productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOnSubsequentAPI);
+            DiagnosticTemplateResource diagnosticTemplateResource = this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(creatorConfig, dependsOnSubsequentAPI);
             resources.Add(subsequentAPITemplateResource);
             resources.Add(apiPolicyResource);
             resources.AddRange(operationPolicyResources);
             resources.AddRange(productAPIResources);
+            resources.Add(diagnosticTemplateResource);
 
             apiTemplate.resources = resources.ToArray();
             return apiTemplate;
