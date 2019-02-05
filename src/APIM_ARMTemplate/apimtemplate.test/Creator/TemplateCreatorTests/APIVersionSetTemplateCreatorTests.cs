@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Xunit;
-using Newtonsoft.Json.Linq;
+﻿using Xunit;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
