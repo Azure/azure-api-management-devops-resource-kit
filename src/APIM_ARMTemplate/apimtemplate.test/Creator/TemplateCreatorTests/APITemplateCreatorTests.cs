@@ -2,7 +2,7 @@
 using Xunit;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class APITemplateCreatorTests
     {
