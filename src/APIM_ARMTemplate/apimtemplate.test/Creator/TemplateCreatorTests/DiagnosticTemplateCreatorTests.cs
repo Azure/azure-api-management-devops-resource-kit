@@ -5,10 +5,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     public class DiagnosticTemplateCreatorTests
     {
         [Fact]
-        public void ShouldCreateAPIVersionSetTemplateFromCreatorConfig()
+        public void ShouldCreateDiagnosticTemplateResourceFromCreatorConfig()
         {
             // arrange
-            DiagnosticTemplateCreator diagnosticTemplateCreator = TemplateCreatorFactory.GenerateDiagnosticTemplateCreator();
+            DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
             CreatorConfig creatorConfig = new CreatorConfig()
             {
                 api = new APIConfig()

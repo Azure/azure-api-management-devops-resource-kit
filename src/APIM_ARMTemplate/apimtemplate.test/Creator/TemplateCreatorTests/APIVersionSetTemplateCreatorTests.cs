@@ -8,7 +8,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public void ShouldCreateAPIVersionSetTemplateFromCreatorConfig()
         {
             // arrange
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = TemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = APIVersionSetTemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
             CreatorConfig creatorConfig = new CreatorConfig()
             {
                 apiVersionSet = new APIVersionSetConfig()
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public void ShouldUseDefaultResourceNameWithoutProvidedId()
         {
             // arrange
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = TemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = APIVersionSetTemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
             CreatorConfig creatorConfig = new CreatorConfig()
             {
                 apiVersionSet = new APIVersionSetConfig()                
@@ -56,7 +56,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public void ShouldUseProvidedIdInResourceName()
         {
             // arrange
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = TemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = APIVersionSetTemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
             CreatorConfig creatorConfig = new CreatorConfig()
             {
                 apiVersionSet = new APIVersionSetConfig()
