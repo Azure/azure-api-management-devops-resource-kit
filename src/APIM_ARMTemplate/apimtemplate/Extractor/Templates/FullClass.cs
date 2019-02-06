@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace ARMTemplateNS
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class ApimServiceName
     {

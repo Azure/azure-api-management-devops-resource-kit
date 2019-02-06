@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <Folder Include="Creator\ExampleFiles\OpenAPISpecs\" />
+    <Folder Include="Extractor\Models\" />
+    <Folder Include="Extractor\TemplateCreators\" />
   </ItemGroup>
 
 </Project>

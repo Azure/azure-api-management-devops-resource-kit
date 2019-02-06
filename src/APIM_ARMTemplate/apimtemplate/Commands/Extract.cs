@@ -3,7 +3,6 @@ using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using ARMTemplateNS;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -37,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 GenerateARMTemplate(apimname, resourceGroup, fileFolder);
 
                 Console.WriteLine("Templates written to output location");
-            
+
             });
         }
 
