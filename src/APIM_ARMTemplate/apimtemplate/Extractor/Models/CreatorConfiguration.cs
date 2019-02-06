@@ -22,9 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
     public class APIConfig
     {
         public string name { get; set; }
-        // openApiSpec file location (local or url)
-        public string openApiSpec { get; set; }
-        // policy file location (local or url)
+          // policy file location (local or url)
         public string policy { get; set; }
         public string suffix { get; set; }
         public string apiVersion { get; set; }

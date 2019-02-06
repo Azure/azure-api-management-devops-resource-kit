@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Microsoft.OpenApi.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -15,7 +16,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public APITemplateCreatorEx(TemplateCreator templateCreator, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator)
         {
-
             this.templateCreator = templateCreator;
             this.policyTemplateCreator = policyTemplateCreator;
             this.productAPITemplateCreator = productAPITemplateCreator;
@@ -64,18 +64,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             resources.Add(subsequentAPITemplateResource);
             resources.Add(apiPolicyResource);
             resources.AddRange(operationPolicyResources);
+            
             //resources.AddRange(productAPIResources);
 
             apiTemplate.resources = resources.ToArray();
             return apiTemplate;
         }
 
+       
+
         public async Task<APITemplateResource> CreateInitialAPITemplateResource(CreatorConfig creatorConfig)
         {
-            // protocols can be pulled by converting the OpenApiSpec into the OpenApiDocument class
-            OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
-            OpenApiDocument doc = await openAPISpecReader.ConvertOpenAPISpecToDoc(creatorConfig.api.openApiSpec);
-
             // create api resource with properties
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
@@ -92,7 +91,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     authenticationSettings = creatorConfig.api.authenticationSettings,
                     path = creatorConfig.api.suffix,
                     displayName = creatorConfig.api.name,
-                    protocols = this.CreateProtocols(doc)
+                    protocols = null
                 },
                 // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
                 dependsOn = new string[] { }
@@ -129,7 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 properties = new APITemplateProperties()
                 {
                     contentFormat = "swagger-json",
-                    contentValue = "{\"swagger\":\"2.0\"}", //JsonConvert.SerializeObject(deserializedFileContents),
+                    contentValue = null, //JsonConvert.SerializeObject(deserializedFileContents),
                     // supplied via optional arguments
                     path = creatorConfig.api.suffix
                 },
@@ -140,12 +139,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public string[] CreateProtocols(OpenApiDocument doc)
         {
-            // pull protocols from swagger OpenApiDocument
+            
             List<string> protocols = new List<string>();
-            //foreach (OpenApiServer server in doc.Servers)
-            //{
-            //    protocols.Add(server.Url.Split(":")[0]);
-            //}
+            // just to debug
             protocols.Add("http");
             protocols.Add("https");
             return protocols.ToArray();

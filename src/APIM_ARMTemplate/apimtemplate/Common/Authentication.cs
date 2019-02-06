@@ -8,13 +8,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class Authentication
     {
+        internal static bool isTokenValid = false;
+        public static DateTime start = DateTime.Now;
+        internal static string internalAzToken;
+        internal static string internalAzSubscriptionId; 
         public async Task<(string azToken, string azSubscriptionId)> GetAccessToken()
         {
+            var tokenTimeout = DateTime.Now;
+
+            if ((tokenTimeout - start).TotalSeconds <= 55 && isTokenValid)
+            {
+                return (internalAzToken, internalAzSubscriptionId);
+            }
+
             (bool cliTokenSucceeded, string cliToken) = await TryGetAzCliToken();
             (bool cliSubscriptionIdSucceeded, string cliSubscriptionId) = await TryGetAzSubscriptionId();
 
             if (cliTokenSucceeded && cliSubscriptionIdSucceeded)
             {
+                start = DateTime.Now;
+                internalAzToken = cliToken;
+                internalAzSubscriptionId = cliSubscriptionId;
+                isTokenValid = true; 
                 return (cliToken, cliSubscriptionId);
             }
 
