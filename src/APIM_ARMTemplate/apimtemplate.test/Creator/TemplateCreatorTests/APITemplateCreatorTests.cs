@@ -85,7 +85,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         }
 
         [Fact]
-        public void ShouldCreateSubsequentlAPITemplateResourceWithCorrectContentFormatFromUrl()
+        public void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithCorrectContent()
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
@@ -93,6 +93,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 api = new APIConfig()
                 {
+                    name = "name",
                     openApiSpec = "https://petstore.swagger.io/v2/swagger.json"
                 }
             };
@@ -101,7 +102,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             APITemplateResource apiTemplateResource = apiTemplateCreator.CreateSubsequentAPITemplateResource(creatorConfig);
 
             // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]", apiTemplateResource.name);
             Assert.Equal("swagger-link-json", apiTemplateResource.properties.contentFormat);
+            Assert.Equal(creatorConfig.api.openApiSpec, apiTemplateResource.properties.contentValue);
         }
 
         [Fact]
