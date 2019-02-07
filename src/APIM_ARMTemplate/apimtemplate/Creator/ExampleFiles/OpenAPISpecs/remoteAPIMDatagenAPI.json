@@ -1,0 +1,113 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "serverlessoheastus-managementapi",
+    "version": "V3",
+    "description": "Import from \"serverlessoheastus-managementapi\" Function App"
+  },
+  "host": "testbasiclucas.azure-api.net",
+  "basePath": "/serverlessoheastus-managementapi",
+  "schemes": [ "https" ],
+  "securityDefinitions": {
+    "apiKeyHeader": {
+      "type": "apiKey",
+      "name": "Ocp-Apim-Subscription-Key",
+      "in": "header"
+    },
+    "apiKeyQuery": {
+      "type": "apiKey",
+      "name": "subscription-key",
+      "in": "query"
+    }
+  },
+  "security": [
+    {
+      "apiKeyHeader": []
+    },
+    {
+      "apiKeyQuery": [ "read", "write" ]
+    }
+  ],
+  "paths": {
+    "/team/submitContent": {
+      "post": {
+        "operationId": "post-submitcontent",
+        "summary": "SubmitContent",
+        "responses": {}
+      }
+    },
+    "/team/registerStorageAccount": {
+      "post": {
+        "operationId": "post-registerstorageaccount",
+        "summary": "RegisterStorageAccount",
+        "responses": {}
+      }
+    },
+    "/team/registerRatingEndpoint": {
+      "post": {
+        "operationId": "post-registerratingendpoint",
+        "summary": "RegisterRatingEndpoint",
+        "responses": {}
+      }
+    },
+    "/team/registerEventHub": {
+      "post": {
+        "operationId": "post-registereventhub",
+        "summary": "RegisterEventHub",
+        "responses": {}
+      }
+    },
+    "/team/findAll": {
+      "get": {
+        "operationId": "get-findallteams",
+        "summary": "FindAllTeams",
+        "responses": {}
+      }
+    },
+    "/definition": {
+      "get": {
+        "operationId": "get-definition",
+        "summary": "Definition",
+        "responses": {}
+      }
+    },
+    "/team/deactivate/{teamTableNumber}": {
+      "post": {
+        "operationId": "post-deactivateteam",
+        "summary": "DeactivateTeam",
+        "parameters": [
+          {
+            "name": "teamTableNumber",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/team/boost/{teamTableNumber}": {
+      "post": {
+        "operationId": "post-boostrate",
+        "summary": "BoostRate",
+        "parameters": [
+          {
+            "name": "teamTableNumber",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/definition/admin": {
+      "get": {
+        "operationId": "get-admindefinition",
+        "summary": "AdminDefinition",
+        "responses": {}
+      }
+    }
+  },
+  "tags": []
+}

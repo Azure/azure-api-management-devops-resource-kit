@@ -1,0 +1,16 @@
+﻿<policies>
+  <inbound>
+    <base />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <set-header name="X-Powered-By" exists-action="delete" />
+    <set-header name="X-AspNet-Version" exists-action="delete" />
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>
