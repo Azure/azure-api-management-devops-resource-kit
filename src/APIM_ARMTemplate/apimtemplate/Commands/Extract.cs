@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Api api = new Api();
             string apis = api.GetAPIs(apimname, resourceGroup).Result;
             
-            ARMTemplate armTemplate = new ARMTemplate()
+            ArmTemplate armTemplate = new ArmTemplate()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 contentVersion = "1.0.0.0",
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Console.WriteLine("Geting operations from {0} API:", apiName);
 
                 JObject oApiDetails = JObject.Parse(apiDetails);
-                APIResource apiResource = JsonConvert.DeserializeObject<APIResource>(apiDetails);
+                ApiResource apiResource = JsonConvert.DeserializeObject<ApiResource>(apiDetails);
                 string oApiName = ((JValue)oApiDetails["name"]).Value.ToString();
 
                 apiResource.type = ((JValue)oApiDetails["type"]).Value.ToString();
@@ -150,7 +150,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         private void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
         {
             Api api = new Api();           
-            ARMTemplate armTemplate = new ARMTemplate()
+            ArmTemplate armTemplate = new ArmTemplate()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 contentVersion = "1.0.0.0",

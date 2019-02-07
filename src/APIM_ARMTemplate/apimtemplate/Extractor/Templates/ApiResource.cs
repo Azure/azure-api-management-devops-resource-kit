@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class APIResource : Resource
+    public class ApiResource : Resource
     {
         public string type { get; set; }
         public string name { get; set; }

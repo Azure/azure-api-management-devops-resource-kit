@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class ARMTemplate
+    public class ArmTemplate
     {
         [JsonProperty(PropertyName = "$schema")]
         public string schema { get; set; }
