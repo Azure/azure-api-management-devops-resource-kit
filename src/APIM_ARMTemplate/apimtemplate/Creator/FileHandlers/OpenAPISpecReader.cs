@@ -51,7 +51,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (isUrl)
             {
                 return await this.ConvertRemoteURLToOpenAPISpecAsync(uriResult);
-            } else
+            }
+            else
             {
                 return this.ConvertLocalFileToOpenAPISpec(openApiSpecFileLocation);
             }

@@ -4,10 +4,12 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <ProjectGuid>{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}</ProjectGuid>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\apimtemplate\apimtemplate.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +22,10 @@
     <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.1.2" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\apimtemplate\apimtemplate.csproj" />
   </ItemGroup>
 
 </Project>
