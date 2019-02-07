@@ -18,8 +18,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                    "..", Path.DirectorySeparatorChar,
                    "apimtemplate", Path.DirectorySeparatorChar,
                    "Creator", Path.DirectorySeparatorChar,
-                   "Configurations", Path.DirectorySeparatorChar,
-                   "Examples", Path.DirectorySeparatorChar);
+                   "ExampleFiles", Path.DirectorySeparatorChar,
+                   "YAMLConfigs", Path.DirectorySeparatorChar);
         }
 
         [Fact]
@@ -58,6 +58,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         }
 
         [Fact]
+        public void ShouldFailWithInvalidAPIMServiceName()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidAPIMServiceName.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("APIM service name is required", ex.Message);
+        }
+
+        [Fact]
         public void ShouldFailWithInvalidAPIConfiguration()
         {
             var createCommand = new CreateCommand();
@@ -85,11 +94,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         }
 
         [Fact]
-        public void ShouldNotFailWithValidConfig()
+        public void ShouldFailWithInvalidAPIName()
         {
             var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "valid.yml") };
-            createCommand.Execute(args);
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidAPIName.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("API name is required", ex.Message);
+        }
+
+        [Fact]
+        public void ShouldFailWithInvalidLinking()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidLinking.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("LinkTemplatesBaseUrl is required for linked templates", ex.Message);
         }
     }
 }
