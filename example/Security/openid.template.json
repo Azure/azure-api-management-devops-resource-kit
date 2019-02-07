@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ApimServiceName": {
+            "type": "string"
+        },
+        "clientID": {
+            "type": "string"
+        },
+        "clientSecret": {
+            "type": "string"
+        },
+        "metadataEndpoint": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/openidConnectProviders",
+            "name": "[concat(parameters('ApimServiceName'), '/', 'client-app')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "displayName": "Azure AD",
+                "metadataEndpoint": "[parameters('metadataEndpoint')]",
+                "clientId": "[parameters('clientID')]",
+                "clientSecret": "[parameters('clientSecret')]"
+            }
+        }
+    ]
+}

@@ -1,0 +1,52 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ApimServiceName": {
+            "type": "string"
+        },
+        "frontendClientID": {
+            "type": "string"
+        },
+        "frontendClientSecret": {
+            "type": "string"
+        },
+        "backendClientID": {
+            "type": "string"
+        },
+        "authorizationEndpoint": {
+            "type": "string"
+        },
+        "tokenEndpoint": {
+            "type": "string"
+        },
+        "clientRegistrationEndpoint": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service/authorizationServers",
+            "name": "[concat(parameters('ApimServiceName'), '/', 'client-app')]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "displayName": "Azure AD",
+                "clientRegistrationEndpoint": "[parameters('clientRegistrationEndpoint')]",
+                "authorizationEndpoint": "[parameters('authorizationEndpoint')]",
+                "authorizationMethods": ["GET"],
+                "clientAuthenticationMethod": ["Body"],
+                "tokenBodyParameters": [
+                    {
+                        "name": "resource",
+                        "value": "[parameters('backendClientID')]"
+                    }
+                ],
+                "tokenEndpoint": "[parameters('tokenEndpoint')]",
+                "grantTypes": ["authorizationCode"],
+                "bearerTokenSendingMethods": ["authorizationHeader"],
+                "clientId": "[parameters('frontendClientID')]",
+                "clientSecret": "[parameters('frontendClientSecret')]"
+            }
+        }
+    ]
+}
