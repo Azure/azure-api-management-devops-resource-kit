@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <ProjectGuid>4EC8C738-6EFC-499A-BBF7-C6180DACCF5A</ProjectGuid>
+    <ProjectGuid>{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>

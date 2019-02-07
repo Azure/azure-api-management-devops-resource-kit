@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             var tokenTimeout = DateTime.Now;
 
-            if ((tokenTimeout - start).TotalSeconds <= 55 && isTokenValid)
+            if ((tokenTimeout - start).TotalMinutes <= 15 && isTokenValid)
             {
                 return (internalAzToken, internalAzSubscriptionId);
             }

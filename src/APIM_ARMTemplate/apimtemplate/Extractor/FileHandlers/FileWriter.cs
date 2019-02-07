@@ -17,17 +17,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             });
             File.WriteAllText(location, jsonString);
         }
-
-        public CreatorFileNames GenerateCreatorFileNames()
-        {
-            // generate useable object with file names for consistency throughout project
-            return new CreatorFileNames()
-            {
-                apiVersionSet = $@"/versionset.template.json",
-                initialAPI = $@"/initialAPI.template.json",
-                subsequentAPI = $@"/subsequentAPI.template.json",
-                master = @"/master.template.json"
-            };
-        }
     }
 }
