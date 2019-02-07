@@ -6,7 +6,7 @@
             "value": "contosoapim-dev"
         },
         "LinkedTemplatesBaseUrl": {
-            "value": "https://raw.githubusercontent.com/Azure/azure-api-management-devops-example/master/example/demo/Output/"
+            "value": "https://raw.githubusercontent.com/miaojiang/azure-api-management-devops-example/lucas/example/demo/Output/"
         }
     },
     "resources": []
