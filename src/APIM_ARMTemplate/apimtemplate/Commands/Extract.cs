@@ -3,6 +3,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -144,7 +145,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             #endregion
 
             FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + "\\" + apimname + "-apis-template.json");
+            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json");
         }
 
         private void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
@@ -168,7 +169,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             string versionSet = api.GetAPIVersionSet(apimname, resourceGroup, versionSetName).Result;
             VersionSetResource versionSetResource = JsonConvert.DeserializeObject<VersionSetResource>(versionSet);
 
-            string filePath = fileFolder + "\\" + string.Format(versionSetResource.name, "/", "-") + ".json";
+            string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format(versionSetResource.name, "/", "-") + ".json";
 
             versionSetResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetResource.name}')]";
             versionSetResource.apiVersion = "2018-01-01";
