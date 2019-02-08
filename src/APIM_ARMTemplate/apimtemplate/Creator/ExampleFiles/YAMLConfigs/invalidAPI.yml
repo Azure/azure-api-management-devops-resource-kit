@@ -1,0 +1,9 @@
+version: 0.0.1
+apimServiceName: testapimlucas
+apiVersionSet:
+    displayName: myAPIVersionSet
+    description: a description
+    versioningScheme: Query
+    versionQueryName: versionQuery
+    versionHeaderName: versionHeader
+outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
