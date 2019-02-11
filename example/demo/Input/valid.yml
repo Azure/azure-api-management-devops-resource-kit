@@ -1,6 +1,7 @@
 version: 0.0.1   # Required
-apimServiceName: ContosoApim   # Required, must match name of an apim service deployed in the specified resource group
+apimServiceName: contosoapim-dev   # Required, must match name of an apim service deployed in the specified resource group
 apiVersionSet:   # Optional
+    id: myVersionSetID
     displayName: myAPIVersionSet
     description: a description
     versioningScheme: Query
@@ -8,25 +9,26 @@ apiVersionSet:   # Optional
     versionHeaderName: versionHeader
 api:
   name: myAPI   # Required
-  openApiSpec: /Users/miaojiang/Work/APIM-Demo/DevOps-Demo/Input/swaggerPetstore.json    # Required, can be url or local file
+  openApiSpec: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Input/swaggerPetstore.json    # Required, can be url or local file
   #openApiSpec: https://petstore.swagger.io/v2/swagger.json
-  policy: /Users/miaojiang/Work/APIM-Demo/DevOps-Demo/Input/apiPolicyHeaders.xml   # Optional, can be url or local file
+  policy: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Input/apiPolicyHeaders.xml   # Optional, can be url or local file
   suffix: myAPIPet   # Required
   apiVersion: v1   # Optional
   apiVersionDescription: My first version   # Optional
+  apiVersionSetId: myVersionSetID
   revision: 1   # Optional
   revisionDescription: My first revision   # Optional
   operations:   # Optional
     addPet: # Must match the operationId property of a path's operations
-      policy: /Users/miaojiang/Work/APIM-Demo/DevOps-Demo/Input/operationRateLimit.xml   # Optional, can be url or local file
+      policy: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Input/operationRateLimit.xml   # Optional, can be url or local file
     deletePet:  # Must match the operationId property of a path's operations
-      policy: /Users/miaojiang/Work/APIM-Demo/DevOps-Demo/Input/operationRateLimit.xml   # Optional, can be url or local file
+      policy: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Input/operationRateLimit.xml   # Optional, can be url or local file
   authenticationSettings:   # Optional
     subscriptionKeyRequired: false
     #oAuth2:
     #    authorizationServerId: apimgmtaad
     #    scope: scope
   products: starter    # Optional, adds api to the specified products
-outputLocation: /Users/miaojiang/Work/APIM-Demo/DevOps-Demo/Output/   # Required, folder the creator will write the templates to
+outputLocation: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Output   # Required, folder the creator will write the templates to
 linked: true   # Optional
-linkedTemplatesBaseUrl : https://raw.githubusercontent.com/miaojiang/APIM-Demo/master/DevOps-Demo/Output/   # Required if 'linked' property is set to true
+linkedTemplatesBaseUrl : https://raw.githubusercontent.com/miaojiang/azure-api-management-devops-example/Ready19/example/demo/Output/  # Required if 'linked' property is set to true

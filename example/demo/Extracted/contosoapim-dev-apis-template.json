@@ -1,0 +1,587 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service/apis",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "httpbin.org",
+        "apiRevision": "1",
+        "description": "API Management facade for a very handy and free online HTTP tool.",
+        "serviceUrl": "https://httpbin.org",
+        "path": "httpbin",
+        "protocols": [
+          "https"
+        ],
+        "authenticationSettings": {
+          "oAuth2": null,
+          "openid": null
+        },
+        "subscriptionKeyParameterNames": {
+          "header": "Ocp-Apim-Subscription-Key",
+          "query": "subscription-key"
+        }
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/anything')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/anything",
+        "method": "GET",
+        "urlTemplate": "/anything",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/base64')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/base64",
+        "method": "GET",
+        "urlTemplate": "/base64/{value}",
+        "templateParameters": [
+          {
+            "name": "value",
+            "description": "Base64 encoded string.",
+            "type": "string",
+            "defaultValue": "aGVsbG8gd29ybGQNCg%3D%3D",
+            "required": true,
+            "values": []
+          }
+        ],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/brotli')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/brotli",
+        "method": "GET",
+        "urlTemplate": "/brotli",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/bytes')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/bytes",
+        "method": "GET",
+        "urlTemplate": "/bytes/{number}",
+        "templateParameters": [
+          {
+            "name": "number",
+            "description": "Number of bytes to return.",
+            "type": "string",
+            "defaultValue": "1024",
+            "required": true,
+            "values": []
+          }
+        ],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/cache')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/cache",
+        "method": "GET",
+        "urlTemplate": "/cache/{maxAge}",
+        "templateParameters": [
+          {
+            "name": "maxAge",
+            "description": "",
+            "type": "string",
+            "defaultValue": "10",
+            "required": true,
+            "values": [
+              "10"
+            ]
+          }
+        ],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/deflate')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/deflate",
+        "method": "GET",
+        "urlTemplate": "/deflate",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/delay')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/delay",
+        "method": "GET",
+        "urlTemplate": "/delay/{seconds}",
+        "templateParameters": [
+          {
+            "name": "seconds",
+            "description": "",
+            "type": "string",
+            "defaultValue": "2",
+            "required": true,
+            "values": [
+              "2"
+            ]
+          }
+        ],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/get')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/get",
+        "method": "GET",
+        "urlTemplate": "/get",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/gzip')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/gzip",
+        "method": "GET",
+        "urlTemplate": "/gzip",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/headers')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/headers",
+        "method": "GET",
+        "urlTemplate": "/headers",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/ip')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/ip",
+        "method": "GET",
+        "urlTemplate": "/ip",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/patch')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/patch",
+        "method": "PATCH",
+        "urlTemplate": "/patch",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/post')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/post",
+        "method": "POST",
+        "urlTemplate": "/post",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/put')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/put",
+        "method": "PUT",
+        "urlTemplate": "/put",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/redirect-to')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/redirect-to",
+        "method": "GET",
+        "urlTemplate": "/redirect-to?url={url}",
+        "templateParameters": [
+          {
+            "name": "url",
+            "description": "Redirect target",
+            "type": "string",
+            "defaultValue": "http://example.com",
+            "required": true,
+            "values": []
+          }
+        ],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/response-headers')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/response-headers",
+        "method": "GET",
+        "urlTemplate": "/response-headers",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/status')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/status",
+        "method": "GET",
+        "urlTemplate": "/status/{code}",
+        "templateParameters": [
+          {
+            "name": "code",
+            "description": "HTTP code to return.",
+            "type": "number",
+            "defaultValue": "200",
+            "required": true,
+            "values": [
+              "200"
+            ]
+          }
+        ],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/stream')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/stream",
+        "method": "GET",
+        "urlTemplate": "/stream/{number}",
+        "templateParameters": [
+          {
+            "name": "number",
+            "description": "Number of lines to stream.",
+            "type": "number",
+            "defaultValue": "10",
+            "required": true,
+            "values": []
+          }
+        ],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/user-agent')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/user-agent",
+        "method": "GET",
+        "urlTemplate": "/user-agent",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/uuid')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/uuid",
+        "method": "GET",
+        "urlTemplate": "/uuid",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/xml')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "/xml",
+        "method": "GET",
+        "urlTemplate": "/xml",
+        "templateParameters": [],
+        "responses": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "name": "[concat(parameters('ApimServiceName'), '/httpbin/policy')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "policyContent": "<!--\r\n    IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - Only the <forward-request> policy element can appear within the <backend> section element.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy position the cursor at the desired insertion point and click on the round button associated with the policy.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\r\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n-->\r\n<policies>\r\n\t<inbound>\r\n\t\t<base />\r\n\t\t<cors>\r\n\t\t\t<allowed-origins>\r\n\t\t\t\t<origin>*</origin>\r\n\t\t\t\t<!-- allow any -->\r\n\t\t\t</allowed-origins>\r\n\t\t\t<allowed-methods>\r\n\t\t\t\t<!-- allow any -->\r\n\t\t\t\t<method>GET</method>\r\n\t\t\t</allowed-methods>\r\n\t\t\t<allowed-headers>\r\n\t\t\t\t<!-- allow any -->\r\n\t\t\t\t<header>*</header>\r\n\t\t\t</allowed-headers>\r\n\t\t</cors>\r\n\t</inbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<outbound>\r\n\t\t<base />\r\n\t</outbound>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpbin')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis",
+      "name": "[concat(parameters('ApimServiceName'), '/myAPI')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "Swagger Petstore",
+        "apiRevision": "1",
+        "description": "A sample API that uses a petstore as an example to demonstrate features in the swagger-2.0 specification",
+        "serviceUrl": "http://petstore.swagger.io/api",
+        "path": "myAPIPet",
+        "protocols": [
+          "http"
+        ],
+        "authenticationSettings": {
+          "oAuth2": null,
+          "openid": null
+        },
+        "subscriptionKeyParameterNames": {
+          "header": "Ocp-Apim-Subscription-Key",
+          "query": "subscription-key"
+        },
+        "apiVersion": "v1",
+        "apiVersionSetId": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset')]"
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/myAPI/addPet')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "addPet",
+        "method": "POST",
+        "urlTemplate": "/pets",
+        "templateParameters": [],
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "pet response",
+            "headers": []
+          },
+          {
+            "statusCode": 500,
+            "description": "unexpected error",
+            "headers": []
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'myAPI')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/myAPI/deletePet')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "deletePet",
+        "method": "DELETE",
+        "urlTemplate": "/pets/{id}",
+        "templateParameters": [
+          {
+            "name": "id",
+            "description": "Format - int64. ID of pet to delete",
+            "type": "integer",
+            "required": true,
+            "values": []
+          }
+        ],
+        "responses": [
+          {
+            "statusCode": 204,
+            "description": "pet deleted",
+            "headers": []
+          },
+          {
+            "statusCode": 500,
+            "description": "unexpected error",
+            "headers": []
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'myAPI')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/myAPI/find-pet-by-id')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "find pet by id",
+        "method": "GET",
+        "urlTemplate": "/pets/{id}",
+        "templateParameters": [
+          {
+            "name": "id",
+            "description": "Format - int64. ID of pet to fetch",
+            "type": "integer",
+            "required": true,
+            "values": []
+          }
+        ],
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "pet response",
+            "headers": []
+          },
+          {
+            "statusCode": 500,
+            "description": "unexpected error",
+            "headers": []
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'myAPI')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/myAPI/findPets')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "displayName": "findPets",
+        "method": "GET",
+        "urlTemplate": "/pets",
+        "templateParameters": [],
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "pet response",
+            "headers": []
+          },
+          {
+            "statusCode": 500,
+            "description": "unexpected error",
+            "headers": []
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'myAPI')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "name": "[concat(parameters('ApimServiceName'), '/myAPI/policy')]",
+      "apiVersion": "2018-01-01",
+      "properties": {
+        "policyContent": "<policies>\r\n\t<inbound>\r\n\t\t<base />\r\n\t</inbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<outbound>\r\n\t\t<set-header name=\"X-Powered-By\" exists-action=\"delete\" />\r\n\t\t<set-header name=\"X-AspNet-Version\" exists-action=\"delete\" />\r\n\t\t<base />\r\n\t</outbound>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'myAPI')]"
+      ]
+    }
+  ]
+}
