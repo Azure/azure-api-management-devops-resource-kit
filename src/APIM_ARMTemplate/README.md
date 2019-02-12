@@ -18,7 +18,7 @@
 
 ## Create the Config File
 
-The utility requires one argument, --configFile, which points to a yaml file that links to policy and Open API Spec files and on which the entire process is dependent. 
+The utility requires one argument, --configFile, which points to a yaml file that links to policy and Open API Spec files and on which the entire process is dependent. The file contains a Creator Configuration object whose schema and related schemas are listed below:
 
 ### Schemas
 
@@ -27,7 +27,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | version               | string                | Yes                   | Configuration version.                            |
-| apimServiceName       | string                | Yes                   | Name of APIM Instance to deploy resources into.   |
+| apimServiceName       | string                | Yes                   | Name of APIM service to deploy resources into.  must match name of an APIM service deployed in the specified resource group. |
 | apiVersionSet         | [APIVersionSetConfiguration](#APIVersionSetConfiguration) | No               | VersionSet configuration.                        |
 | api                   | [APIConfiguration](#APIConfiguration)      | Yes                   | API configuration.                                |
 | diagnostic            | [DiagnosticContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis/diagnostics#DiagnosticContractProperties) | No | Diagnostic configuration. |
@@ -58,8 +58,8 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | apiVersionDescription | string                | No                    | Description of the Api Version.                   |
 | revision              | string                | No                    | Describes the Revision of the Api. If no value is provided, default revision 1 is created.                  |
 | revisionDescription   | string                | No                    | Description of the Api Revision.                 |
-| apiVersionSetId       | string                | No                    | A resource identifier for the related ApiVersionSet. Value is irrelevant if the apiVersionSet property is supplied.                         |
-| operations            | Dictionary<string, [OperationPolicyConfiguration](#OperationPolicyConfiguration)> | No    | XML policies that will be applied to operations within the API. Keys are operation IDs and values are the policy configurations that apply to those operations.                 |
+| apiVersionSetId       | string                | No                    | A resource identifier for the related ApiVersionSet. Value must match the resource id on an existing version set and is irrelevant if the apiVersionSet property is supplied.       |
+| operations            | Dictionary<string, [OperationPolicyConfiguration](#OperationPolicyConfiguration)> | No    | XML policies that will be applied to operations within the API. Keys must match the operationId property of one of the API's operations.                 |
 | authenticationSettings| [AuthenticationSettingsContract](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis#AuthenticationSettingsContract)                | No                    | Collection of authentication settings included into this API.                         |
 | products              | string                | No                    | Comma separated list of existing products to associate the API with.                   |
 
@@ -74,37 +74,37 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 The following is a full config.yml file with each property listed:
 
 ```
-version: 0.0.1   # Required
-apimServiceName: testapimlucas   # Required, must match name of an apim service deployed in the specified resource group
-apiVersionSet:   # Optional
+version: 0.0.1
+apimServiceName: testapimlucas
+apiVersionSet:
     id: myAPIVersionSetID
     displayName: myAPIVersionSet
     description: a description
     versioningScheme: Query
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
-api:   # Required
-  name: myAPI   # Required
-  openApiSpec: ./swaggerPetstore.json   # Required, can be url or local file
-  policy: ./apiPolicyHeaders.xml   # Optional, can be url or local file
-  suffix: conf   # Required
-  apiVersion: v1   # Optional
-  apiVersionDescription: My first version   # Optional
-  revision: 1   # Optional
-  revisionDescription: My first revision   # Optional
-  #apiVersionSetId: myID    # Optional, must match the resource id on an existing version set. Irrelevant if a version set is created in the config file.
-  operations:   # Optional
-    addPet: # Must match the operationId property of a path's operations
-      policy: ./operationRateLimit.xml   # Optional, can be url or local file
-    deletePet:  # Must match the operationId property of a path's operations
-      policy: ./operationRateLimit.xml   # Optional, can be url or local file
-  authenticationSettings:   # Optional
+api:
+  name: myAPI 
+  openApiSpec: ./swaggerPetstore.json
+  policy: ./apiPolicyHeaders.xml
+  suffix: conf
+  apiVersion: v1
+  apiVersionDescription: My first version
+  revision: 1
+  revisionDescription: My first revision
+  #apiVersionSetId: myID
+  operations:
+    addPet:
+      policy:
+    deletePet:
+      policy:
+  authenticationSettings:
     subscriptionKeyRequired: false
     oAuth2:
         authorizationServerId: serverId
         scope: scope
-  products: starter, platinum    # Optional, adds api to the specified products
-diagnostic:   # Optional
+  products: starter, platinum
+diagnostic:
   alwaysLog: allErrors
   loggerId: /loggers/applicationinsights,
   sampling:
@@ -133,9 +133,9 @@ diagnostic:   # Optional
       body: 
         bytes: 512
   enableHttpCorrelationHeaders: true
-outputLocation: C:\Users\user1\Desktop\GeneratedTemplates   # Required, folder the utility will write the templates to
-linked: true   # Optional
-linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml   # Required if 'linked' property is set to true
+outputLocation: C:\Users\user1\Desktop\GeneratedTemplates
+linked: true
+linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml
 ```
 
 ## Generate Templates Using the Create Command
