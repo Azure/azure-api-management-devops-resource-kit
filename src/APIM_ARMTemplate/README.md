@@ -1,21 +1,23 @@
 # Table of Contents
 
 1. [ Creator ](#Creator)
-    * [Deploy an APIM Instance](###Deploy%20an%20APIM%20Instance)
-    * [Create the Config File](###Create%20the%20Config%20File)
-    * [Generate Templates Using the Create Command](###Generate%20Templates%20Using%20the%20Create%20Command)
-    * [Deploying Linked Templates](###Deploying%20Linked%20Templates)
-    * [Deploying Unlinked Templates](###Deploying%20Unlinked%20Templates)
+    * [Deploy an APIM Instance](#creator1)
+    * [Create the Config File](#creator2)
+    * [Generate Templates Using the Create Command](#creator3)
+    * [Deploying Linked Templates](#creator4)
+    * [Deploying Unlinked Templates](#creator5)
 2. [ Extractor ](#Extractor)
 
 # Creator
 
+<a name="creator1"></a>
 ## Deploy an APIM Instance
 
 - Log into the Azure Portal
 - Search for 'API Management services' in the bar at the top of the portal.
 - Click 'Add' and fill out the necessary properties to create the instance
 
+<a name="creator2"></a>
 ## Create the Config File
 
 The utility requires one argument, --configFile, which points to a yaml file that links to policy and Open API Spec files and on which the entire process is dependent. The file contains a Creator Configuration object whose schema and related schemas are listed below:
@@ -138,6 +140,7 @@ linked: true
 linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml
 ```
 
+<a name="creator3"></a>
 ## Generate Templates Using the Create Command
 
 - Clone this repository and restore its packages
@@ -146,6 +149,7 @@ linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml
 
 The ```dotnet run create``` command will generate template and parameter files in the folder specified in the config file's outputLocation property.
 
+<a name="creator4"></a>
 ## Deploying Linked Templates 
 
 If the linked property in the config file is set to true, the utility will generate master template and parameters files, as well as a number of other templates the master template links to.
@@ -154,6 +158,7 @@ If the linked property in the config file is set to true, the utility will gener
 - Navigate into the folder that contains the generated templates
 - ```az group deployment create --resource-group YOUR_RESOURCE_GROUP --template-file ./master.template.json --parameters ./master.parameters.json```
 
+<a name="creator5"></a>
 ## Deploying Unlinked Templates
 
 If the linked property in the config file is set to false, the utility will generate two master templates and a parameters file, requiring two deployments.
