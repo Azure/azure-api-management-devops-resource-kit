@@ -14,12 +14,12 @@ api:
   policy: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Input/apiPolicyHeaders.xml   # Optional, can be url or local file
   suffix: myAPIPet   # Required
   apiVersion: v1   # Optional
-  apiVersionDescription: My first version   # Optional
+  apiVersionDescription: My first version   # Optional 
   apiVersionSetId: myVersionSetID
   revision: 1   # Optional
   revisionDescription: My first revision   # Optional
   operations:   # Optional
-    addPet:     # Must match the operationId property of a path's operations
+    addPet: # Must match the operationId property of a path's operations
       policy: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Input/operationRateLimit.xml   # Optional, can be url or local file
     deletePet:  # Must match the operationId property of a path's operations
       policy: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Input/operationRateLimit.xml   # Optional, can be url or local file
