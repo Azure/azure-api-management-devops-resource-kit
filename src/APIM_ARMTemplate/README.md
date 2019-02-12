@@ -1,61 +1,165 @@
-[![Build Status](https://dev.azure.com/apim-devops/ARM-template-generator/_apis/build/status/Master%20-%20Quality%20Gate?branchName=master)](https://dev.azure.com/apim-devops/ARM-template-generator/_build/latest?definitionId=1?branchName=master)
+# Table of Contents
 
-# Azure API Management DevOps Example
+1. [ Creator ](#Creator)
+    * [Deploy an APIM Instance](###Deploy%20an%20APIM%20Instance)
+    * [Create the Config File](###Create%20the%20Config%20File)
+    * [Generate Templates Using the Create Command](###Generate%20Templates%20Using%20the%20Create%20Command)
+    * [Deploying Linked Templates](###Deploying%20Linked%20Templates)
+    * [Deploying Unlinked Templates](###Deploying%20Unlinked%20Templates)
+2. [ Extractor ](#Extractor)
 
-This repository contains examples and tools to help you achieve API DevOps with Azure API Management.
+# Creator
 
-## Background
+## Deploy an APIM Instance
 
-Organizations today often have multiple deployment environments (e.g., development, QA, production) and use separate API Management (APIM) instances for each environment. In some cases, those APIM instances are shared by a number of API development teams, each responsible for one or more APIs. It becomes a challenge for organizations to automate deployment of APIs into a shared environment without interference between the teams and/or impact on API consumers.
+- Log into the Azure Portal
+- Search for 'API Management services' in the bar at the top of the portal.
+- Click 'Add' and fill out the necessary properties to create the instance
 
-In this repository, we propose an approach for the problem along with examples and tools to implement the solution.
+## Create the Config File
 
-## API DevOps with API Management
+The utility requires one argument, --configFile, which points to a yaml file that links to policy and Open API Spec files and on which the entire process is dependent. 
 
-The proposed approach is shown in the below picture.
+### Schemas
 
-![alt](APIM-DevOps.png)
+#### Creator Configuration
 
-In this example, there are two deployment environments: _Development_ and _Production_, each environment has its own APIM instance. _API developers_ have access to the _Development_ instance and can use it for developing and testing their APIs. The _Production_ instance is managed by a designated team called the _API publishers_.
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| version               | string                | Yes                   | Configuration version.                            |
+| apimServiceName       | string                | Yes                   | Name of APIM Instance to deploy resources into.   |
+| apiVersionSet         | [APIVersionSetConfiguration](#APIVersionSetConfiguration) | No               | VersionSet configuration.                        |
+| api                   | [APIConfiguration](#APIConfiguration)      | Yes                   | API configuration.                                |
+| diagnostic            | [DiagnosticContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis/diagnostics#DiagnosticContractProperties) | No | Diagnostic configuration. |
+| outputLocation        | string                | Yes                   | Local folder the utility will write templates to. |
+| linked                | boolean               | No                    | Determines whether the utility will output linked or unlinked templates. |
+| linkedTemplatesBaseUrl| string                | No                    | Remote location that stores linked templates. Required if 'linked' is set to true. |
 
-The key in this proposed solution is to keep all your APIM configurations in Azure Resource Manager (ARM) templates under your SCM systems. In this example, we use GIT. There is a _Publisher repository_ that contains all the configurations of the _Production_ instance. _API developers_ can fork and clone the _Publisher repository_ and then start working on their APIs in their own repository.
+#### APIVersionSetConfiguration
 
-There are three types of ARM templates: the _Service template_ contains all the configurations related to the APIM instance (e.g., sku type, custom URL). The _Shared templates_ contain shared resources (e.g., groups, products). For each API, there is an _API template_ that contains all the configurations related to the API and its sub-resources (e.g., API definition, operations, policies).
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| id                    | string                | No                    | ID of the API Version Set.                        |
+| displayName           | string                | No                    | Name of API Version Set.                          |
+| description           | string                | No                    | Description of API Version Set.                  |
+| versioningScheme      | enum                  | No                    | An value that determines where the API Version identifer will be located in a HTTP request. - Segment, Query, Header   |
+| versionQueryName      | string                | No                    | Name of query parameter that indicates the API Version if versioningScheme is set to query.                             |
+| versionHeaderName     | string                | No                    | Name of HTTP header parameter that indicates the API Version if versioningScheme is set to header.                            |
 
-Finally, The _Master template_ ties everything together by linking to all templates and deploy them in order. Therefore, if you want to deploy everything to an APIM instance, you can simply deploy the _Master template_. A beautiful thing is that each template can also be deployed individually. For example, if you just want to deploy a single API. 
+#### APIConfiguration
 
-_API developers_ normally work with Open API (aka., Swagger) files for defining their APIs. One challenge for them is authoring the _API templates_, which might be an error-prone task for people not familiar with ARM template formats. Therefore, we will create and open source an **ARM template generator** to help you generate _API templates_ based on Open API (aka., Swagger) files and policy files. Basically, the generator will extract your API and operation definitions from an Open API file and insert them into an ARM template in the proper format. It will also extract policies from an XML file and inline the policies into the template. With this tool, _API developers_ can continue focusing on the formats they are familiar with.
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                  | string                | Yes                   | API identifier. Must be unique in the current API Management service instance.                                 |
+| openApiSpec           | string                | Yes                   | Location of the Open API Spec file. Can be url or local file.                          |
+| policy                | string                | No                    | Location of the API policy XML file. Can be url or local file.                          |
+| suffix                | string                | Yes                    | Relative URL uniquely identifying this API and all of its resource paths within the API Management service instance. It is appended to the API endpoint base URL specified during the service instance creation to form a public URL for this API.                       |
+| apiVersion            | string                | No                    | Indicates the Version identifier of the API if the API is versioned.                         |
+| apiVersionDescription | string                | No                    | Description of the Api Version.                   |
+| revision              | string                | No                    | Describes the Revision of the Api. If no value is provided, default revision 1 is created.                  |
+| revisionDescription   | string                | No                    | Description of the Api Revision.                 |
+| apiVersionSetId       | string                | No                    | A resource identifier for the related ApiVersionSet. Value is irrelevant if the apiVersionSet property is supplied.                         |
+| operations            | Dictionary<string, [OperationPolicyConfiguration](#OperationPolicyConfiguration)> | No    | XML policies that will be applied to operations within the API. Keys are operation IDs and values are the policy configurations that apply to those operations.                 |
+| authenticationSettings| [AuthenticationSettingsContract](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis#AuthenticationSettingsContract)                | No                    | Collection of authentication settings included into this API.                         |
+| products              | string                | No                    | Comma separated list of existing products to associate the API with.                   |
 
-If you already have APIs published by APIM, or if you prefer using the Admin UX for configuring your APIs, we will also provide a **second ARM template generator** to help you generate _API templates_ by extracting configurations from an existing APIM instance. Likewise, this generator will also be open sourced. 
+#### OperationPolicyConfiguration
 
-When _API developers_ finish develop and test an API, and have generated the _API template_ for it, they can submit a pull request to merge the changes back to the _Publisher repository_. _API publishers_ can validate the pull request to make sure the changes are safe and compliant to the corporate standards. Most of the validations can be automated as part of the CI/CD pipeline.
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| policy                | string                | No                    | Location of the operation policy XML file. Can be url or local file.      |
 
-Once the changes are merged successfully, then _API publishers_ can deploy them to the _Production_ instance either on schedule or on request.
+### Example File
 
-With this approach, it is easy to migrate changes from one environment to another. Also, since different API development teams will be working on different sets of API templates and files, it also prevents them from colliding with each other.
+The following is a full config.yml file with each property listed:
 
-We have provided an [example](Example.md) on how to use this approach and deploy using the Azure CLI.
+```
+version: 0.0.1   # Required
+apimServiceName: testapimlucas   # Required, must match name of an apim service deployed in the specified resource group
+apiVersionSet:   # Optional
+    id: myAPIVersionSetID
+    displayName: myAPIVersionSet
+    description: a description
+    versioningScheme: Query
+    versionQueryName: versionQuery
+    versionHeaderName: versionHeader
+api:   # Required
+  name: myAPI   # Required
+  openApiSpec: ./swaggerPetstore.json   # Required, can be url or local file
+  policy: ./apiPolicyHeaders.xml   # Optional, can be url or local file
+  suffix: conf   # Required
+  apiVersion: v1   # Optional
+  apiVersionDescription: My first version   # Optional
+  revision: 1   # Optional
+  revisionDescription: My first revision   # Optional
+  #apiVersionSetId: myID    # Optional, must match the resource id on an existing version set. Irrelevant if a version set is created in the config file.
+  operations:   # Optional
+    addPet: # Must match the operationId property of a path's operations
+      policy: ./operationRateLimit.xml   # Optional, can be url or local file
+    deletePet:  # Must match the operationId property of a path's operations
+      policy: ./operationRateLimit.xml   # Optional, can be url or local file
+  authenticationSettings:   # Optional
+    subscriptionKeyRequired: false
+    oAuth2:
+        authorizationServerId: serverId
+        scope: scope
+  products: starter, platinum    # Optional, adds api to the specified products
+diagnostic:   # Optional
+  alwaysLog: allErrors
+  loggerId: /loggers/applicationinsights,
+  sampling:
+    samplingType: fixed
+    percentage: 50
+  frontend: 
+    request:
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+    response: 
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+  backend: 
+    request:
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+    response: 
+      headers:
+        - Content-type
+      body: 
+        bytes: 512
+  enableHttpCorrelationHeaders: true
+outputLocation: C:\Users\user1\Desktop\GeneratedTemplates   # Required, folder the utility will write the templates to
+linked: true   # Optional
+linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml   # Required if 'linked' property is set to true
+```
 
-We realize our customers bring a wide range of engineering cultures and existing automation solutions. The approach proposed here is not meant to be a one-size-fits-all solution. That's the reason we created this repository and open sourced everything, so that you can extend and custom the solution.
+## Generate Templates Using the Create Command
 
-If you have any questions or feedback, please raise issues in the repository or email us at apimgmt at microsoft dotcom. We also started an [FAQ page](./FAQ.md) to answer most common questions. 
+- Clone this repository and restore its packages
+- Navigate to the azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate directory
+- ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
 
-## License
+The ```dotnet run create``` command will generate template and parameter files in the folder specified in the config file's outputLocation property.
 
-This project is licensed under [the MIT License](LICENSE)
+## Deploying Linked Templates 
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+If the linked property in the config file is set to true, the utility will generate master template and parameters files, as well as a number of other templates the master template links to.
 
-## Contributing
+- Push each of the other templates to the location specified in the linkedTemplatesBaseUrl property in the config file (can be a GitHub repo, Azure blob storage container, etc)
+- Navigate into the folder that contains the generated templates
+- ```az group deployment create --resource-group YOUR_RESOURCE_GROUP --template-file ./master.template.json --parameters ./master.parameters.json```
 
-This project welcomes contributions and suggestions. Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+## Deploying Unlinked Templates
 
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+If the linked property in the config file is set to false, the utility will generate two master templates and a parameters file, requiring two deployments.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+- Navigate into the folder that contains the generated templates
+- ```az group deployment create --resource-group YOUR_RESOURCE_GROUP --template-file ./master1.template.json --parameters ./master.parameters.json```
+- ```az group deployment create --resource-group YOUR_RESOURCE_GROUP --template-file ./master2.template.json --parameters ./master.parameters.json```
+
+# Extractor
