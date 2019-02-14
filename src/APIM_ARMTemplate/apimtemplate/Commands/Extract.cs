@@ -79,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 apiResource.type = ((JValue)oApiDetails["type"]).Value.ToString();
                 apiResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}')]";
-                apiResource.apiVersion = "2018-01-01";
+                apiResource.apiVersion = "2018-06-01-preview";
                 apiResource.scale = null;
                 if (apiResource.properties.apiVersionSetId != null)
                 {
@@ -112,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     JObject oOperationDetails = JObject.Parse(operationDetails);
                     OperationResource operationResource = JsonConvert.DeserializeObject<OperationResource>(operationDetails);
                     operationResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResource.name}')]";
-                    operationResource.apiVersion = "2018-01-01";
+                    operationResource.apiVersion = "2018-06-01-preview";
                     operationResource.scale = null;
                     operationResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
@@ -129,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     JObject oApiPolicies = JObject.Parse(apiPolicies);
                     ApiPoliciesResource apiPoliciesResource = JsonConvert.DeserializeObject<ApiPoliciesResource>(apiPolicies);
 
-                    apiPoliciesResource.apiVersion = "2018-01-01";
+                    apiPoliciesResource.apiVersion = "2018-06-01-preview";
                     apiPoliciesResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiPoliciesResource.name}')]";
                     apiPoliciesResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
@@ -153,7 +153,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     DiagnosticResource diagnosticResource = diagnostic.ToObject<DiagnosticResource>();
                     diagnosticResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{diagnosticName}')]";
                     diagnosticResource.type = "Microsoft.ApiManagement/service/apis/diagnostics";
-                    diagnosticResource.apiVersion = "2018-01-01";
+                    diagnosticResource.apiVersion = "2018-06-01-preview";
                     diagnosticResource.scale = null;
                     diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
@@ -194,7 +194,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format(versionSetResource.name, "/", "-") + ".json";
 
             versionSetResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetResource.name}')]";
-            versionSetResource.apiVersion = "2018-01-01";
+            versionSetResource.apiVersion = "2018-06-01-preview";
             armTemplate.resources.Add(versionSetResource);
 
             FileWriter fileWriter = new FileWriter();

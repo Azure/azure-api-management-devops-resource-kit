@@ -9,10 +9,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create diagnostic resource with properties
             DiagnosticTemplateResource diagnosticTemplateResource = new DiagnosticTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}/diagnostic')]",
+                name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}/{creatorConfig.api.diagnostic.name}')]",
                 type = "Microsoft.ApiManagement/service/apis/diagnostics",
-                apiVersion = "2018-01-01",
-                properties = creatorConfig.diagnostic,
+                apiVersion = "2018-06-01-preview",
+                properties = creatorConfig.api.diagnostic,
                 dependsOn = dependsOn
             };
             return diagnosticTemplateResource;

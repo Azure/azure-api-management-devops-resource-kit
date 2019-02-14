@@ -1,5 +1,5 @@
 version: 0.0.1   # Required
-apimServiceName: Lucas2   # Required, must match name of an apim service deployed in the specified resource group
+apimServiceName: LucasUnlinked2   # Required, must match name of an apim service deployed in the specified resource group
 apiVersionSet:   # Optional
     id: myAPIVersionSetID
     displayName: swaggerPetstoreVersionSetLinked
@@ -13,6 +13,7 @@ api:
   policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml   # Optional, can be url or local file
   suffix: conf   # Required
   apiVersion: v1   # Optional
+  subscriptionRequired: true
   apiVersionDescription: My first version   # Optional
   #apiVersionSetId: myID    # Optional, must match the resource id on an existing version set
   revision: 1   # Optional

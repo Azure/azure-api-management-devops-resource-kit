@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             PolicyTemplateResource apiPolicyResource = creatorConfig.api.policy != null ? this.policyTemplateCreator.CreateAPIPolicyTemplateResource(creatorConfig, dependsOnSubsequentAPI) : null;
             List<PolicyTemplateResource> operationPolicyResources = creatorConfig.api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(creatorConfig, dependsOnSubsequentAPI) : null;
             List<ProductAPITemplateResource> productAPIResources = creatorConfig.api.products != null ? this.productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOnSubsequentAPI) : null;
-            DiagnosticTemplateResource diagnosticTemplateResource = creatorConfig.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(creatorConfig, dependsOnSubsequentAPI) : null;
+            DiagnosticTemplateResource diagnosticTemplateResource = creatorConfig.api.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(creatorConfig, dependsOnSubsequentAPI) : null;
             resources.Add(subsequentAPITemplateResource);
             // add resources if not null
             if (apiPolicyResource != null) resources.Add(apiPolicyResource);
@@ -86,11 +86,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]",
                 type = "Microsoft.ApiManagement/service/apis",
-                apiVersion = "2018-01-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()
                 {
                     // supplied via optional arguments
                     apiVersion = creatorConfig.api.apiVersion,
+                    subscriptionRequired = creatorConfig.api.subscriptionRequired,
                     apiRevision = creatorConfig.api.revision,
                     apiRevisionDescription = creatorConfig.api.revisionDescription,
                     apiVersionDescription = creatorConfig.api.apiVersionDescription,
@@ -134,7 +135,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = subsequentAPIName,
                 type = subsequentAPIType,
-                apiVersion = "2018-01-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()
                 {
                     contentFormat = isUrl ? "swagger-link-json" : "swagger-json",
