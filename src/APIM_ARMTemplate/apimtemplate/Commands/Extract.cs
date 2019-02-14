@@ -140,6 +140,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Console.WriteLine("Policy NOT found!");     
                 }
                 #endregion
+
+                #region Diagnostics
+
+                string diagnostics = api.GetAPIDiagnostics(apimname, resourceGroup, apiName).Result;
+                JObject oDiagnostics = JObject.Parse(diagnostics);
+                foreach (var diagnostic in oDiagnostics["value"])
+                {
+                    string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
+                    Console.WriteLine("'{0}' Diagnostic found", diagnosticName);
+
+                    DiagnosticResource diagnosticResource = diagnostic.ToObject<DiagnosticResource>();
+                    diagnosticResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{diagnosticName}')]";
+                    diagnosticResource.type = "Microsoft.ApiManagement/service/apis/diagnostics";
+                    diagnosticResource.apiVersion = "2018-01-01";
+                    diagnosticResource.scale = null;
+                    diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+
+                    armTemplate.resources.Add(diagnosticResource);
+
+                }
+
+                #endregion
             }
 
             #endregion
