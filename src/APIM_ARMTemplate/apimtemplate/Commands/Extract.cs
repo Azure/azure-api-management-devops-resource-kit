@@ -65,6 +65,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             armTemplate.resources = new List<Resource>();
 
+            GenerateLoggerTemplate(resourceGroup, apimname, fileFolder);
+
             for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++) //TODO: Refactory
             {
                 string apiName = ((JValue)oApi["value"][i]["name"]).Value.ToString();
@@ -143,6 +145,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 #region Diagnostics
 
+                Console.WriteLine("------------------------------------------");
+                Console.WriteLine("Geting diagnostics from {0} API:", apiName);
                 string diagnostics = api.GetAPIDiagnostics(apimname, resourceGroup, apiName).Result;
                 JObject oDiagnostics = JObject.Parse(diagnostics);
                 foreach (var diagnostic in oDiagnostics["value"])
@@ -156,6 +160,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     diagnosticResource.apiVersion = "2018-06-01-preview";
                     diagnosticResource.scale = null;
                     diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+
+                    if (!diagnosticName.Contains("applicationinsights"))
+                    {
+                        // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
+                        diagnosticResource.properties.enableHttpCorrelationHeaders = null;
+                    }
 
                     armTemplate.resources.Add(diagnosticResource);
 
@@ -172,7 +182,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         private void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
         {
-            Api api = new Api();           
+            Api api = new Api();
             ArmTemplate armTemplate = new ArmTemplate()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
@@ -199,6 +209,48 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             FileWriter fileWriter = new FileWriter();
 
+            fileWriter.WriteJSONToFile(armTemplate, filePath);
+        }
+
+        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder)
+        {
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Geting loggers from service");
+            Logger logger = new Logger();
+            ArmTemplate armTemplate = new ArmTemplate()
+            {
+                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                contentVersion = "1.0.0.0",
+                parameters = new Dictionary<string, ExtractorTemplateParameterProperties>
+                {
+                    { "ApimServiceName", new ExtractorTemplateParameterProperties(){ type = "string" } }
+                },
+                variables = { },
+                resources = { },
+                outputs = { }
+            };
+
+            armTemplate.resources = new List<Resource>();
+
+            string loggers = logger.GetLoggers(apimname, resourceGroup).Result;
+            JObject oLoggers = JObject.Parse(loggers);
+            foreach (var extractedLogger in oLoggers["value"])
+            {
+                string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
+                Console.WriteLine("'{0}' Logger found", loggerName);
+
+                string fullLoggerResource = await logger.GetLogger(apimname, resourceGroup, loggerName);
+                LoggerResource loggerResource = JsonConvert.DeserializeObject<LoggerResource>(fullLoggerResource);
+                loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
+                loggerResource.type = "Microsoft.ApiManagement/service/loggers";
+                loggerResource.apiVersion = "2018-06-01-preview";
+                loggerResource.scale = null;
+
+                armTemplate.resources.Add(loggerResource);
+            }
+
+            FileWriter fileWriter = new FileWriter();
+            string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format("loggers", "/", "-") + ".json";
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
     }
