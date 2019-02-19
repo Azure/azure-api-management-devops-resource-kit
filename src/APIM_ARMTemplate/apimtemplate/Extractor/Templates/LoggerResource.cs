@@ -15,8 +15,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
     {
         public string loggerType { get; set; }
         public string description { get; set; }
-        public object credentials { get; set; }
+        public LoggerCredentials credentials { get; set; }
         public bool isBuffered { get; set; }
         public string resourceId { get; set; }
+    }
+
+    public class LoggerCredentials
+    {
+        public string name { get; set; }
+        public string connectionString { get; set; }
+        public string instrumentationKey { get; set; }
     }
 }

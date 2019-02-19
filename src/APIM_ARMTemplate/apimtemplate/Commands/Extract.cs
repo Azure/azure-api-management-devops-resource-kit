@@ -41,12 +41,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             });
         }
 
-        private void GenerateARMTemplate(string apimname, string resourceGroup, string fileFolder )
+        private void GenerateARMTemplate(string apimname, string resourceGroup, string fileFolder)
         {
             #region API's
             Api api = new Api();
             string apis = api.GetAPIs(apimname, resourceGroup).Result;
-            
+
             ArmTemplate armTemplate = new ArmTemplate()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
@@ -54,7 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 parameters = new Dictionary<string, ExtractorTemplateParameterProperties>
                 {
                     { "ApimServiceName", new ExtractorTemplateParameterProperties(){ type = "string" } }
-                },  
+                },
                 variables = { },
                 resources = { },
                 outputs = { }
@@ -139,7 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Policy NOT found!");     
+                    Console.WriteLine("Policy NOT found!");
                 }
                 #endregion
 
@@ -217,6 +217,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Geting loggers from service");
             Logger logger = new Logger();
+            Property property = new Property();
             ArmTemplate armTemplate = new ArmTemplate()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
@@ -232,6 +233,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             armTemplate.resources = new List<Resource>();
 
+            // pull named values for later credential reference
+            string properties = property.GetProperties(apimname, resourceGroup).Result;
+            JObject oProperties = JObject.Parse(properties);
+            List<PropertyResource> propertyResources = oProperties["value"].ToObject<List<PropertyResource>>();
+
             string loggers = logger.GetLoggers(apimname, resourceGroup).Result;
             JObject oLoggers = JObject.Parse(loggers);
             foreach (var extractedLogger in oLoggers["value"])
@@ -245,6 +251,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 loggerResource.type = "Microsoft.ApiManagement/service/loggers";
                 loggerResource.apiVersion = "2018-06-01-preview";
                 loggerResource.scale = null;
+
+                // swap credentials for their hidden values, taken from named values
+                if (loggerResource.properties.credentials != null)
+                {
+                    if (loggerResource.properties.credentials.instrumentationKey != null)
+                    {
+                        string hiddenKey = loggerResource.properties.credentials.instrumentationKey.Substring(2, loggerResource.properties.credentials.instrumentationKey.Length - 4);
+                        loggerResource.properties.credentials.instrumentationKey = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
+                    } else if (loggerResource.properties.credentials.connectionString != null)
+                    {
+                        string hiddenKey = loggerResource.properties.credentials.connectionString.Substring(2, loggerResource.properties.credentials.connectionString.Length - 4);
+                        loggerResource.properties.credentials.connectionString = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
+                    }
+                }
 
                 armTemplate.resources.Add(loggerResource);
             }
