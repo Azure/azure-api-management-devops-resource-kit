@@ -37,3 +37,6 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+# Local Testing
+*validTesting.yml

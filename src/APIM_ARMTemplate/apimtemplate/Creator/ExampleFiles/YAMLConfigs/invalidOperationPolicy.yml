@@ -1,4 +1,5 @@
 version: 0.0.1
+apimServiceName: MyAPIMService
 apiVersionSet:
     id: myAPIVersionSetID
     displayName: swaggerPetstoreVersionSetLinked
@@ -19,9 +20,7 @@ api:
   revisionDescription: My first revision
   operations:
     addPet:
-      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
     deletePet:
-      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
   products: starter, platinum
   diagnostic:
     name: applicationinsights

@@ -110,5 +110,41 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("LinkTemplatesBaseUrl is required for linked templates", ex.Message);
         }
+
+        [Fact]
+        public void ShouldFailWithInvalidVersionSetDisplayName()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidVersionSetDisplayName.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("Display name is required if an API Version Set is provided", ex.Message);
+        }
+
+        [Fact]
+        public void ShouldFailWithInvalidVersionSetVersioningScheme()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidVersionSetVersioningScheme.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("Versioning scheme is required if an API Version Set is provided", ex.Message);
+        }
+
+        [Fact]
+        public void ShouldFailWithInvalidOperationPolicy()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidOperationPolicy.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("Policy XML is required if an API operation is provided", ex.Message);
+        }
+
+        [Fact]
+        public void ShouldFailWithInvalidDiagnosticLoggerId()
+        {
+            var createCommand = new CreateCommand();
+            string[] args = new string[] { "--configFile", String.Concat(this.configExamplesFolder, "invalidDiagnosticLoggerId.yml") };
+            var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
+            Assert.Contains("LoggerId is required if an API diagnostic is provided", ex.Message);
+        }
     }
 }
