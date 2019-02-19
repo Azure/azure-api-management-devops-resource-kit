@@ -32,7 +32,6 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | apimServiceName       | string                | Yes                   | Name of APIM service to deploy resources into.  must match name of an APIM service deployed in the specified resource group. |
 | apiVersionSet         | [APIVersionSetConfiguration](#APIVersionSetConfiguration) | No               | VersionSet configuration.                        |
 | api                   | [APIConfiguration](#APIConfiguration)      | Yes                   | API configuration.                                |
-| diagnostic            | [DiagnosticContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis/diagnostics#DiagnosticContractProperties) | No | Diagnostic configuration. |
 | outputLocation        | string                | Yes                   | Local folder the utility will write templates to. |
 | linked                | boolean               | No                    | Determines whether the utility will output linked or unlinked templates. |
 | linkedTemplatesBaseUrl| string                | No                    | Remote location that stores linked templates. Required if 'linked' is set to true. |
@@ -42,9 +41,9 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | id                    | string                | No                    | ID of the API Version Set.                        |
-| displayName           | string                | No                    | Name of API Version Set.                          |
+| displayName           | string                | Yes                    | Name of API Version Set.                          |
 | description           | string                | No                    | Description of API Version Set.                  |
-| versioningScheme      | enum                  | No                    | An value that determines where the API Version identifer will be located in a HTTP request. - Segment, Query, Header   |
+| versioningScheme      | enum                  | Yes                    | An value that determines where the API Version identifer will be located in a HTTP request. - Segment, Query, Header   |
 | versionQueryName      | string                | No                    | Name of query parameter that indicates the API Version if versioningScheme is set to query.                             |
 | versionHeaderName     | string                | No                    | Name of HTTP header parameter that indicates the API Version if versioningScheme is set to header.                            |
 
@@ -56,20 +55,34 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | openApiSpec           | string                | Yes                   | Location of the Open API Spec file. Can be url or local file.                          |
 | policy                | string                | No                    | Location of the API policy XML file. Can be url or local file.                          |
 | suffix                | string                | Yes                    | Relative URL uniquely identifying this API and all of its resource paths within the API Management service instance. It is appended to the API endpoint base URL specified during the service instance creation to form a public URL for this API.                       |
+| subscriptionRequired  | boolean               | No                    | Specifies whether an API or Product subscription is required for accessing the API.                         |
 | apiVersion            | string                | No                    | Indicates the Version identifier of the API if the API is versioned.                         |
 | apiVersionDescription | string                | No                    | Description of the Api Version.                   |
 | revision              | string                | No                    | Describes the Revision of the Api. If no value is provided, default revision 1 is created.                  |
 | revisionDescription   | string                | No                    | Description of the Api Revision.                 |
 | apiVersionSetId       | string                | No                    | A resource identifier for the related ApiVersionSet. Value must match the resource id on an existing version set and is irrelevant if the apiVersionSet property is supplied.       |
-| operations            | Dictionary<string, [OperationPolicyConfiguration](#OperationPolicyConfiguration)> | No    | XML policies that will be applied to operations within the API. Keys must match the operationId property of one of the API's operations.                 |
+| operations            | Dictionary<string, [APIOperationPolicyConfiguration](#APIOperationPolicyConfiguration)> | No    | XML policies that will be applied to operations within the API. Keys must match the operationId property of one of the API's operations.                 |
 | authenticationSettings| [AuthenticationSettingsContract](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis#AuthenticationSettingsContract)                | No                    | Collection of authentication settings included into this API.                         |
 | products              | string                | No                    | Comma separated list of existing products to associate the API with.                   |
+| diagnostic            | [APIDiagnosticConfiguration](#APIDiagnosticConfiguration) | No | Diagnostic configuration. |
 
-#### OperationPolicyConfiguration
+#### APIOperationPolicyConfiguration
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
-| policy                | string                | No                    | Location of the operation policy XML file. Can be url or local file.      |
+| policy                | string                | Yes                    | Location of the operation policy XML file. Can be url or local file.      |
+
+#### APIDiagnosticConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                  | enum                | No                    | Name of API Diagnostic - azureEventHub or applicationInsights       |
+| alwaysLog             | enum                | No                    | Specifies for what type of messages sampling settings should not apply. - allErrors       |
+| loggerId              | string              | Yes                    | Resource Id of an existing target logger.       |
+| sampling              | object                | No                    | Sampling settings for Diagnostic. - [SamplingSettings object](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis/diagnostics#SamplingSettings)       |
+| frontend              | object                | No                    | Diagnostic settings for incoming/outgoing HTTP messages to the Gateway. - [PipelineDiagnosticSettings object](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis/diagnostics#PipelineDiagnosticSettings)       |
+| backend                  | object                | No                    | Diagnostic settings for incoming/outgoing HTTP messages to the Backend - [PipelineDiagnosticSettings object](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis/diagnostics#PipelineDiagnosticSettings)       |
+| enableHttpCorrelationHeaders | boolean                | No                    | Whether to process Correlation Headers coming to Api Management Service. Only applicable to Application Insights diagnostics. Default is true.      |
 
 ### Example File
 
@@ -77,7 +90,7 @@ The following is a full config.yml file with each property listed:
 
 ```
 version: 0.0.1
-apimServiceName: testapimlucas
+apimServiceName: MyAPIMService
 apiVersionSet:
     id: myAPIVersionSetID
     displayName: myAPIVersionSet
@@ -90,6 +103,7 @@ api:
   openApiSpec: ./swaggerPetstore.json
   policy: ./apiPolicyHeaders.xml
   suffix: conf
+  subscriptionRequired: true
   apiVersion: v1
   apiVersionDescription: My first version
   revision: 1
@@ -106,38 +120,35 @@ api:
         authorizationServerId: serverId
         scope: scope
   products: starter, platinum
-diagnostic:
-  alwaysLog: allErrors
-  loggerId: /loggers/applicationinsights,
-  sampling:
-    samplingType: fixed
-    percentage: 50
-  frontend: 
-    request:
-      headers:
-        - Content-type
-      body: 
-        bytes: 512
-    response: 
-      headers:
-        - Content-type
-      body: 
-        bytes: 512
-  backend: 
-    request:
-      headers:
-        - Content-type
-      body: 
-        bytes: 512
-    response: 
-      headers:
-        - Content-type
-      body: 
-        bytes: 512
-  enableHttpCorrelationHeaders: true
+  diagnostic:
+    name: applicationinsights
+    alwaysLog: allErrors
+    loggerId: /subscriptions/24de26c5-cf48-4954-8400-013fe61042wd/resourceGroups/MyResourceGroup/providers/Microsoft.ApiManagement/service/MyAPIMService/loggers/myappinsights,
+    sampling:
+      samplingType: fixed
+      percentage: 50
+    frontend: 
+      request:
+        headers:
+        body: 
+          bytes: 512
+      response: 
+        headers:
+        body: 
+          bytes: 512
+    backend: 
+      request:
+        headers:
+        body: 
+          bytes: 512
+      response: 
+        headers:
+        body: 
+          bytes: 512
+    enableHttpCorrelationHeaders: true
 outputLocation: C:\Users\user1\Desktop\GeneratedTemplates
 linked: true
-linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml
+linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
 ```
 
 <a name="creator3"></a>

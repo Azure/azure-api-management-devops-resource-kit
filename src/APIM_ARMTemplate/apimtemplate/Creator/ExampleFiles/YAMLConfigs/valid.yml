@@ -12,8 +12,8 @@ api:
   openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json    # Required, can be url or local file
   policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml   # Optional, can be url or local file
   suffix: conf   # Required
-  apiVersion: v1   # Optional
   subscriptionRequired: true
+  apiVersion: v1   # Optional
   apiVersionDescription: My first version   # Optional
   #apiVersionSetId: myID    # Optional, must match the resource id on an existing version set
   revision: 1   # Optional
