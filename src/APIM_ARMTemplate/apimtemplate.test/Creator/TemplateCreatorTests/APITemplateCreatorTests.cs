@@ -1,9 +1,9 @@
 ﻿using Microsoft.OpenApi.Models;
-using System;
-using System.IO;
 using Xunit;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
     public class APITemplateCreatorTests
     {

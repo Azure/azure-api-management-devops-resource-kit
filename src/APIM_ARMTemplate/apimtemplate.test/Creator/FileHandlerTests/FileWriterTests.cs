@@ -2,9 +2,9 @@
 using Xunit;
 using Newtonsoft.Json.Linq;
 using System;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
     public class FileWriterTests
     {

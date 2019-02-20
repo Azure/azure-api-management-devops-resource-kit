@@ -2,10 +2,11 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    class Api
+    class APIExtractor
     {
         static string baseUrl = "https://management.azure.com";
         internal Authentication auth = new Authentication();

@@ -2,8 +2,9 @@ using System;
 using Xunit;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
     public class CreateTests
     {

@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -20,7 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             this.HelpOption();
 
-            this.OnExecute(async () =>
+            this.OnExecute(() =>
             {
                 if (!apiManagementName.HasValue()) throw new Exception("Missing parameter <apimname>.");
                 if (!resourceGroupName.HasValue()) throw new Exception("Missing parameter <resourceGroup>.");
@@ -44,16 +45,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         private void GenerateARMTemplate(string apimname, string resourceGroup, string fileFolder)
         {
             #region API's
-            Api api = new Api();
-            string apis = api.GetAPIs(apimname, resourceGroup).Result;
+            APIExtractor apiExtractor = new APIExtractor();
+            string apis = apiExtractor.GetAPIs(apimname, resourceGroup).Result;
 
-            ArmTemplate armTemplate = new ArmTemplate()
+            Template armTemplate = new Template()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 contentVersion = "1.0.0.0",
-                parameters = new Dictionary<string, ExtractorTemplateParameterProperties>
+                parameters = new Dictionary<string, TemplateParameterProperties>
                 {
-                    { "ApimServiceName", new ExtractorTemplateParameterProperties(){ type = "string" } }
+                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
                 },
                 variables = { },
                 resources = { },
@@ -63,20 +64,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             JObject oApi = JObject.Parse(apis);
             Console.WriteLine("{0} API's found ...", ((JContainer)oApi["value"]).Count.ToString());
 
-            armTemplate.resources = new List<Resource>();
+            List<TemplateResource> templateResources = new List<TemplateResource>();
 
             GenerateLoggerTemplate(resourceGroup, apimname, fileFolder);
 
             for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++) //TODO: Refactory
             {
                 string apiName = ((JValue)oApi["value"][i]["name"]).Value.ToString();
-                string apiDetails = api.GetAPIDetails(apimname, resourceGroup, apiName).Result;
+                string apiDetails = apiExtractor.GetAPIDetails(apimname, resourceGroup, apiName).Result;
 
                 Console.WriteLine("------------------------------------------");
                 Console.WriteLine("Geting operations from {0} API:", apiName);
 
                 JObject oApiDetails = JObject.Parse(apiDetails);
-                ApiResource apiResource = JsonConvert.DeserializeObject<ApiResource>(apiDetails);
+                APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
                 string oApiName = ((JValue)oApiDetails["name"]).Value.ToString();
 
                 apiResource.type = ((JValue)oApiDetails["type"]).Value.ToString();
@@ -98,27 +99,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     apiResource.dependsOn = new string[] { };
                 }
 
-                armTemplate.resources.Add(apiResource);
+                templateResources.Add(apiResource);
                 #region Operations
 
-                string operations = api.GetAPIOperations(apimname, resourceGroup, apiName).Result;
+                string operations = apiExtractor.GetAPIOperations(apimname, resourceGroup, apiName).Result;
                 JObject oOperations = JObject.Parse(operations);
 
                 foreach (var item in oOperations["value"])
                 {
                     string operationName = ((JValue)item["name"]).Value.ToString();
-                    string operationDetails = api.GetAPIOperationDetail(apimname, resourceGroup, apiName, operationName).Result;
+                    string operationDetails = apiExtractor.GetAPIOperationDetail(apimname, resourceGroup, apiName, operationName).Result;
 
                     Console.WriteLine("'{0}' Operation found", operationName);
 
                     JObject oOperationDetails = JObject.Parse(operationDetails);
-                    OperationResource operationResource = JsonConvert.DeserializeObject<OperationResource>(operationDetails);
+                    OperationTemplateResource operationResource = JsonConvert.DeserializeObject<OperationTemplateResource>(operationDetails);
                     operationResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResource.name}')]";
                     operationResource.apiVersion = "2018-06-01-preview";
                     operationResource.scale = null;
                     operationResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
-                    armTemplate.resources.Add(operationResource);
+                    templateResources.Add(operationResource);
                 }
                 #endregion
 
@@ -126,16 +127,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 try
                 {
                     Console.Write("Geting API Policy from {0} API: ", apiName);
-                    string apiPolicies = api.GetAPIPolicies(apimname, resourceGroup, apiName).Result;
+                    string apiPolicies = apiExtractor.GetAPIPolicies(apimname, resourceGroup, apiName).Result;
                     Console.WriteLine("Policy found!");
                     JObject oApiPolicies = JObject.Parse(apiPolicies);
-                    ApiPoliciesResource apiPoliciesResource = JsonConvert.DeserializeObject<ApiPoliciesResource>(apiPolicies);
+                    PolicyTemplateResource apiPoliciesResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(apiPolicies);
 
                     apiPoliciesResource.apiVersion = "2018-06-01-preview";
                     apiPoliciesResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiPoliciesResource.name}')]";
                     apiPoliciesResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
-                    armTemplate.resources.Add(apiPoliciesResource);
+                    templateResources.Add(apiPoliciesResource);
                 }
                 catch (Exception)
                 {
@@ -147,14 +148,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 Console.WriteLine("------------------------------------------");
                 Console.WriteLine("Geting diagnostics from {0} API:", apiName);
-                string diagnostics = api.GetAPIDiagnostics(apimname, resourceGroup, apiName).Result;
+                string diagnostics = apiExtractor.GetAPIDiagnostics(apimname, resourceGroup, apiName).Result;
                 JObject oDiagnostics = JObject.Parse(diagnostics);
                 foreach (var diagnostic in oDiagnostics["value"])
                 {
                     string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
                     Console.WriteLine("'{0}' Diagnostic found", diagnosticName);
 
-                    DiagnosticResource diagnosticResource = diagnostic.ToObject<DiagnosticResource>();
+                    DiagnosticTemplateResource diagnosticResource = diagnostic.ToObject<DiagnosticTemplateResource>();
                     diagnosticResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{diagnosticName}')]";
                     diagnosticResource.type = "Microsoft.ApiManagement/service/apis/diagnostics";
                     diagnosticResource.apiVersion = "2018-06-01-preview";
@@ -167,7 +168,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         diagnosticResource.properties.enableHttpCorrelationHeaders = null;
                     }
 
-                    armTemplate.resources.Add(diagnosticResource);
+                    templateResources.Add(diagnosticResource);
 
                 }
 
@@ -176,39 +177,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             #endregion
 
+
+            armTemplate.resources = templateResources.ToArray();
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json");
         }
 
         private void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
         {
-            Api api = new Api();
-            ArmTemplate armTemplate = new ArmTemplate()
+            APIExtractor apiExtractor = new APIExtractor();
+            Template armTemplate = new Template()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 contentVersion = "1.0.0.0",
-                parameters = new Dictionary<string, ExtractorTemplateParameterProperties>
+                parameters = new Dictionary<string, TemplateParameterProperties>
                 {
-                    { "ApimServiceName", new ExtractorTemplateParameterProperties(){ type = "string" } }
+                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
                 },
                 variables = { },
                 resources = { },
                 outputs = { }
             };
 
-            armTemplate.resources = new List<Resource>();
+            List<TemplateResource> templateResources = new List<TemplateResource>();            
 
-            string versionSet = api.GetAPIVersionSet(apimname, resourceGroup, versionSetName).Result;
-            VersionSetResource versionSetResource = JsonConvert.DeserializeObject<VersionSetResource>(versionSet);
+            string versionSet = apiExtractor.GetAPIVersionSet(apimname, resourceGroup, versionSetName).Result;
+            APIVersionSetTemplateResource versionSetResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSet);
 
             string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format(versionSetResource.name, "/", "-") + ".json";
 
             versionSetResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetResource.name}')]";
             versionSetResource.apiVersion = "2018-06-01-preview";
-            armTemplate.resources.Add(versionSetResource);
+
+            templateResources.Add(versionSetResource);
+            armTemplate.resources = templateResources.ToArray();
 
             FileWriter fileWriter = new FileWriter();
-
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
 
@@ -216,37 +220,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Geting loggers from service");
-            Logger logger = new Logger();
-            Property property = new Property();
-            ArmTemplate armTemplate = new ArmTemplate()
+            LoggerExtractor loggerExtractor = new LoggerExtractor();
+            PropertyExtractor propertyExtractor = new PropertyExtractor();
+            Template armTemplate = new Template()
             {
                 schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 contentVersion = "1.0.0.0",
-                parameters = new Dictionary<string, ExtractorTemplateParameterProperties>
+                parameters = new Dictionary<string, TemplateParameterProperties>
                 {
-                    { "ApimServiceName", new ExtractorTemplateParameterProperties(){ type = "string" } }
+                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
                 },
                 variables = { },
                 resources = { },
                 outputs = { }
             };
 
-            armTemplate.resources = new List<Resource>();
+            List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull named values for later credential reference
-            string properties = property.GetProperties(apimname, resourceGroup).Result;
+            string properties = propertyExtractor.GetProperties(apimname, resourceGroup).Result;
             JObject oProperties = JObject.Parse(properties);
-            List<PropertyResource> propertyResources = oProperties["value"].ToObject<List<PropertyResource>>();
+            List<PropertyTemplateResource> propertyResources = oProperties["value"].ToObject<List<PropertyTemplateResource>>();
 
-            string loggers = logger.GetLoggers(apimname, resourceGroup).Result;
+            string loggers = loggerExtractor.GetLoggers(apimname, resourceGroup).Result;
             JObject oLoggers = JObject.Parse(loggers);
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
                 Console.WriteLine("'{0}' Logger found", loggerName);
 
-                string fullLoggerResource = await logger.GetLogger(apimname, resourceGroup, loggerName);
-                LoggerResource loggerResource = JsonConvert.DeserializeObject<LoggerResource>(fullLoggerResource);
+                string fullLoggerResource = await loggerExtractor.GetLogger(apimname, resourceGroup, loggerName);
+                LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
                 loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
                 loggerResource.type = "Microsoft.ApiManagement/service/loggers";
                 loggerResource.apiVersion = "2018-06-01-preview";
@@ -266,9 +270,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     }
                 }
 
-                armTemplate.resources.Add(loggerResource);
+                templateResources.Add(loggerResource);
             }
 
+            armTemplate.resources = templateResources.ToArray();
             FileWriter fileWriter = new FileWriter();
             string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format("loggers", "/", "-") + ".json";
             fileWriter.WriteJSONToFile(armTemplate, filePath);

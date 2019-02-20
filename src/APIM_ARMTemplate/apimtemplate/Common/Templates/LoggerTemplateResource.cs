@@ -1,14 +1,9 @@
 ﻿
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
-    public class LoggerResource : Resource
+    public class LoggerTemplateResource : TemplateResource
     {
-        public string type { get; set; }
-        public string name { get; set; }
-        public string apiVersion { get; set; }
-        public object scale { get; set; }
         public LoggerResourceProperties properties { get; set; }
-        public string[] dependsOn { get; set; }
     }
 
     public class LoggerResourceProperties

@@ -1,10 +1,10 @@
 using McMaster.Extensions.CommandLineUtils;
 using Colors.Net;
 using System;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class CreateCommand : CommandLineApplication
     {

@@ -1,4 +1,5 @@
-﻿
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class TemplateCreator

@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     public class FileWriter
     {
@@ -9,7 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // writes json object to provided location
             string jsonString = JsonConvert.SerializeObject(template,
-                            Formatting.None,
+                            Formatting.Indented,
                             new JsonSerializerSettings
                             {
                                 NullValueHandling = NullValueHandling.Ignore
