@@ -56,6 +56,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             return await CallApiManagement(azToken, requestUrl);
         }
+        public async Task<string> GetProducts(string ApiManagementName, string ResourceGroupName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+                                                                                                                          
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
+
+        public async Task<string> GetProductDetails(string ApiManagementName, string ResourceGroupName, string ProductName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
         public async Task<string> GetAPIs(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -79,6 +98,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/diagnostics?api-version={5}",
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
+
+        public async Task<string> GetApiOperationPolicies(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+                                                                                                                      
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/get/policies/policy?api-version={5}",
                 baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);

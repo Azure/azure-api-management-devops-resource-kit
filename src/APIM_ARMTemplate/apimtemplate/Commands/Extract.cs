@@ -67,8 +67,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             GenerateLoggerTemplate(resourceGroup, apimname, fileFolder);
+            GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder);
 
-            for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++) //TODO: Refactory
+            for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++) 
             {
                 string apiName = ((JValue)oApi["value"][i]["name"]).Value.ToString();
                 string apiDetails = apiExtractor.GetAPIDetails(apimname, resourceGroup, apiName).Result;
@@ -112,7 +113,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                     Console.WriteLine("'{0}' Operation found", operationName);
 
-                    JObject oOperationDetails = JObject.Parse(operationDetails);
                     OperationTemplateResource operationResource = JsonConvert.DeserializeObject<OperationTemplateResource>(operationDetails);
                     operationResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResource.name}')]";
                     operationResource.apiVersion = "2018-06-01-preview";
@@ -128,8 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     Console.Write("Geting API Policy from {0} API: ", apiName);
                     string apiPolicies = apiExtractor.GetAPIPolicies(apimname, resourceGroup, apiName).Result;
-                    Console.WriteLine("Policy found!");
-                    JObject oApiPolicies = JObject.Parse(apiPolicies);
+                    Console.WriteLine("API Policy found!");
                     PolicyTemplateResource apiPoliciesResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(apiPolicies);
 
                     apiPoliciesResource.apiVersion = "2018-06-01-preview";
@@ -140,7 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Policy NOT found!");
+                    Console.WriteLine("No API policy!");
                 }
                 #endregion
 
@@ -176,13 +175,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
 
             #endregion
-
-
+            
             armTemplate.resources = templateResources.ToArray();
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json");
         }
-
         private void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
         {
             APIExtractor apiExtractor = new APIExtractor();
@@ -215,7 +212,48 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
+        private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder)
+        {
+            APIExtractor apiExtractor = new APIExtractor();
+            Template armTemplate = new Template()
+            {
+                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                contentVersion = "1.0.0.0",
+                parameters = new Dictionary<string, TemplateParameterProperties>
+                {
+                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+                },
+                variables = { },
+                resources = { },
+                outputs = { }
+            };
 
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            string products = apiExtractor.GetProducts(apimname, resourceGroup).Result;
+            JObject oProducts = JObject.Parse(products);
+
+            foreach (var item in oProducts["value"])
+            {
+                string productName = ((JValue)item["name"]).Value.ToString();
+
+                Console.WriteLine("'{0}' Product found", productName);
+
+                string productDetails = apiExtractor.GetProductDetails(apimname, resourceGroup, productName).Result;
+
+                ProductsDetailsTemplateResource productsDetailsResource = JsonConvert.DeserializeObject<ProductsDetailsTemplateResource>(productDetails);
+                productsDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
+                productsDetailsResource.apiVersion = "2018-06-01-preview";
+
+                templateResources.Add(productsDetailsResource);
+
+            }
+
+            armTemplate.resources = templateResources.ToArray();
+            FileWriter fileWriter = new FileWriter();
+            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-products.json");
+
+        }
         private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder)
         {
             Console.WriteLine("------------------------------------------");

@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --name LucasLinked2  --resourceGroup LucasHuetHudsonInternal --fileFolder C:\\\\Users\\\\lucashh\\\\Desktop\\\\Projects\\\\APIM-ARM\\\\ExtractedTemplates"
+      "commandLineArgs": "extract  --name odaibert-dev --resourceGroup apim-dev --fileFolder C:\\apim-templates"
     }
   }
 }
