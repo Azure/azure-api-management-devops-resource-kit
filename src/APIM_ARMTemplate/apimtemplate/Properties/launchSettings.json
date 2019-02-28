@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --name odaibert-dev --resourceGroup apim-dev --fileFolder C:\\apim-templates"
+      "commandLineArgs": "extract  --name apim-extractor --resourceGroup apim-extractor --fileFolder C:\\apim-templates --apiName httpBinAPI"
     }
   }
 }
