@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -13,7 +14,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string apimServiceName { get; set; }
         public APIVersionSetConfig apiVersionSet { get; set; }
         public APIConfig api { get; set; }
-        public DiagnosticTemplateProperties diagnostic { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
@@ -32,6 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         // policy file location (local or url)
         public string policy { get; set; }
         public string suffix { get; set; }
+        public bool subscriptionRequired { get; set; }
         public string apiVersion { get; set; }
         public string apiVersionDescription { get; set; }
         public string apiVersionSetId { get; set; }
@@ -40,6 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public Dictionary<string, OperationsConfig> operations { get; set; }
         public APITemplateAuthenticationSettings authenticationSettings { get; set; }
         public string products { get; set; }
+        public DiagnosticConfig diagnostic { get; set; }
     }
 
     public class OperationsConfig
@@ -47,5 +49,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         // policy file location (local or url)
         public string policy { get; set; }
     }
+
+    public class DiagnosticConfig: DiagnosticTemplateProperties
+    {
+        public string name { get; set; }
+    }
+
 
 }

@@ -1,6 +1,6 @@
-version: 0.0.1   # Required
-apimServiceName: Lucas2   # Required, must match name of an apim service deployed in the specified resource group
-apiVersionSet:   # Optional
+version: 0.0.1
+apimServiceName: MyAPIMService
+apiVersionSet:
     id: myAPIVersionSetID
     displayName: swaggerPetstoreVersionSetLinked
     description: a description
@@ -8,50 +8,48 @@ apiVersionSet:   # Optional
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
-  name: myUnlinkedAPI   # Required
-  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json    # Required, can be url or local file
-  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml   # Optional, can be url or local file
-  suffix: conf   # Required
-  apiVersion: v1   # Optional
-  apiVersionDescription: My first version   # Optional
-  #apiVersionSetId: myID    # Optional, must match the resource id on an existing version set
-  revision: 1   # Optional
-  revisionDescription: My first revision   # Optional
-  operations:   # Optional
-    addPet: # Must match the operationId property of a path's operations
-      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml   # Optional, can be url or local file
-    deletePet:  # Must match the operationId property of a path's operations
-      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml   # Optional, can be url or local file
-  products: starter, platinum    # Optional, adds api to the specified products
-diagnostic: # Optional
+  name: myAPI
+  openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
+  policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
+  suffix: conf
+  subscriptionRequired: true
+  apiVersion: v1
+  apiVersionDescription: My first version
+  #apiVersionSetId: myID
+  revision: 1
+  revisionDescription: My first revision
+  operations:
+    addPet:
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
+    deletePet:
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
+  products: starter, platinum
+  diagnostic:
+    name: applicationinsights
     alwaysLog: allErrors
-    loggerId: /loggers/applicationinsights,
+    loggerId: /subscriptions/33eea26c5-cf88-4924-8400-013f731899fd/resourceGroups/MyResourceGroup/providers/Microsoft.ApiManagement/service/MyAPIMService/loggers/myAppInsights
     sampling:
-        samplingType: fixed
-        percentage: 50
+      samplingType: fixed
+      percentage: 50
     frontend: 
-        request:
-            headers:
-                - Content-type
-            body: 
-                bytes: 512
-        response: 
-            headers:
-                - Content-type
-            body: 
-                bytes: 512
+      request:
+        headers:
+        body: 
+          bytes: 512
+      response: 
+        headers:
+        body: 
+          bytes: 512
     backend: 
-        request:
-            headers:
-                - Content-type
-            body: 
-                bytes: 512
-        response: 
-            headers:
-                - Content-type
-            body: 
-                bytes: 512
+      request:
+        headers:
+        body: 
+          bytes: 512
+      response: 
+        headers:
+        body: 
+          bytes: 512
     enableHttpCorrelationHeaders: true
-outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates   # Required, folder the creator will write the templates to
-linked: true   # Optional
-linkedTemplatesBaseUrl : https://lucasyamlblob.blob.core.windows.net/yaml   # Required if 'linked' property is set to true
+outputLocation: C:\Users\myUsername\GeneratedTemplates
+linked: false
+linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer

@@ -1,9 +1,10 @@
 using McMaster.Extensions.CommandLineUtils;
 using Colors.Net;
 using System;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class CreateCommand : CommandLineApplication
     {
@@ -22,41 +23,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
-
-                // ensure required parameters have been passed in
-                if (creatorConfig.outputLocation == null)
-                {
-                    throw new CommandParsingException(this, "Output location is required");
-                }
-                else if (creatorConfig.version == null)
-                {
-                    throw new CommandParsingException(this, "Version is required");
-                }
-                else if (creatorConfig.apimServiceName == null)
-                {
-                    throw new CommandParsingException(this, "APIM service name is required");
-                }
-                else if (creatorConfig.api == null)
-                {
-                    throw new CommandParsingException(this, "API configuration is required");
-                }
-                else if (creatorConfig.api.openApiSpec == null)
-                {
-                    throw new CommandParsingException(this, "Open API Spec is required");
-                }
-                else if (creatorConfig.api.suffix == null)
-                {
-                    throw new CommandParsingException(this, "API suffix is required");
-                }
-                else if (creatorConfig.api.name == null)
-                {
-                    throw new CommandParsingException(this, "API name is required");
-                }
-                else if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
-                {
-                    throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
-                }
-                else
+                // validate creator config
+                bool isValidCreatorConfig = ValidateCreatorConfig(creatorConfig);
+                if (isValidCreatorConfig == true)
                 {
                     // required parameters have been supplied
 
@@ -91,7 +60,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                         fileWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.subsequentAPI));
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, "/master.template.json"));
                         fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, "/master.parameters.json"));
-                    } else
+                    }
+                    else
                     {
                         // create unlinked master template
                         Template initialMasterTemplate = masterTemplateCreator.CreateInitialUnlinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate);
@@ -108,6 +78,79 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 }
                 return 0;
             });
+        }
+
+        public bool ValidateCreatorConfig(CreatorConfig creatorConfig)
+        {
+            bool isValid = true;
+            // ensure required parameters have been passed in
+            if (creatorConfig.outputLocation == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "Output location is required");
+            }
+            if (creatorConfig.version == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "Version is required");
+            }
+            if (creatorConfig.apimServiceName == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "APIM service name is required");
+            }
+            if (creatorConfig.api == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "API configuration is required");
+            }
+            if (creatorConfig.api.openApiSpec == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "Open API Spec is required");
+            }
+            if (creatorConfig.api.suffix == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "API suffix is required");
+            }
+            if (creatorConfig.api.name == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "API name is required");
+            }
+            if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
+            }
+            if (creatorConfig.apiVersionSet != null && creatorConfig.apiVersionSet.displayName == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "Display name is required if an API Version Set is provided");
+            }
+            if (creatorConfig.apiVersionSet != null && creatorConfig.apiVersionSet.versioningScheme == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "Versioning scheme is required if an API Version Set is provided");
+            }
+            if (creatorConfig.api.operations != null)
+            {
+                foreach (KeyValuePair<string, OperationsConfig> operation in creatorConfig.api.operations)
+                {
+                    if (operation.Value == null || operation.Value.policy == null)
+                    {
+                        isValid = false;
+                        throw new CommandParsingException(this, "Policy XML is required if an API operation is provided");
+                    }
+                }
+            }
+            if (creatorConfig.api.diagnostic != null && creatorConfig.api.diagnostic.loggerId == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "LoggerId is required if an API diagnostic is provided");
+            }
+            return isValid;
         }
     }
 }

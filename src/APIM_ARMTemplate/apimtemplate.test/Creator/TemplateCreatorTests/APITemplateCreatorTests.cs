@@ -1,9 +1,9 @@
 ﻿using Microsoft.OpenApi.Models;
-using System;
-using System.IO;
 using Xunit;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
     public class APITemplateCreatorTests
     {
@@ -23,6 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     revision = "revision",
                     revisionDescription = "revisionDescription",
                     suffix = "suffix",
+                    subscriptionRequired = true,
                     authenticationSettings = new APITemplateAuthenticationSettings()
                     {
                         oAuth2 = new APITemplateOAuth2()
@@ -53,6 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Assert.Equal(creatorConfig.api.revision, apiTemplateResource.properties.apiRevision);
             Assert.Equal(creatorConfig.api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
             Assert.Equal(creatorConfig.api.suffix, apiTemplateResource.properties.path);
+            Assert.Equal(creatorConfig.api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
             Assert.Equal(creatorConfig.api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);
             Assert.Equal(creatorConfig.api.authenticationSettings.oAuth2.scope, apiTemplateResource.properties.authenticationSettings.oAuth2.scope);
             Assert.Equal(creatorConfig.api.authenticationSettings.openid.openidProviderId, apiTemplateResource.properties.authenticationSettings.openid.openidProviderId);

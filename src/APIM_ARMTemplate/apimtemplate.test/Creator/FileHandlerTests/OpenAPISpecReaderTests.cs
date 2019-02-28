@@ -1,8 +1,8 @@
 ﻿using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using Microsoft.OpenApi.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
     public class OpenAPISpecReaderTests
     {

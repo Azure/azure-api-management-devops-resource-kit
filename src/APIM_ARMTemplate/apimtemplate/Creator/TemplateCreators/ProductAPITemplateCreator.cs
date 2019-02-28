@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -11,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{productID}/{apiName}')]",
                 type = "Microsoft.ApiManagement/service/products/apis",
-                apiVersion = "2018-01-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new ProductAPITemplateProperties(),
                 dependsOn = dependsOn
             };

@@ -1,30 +1,54 @@
 version: 0.0.1
-apimServiceName: testapimlucas
+apimServiceName: MyAPIMService
 apiVersionSet:
-    displayName: myAPIVersionSet
+    id: myAPIVersionSetID
+    displayName: swaggerPetstoreVersionSetLinked
     description: a description
     versioningScheme: Query
     versionQueryName: versionQuery
     versionHeaderName: versionHeader
 api:
   name: myAPI
-  openApiSpec: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json
-  policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
+  openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
+  policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
   suffix: conf
+  subscriptionRequired: true
   apiVersion: v1
   apiVersionDescription: My first version
+  #apiVersionSetId: myID
   revision: 1
   revisionDescription: My first revision
   operations:
-    addPet: 
-      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
-    deletePet: 
-      policy: C:\Users\lucashh\Desktop\Projects\APIM-ARM\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
-  authenticationSettings:
-    subscriptionKeyRequired: false
-    oAuth2:
-        authorizationServerId: serverId
-        scope: scope
+    addPet:
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
+    deletePet:
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
   products: starter, platinum
-outputLocation: C:\Users\lucashh\Desktop\Projects\APIM-ARM\GeneratedTemplates
+  diagnostic:
+    name: applicationinsights
+    alwaysLog: allErrors
+    loggerId: /subscriptions/33eea26c5-cf88-4924-8400-013f731899fd/resourceGroups/MyResourceGroup/providers/Microsoft.ApiManagement/service/MyAPIMService/loggers/myAppInsights
+    sampling:
+      samplingType: fixed
+      percentage: 50
+    frontend: 
+      request:
+        headers:
+        body: 
+          bytes: 512
+      response: 
+        headers:
+        body: 
+          bytes: 512
+    backend: 
+      request:
+        headers:
+        body: 
+          bytes: 512
+      response: 
+        headers:
+        body: 
+          bytes: 512
+    enableHttpCorrelationHeaders: true
+outputLocation: C:\Users\myUsername\GeneratedTemplates
 linked: true

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     public class DiagnosticTemplateResource : APITemplateSubResource
     {
@@ -16,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public DiagnosticTemplateSampling sampling { get; set; }
         public DiagnosticTemplateFrontendBackend frontend { get; set; }
         public DiagnosticTemplateFrontendBackend backend { get; set; }
-        public bool enableHttpCorrelationHeaders { get; set; }
+        public Nullable<bool> enableHttpCorrelationHeaders { get; set; }
     }
 
     public class DiagnosticTemplateSampling

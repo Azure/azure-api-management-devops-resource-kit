@@ -1,4 +1,5 @@
 version: 0.0.1
+apimServiceName: MyAPIMService
 apiVersionSet:
     id: myAPIVersionSetID
     displayName: swaggerPetstoreVersionSetLinked
@@ -26,7 +27,6 @@ api:
   diagnostic:
     name: applicationinsights
     alwaysLog: allErrors
-    loggerId: /subscriptions/33eea26c5-cf88-4924-8400-013f731899fd/resourceGroups/MyResourceGroup/providers/Microsoft.ApiManagement/service/MyAPIMService/loggers/myAppInsights
     sampling:
       samplingType: fixed
       percentage: 50

@@ -1,7 +1,7 @@
 version: 0.0.1
+apimServiceName: MyAPIMService
 apiVersionSet:
     id: myAPIVersionSetID
-    displayName: swaggerPetstoreVersionSetLinked
     description: a description
     versioningScheme: Query
     versionQueryName: versionQuery

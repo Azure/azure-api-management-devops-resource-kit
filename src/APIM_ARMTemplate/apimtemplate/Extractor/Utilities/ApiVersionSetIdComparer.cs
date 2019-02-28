@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace APIManagementTemplate
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class ApiVersionSetIdComparer : IEqualityComparer<JToken>
     {

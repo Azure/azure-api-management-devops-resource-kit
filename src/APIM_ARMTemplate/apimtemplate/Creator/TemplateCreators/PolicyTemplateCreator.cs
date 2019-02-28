@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -22,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/policies",
-                apiVersion = "2018-01-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = isUrl ? "rawxml-link" : "rawxml",
@@ -42,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{policyPair.Key}/policy')]",
                 type = "Microsoft.ApiManagement/service/apis/operations/policies",
-                apiVersion = "2018-01-01",
+                apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = isUrl ? "rawxml-link" : "rawxml",

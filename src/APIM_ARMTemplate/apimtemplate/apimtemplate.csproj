@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extractor\Models\**" />
+    <Compile Remove="Extractor\TemplateCreators\**" />
+    <EmbeddedResource Remove="Extractor\Models\**" />
+    <EmbeddedResource Remove="Extractor\TemplateCreators\**" />
+    <None Remove="Extractor\Models\**" />
+    <None Remove="Extractor\TemplateCreators\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="microsoft.gpg" />
     <None Remove="packages-microsoft-prod.deb" />
   </ItemGroup>
@@ -28,8 +37,6 @@
 
   <ItemGroup>
     <Folder Include="Creator\ExampleFiles\OpenAPISpecs\" />
-    <Folder Include="Extractor\Models\" />
-    <Folder Include="Extractor\TemplateCreators\" />
   </ItemGroup>
 
 </Project>

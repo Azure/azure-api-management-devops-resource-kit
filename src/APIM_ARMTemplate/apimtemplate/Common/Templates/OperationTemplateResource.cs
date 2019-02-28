@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+﻿
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     public class OperationTemplateResource : APITemplateSubResource
     {
@@ -37,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string description { get; set; }
         public OperationTemplateParameter[] queryParameters { get; set; }
         public OperationTemplateParameter[] headers { get; set; }
-        public OperationTemplateRepresentation[] representations { get; set; }
+        //public OperationTemplateRepresentation[] representations { get; set; }
     }
 
     public class OperationTemplateRepresentation
@@ -54,6 +51,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         public string statusCode { get; set; }
         public string description { get; set; }
         public OperationTemplateParameter[] headers { get; set; }
-        public OperationTemplateRepresentation[] representations { get; set; }
+        //public OperationTemplateRepresentation[] representations { get; set; }
     }
 }
