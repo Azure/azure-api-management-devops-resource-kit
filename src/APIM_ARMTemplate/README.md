@@ -1,23 +1,17 @@
 # Table of Contents
 
 1. [ Creator ](#Creator)
-    * [Deploy an APIM Instance](#creator1)
-    * [Create the Config File](#creator2)
-    * [Generate Templates Using the Create Command](#creator3)
-    * [Deploying Linked Templates](#creator4)
-    * [Deploying Unlinked Templates](#creator5)
+    * [Create the Config File](#creator1)
+    * [Running the Creator](#creator2)
 2. [ Extractor ](#Extractor)
+    * [Running the Extractor](#extrator1)
 
 # Creator
 
+This utility creates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) for an API based on the [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) of the API. Optionaly, you can provide policies you wish to apply to the API and its operations in seperate files.
+
 <a name="creator1"></a>
-## Deploy an APIM Instance
 
-- Log into the Azure Portal
-- Search for 'API Management services' in the bar at the top of the portal.
-- Click 'Add' and fill out the necessary properties to create the instance
-
-<a name="creator2"></a>
 ## Create the Config File
 
 The utility requires one argument, --configFile, which points to a yaml file that links to policy and Open API Spec files and on which the entire process is dependent. The file contains a Creator Configuration object whose schema and related schemas are listed below:
@@ -29,12 +23,12 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | version               | string                | Yes                   | Configuration version.                            |
-| apimServiceName       | string                | Yes                   | Name of APIM service to deploy resources into.  must match name of an APIM service deployed in the specified resource group. |
+| apimServiceName       | string                | Yes                   | Name of APIM service to deploy resources into.    |
 | apiVersionSet         | [APIVersionSetConfiguration](#APIVersionSetConfiguration) | No               | VersionSet configuration.                        |
 | api                   | [APIConfiguration](#APIConfiguration)      | Yes                   | API configuration.                                |
 | outputLocation        | string                | Yes                   | Local folder the utility will write templates to. |
-| linked                | boolean               | No                    | Determines whether the utility will output linked or unlinked templates. |
-| linkedTemplatesBaseUrl| string                | No                    | Remote location that stores linked templates. Required if 'linked' is set to true. |
+| linked                | boolean               | No                    | Determines whether the utility should create a master template that links to all generated templates. |
+| linkedTemplatesBaseUrl| string                | No                    | Location that stores linked templates. Required if 'linked' is set to true. |
 
 #### APIVersionSetConfiguration
 
@@ -43,7 +37,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | id                    | string                | No                    | ID of the API Version Set.                        |
 | displayName           | string                | Yes                    | Name of API Version Set.                          |
 | description           | string                | No                    | Description of API Version Set.                  |
-| versioningScheme      | enum                  | Yes                    | An value that determines where the API Version identifer will be located in a HTTP request. - Segment, Query, Header   |
+| versioningScheme      | enum                  | Yes                    | A value that determines where the API Version identifer will be located in a HTTP request. - Segment, Query, Header   |
 | versionQueryName      | string                | No                    | Name of query parameter that indicates the API Version if versioningScheme is set to query.                             |
 | versionHeaderName     | string                | No                    | Name of HTTP header parameter that indicates the API Version if versioningScheme is set to header.                            |
 
@@ -84,7 +78,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | backend                  | object                | No                    | Diagnostic settings for incoming/outgoing HTTP messages to the Backend - [PipelineDiagnosticSettings object](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2018-06-01-preview/service/apis/diagnostics#PipelineDiagnosticSettings)       |
 | enableHttpCorrelationHeaders | boolean                | No                    | Whether to process Correlation Headers coming to Api Management Service. Only applicable to Application Insights diagnostics. Default is true.      |
 
-### Example File
+### Sample Config File
 
 The following is a full config.yml file with each property listed:
 
@@ -151,31 +145,42 @@ linked: true
 linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
 ```
 
-<a name="creator3"></a>
-## Generate Templates Using the Create Command
+<a name="creator2"></a>
 
-- Clone this repository and restore its packages
-- Navigate to the azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate directory
-- ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
+## Running the Creator
+Below are the steps to run the Creator from the source code:
 
-The ```dotnet run create``` command will generate template and parameter files in the folder specified in the config file's outputLocation property.
+- Clone this repository and restore its packages using ```dotnet restore```
+- Navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate directory
+- Run the following command:
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
 
-<a name="creator4"></a>
-## Deploying Linked Templates 
-
-If the linked property in the config file is set to true, the utility will generate master template and parameters files, as well as a number of other templates the master template links to.
-
-- Push each of the other templates to the location specified in the linkedTemplatesBaseUrl property in the config file (can be a GitHub repo, Azure blob storage container, etc)
-- Navigate into the folder that contains the generated templates
-- ```az group deployment create --resource-group YOUR_RESOURCE_GROUP --template-file ./master.template.json --parameters ./master.parameters.json```
-
-<a name="creator5"></a>
-## Deploying Unlinked Templates
-
-If the linked property in the config file is set to false, the utility will generate two master templates and a parameters file, requiring two deployments.
-
-- Navigate into the folder that contains the generated templates
-- ```az group deployment create --resource-group YOUR_RESOURCE_GROUP --template-file ./master1.template.json --parameters ./master.parameters.json```
-- ```az group deployment create --resource-group YOUR_RESOURCE_GROUP --template-file ./master2.template.json --parameters ./master.parameters.json```
+You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
 
 # Extractor
+
+This utility generates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) by extracing existing configurations of one or more APIs in an API Management instance. 
+
+<a name="prerequisite"></a>
+
+## Prerequisite
+
+To be able to run the Extractor, you would first need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+
+<a name="extractor1"></a>
+
+## Running the Extractor
+Below are the steps to run the Extractor from the source code:
+- Clone this repository and restore its packages using ```dotnet restore```
+- Navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate directory
+- Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted. 
+```
+az login
+az account set --subscription <subscription_id>
+```
+- Run the Extractor with the following command: 
+```
+dotnet run extract --name <name_of_the_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder>
+```
+
+You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
