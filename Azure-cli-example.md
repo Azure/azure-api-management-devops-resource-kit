@@ -1,4 +1,4 @@
-# Example deployment using the Azure CLI
+# Deploying Resource Manager templates using Azure CLI
 
 The following instructions demonstrate how to deploy the contents of this example repository using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
