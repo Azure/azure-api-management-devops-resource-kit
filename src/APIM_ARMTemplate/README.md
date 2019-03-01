@@ -178,7 +178,11 @@ Below are the steps to run the Extractor from the source code:
 az login
 az account set --subscription <subscription_id>
 ```
-- Run the Extractor with the following command: 
+- Run the Extractor with the following command to extract a single API: 
+```
+dotnet run extract --name <name_of_the_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --apiName <api_name>
+```
+- Or run the Extractor with the following command to extract all APIs: 
 ```
 dotnet run extract --name <name_of_the_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder>
 ```
