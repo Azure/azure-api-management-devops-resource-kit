@@ -59,9 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             FileWriter fileWriter;
             APIExtractor apiExtractor = new APIExtractor();
             string apis = apiExtractor.GetAPIs(apimname, resourceGroup).Result;
-            TemplateCreator templateCreator = new TemplateCreator();
-            Template armTemplate = templateCreator.CreateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             JObject oApi = JObject.Parse(apis);
             oApi = FormatoApi(singleApiName, oApi);
@@ -268,9 +266,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         private void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
         {
             APIExtractor apiExtractor = new APIExtractor();
-            TemplateCreator templateCreator = new TemplateCreator();
-            Template armTemplate = templateCreator.CreateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -288,12 +284,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
+
         private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder)
         {
             APIExtractor apiExtractor = new APIExtractor();
-            TemplateCreator templateCreator = new TemplateCreator();
-            Template armTemplate = templateCreator.CreateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -327,9 +322,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Console.WriteLine("Geting loggers from service");
             LoggerExtractor loggerExtractor = new LoggerExtractor();
             PropertyExtractor propertyExtractor = new PropertyExtractor();
-            TemplateCreator templateCreator = new TemplateCreator();
-            Template armTemplate = templateCreator.CreateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -374,6 +367,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             FileWriter fileWriter = new FileWriter();
             string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format("loggers", "/", "-") + ".json";
             fileWriter.WriteJSONToFile(armTemplate, filePath);
+        }
+
+        public Template GenerateEmptyTemplateWithParameters()
+        {
+            TemplateCreator templateCreator = new TemplateCreator();
+            Template armTemplate = templateCreator.CreateEmptyTemplate();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            return armTemplate;
         }
     }
 }
