@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --name apim-extractor --resourceGroup apim-extractor --fileFolder C:\\apim-templates --apiName httpBinAPI"
+      "commandLineArgs": "create --configFile ./Creator/ExampleFiles/YAMLConfigs/validTesting.yml"
     }
   }
 }
