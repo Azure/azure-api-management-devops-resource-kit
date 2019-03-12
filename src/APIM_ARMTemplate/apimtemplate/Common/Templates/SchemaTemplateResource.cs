@@ -16,4 +16,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     {
         public string value { get; set; }
     }
+
+    public class RESTReturnedSchemaTemplate : APITemplateSubResource
+    {
+        public RESTReturnedSchemaTemplateProperties properties { get; set; }
+    }
+
+    public class RESTReturnedSchemaTemplateProperties
+    {
+        public string contentType { get; set; }
+        public object document { get; set; }
+    }
 }
