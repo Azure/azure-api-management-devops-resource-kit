@@ -414,19 +414,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 loggerResource.apiVersion = "2018-06-01-preview";
                 loggerResource.scale = null;
 
-                // swap credentials for their hidden values, taken from named values
-                if (loggerResource.properties.credentials != null)
+                // swap instrumentation key credentials for their hidden values if the logger is app insights, taken from named values
+                if (loggerResource.properties.credentials != null && loggerResource.properties.credentials.instrumentationKey != null)
                 {
-                    if (loggerResource.properties.credentials.instrumentationKey != null)
-                    {
-                        string hiddenKey = loggerResource.properties.credentials.instrumentationKey.Substring(2, loggerResource.properties.credentials.instrumentationKey.Length - 4);
-                        loggerResource.properties.credentials.instrumentationKey = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
-                    }
-                    else if (loggerResource.properties.credentials.connectionString != null)
-                    {
-                        string hiddenKey = loggerResource.properties.credentials.connectionString.Substring(2, loggerResource.properties.credentials.connectionString.Length - 4);
-                        loggerResource.properties.credentials.connectionString = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
-                    }
+                    string hiddenKey = loggerResource.properties.credentials.instrumentationKey.Substring(2, loggerResource.properties.credentials.instrumentationKey.Length - 4);
+                    loggerResource.properties.credentials.instrumentationKey = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
                 }
 
                 templateResources.Add(loggerResource);
