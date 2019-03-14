@@ -69,6 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             if (singleApiName == null)
             {
+                GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder);
                 GenerateLoggerTemplate(resourceGroup, apimname, fileFolder);
             }
 
@@ -390,15 +391,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting loggers from service");
             LoggerExtractor loggerExtractor = new LoggerExtractor();
-            PropertyExtractor propertyExtractor = new PropertyExtractor();
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // pull named values for later credential reference
-            string properties = propertyExtractor.GetProperties(apimname, resourceGroup).Result;
-            JObject oProperties = JObject.Parse(properties);
-            List<PropertyTemplateResource> propertyResources = oProperties["value"].ToObject<List<PropertyTemplateResource>>();
 
             string loggers = loggerExtractor.GetLoggers(apimname, resourceGroup).Result;
             JObject oLoggers = JObject.Parse(loggers);
@@ -414,19 +409,44 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 loggerResource.apiVersion = "2018-06-01-preview";
                 loggerResource.scale = null;
 
-                // swap instrumentation key credentials for their hidden values if the logger is app insights, taken from named values
-                if (loggerResource.properties.credentials != null && loggerResource.properties.credentials.instrumentationKey != null)
-                {
-                    string hiddenKey = loggerResource.properties.credentials.instrumentationKey.Substring(2, loggerResource.properties.credentials.instrumentationKey.Length - 4);
-                    loggerResource.properties.credentials.instrumentationKey = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
-                }
-
                 templateResources.Add(loggerResource);
             }
 
             armTemplate.resources = templateResources.ToArray();
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
+        }
+
+        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder)
+        {
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Getting named values from service");
+            PropertyExtractor propertyExtractor = new PropertyExtractor();
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // pull named values for later credential reference
+            string properties = propertyExtractor.GetProperties(apimname, resourceGroup).Result;
+            JObject oProperties = JObject.Parse(properties);
+            foreach (var extractedProperty in oProperties["value"])
+            {
+                string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
+                Console.WriteLine("'{0}' Named value found", propertyName);
+
+                string fullLoggerResource = await propertyExtractor.GetProperty(apimname, resourceGroup, propertyName);
+                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullLoggerResource);
+                propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
+                propertyTemplateResource.type = "Microsoft.ApiManagement/service/properties";
+                propertyTemplateResource.apiVersion = "2018-06-01-preview";
+                propertyTemplateResource.scale = null;
+
+                templateResources.Add(propertyTemplateResource);
+            }
+
+            armTemplate.resources = templateResources.ToArray();
+            FileWriter fileWriter = new FileWriter();
+            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-namedvalues.json");
         }
 
         public Template GenerateEmptyTemplateWithParameters()
