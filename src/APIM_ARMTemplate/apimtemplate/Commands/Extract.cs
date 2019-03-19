@@ -240,6 +240,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 if (singleApiName != null)
                 {
+                    GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder);
                     fileWriter = new FileWriter();
                     fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + oApiName + "-template.json");
                     templateResources = new List<TemplateResource>();
@@ -335,7 +336,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 string productDetails = apiExtractor.GetProductDetails(apimname, resourceGroup, productName).Result;
 
-                ProductsDetailsTemplateResource productsDetailsResource = JsonConvert.DeserializeObject<ProductsDetailsTemplateResource>(productDetails);
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                };
+
+                ProductsDetailsTemplateResource productsDetailsResource = JsonConvert.DeserializeObject<ProductsDetailsTemplateResource>(productDetails, settings);
                 productsDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
                 productsDetailsResource.apiVersion = "2018-06-01-preview";
 
