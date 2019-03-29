@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
@@ -38,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     singleApiName = apiName.Values[0].ToString();
                 }
-                
+
                 Console.WriteLine("API Management Template");
                 Console.WriteLine();
                 Console.WriteLine("Connecting to {0} API Management Service on {1} Resource Group ...", apimname, resourceGroup);
@@ -46,6 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 GenerateARMTemplate(apimname, resourceGroup, fileFolder, singleApiName);
 
                 Console.WriteLine("Templates written to output location");
+                Console.WriteLine("Press any key to exit process:");
 #if DEBUG
                 Console.ReadKey();
 #endif
@@ -58,19 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             FileWriter fileWriter;
             APIExtractor apiExtractor = new APIExtractor();
             string apis = apiExtractor.GetAPIs(apimname, resourceGroup).Result;
-
-            Template armTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = new Dictionary<string, TemplateParameterProperties>
-                {
-                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
-                },
-                variables = { },
-                resources = { },
-                outputs = { }
-            };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             JObject oApi = JObject.Parse(apis);
             oApi = FormatoApi(singleApiName, oApi);
@@ -79,6 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             if (singleApiName == null)
             {
+                GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder);
                 GenerateLoggerTemplate(resourceGroup, apimname, fileFolder);
             }
 
@@ -90,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string apiDetails = apiExtractor.GetAPIDetails(apimname, resourceGroup, apiName).Result;
 
                 Console.WriteLine("------------------------------------------");
-                Console.WriteLine("Geting operations from {0} API:", apiName);
+                Console.WriteLine("Getting operations from {0} API:", apiName);
 
                 JObject oApiDetails = JObject.Parse(apiDetails);
                 APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
@@ -119,6 +110,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 templateResources.Add(apiResource);
 
+                #region Schemas
+                List<TemplateResource> schemaResources = GenerateSchemasARMTemplate(apimname, apiName, resourceGroup, fileFolder);
+                templateResources.AddRange(schemaResources);
+                #endregion
+
                 #region Operations
 
                 string operations = apiExtractor.GetAPIOperations(apimname, resourceGroup, apiName).Result;
@@ -136,7 +132,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     operationResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}')]";
                     operationResource.apiVersion = "2018-06-01-preview";
                     operationResource.scale = null;
-                    operationResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+
+                    // depend on api and schemas if necessary
+                    List<string> operationDependsOn = new List<string>() { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+                    foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationResource.properties.request.representations)
+                    {
+                        if (operationTemplateRepresentation.schemaId != null)
+                        {
+                            string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('ApimServiceName'), '{oApiName}', '{operationTemplateRepresentation.schemaId}')]";
+                            // add value to list if schema has not already been added
+                            if (!operationDependsOn.Exists(o => o == dependsOn))
+                            {
+                                operationDependsOn.Add(dependsOn);
+                            }
+                        }
+                    }
+                    foreach (OperationsTemplateResponse operationTemplateResponse in operationResource.properties.responses)
+                    {
+                        foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationTemplateResponse.representations)
+                        {
+                            if (operationTemplateRepresentation.schemaId != null)
+                            {
+                                string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('ApimServiceName'), '{oApiName}', '{operationTemplateRepresentation.schemaId}')]";
+                                // add value to list if schema has not already been added
+                                if (!operationDependsOn.Exists(o => o == dependsOn))
+                                {
+                                    operationDependsOn.Add(dependsOn);
+                                }
+                            }
+                        }
+                    }
+                    operationResource.dependsOn = operationDependsOn.ToArray();
 
                     templateResources.Add(operationResource);
                     try
@@ -161,7 +187,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 #region API Policies
                 try
                 {
-                    Console.WriteLine("Geting API Policy from {0} API: ", apiName);
+                    Console.WriteLine("Getting API Policy from {0} API: ", apiName);
                     string apiPolicies = apiExtractor.GetAPIPolicies(apimname, resourceGroup, apiName).Result;
                     Console.WriteLine("API Policy found!");
                     PolicyTemplateResource apiPoliciesResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(apiPolicies);
@@ -181,7 +207,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 #region API Products
                 try
                 {
-                    Console.WriteLine("Geting API Products from {0} API: ", apiName);
+                    Console.WriteLine("Getting API Products from {0} API: ", apiName);
                     string apiProducts = apiExtractor.GetApiProducts(apimname, resourceGroup, apiName).Result;
                     JObject oApiProducts = JObject.Parse(apiProducts);
 
@@ -191,9 +217,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         Console.WriteLine($" -- {apiProductName} Product found to {oApiName} API");
                         ApiProductsTemplateResource apiProductsResource = JsonConvert.DeserializeObject<ApiProductsTemplateResource>(apiProducts);
                         apiProductsResource.type = "Microsoft.ApiManagement/service/products/apis";
-                        apiProductsResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]"; 
+                        apiProductsResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]";
                         apiProductsResource.apiVersion = "2018-06-01-preview";
-                        apiProductsResource.scale = null; 
+                        apiProductsResource.scale = null;
                         apiProductsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
                         templateResources.Add(apiProductsResource);
@@ -205,11 +231,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Console.WriteLine("No API products!");
                 }
                 #endregion
-                
+
                 #region Diagnostics
 
                 Console.WriteLine("------------------------------------------");
-                Console.WriteLine("Geting diagnostics from {0} API:", apiName);
+                Console.WriteLine("Getting diagnostics from {0} API:", apiName);
                 string diagnostics = apiExtractor.GetAPIDiagnostics(apimname, resourceGroup, apiName).Result;
                 JObject oDiagnostics = JObject.Parse(diagnostics);
                 foreach (var diagnostic in oDiagnostics["value"])
@@ -251,7 +277,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 fileWriter = new FileWriter();
                 fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json");
             }
-        #endregion
+            #endregion
         }
         private static JObject FormatoApi(string singleApiName, JObject oApi)
         {
@@ -265,7 +291,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 var selectedApi = (JObject)oApi.SelectTokens(objectSelector).FirstOrDefault();
                 if (selectedApi == null)
                 {
-                    throw new Exception($"{singleApiName} API not found!" );
+                    throw new Exception($"{singleApiName} API not found!");
                 }
                 item2.Add(selectedApi);
                 value["value"] = item2;
@@ -277,20 +303,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         private void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
         {
             APIExtractor apiExtractor = new APIExtractor();
-            Template armTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = new Dictionary<string, TemplateParameterProperties>
-                {
-                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
-                },
-                variables = { },
-                resources = { },
-                outputs = { }
-            };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
-            List<TemplateResource> templateResources = new List<TemplateResource>();            
+            List<TemplateResource> templateResources = new List<TemplateResource>();
 
             string versionSet = apiExtractor.GetAPIVersionSet(apimname, resourceGroup, versionSetName).Result;
             APIVersionSetTemplateResource versionSetResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSet);
@@ -306,21 +321,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
+
         private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder)
         {
             APIExtractor apiExtractor = new APIExtractor();
-            Template armTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = new Dictionary<string, TemplateParameterProperties>
-                {
-                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
-                },
-                variables = { },
-                resources = { },
-                outputs = { }
-            };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -348,31 +353,47 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-products.json");
 
         }
+
+        private List<TemplateResource> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
+        {
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Getting operation schemas from service");
+
+            APIExtractor apiExtractor = new APIExtractor();
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            string schemas = apiExtractor.GetApiSchemas(apimServiceName, resourceGroup, apiName).Result;
+            JObject oSchemas = JObject.Parse(schemas);
+
+            foreach (var item in oSchemas["value"])
+            {
+                string schemaName = ((JValue)item["name"]).Value.ToString();
+                Console.WriteLine("'{0}' Schema found", schemaName);
+
+                string schemaDetails = apiExtractor.GetApiSchemaDetails(apimServiceName, resourceGroup, apiName, schemaName).Result;
+
+                // pull returned document and convert to correct format
+                RESTReturnedSchemaTemplate restReturnedSchemaTemplate = JsonConvert.DeserializeObject<RESTReturnedSchemaTemplate>(schemaDetails);
+                SchemaTemplateResource schemaDetailsResource = JsonConvert.DeserializeObject<SchemaTemplateResource>(schemaDetails);
+                schemaDetailsResource.properties.document.value = JsonConvert.SerializeObject(restReturnedSchemaTemplate.properties.document);
+                schemaDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{schemaName}')]";
+                schemaDetailsResource.apiVersion = "2018-06-01-preview";
+                schemaDetailsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
+
+                templateResources.Add(schemaDetailsResource);
+
+            }
+            return templateResources;
+        }
+
         private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder)
         {
             Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Geting loggers from service");
+            Console.WriteLine("Getting loggers from service");
             LoggerExtractor loggerExtractor = new LoggerExtractor();
-            PropertyExtractor propertyExtractor = new PropertyExtractor();
-            Template armTemplate = new Template()
-            {
-                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                contentVersion = "1.0.0.0",
-                parameters = new Dictionary<string, TemplateParameterProperties>
-                {
-                    { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
-                },
-                variables = { },
-                resources = { },
-                outputs = { }
-            };
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // pull named values for later credential reference
-            string properties = propertyExtractor.GetProperties(apimname, resourceGroup).Result;
-            JObject oProperties = JObject.Parse(properties);
-            List<PropertyTemplateResource> propertyResources = oProperties["value"].ToObject<List<PropertyTemplateResource>>();
 
             string loggers = loggerExtractor.GetLoggers(apimname, resourceGroup).Result;
             JObject oLoggers = JObject.Parse(loggers);
@@ -388,27 +409,52 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 loggerResource.apiVersion = "2018-06-01-preview";
                 loggerResource.scale = null;
 
-                // swap credentials for their hidden values, taken from named values
-                if (loggerResource.properties.credentials != null)
-                {
-                    if (loggerResource.properties.credentials.instrumentationKey != null)
-                    {
-                        string hiddenKey = loggerResource.properties.credentials.instrumentationKey.Substring(2, loggerResource.properties.credentials.instrumentationKey.Length - 4);
-                        loggerResource.properties.credentials.instrumentationKey = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
-                    } else if (loggerResource.properties.credentials.connectionString != null)
-                    {
-                        string hiddenKey = loggerResource.properties.credentials.connectionString.Substring(2, loggerResource.properties.credentials.connectionString.Length - 4);
-                        loggerResource.properties.credentials.connectionString = propertyResources.Find(p => p.properties.displayName == hiddenKey).properties.value;
-                    }
-                }
-
                 templateResources.Add(loggerResource);
             }
 
             armTemplate.resources = templateResources.ToArray();
             FileWriter fileWriter = new FileWriter();
-            string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format("loggers", "/", "-") + ".json";
-            fileWriter.WriteJSONToFile(armTemplate, filePath);
+            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
+        }
+
+        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder)
+        {
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Getting named values from service");
+            PropertyExtractor propertyExtractor = new PropertyExtractor();
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // pull named values for later credential reference
+            string properties = propertyExtractor.GetProperties(apimname, resourceGroup).Result;
+            JObject oProperties = JObject.Parse(properties);
+            foreach (var extractedProperty in oProperties["value"])
+            {
+                string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
+                Console.WriteLine("'{0}' Named value found", propertyName);
+
+                string fullLoggerResource = await propertyExtractor.GetProperty(apimname, resourceGroup, propertyName);
+                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullLoggerResource);
+                propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
+                propertyTemplateResource.type = "Microsoft.ApiManagement/service/properties";
+                propertyTemplateResource.apiVersion = "2018-06-01-preview";
+                propertyTemplateResource.scale = null;
+
+                templateResources.Add(propertyTemplateResource);
+            }
+
+            armTemplate.resources = templateResources.ToArray();
+            FileWriter fileWriter = new FileWriter();
+            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-namedvalues.json");
+        }
+
+        public Template GenerateEmptyTemplateWithParameters()
+        {
+            TemplateCreator templateCreator = new TemplateCreator();
+            Template armTemplate = templateCreator.CreateEmptyTemplate();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            return armTemplate;
         }
     }
 }
