@@ -31,4 +31,4 @@ api:
   products: starter    # Optional, adds api to the specified products
 outputLocation: /Users/miaojiang/Work/azure-api-management-devops-example/example/demo/Output   # Required, folder the creator will write the templates to
 linked: true   # Optional
-linkedTemplatesBaseUrl : https://raw.githubusercontent.com/miaojiang/azure-api-management-devops-example/Ready19/example/demo/Output  # Required if 'linked' property is set to true
+linkedTemplatesBaseUrl : https://raw.githubusercontent.com/miaojiang/azure-api-management-devops-example/MVP/example/demo/Output  # Required if 'linked' property is set to true
