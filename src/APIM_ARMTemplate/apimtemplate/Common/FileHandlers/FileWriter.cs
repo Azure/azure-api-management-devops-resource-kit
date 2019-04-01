@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 linkedMaster = $@"/{apiName}.master.template.json",
                 unlinkedMasterOne = $@"/{apiName}.master1.template.json",
                 unlinkedMasterTwo = $@"/{apiName}.master2.template.json",
-                masterParameters = @"/master.parameters.json",
+                masterParameters = $@"/{apiName}.master.parameters.json",
             };
         }
     }
