@@ -9,10 +9,10 @@
   "resources": [
     {
       "type": "Microsoft.ApiManagement/service/apis/releases",
-      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI', '/beta')]",
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2', '/beta')]",
       "apiVersion": "2018-01-01",      
       "properties": {
-        "apiId": "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI;rev=2')]",
+        "apiId": "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]",
         "notes": "make revision 2 as current"
       }
     }
