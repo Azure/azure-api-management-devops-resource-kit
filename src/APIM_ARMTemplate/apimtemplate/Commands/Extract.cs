@@ -67,8 +67,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             Console.WriteLine("{0} API's found ...", ((JContainer)oApi["value"]).Count.ToString());
 
-            GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder, singleApiName);
-            GenerateLoggerTemplate(resourceGroup, apimname, fileFolder, singleApiName);
+            // store api and operation policies as well as diagnostics for the time being in order to extract loggers correctly
+            List<PolicyTemplateResource> policyResources = new List<PolicyTemplateResource>();
+            List<DiagnosticTemplateResource> diagnosticResources = new List<DiagnosticTemplateResource>();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -173,6 +174,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         operationPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
 
                         templateResources.Add(operationPolicyResource);
+                        // add the operation policy resource to the list used to extract loggers later on
+                        policyResources.Add(operationPolicyResource);
                     }
                     catch (Exception)
                     {
@@ -194,6 +197,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     apiPoliciesResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
                     templateResources.Add(apiPoliciesResource);
+                    // add the api policy resource to the list used to extract loggers later on
+                    policyResources.Add(apiPoliciesResource);
                 }
                 catch (Exception)
                 {
@@ -254,6 +259,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     }
 
                     templateResources.Add(diagnosticResource);
+                    // add the diagnostic resource to the list used to extract loggers later on
+                    diagnosticResources.Add(diagnosticResource);
 
                 }
 
@@ -268,6 +275,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     templateResources = new List<TemplateResource>();
                 }
             }
+
+            GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder, singleApiName, policyResources, diagnosticResources);
+            GenerateLoggerTemplate(resourceGroup, apimname, fileFolder, singleApiName, policyResources, diagnosticResources);
 
             if (singleApiName == null)
             {
@@ -383,7 +393,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return templateResources;
         }
 
-        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName)
+        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName, List<PolicyTemplateResource> policyResources, List<DiagnosticTemplateResource> diagnosticResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting loggers from service");
@@ -397,7 +407,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-                Console.WriteLine("'{0}' Logger found", loggerName);
 
                 string fullLoggerResource = await loggerExtractor.GetLogger(apimname, resourceGroup, loggerName);
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
@@ -406,7 +415,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 loggerResource.apiVersion = "2018-06-01-preview";
                 loggerResource.scale = null;
 
-                templateResources.Add(loggerResource);
+                if(singleApiName == null)
+                {
+                    // if the user is extracting all apis, extract all the loggers
+                    Console.WriteLine("'{0}' Logger found", loggerName);
+                    templateResources.Add(loggerResource);
+                } else
+                {
+                    // if the user is extracting a single api, extract the loggers referenced by its diagnostics and api policies
+                    bool isReferencedInPolicy = false;
+                    bool isReferencedInDiagnostic = false;
+                    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+                    {
+                        if (policyTemplateResource.properties.policyContent.Contains(loggerName))
+                        {
+                            isReferencedInPolicy = true;
+                        }
+                    }
+                    foreach (DiagnosticTemplateResource diagnosticTemplateResource in diagnosticResources)
+                    {
+                        if (diagnosticTemplateResource.properties.loggerId.Contains(loggerName))
+                        {
+                            isReferencedInPolicy = true;
+                        }
+                    }
+                    if(isReferencedInPolicy == true || isReferencedInDiagnostic == true)
+                    {
+                        // logger was used in policy or diagnostic, extract it
+                        Console.WriteLine("'{0}' Logger found", loggerName);
+                        templateResources.Add(loggerResource);
+                    }
+                };
             }
 
             armTemplate.resources = templateResources.ToArray();
@@ -414,7 +453,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
         }
 
-        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName)
+        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName, List<PolicyTemplateResource> policyResources, List<DiagnosticTemplateResource> diagnosticResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting named values from service");
