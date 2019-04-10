@@ -67,11 +67,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             Console.WriteLine("{0} API's found ...", ((JContainer)oApi["value"]).Count.ToString());
 
-            if (singleApiName == null)
-            {
-                GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder);
-                GenerateLoggerTemplate(resourceGroup, apimname, fileFolder);
-            }
+            GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder, singleApiName);
+            GenerateLoggerTemplate(resourceGroup, apimname, fileFolder, singleApiName);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -386,7 +383,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return templateResources;
         }
 
-        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder)
+        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting loggers from service");
@@ -417,7 +414,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
         }
 
-        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder)
+        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting named values from service");
