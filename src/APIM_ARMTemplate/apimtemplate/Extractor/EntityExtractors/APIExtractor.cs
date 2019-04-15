@@ -128,9 +128,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<string> GetApiProducts(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
-                                                                                                                        
+
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/products?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
+        public async Task<string> GetApiSchemas(string ApiManagementName, string ResourceGroupName, string ApiName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/schemas?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
+        public async Task<string> GetApiSchemaDetails(string ApiManagementName, string ResourceGroupName, string ApiName, string schemaName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/schemas/{5}?api-version={6}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, schemaName, Constants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }

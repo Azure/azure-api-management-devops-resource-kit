@@ -10,9 +10,8 @@
   "resources": [
     {
       "type": "Microsoft.ApiManagement/service/apis",
-      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI')]",
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2')]",
       "apiVersion": "2018-01-01",
-      "scale": null,
       "properties": {
         "displayName": "HTTP Bin API",
         "apiRevision": "1",
@@ -22,15 +21,13 @@
         "protocols": [
           "https"
         ],
-        "authenticationSettings": null,
-        "subscriptionKeyParameterNames": null,
-        "apiVersion": "v1",
+        "apiVersion": "v2",
         "apiVersionSetId": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/api-version-sets/versionset-httpbin-api')]"
       }
     },
     {
       "type": "Microsoft.ApiManagement/service/apis/operations",
-      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI/get')]",
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2/get')]",
       "apiVersion": "2018-01-01",
       "scale": null,
       "properties": {
@@ -45,16 +42,15 @@
             "description": "OK",
             "headers": []
           }
-        ],
-        "policies": null
+        ]
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]"
       ]
     },
     {
       "type": "Microsoft.ApiManagement/service/apis/operations",
-      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI/post')]",
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2/post')]",
       "apiVersion": "2018-01-01",
       "scale": null,
       "properties": {
@@ -69,32 +65,54 @@
             "description": "OK",
             "headers": []
           }
-        ],
-        "policies": null
+        ]
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2/remove-resource')]",
+      "apiVersion": "2018-01-01",
+      "scale": null,
+      "properties": {
+        "displayName": "Remove resource",
+        "method": "DELETE",
+        "urlTemplate": "/resource",
+        "templateParameters": [],
+        "description": "A demonstration of a DELETE call which traditionally deletes the resource.",
+        "responses": [
+          {
+            "statusCode": 200,
+            "representations": [],
+            "headers": []
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]"
       ]
     },
     {
       "type": "Microsoft.ApiManagement/service/products/apis",
-      "name": "[concat(parameters('ApimServiceName'), '/starter/httpBinAPI')]",
+      "name": "[concat(parameters('ApimServiceName'), '/starter/httpBinAPI-v2;rev=2')]",
       "apiVersion": "2018-01-01",
       "scale": null,
       "properties": {},
       "dependsOn": [
-        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]"
       ]
     },
     {
       "type": "Microsoft.ApiManagement/service/apis/policies",
-      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI/policy')]",
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2/policy')]",
       "apiVersion": "2018-01-01",
       "properties": {
         "policyContent": "[concat('<!--\r\n    IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - Only the <forward-request> policy element can appear within the <backend> section element.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy position the cursor at the desired insertion point and click on the round button associated with the policy.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\r\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n-->\r\n<policies>\r\n  <inbound>\r\n    <base />\r\n    <set-backend-service base-url=\"https://api.apis.guru/v2/\" />\r\n    <rewrite-uri template=\"/metrics.json\" />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI')]"
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]"
       ]
     }
   ]

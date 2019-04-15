@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service/apis/releases",
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2', '/beta')]",
+      "apiVersion": "2018-01-01",      
+      "properties": {
+        "apiId": "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]",
+        "notes": "make revision 2 as current"
+      }
+    }
+  ]
+}

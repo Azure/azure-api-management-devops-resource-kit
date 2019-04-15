@@ -20,6 +20,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
+        public async Task<string> GetProperty(string ApiManagementName, string ResourceGroupName, string propertyName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/properties/{4}?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, propertyName, Constants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
+
         private static async Task<string> CallApiManagement(string azToken, string requestUrl)
         {
             using (HttpClient httpClient = new HttpClient())

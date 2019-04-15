@@ -171,8 +171,8 @@ To be able to run the Extractor, you would first need to [install the Azure CLI]
 
 ## Running the Extractor
 Below are the steps to run the Extractor from the source code:
-- Clone this repository and restore its packages using ```dotnet restore```
-- Navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate directory
+- Clone this repository and navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate 
+- Restore its packages using ```dotnet restore```
 - Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted. 
 ```
 az login

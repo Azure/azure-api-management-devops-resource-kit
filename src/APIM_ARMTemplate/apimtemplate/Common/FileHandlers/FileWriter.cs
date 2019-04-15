@@ -18,15 +18,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             File.WriteAllText(location, jsonString);
         }
 
-        public CreatorFileNames GenerateCreatorLinkedFileNames()
+        public CreatorFileNames GenerateCreatorLinkedFileNames(CreatorConfig creatorConfig)
         {
+            string apiName = creatorConfig.api.name;
+            string versionSetName = creatorConfig.apiVersionSet.displayName;
             // generate useable object with file names for consistency throughout project
             return new CreatorFileNames()
             {
-                apiVersionSet = $@"/versionset.template.json",
-                initialAPI = $@"/initialAPI.template.json",
-                subsequentAPI = $@"/subsequentAPI.template.json",
-                master = @"/master.template.json"
+                apiVersionSet = $@"/{versionSetName}.template.json",
+                initialAPI = $@"/{apiName}-initial.api.template.json",
+                subsequentAPI = $@"/{apiName}-subsequent.api.template.json",
+                linkedMaster = $@"/{apiName}.master.template.json",
+                unlinkedMasterOne = $@"/{apiName}.master1.template.json",
+                unlinkedMasterTwo = $@"/{apiName}.master2.template.json",
+                masterParameters = $@"/{apiName}.master.parameters.json",
             };
         }
     }
