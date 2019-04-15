@@ -362,17 +362,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 productsDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
                 productsDetailsResource.apiVersion = "2018-06-01-preview";
 
-                if (singleApiName == null)
+                // only extract the product if this is a full extraction, or in the case of a single api, if it is found in productNames(all prodct names associated with the specific api)
+                if (singleApiName == null || productNames.SingleOrDefault(p => p == productName) != null)
                 {
                     templateResources.Add(productsDetailsResource);
-                } else
-                {
-                    // utility is extracting a single api, only extract the product if it is found in productNames (all prodct names associated with the specific api)
-                    if (productNames.SingleOrDefault(p => p == productName) != null)
-                    {
-                        // current product is indeed associated with the api
-                        templateResources.Add(productsDetailsResource);
-                    }
                 }
             }
 
