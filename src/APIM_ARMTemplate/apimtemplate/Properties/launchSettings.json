@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --name apiphany --resourceGroup vlvinogr-apim --fileFolder C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExtractedTemplates --apiName http-bin-dot-org"
+      "commandLineArgs": "extract  --name apiphany --resourceGroup vlvinogr-apim --fileFolder C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExtractedTemplates\\Full"
     }
   }
 }

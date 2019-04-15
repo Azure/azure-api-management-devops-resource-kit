@@ -67,9 +67,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             Console.WriteLine("{0} API's found ...", ((JContainer)oApi["value"]).Count.ToString());
 
-            // store api and operation policies as well as diagnostics for the time being in order to extract loggers correctly
+            // store api and operation policies as well as diagnostics for the time being in order to extract loggers correctly in case of a single api
             List<PolicyTemplateResource> policyResources = new List<PolicyTemplateResource>();
             List<DiagnosticTemplateResource> diagnosticResources = new List<DiagnosticTemplateResource>();
+            // store product names for the time being in order to extract products correctly in case of a single api
+            List<string> productNames = new List<string>();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -225,6 +227,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         apiProductsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
                         templateResources.Add(apiProductsResource);
+                        // add the product name to the list used to extract products later on
+                        productNames.Add(apiProductName);
 
                     }
                 }
@@ -270,13 +274,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 if (singleApiName != null)
                 {
-                    GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder);
                     fileWriter = new FileWriter();
                     fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + oApiName + "-template.json");
-                    templateResources = new List<TemplateResource>();
                 }
             }
 
+            // extract resources that do not fall under api. Pass in the single api name and associated resources for the single api case
+            GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, productNames);
             GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder, singleApiName, policyResources, diagnosticResources);
             GenerateLoggerTemplate(resourceGroup, apimname, fileFolder, singleApiName, policyResources, diagnosticResources);
 
@@ -330,7 +334,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
 
-        private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder)
+        private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<string> productNames)
         {
             APIExtractor apiExtractor = new APIExtractor();
             Template armTemplate = GenerateEmptyTemplateWithParameters();
@@ -358,8 +362,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 productsDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
                 productsDetailsResource.apiVersion = "2018-06-01-preview";
 
-                templateResources.Add(productsDetailsResource);
-
+                if (singleApiName == null)
+                {
+                    templateResources.Add(productsDetailsResource);
+                } else
+                {
+                    // utility is extracting a single api, only extract the product if it is found in productNames (all prodct names associated with the specific api)
+                    if (productNames.SingleOrDefault(p => p == productName) != null)
+                    {
+                        // current product is indeed associated with the api
+                        templateResources.Add(productsDetailsResource);
+                    }
+                }
             }
 
             armTemplate.resources = templateResources.ToArray();
