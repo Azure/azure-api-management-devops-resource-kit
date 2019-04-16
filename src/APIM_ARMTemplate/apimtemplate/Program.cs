@@ -21,9 +21,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {   
                 var app = new CommandLineApplication() 
                 {
-                    Name = Constants.AppShortName,
-                    FullName = Constants.AppLongName,
-                    Description = Constants.AppDescription
+                    Name = GlobalConstants.AppShortName,
+                    FullName = GlobalConstants.AppLongName,
+                    Description = GlobalConstants.AppDescription
                 };
                 
                 app.HelpOption(inherited: true);

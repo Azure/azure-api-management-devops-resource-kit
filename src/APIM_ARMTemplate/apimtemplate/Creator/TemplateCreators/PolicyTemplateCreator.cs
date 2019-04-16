@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}/policy')]",
-                type = "Microsoft.ApiManagement/service/apis/policies",
+                type = ResourceTypeConstants.APIPolicy,
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{policyPair.Key}/policy')]",
-                type = "Microsoft.ApiManagement/service/apis/operations/policies",
+                type = ResourceTypeConstants.APIOperationPolicy,
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {

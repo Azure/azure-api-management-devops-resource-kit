@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}?api-version={6}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -34,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/policies/policy?api-version={6}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationId, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationId, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
                                                                                                                          
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/{4}?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, VersionSetName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, VersionSetName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
                                                                                                                           
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -79,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?api-version={4}",
-                baseUrl, azSubId, ResourceGroupName, ApiManagementName, Constants.APIVersion);
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
           
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -88,7 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/policies/policy?api-version={5}",
-                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -97,7 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/diagnostics?api-version={5}",
-                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -106,7 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
                                                                                                                       
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/get/policies/policy?api-version={5}",
-                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -130,7 +130,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/products?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -139,7 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/schemas?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -148,7 +148,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/schemas/{5}?api-version={6}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, schemaName, Constants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, schemaName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }

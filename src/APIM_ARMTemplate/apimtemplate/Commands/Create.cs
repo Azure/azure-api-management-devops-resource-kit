@@ -10,8 +10,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         public CreateCommand()
         {
-            this.Name = Constants.CreateName;
-            this.Description = Constants.CreateDescription;
+            this.Name = GlobalConstants.CreateName;
+            this.Description = GlobalConstants.CreateDescription;
 
             // list command options
             CommandOption configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();

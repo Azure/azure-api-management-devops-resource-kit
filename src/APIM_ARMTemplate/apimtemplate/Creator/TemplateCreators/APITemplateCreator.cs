@@ -86,7 +86,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]",
-                type = "Microsoft.ApiManagement/service/apis",
+                type = ResourceTypeConstants.API,
                 apiVersion = "2018-06-01-preview",
                 properties = new APITemplateProperties()
                 {
@@ -127,7 +127,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // create api resource with properties
             string subsequentAPIName = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]";
-            string subsequentAPIType = "Microsoft.ApiManagement/service/apis";
+            string subsequentAPIType = ResourceTypeConstants.API;
             Uri uriResult;
             bool isUrl = Uri.TryCreate(creatorConfig.api.openApiSpec, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             // used to escape sequences in local swagger json
