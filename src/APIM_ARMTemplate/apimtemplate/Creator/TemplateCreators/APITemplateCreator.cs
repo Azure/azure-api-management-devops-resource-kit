@@ -104,11 +104,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
                 dependsOn = new string[] { }
             };
-            // if the template is linked and a version set was created, the initial api depends on it
-            if (creatorConfig.linked == false && api.apiVersionSetId != null)
-            {
-                apiTemplateResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]" };
-            }
             // set the version set id
             if (api.apiVersionSetId != null)
             {

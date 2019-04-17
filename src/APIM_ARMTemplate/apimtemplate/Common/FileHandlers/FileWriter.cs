@@ -17,16 +17,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                             });
             File.WriteAllText(location, jsonString);
         }
-
-        public CreatorFileNames GenerateCreatorLinkedFileNames(CreatorConfig creatorConfig)
-        {
-            // generate useable object with file names for consistency throughout project
-            return new CreatorFileNames()
-            {
-                apiVersionSet = @"/version-sets.template.json",
-                linkedMaster = @"/master.template.json",
-                masterParameters = @"/master.parameters.json",
-            };
-        }
     }
 }

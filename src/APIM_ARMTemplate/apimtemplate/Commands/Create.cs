@@ -3,6 +3,7 @@ using Colors.Net;
 using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -31,6 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                     // initialize helper classes
                     FileWriter fileWriter = new FileWriter();
+                    FileNameGenerator fileNameGenerator = new FileNameGenerator();
                     TemplateCreator templateCreator = new TemplateCreator();
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
@@ -41,48 +43,51 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                     // create templates from provided configuration
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
-                    List<Template> initialAPITemplates = new List<Template>();
-                    List<Template> subsequentAPITemplates = new List<Template>();
-                    List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
+                    // store name and full template on each api necessary to build unlinked templates
+                    Dictionary<string, Template> initialAPITemplates = new Dictionary<string, Template>();
+                    Dictionary<string, Template> subsequentAPITemplates = new Dictionary<string, Template>();
+                    // store name and whether the api will depend on the version set template each api necessary to build linked templates
+                    Dictionary<string, bool> apiInformation = new Dictionary<string, bool>();
 
                     foreach (APIConfig api in creatorConfig.apis)
                     {
                         Template initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig, api);
                         Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(api);
-                        initialAPITemplates.Add(initialAPITemplate);
-                        subsequentAPITemplates.Add(subsequentAPITemplate);
-                        apiInformation.Add(new LinkedMasterTemplateAPIInformation() { name = api.name, hasAPIVersionSetId = api.apiVersionSetId != null });
+                        initialAPITemplates.Add(api.name, initialAPITemplate);
+                        subsequentAPITemplates.Add(api.name, subsequentAPITemplate);
+                        apiInformation.Add(api.name, api.apiVersionSetId != null);
                     }
 
-                    CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorLinkedFileNames(creatorConfig);
+                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
+                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, apiInformation, creatorFileNames);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, apiInformation, creatorFileNames, fileNameGenerator);
+                        // write parameters to outputLocation
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedParameters));
                         // write linked specific template to outputLocationc
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
                     }
                     else
                     {
-                        // write unlinked specific templates to outputLocationc
-                        foreach (Template initialAPITemplate in initialAPITemplates)
-                        {
-                            fileWriter.WriteJSONToFile(initialAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.initialAPI));
-                        }
-                        foreach (Template subsequentAPITemplate in subsequentAPITemplates)
-                        {
-                            fileWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.subsequentAPI));
-                        }
-
+                        // write parameters to outputLocation
+                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.unlinkedParameters));
                     }
-                    // write parameters to outputLocation
-                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-                    fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.masterParameters));
-
-                    // write common templates to outputLocationc
+                    // write templates to outputLocation
+                    foreach (KeyValuePair<string, Template> initialAPITemplatePair in initialAPITemplates)
+                    {
+                        string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(initialAPITemplatePair.Key, true);
+                        fileWriter.WriteJSONToFile(initialAPITemplatePair.Value, String.Concat(creatorConfig.outputLocation, initialAPIFileName));
+                    }
+                    foreach (KeyValuePair<string, Template> subsequentAPITemplatePair in subsequentAPITemplates)
+                    {
+                        string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(subsequentAPITemplatePair.Key, false);
+                        fileWriter.WriteJSONToFile(subsequentAPITemplatePair.Value, String.Concat(creatorConfig.outputLocation, subsequentAPIFileName));
+                    }
                     if (apiVersionSetTemplate != null)
                     {
-                        fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSet));
+                        fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSets));
                     }
                     ColoredConsole.WriteLine("Templates written to output location");
                 }

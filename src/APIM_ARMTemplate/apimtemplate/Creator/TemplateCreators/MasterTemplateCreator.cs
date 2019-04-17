@@ -13,8 +13,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         }
 
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
-            List<LinkedMasterTemplateAPIInformation> apiInformation,
-            CreatorFileNames creatorFileNames)
+            Dictionary<string, bool> apiInformation,
+            CreatorFileNames creatorFileNames,
+            FileNameGenerator fileNameGenerator)
         {
             // create empty template
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
@@ -28,22 +29,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // apiVersionSet
             if (apiVersionSetTemplate != null)
             {
-                string apiVersionSetUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.apiVersionSet}')]";
+                string apiVersionSetUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.apiVersionSets}')]";
                 resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, new string[] { }));
             }
 
-            //api
-            foreach(LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
+            // api info stores api name as the key and whether the api depends on the version set template as the value
+            foreach(KeyValuePair<string, bool> apiInfo in apiInformation)
             {
-                string initialAPIFileName = $@"/{apiInfo.name}-initial.api.template.json";
-                string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
-                string[] initialAPIDependsOn = apiVersionSetTemplate != null && apiInfo.hasAPIVersionSetId == true ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
-                resources.Add(this.CreateLinkedMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
+                string initialAPIDeploymentResourceName = $"{apiInfo.Key}-InitialAPITemplate";
+                string subsequentAPIDeploymentResourceName = $"{apiInfo.Key}-SubsequentAPITemplate";
 
-                string subsequentAPIFileName = $@"/{apiInfo.name}-subsequent.api.template.json";
+                string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.Key, true);
+                string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
+                string[] initialAPIDependsOn = apiVersionSetTemplate != null && apiInfo.Value == true ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
+                resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn));
+
+                string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.Key, false);
                 string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{subsequentAPIFileName}')]";
-                string[] subsequentAPIDependsOn = new string[] { "[resourceId('Microsoft.Resources/deployments', 'initialAPITemplate')]" };
-                resources.Add(this.CreateLinkedMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
+                string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
+                resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
             }
 
             masterTemplate.resources = resources.ToArray();
@@ -128,12 +132,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             masterTemplate.parameters = parameters;
             return masterTemplate;
         }
-    }
-
-    public class LinkedMasterTemplateAPIInformation
-    {
-
-        public string name { get; set; }
-        public bool hasAPIVersionSetId { get; set; }
     }
 }
