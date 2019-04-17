@@ -13,8 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         }
 
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
-            Template initialAPITemplate,
-            Template subsequentAPITemplate,
+            List<LinkedMasterTemplateAPIInformation> apiInformation,
             CreatorFileNames creatorFileNames)
         {
             // create empty template
@@ -34,56 +33,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
 
             //api
-            string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.initialAPI}')]";
-            string[] initialAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
-            resources.Add(this.CreateLinkedMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
-
-            string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.subsequentAPI}')]";
-            string[] subsequentAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'initialAPITemplate')]" } : new string[] { };
-            resources.Add(this.CreateLinkedMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
-
-            masterTemplate.resources = resources.ToArray();
-            return masterTemplate;
-        }
-
-        public Template CreateInitialUnlinkedMasterTemplate(Template apiVersionSetTemplate,
-            Template initialAPITemplate)
-        {
-            // create empty template
-            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
-
-            // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters(false);
-
-            // add all resources directly
-            List<TemplateResource> resources = new List<TemplateResource>();
-
-            // apiVersionSet
-            if (apiVersionSetTemplate != null)
+            foreach(LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
             {
-                resources.AddRange(apiVersionSetTemplate.resources);
+                string initialAPIFileName = $@"/{apiInfo.name}-initial.api.template.json";
+                string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
+                string[] initialAPIDependsOn = apiVersionSetTemplate != null && apiInfo.hasAPIVersionSetId == true ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
+                resources.Add(this.CreateLinkedMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
+
+                string subsequentAPIFileName = $@"/{apiInfo.name}-subsequent.api.template.json";
+                string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{subsequentAPIFileName}')]";
+                string[] subsequentAPIDependsOn = new string[] { "[resourceId('Microsoft.Resources/deployments', 'initialAPITemplate')]" };
+                resources.Add(this.CreateLinkedMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
             }
-
-            //api
-            resources.AddRange(initialAPITemplate.resources);
-
-            masterTemplate.resources = resources.ToArray();
-            return masterTemplate;
-        }
-
-        public Template CreateSubsequentUnlinkedMasterTemplate(Template subequentAPITemplate)
-        {
-            // create empty template
-            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
-
-            // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters(false);
-
-            // add all resources directly
-            List<TemplateResource> resources = new List<TemplateResource>();
-
-            //api
-            resources.AddRange(subequentAPITemplate.resources);
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
@@ -167,5 +128,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             masterTemplate.parameters = parameters;
             return masterTemplate;
         }
+    }
+
+    public class LinkedMasterTemplateAPIInformation
+    {
+
+        public string name { get; set; }
+        public bool hasAPIVersionSetId { get; set; }
     }
 }

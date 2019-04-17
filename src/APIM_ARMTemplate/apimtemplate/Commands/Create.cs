@@ -41,37 +41,48 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                     // create templates from provided configuration
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
-                    Template initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig);
-                    Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(creatorConfig);
-                    CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorLinkedFileNames(creatorConfig);
+                    List<Template> initialAPITemplates = new List<Template>();
+                    List<Template> subsequentAPITemplates = new List<Template>();
+                    List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
 
+                    foreach (APIConfig api in creatorConfig.apis)
+                    {
+                        Template initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig, api);
+                        Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(api);
+                        initialAPITemplates.Add(initialAPITemplate);
+                        subsequentAPITemplates.Add(subsequentAPITemplate);
+                        apiInformation.Add(new LinkedMasterTemplateAPIInformation() { name = api.name, hasAPIVersionSetId = api.apiVersionSetId != null });
+                    }
+
+                    CreatorFileNames creatorFileNames = fileWriter.GenerateCreatorLinkedFileNames(creatorConfig);
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate, subsequentAPITemplate, creatorFileNames);
-                        Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-
-                        // write templates to outputLocation
-                        if (apiVersionSetTemplate != null)
-                        {
-                            fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSet));
-                        }
-                        fileWriter.WriteJSONToFile(initialAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.initialAPI));
-                        fileWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.subsequentAPI));
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, apiInformation, creatorFileNames);
+                        // write linked specific template to outputLocationc
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.masterParameters));
                     }
                     else
                     {
-                        // create unlinked master template
-                        Template initialMasterTemplate = masterTemplateCreator.CreateInitialUnlinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate);
-                        Template subsequentMasterTemplate = masterTemplateCreator.CreateSubsequentUnlinkedMasterTemplate(subsequentAPITemplate);
-                        Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+                        // write unlinked specific templates to outputLocationc
+                        foreach (Template initialAPITemplate in initialAPITemplates)
+                        {
+                            fileWriter.WriteJSONToFile(initialAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.initialAPI));
+                        }
+                        foreach (Template subsequentAPITemplate in subsequentAPITemplates)
+                        {
+                            fileWriter.WriteJSONToFile(subsequentAPITemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.subsequentAPI));
+                        }
 
-                        // write templates to outputLocation
-                        fileWriter.WriteJSONToFile(initialMasterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.unlinkedMasterOne));
-                        fileWriter.WriteJSONToFile(subsequentMasterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.unlinkedMasterTwo));
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.masterParameters));
+                    }
+                    // write parameters to outputLocation
+                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+                    fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.masterParameters));
+
+                    // write common templates to outputLocationc
+                    if (apiVersionSetTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSet));
                     }
                     ColoredConsole.WriteLine("Templates written to output location");
                 }
@@ -98,26 +109,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 isValid = false;
                 throw new CommandParsingException(this, "APIM service name is required");
             }
-            if (creatorConfig.api == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "API configuration is required");
-            }
-            if (creatorConfig.api.openApiSpec == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "Open API Spec is required");
-            }
-            if (creatorConfig.api.suffix == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "API suffix is required");
-            }
-            if (creatorConfig.api.name == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "API name is required");
-            }
             if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
             {
                 isValid = false;
@@ -133,21 +124,44 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 isValid = false;
                 throw new CommandParsingException(this, "Versioning scheme is required if an API Version Set is provided");
             }
-            if (creatorConfig.api.operations != null)
+            foreach (APIConfig api in creatorConfig.apis)
             {
-                foreach (KeyValuePair<string, OperationsConfig> operation in creatorConfig.api.operations)
+                if (api == null)
                 {
-                    if (operation.Value == null || operation.Value.policy == null)
+                    isValid = false;
+                    throw new CommandParsingException(this, "API configuration is required");
+                }
+                if (api.openApiSpec == null)
+                {
+                    isValid = false;
+                    throw new CommandParsingException(this, "Open API Spec is required");
+                }
+                if (api.suffix == null)
+                {
+                    isValid = false;
+                    throw new CommandParsingException(this, "API suffix is required");
+                }
+                if (api.name == null)
+                {
+                    isValid = false;
+                    throw new CommandParsingException(this, "API name is required");
+                }
+                if (api.operations != null)
+                {
+                    foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
                     {
-                        isValid = false;
-                        throw new CommandParsingException(this, "Policy XML is required if an API operation is provided");
+                        if (operation.Value == null || operation.Value.policy == null)
+                        {
+                            isValid = false;
+                            throw new CommandParsingException(this, "Policy XML is required if an API operation is provided");
+                        }
                     }
                 }
-            }
-            if (creatorConfig.api.diagnostic != null && creatorConfig.api.diagnostic.loggerId == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "LoggerId is required if an API diagnostic is provided");
+                if (api.diagnostic != null && api.diagnostic.loggerId == null)
+                {
+                    isValid = false;
+                    throw new CommandParsingException(this, "LoggerId is required if an API diagnostic is provided");
+                }
             }
             return isValid;
         }

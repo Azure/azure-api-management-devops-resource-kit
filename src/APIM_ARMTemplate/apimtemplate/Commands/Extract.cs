@@ -347,14 +347,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 };
 
-                ProductsDetailsTemplateResource productsDetailsResource = JsonConvert.DeserializeObject<ProductsDetailsTemplateResource>(productDetails, settings);
-                productsDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
-                productsDetailsResource.apiVersion = "2018-06-01-preview";
+                ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails, settings);
+                productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
+                productsTemplateResource.apiVersion = "2018-06-01-preview";
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
                 if (singleApiName == null || productAPIResources.SingleOrDefault(p => p.name.Contains(productName)) != null)
                 {
-                    templateResources.Add(productsDetailsResource);
+                    templateResources.Add(productsTemplateResource);
                 }
             }
 
@@ -492,7 +492,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 else
                 {
-                    // if the user is executing a single api, extract all the named values used in the template resources
+                    // TODO - if the user is executing a single api, extract all the named values used in the template resources
                     Console.WriteLine("'{0}' Named value found", propertyName);
                     templateResources.Add(propertyTemplateResource);
                 };

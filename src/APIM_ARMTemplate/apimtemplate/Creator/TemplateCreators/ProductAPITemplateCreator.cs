@@ -19,14 +19,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return productAPITemplateResource;
         }
 
-        public List<ProductAPITemplateResource> CreateProductAPITemplateResources(CreatorConfig creatorConfig, string[] dependsOn)
+        public List<ProductAPITemplateResource> CreateProductAPITemplateResources(APIConfig api, string[] dependsOn)
         {
             // create a products/apis association resource for each product provided in the config file
             List<ProductAPITemplateResource> productAPITemplates = new List<ProductAPITemplateResource>();
-            string[] productIDs = creatorConfig.api.products.Split(", ");
+            string[] productIDs = api.products.Split(", ");
             foreach (string productID in productIDs)
             {
-                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, creatorConfig.api.name, dependsOn);
+                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, dependsOn);
                 productAPITemplates.Add(productAPITemplate);
             }
             return productAPITemplates;
