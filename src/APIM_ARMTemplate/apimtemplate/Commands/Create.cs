@@ -44,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
 
                     // create templates from provided configuration
-                    Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
+                    Template apiVersionSetTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
                     // store name and full template on each api necessary to build unlinked templates
                     Dictionary<string, Template> initialAPITemplates = new Dictionary<string, Template>();
@@ -126,15 +126,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 isValid = false;
                 throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
             }
-            if (creatorConfig.apiVersionSet != null && creatorConfig.apiVersionSet.displayName == null)
+            foreach(APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
             {
-                isValid = false;
-                throw new CommandParsingException(this, "Display name is required if an API Version Set is provided");
-            }
-            if (creatorConfig.apiVersionSet != null && creatorConfig.apiVersionSet.versioningScheme == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "Versioning scheme is required if an API Version Set is provided");
+                if (apiVersionSet != null && apiVersionSet.displayName == null)
+                {
+                    isValid = false;
+                    throw new CommandParsingException(this, "Display name is required if an API Version Set is provided");
+                }
+                if (apiVersionSet != null && apiVersionSet.versioningScheme == null)
+                {
+                    isValid = false;
+                    throw new CommandParsingException(this, "Versioning scheme is required if an API Version Set is provided");
+                }
             }
             foreach (APIConfig api in creatorConfig.apis)
             {

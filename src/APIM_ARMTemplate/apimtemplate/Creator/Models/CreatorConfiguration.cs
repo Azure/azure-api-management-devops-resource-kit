@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         public string version { get; set; }
         public string apimServiceName { get; set; }
-        public APIVersionSetConfig apiVersionSet { get; set; }
+        public List<APIVersionSetConfig> apiVersionSets { get; set; }
         public List<APIConfig> apis { get; set; }
         public List<ProductsTemplateProperties> products { get; set; }
         public List<LoggerConfig> loggers { get; set; }
