@@ -35,19 +35,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
                     TemplateCreator templateCreator = new TemplateCreator();
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
+                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(templateCreator);
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, templateCreator, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
+                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
 
                     // create templates from provided configuration
                     Template apiVersionSetTemplate = creatorConfig.apiVersionSet != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
+                    Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
                     // store name and full template on each api necessary to build unlinked templates
                     Dictionary<string, Template> initialAPITemplates = new Dictionary<string, Template>();
                     Dictionary<string, Template> subsequentAPITemplates = new Dictionary<string, Template>();
                     // store name and whether the api will depend on the version set template each api necessary to build linked templates
-                    Dictionary<string, bool> apiInformation = new Dictionary<string, bool>();
+                    List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
+                    // create parameters file
+                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
                     foreach (APIConfig api in creatorConfig.apis)
                     {
@@ -55,26 +60,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(api);
                         initialAPITemplates.Add(api.name, initialAPITemplate);
                         subsequentAPITemplates.Add(api.name, subsequentAPITemplate);
-                        apiInformation.Add(api.name, api.apiVersionSetId != null);
+                        apiInformation.Add(new LinkedMasterTemplateAPIInformation()
+                        {
+                            name = api.name,
+                            dependsOnVersionSets = api.apiVersionSetId != null,
+                            dependsOnProducts = api.products != null,
+                            dependsOnLoggers = true
+                        });
                     }
 
-                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
-                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+                    // write templates to outputLocation
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, apiInformation, creatorFileNames, fileNameGenerator);
-                        // write parameters to outputLocation
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedParameters));
-                        // write linked specific template to outputLocationc
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, productsTemplate, apiInformation, creatorFileNames, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
                     }
-                    else
-                    {
-                        // write parameters to outputLocation
-                        fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorFileNames.unlinkedParameters));
-                    }
-                    // write templates to outputLocation
                     foreach (KeyValuePair<string, Template> initialAPITemplatePair in initialAPITemplates)
                     {
                         string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(initialAPITemplatePair.Key, true);
@@ -89,6 +90,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSets));
                     }
+                    if (productsTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(productsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.products));
+                    }
+                    // write parameters to outputLocation
+                    fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorConfig.linked == true ? creatorFileNames.linkedParameters : creatorFileNames.unlinkedParameters));
                     ColoredConsole.WriteLine("Templates written to output location");
                 }
                 return 0;

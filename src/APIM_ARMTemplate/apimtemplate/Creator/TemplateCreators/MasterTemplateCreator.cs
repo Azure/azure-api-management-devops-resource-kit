@@ -3,6 +3,15 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
+
+    public class LinkedMasterTemplateAPIInformation
+    {
+        public string name { get; set; }
+        public bool dependsOnVersionSets { get; set; }
+        public bool dependsOnProducts { get; set; }
+        public bool dependsOnLoggers { get; set; }
+    }
+
     public class MasterTemplateCreator
     {
         private TemplateCreator templateCreator;
@@ -13,7 +22,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         }
 
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
-            Dictionary<string, bool> apiInformation,
+            Template productsTemplate,
+            List<LinkedMasterTemplateAPIInformation> apiInformation,
             CreatorFileNames creatorFileNames,
             FileNameGenerator fileNameGenerator)
         {
@@ -33,18 +43,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, new string[] { }));
             }
 
-            // api info stores api name as the key and whether the api depends on the version set template as the value
-            foreach(KeyValuePair<string, bool> apiInfo in apiInformation)
+            // product
+            if (productsTemplate != null)
             {
-                string initialAPIDeploymentResourceName = $"{apiInfo.Key}-InitialAPITemplate";
-                string subsequentAPIDeploymentResourceName = $"{apiInfo.Key}-SubsequentAPITemplate";
+                string productsUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.products}')]";
+                resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }));
+            }
 
-                string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.Key, true);
+            // api info stores api name as the key and whether the api depends on the version set template as the value
+            foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
+            {
+                string initialAPIDeploymentResourceName = $"{apiInfo.name}-InitialAPITemplate";
+                string subsequentAPIDeploymentResourceName = $"{apiInfo.name}-SubsequentAPITemplate";
+
+                string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, true);
                 string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
-                string[] initialAPIDependsOn = apiVersionSetTemplate != null && apiInfo.Value == true ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
-                resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn));
+                List<string> initialAPIDependsOn = new List<string>();
+                if (apiVersionSetTemplate != null && apiInfo.dependsOnVersionSets == true)
+                {
+                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
+                }
+                if (productsTemplate != null && apiInfo.dependsOnProducts == true)
+                {
+                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
+                }
+                resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn.ToArray()));
 
-                string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.Key, false);
+                string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, false);
                 string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{subsequentAPIFileName}')]";
                 string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
                 resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
@@ -93,7 +118,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 type = "string"
             };
             parameters.Add("ApimServiceName", apimServiceNameProperties);
-            if(linked == true)
+            if (linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
