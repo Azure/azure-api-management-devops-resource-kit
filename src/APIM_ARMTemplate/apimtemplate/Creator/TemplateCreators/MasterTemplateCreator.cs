@@ -3,15 +3,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-
-    public class LinkedMasterTemplateAPIInformation
-    {
-        public string name { get; set; }
-        public bool dependsOnVersionSets { get; set; }
-        public bool dependsOnProducts { get; set; }
-        public bool dependsOnLoggers { get; set; }
-    }
-
     public class MasterTemplateCreator
     {
         private TemplateCreator templateCreator;
@@ -23,6 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
             Template productsTemplate,
+            Template loggersTemplate,
             List<LinkedMasterTemplateAPIInformation> apiInformation,
             CreatorFileNames creatorFileNames,
             FileNameGenerator fileNameGenerator)
@@ -50,6 +42,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }));
             }
 
+            // logger
+            if (loggersTemplate != null)
+            {
+                string loggersUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.loggers}')]";
+                resources.Add(this.CreateLinkedMasterTemplateResource("loggersTemplate", loggersUri, new string[] { }));
+            }
+
             // api info stores api name as the key and whether the api depends on the version set template as the value
             foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
             {
@@ -66,6 +65,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if (productsTemplate != null && apiInfo.dependsOnProducts == true)
                 {
                     initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
+                }
+                if (loggersTemplate != null && apiInfo.dependsOnLoggers == true)
+                {
+                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
                 }
                 resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn.ToArray()));
 
@@ -157,5 +160,39 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             masterTemplate.parameters = parameters;
             return masterTemplate;
         }
+
+        public bool DetermineIfAPIDependsOnLogger(APIConfig api, FileReader fileReader)
+        {
+            if (api.diagnostic != null && api.diagnostic.loggerId != null)
+            {
+                // capture api diagnostic dependent on logger
+                return true;
+            }
+            string apiPolicy = api.policy != null ? fileReader.RetrieveLocalFileContents(api.policy) : "";
+            if (apiPolicy.Contains("logger"))
+            {
+                // capture api policy dependent on logger
+                return true;
+            }
+            foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
+            {
+                string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
+                if (operation.Value.policy != null && operation.Value.policy.Contains("logger"))
+                {
+                    // capture operation policy dependent on logger
+                    return true;
+                }
+            }
+            return false;
+        }
     }
+
+    public class LinkedMasterTemplateAPIInformation
+    {
+        public string name { get; set; }
+        public bool dependsOnVersionSets { get; set; }
+        public bool dependsOnProducts { get; set; }
+        public bool dependsOnLoggers { get; set; }
+    }
+
 }

@@ -35,6 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
                     TemplateCreator templateCreator = new TemplateCreator();
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
+                    LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator(templateCreator);
                     ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(templateCreator);
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
@@ -44,8 +45,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
 
                     // create templates from provided configuration
-                    Template apiVersionSetTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
+                    Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
+                    Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
                     // store name and full template on each api necessary to build unlinked templates
                     Dictionary<string, Template> initialAPITemplates = new Dictionary<string, Template>();
                     Dictionary<string, Template> subsequentAPITemplates = new Dictionary<string, Template>();
@@ -65,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                             name = api.name,
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
-                            dependsOnLoggers = true
+                            dependsOnLoggers = masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader)
                         });
                     }
 
@@ -73,7 +75,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetTemplate, productsTemplate, apiInformation, creatorFileNames, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, apiInformation, creatorFileNames, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
                     }
                     foreach (KeyValuePair<string, Template> initialAPITemplatePair in initialAPITemplates)
@@ -86,13 +88,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(subsequentAPITemplatePair.Key, false);
                         fileWriter.WriteJSONToFile(subsequentAPITemplatePair.Value, String.Concat(creatorConfig.outputLocation, subsequentAPIFileName));
                     }
-                    if (apiVersionSetTemplate != null)
+                    if (apiVersionSetsTemplate != null)
                     {
-                        fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSets));
+                        fileWriter.WriteJSONToFile(apiVersionSetsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSets));
                     }
                     if (productsTemplate != null)
                     {
                         fileWriter.WriteJSONToFile(productsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.products));
+                    }
+                    if (loggersTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(loggersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.loggers));
                     }
                     // write parameters to outputLocation
                     fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorConfig.linked == true ? creatorFileNames.linkedParameters : creatorFileNames.unlinkedParameters));
@@ -126,7 +132,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 isValid = false;
                 throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
             }
-            foreach(APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
+            foreach (APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
             {
                 if (apiVersionSet != null && apiVersionSet.displayName == null)
                 {

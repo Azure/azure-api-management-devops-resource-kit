@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 ProductsTemplateResource productsTemplateResource = new ProductsTemplateResource()
                 {
                     name = $"[concat(parameters('ApimServiceName'), '/{productTemplateProperties.displayName}')]",
-                    type = ResourceTypeConstants.APIVersionSet,
+                    type = ResourceTypeConstants.Product,
                     apiVersion = "2018-06-01-preview",
                     properties = productTemplateProperties,
                     dependsOn = new string[] { }

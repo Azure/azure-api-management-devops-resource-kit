@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             // generate useable object with file names for consistency throughout project
             return new CreatorFileNames()
             {
-                apiVersionSets = @"/version-sets.template.json",
+                apiVersionSets = @"/api-version-sets.template.json",
                 products = @"/products.template.json",
                 loggers = @"/loggers.template.json",
                 linkedMaster = @"/master.template.json",
