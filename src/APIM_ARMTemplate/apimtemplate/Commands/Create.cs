@@ -123,6 +123,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 isValid = false;
                 throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
             }
+            if(creatorConfig.apiVersionSet == null)
+            {
+                isValid = false;
+                throw new CommandParsingException(this, "API version set is required");
+            }
             if (creatorConfig.apiVersionSet != null && creatorConfig.apiVersionSet.displayName == null)
             {
                 isValid = false;
