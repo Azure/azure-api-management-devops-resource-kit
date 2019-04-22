@@ -174,13 +174,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // capture api policy dependent on logger
                 return true;
             }
-            foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
+            if (api.operations != null)
             {
-                string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
-                if (operation.Value.policy != null && operation.Value.policy.Contains("logger"))
+                foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
                 {
-                    // capture operation policy dependent on logger
-                    return true;
+                    string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
+                    if (operation.Value.policy != null && operation.Value.policy.Contains("logger"))
+                    {
+                        // capture operation policy dependent on logger
+                        return true;
+                    }
                 }
             }
             return false;
