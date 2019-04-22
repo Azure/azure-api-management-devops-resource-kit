@@ -15,7 +15,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 properties = new DiagnosticTemplateProperties()
                 {
                     alwaysLog = api.diagnostic.alwaysLog,
-                    loggerId = api.diagnostic.loggerId,
                     sampling = api.diagnostic.sampling,
                     frontend = api.diagnostic.frontend,
                     backend = api.diagnostic.backend,
@@ -23,6 +22,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 },
                 dependsOn = dependsOn
             };
+            // set the version set id
+            if (api.diagnostic.loggerId != null)
+            {
+                diagnosticTemplateResource.properties.loggerId = $"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), '{api.diagnostic.loggerId}')]";
+            }
             return diagnosticTemplateResource;
         }
     }
