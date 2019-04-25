@@ -48,23 +48,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
-                    // store name and full template on each api necessary to build unlinked templates
-                    Dictionary<string, Template> initialAPITemplates = new Dictionary<string, Template>();
-                    Dictionary<string, Template> subsequentAPITemplates = new Dictionary<string, Template>();
                     // store name and whether the api will depend on the version set template each api necessary to build linked templates
                     List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
                     // create parameters file
                     Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
+                    List<Template> apiTemplates = new List<Template>();
                     foreach (APIConfig api in creatorConfig.apis)
                     {
-                        Template initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig, api);
-                        Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(api);
-                        initialAPITemplates.Add(api.name, initialAPITemplate);
-                        subsequentAPITemplates.Add(api.name, subsequentAPITemplate);
+                        // create api templates from provided api config. If the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
+                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplates(creatorConfig, api);
+                        apiTemplates.AddRange(apiTemplateSet);
+                        // create the relevant info that will be needed to properly link to the api template(s) from the master template
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
                         {
                             name = api.name,
+                            isSplit = api.apiVersion != null,
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
                             dependsOnLoggers = masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader)
@@ -78,15 +77,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, apiInformation, creatorFileNames, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
                     }
-                    foreach (KeyValuePair<string, Template> initialAPITemplatePair in initialAPITemplates)
+                    foreach (Template apiTemplate in apiTemplates)
                     {
-                        string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(initialAPITemplatePair.Key, true);
-                        fileWriter.WriteJSONToFile(initialAPITemplatePair.Value, String.Concat(creatorConfig.outputLocation, initialAPIFileName));
-                    }
-                    foreach (KeyValuePair<string, Template> subsequentAPITemplatePair in subsequentAPITemplates)
-                    {
-                        string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(subsequentAPITemplatePair.Key, false);
-                        fileWriter.WriteJSONToFile(subsequentAPITemplatePair.Value, String.Concat(creatorConfig.outputLocation, subsequentAPIFileName));
+                        APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
+                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name));
+                        // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
+                        string apiFileName = fileNameGenerator.GenerateAPIFileName(providedAPIConfiguration.name, providedAPIConfiguration.apiVersion != null, apiResource.properties.contentValue == null);
+                        fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
                     }
                     if (apiVersionSetsTemplate != null)
                     {

@@ -20,9 +20,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             };
         }
 
-        public string GenerateAPIFileName(string apiName, bool isInitialAPI)
+        public string GenerateAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI)
         {
-            return isInitialAPI == true ? $@"/{apiName}-initial.api.template.json" : $@"/{apiName}-subsequent.api.template.json";
+            if (isSplitAPI == true)
+            {
+                return isInitialAPI == true ? $@"/{apiName}-initial.api.template.json" : $@"/{apiName}-subsequent.api.template.json";
+            }
+            else
+            {
+                return $@"/{apiName}.api.template.json";
+            }
         }
     }
 }

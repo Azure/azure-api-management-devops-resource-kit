@@ -49,37 +49,56 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 resources.Add(this.CreateLinkedMasterTemplateResource("loggersTemplate", loggersUri, new string[] { }));
             }
 
-            // api info stores api name as the key and whether the api depends on the version set template as the value
+            // each api has an associated api info class that determines whether the api is split and its dependencies on other resources
             foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
             {
-                string initialAPIDeploymentResourceName = $"{apiInfo.name}-InitialAPITemplate";
-                string subsequentAPIDeploymentResourceName = $"{apiInfo.name}-SubsequentAPITemplate";
+                if(apiInfo.isSplit == true)
+                {
+                    string initialAPIDeploymentResourceName = $"{apiInfo.name}-InitialAPITemplate";
+                    string subsequentAPIDeploymentResourceName = $"{apiInfo.name}-SubsequentAPITemplate";
 
-                string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, true);
-                string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
-                List<string> initialAPIDependsOn = new List<string>();
-                if (apiVersionSetTemplate != null && apiInfo.dependsOnVersionSets == true)
-                {
-                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
-                }
-                if (productsTemplate != null && apiInfo.dependsOnProducts == true)
-                {
-                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
-                }
-                if (loggersTemplate != null && apiInfo.dependsOnLoggers == true)
-                {
-                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
-                }
-                resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn.ToArray()));
+                    string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, apiInfo.isSplit, true);
+                    string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
+                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(apiVersionSetTemplate, productsTemplate, loggersTemplate, apiInfo);
+                    resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn));
 
-                string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, false);
-                string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{subsequentAPIFileName}')]";
-                string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
-                resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
+                    string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, apiInfo.isSplit, false);
+                    string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{subsequentAPIFileName}')]";
+                    string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
+                    resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
+                } else
+                {
+                    string unifiedAPIDeploymentResourceName = $"{apiInfo.name}-APITemplate";
+                    string unifiedAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, apiInfo.isSplit, true);
+                    string unifiedAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{unifiedAPIFileName}')]";
+                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(apiVersionSetTemplate, productsTemplate, loggersTemplate, apiInfo);
+                    resources.Add(this.CreateLinkedMasterTemplateResource(unifiedAPIDeploymentResourceName, unifiedAPIUri, unifiedAPIDependsOn));
+                }
             }
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
+        }
+
+        public string[] CreateAPIResourceDependencies(Template apiVersionSetTemplate,
+            Template productsTemplate,
+            Template loggersTemplate,
+            LinkedMasterTemplateAPIInformation apiInfo)
+        {
+            List<string> apiDependsOn = new List<string>();
+            if (apiVersionSetTemplate != null && apiInfo.dependsOnVersionSets == true)
+            {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
+            }
+            if (productsTemplate != null && apiInfo.dependsOnProducts == true)
+            {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
+            }
+            if (loggersTemplate != null && apiInfo.dependsOnLoggers == true)
+            {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
+            }
+            return apiDependsOn.ToArray();
         }
 
         public MasterTemplateResource CreateLinkedMasterTemplateResource(string name, string uriLink, string[] dependsOn)
@@ -193,6 +212,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     public class LinkedMasterTemplateAPIInformation
     {
         public string name { get; set; }
+        public bool isSplit { get; set; }
         public bool dependsOnVersionSets { get; set; }
         public bool dependsOnProducts { get; set; }
         public bool dependsOnLoggers { get; set; }
