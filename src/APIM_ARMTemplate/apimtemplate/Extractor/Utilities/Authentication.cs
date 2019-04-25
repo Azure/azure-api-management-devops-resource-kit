@@ -39,12 +39,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         private async Task<(bool succeeded, string token)> TryGetAzCliToken()
         {
-            return await ExecuteCommand(Constants.azAccessToken);
+            return await ExecuteCommand(GlobalConstants.azAccessToken);
         }
 
         private async Task<(bool succeeded, string token)> TryGetAzSubscriptionId()
         {
-            return await ExecuteCommand(Constants.azSubscriptionId);
+            return await ExecuteCommand(GlobalConstants.azSubscriptionId);
         }
 
         private static async Task<(bool succeeded, string token)> ExecuteCommand(string commandParameters)

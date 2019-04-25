@@ -1,7 +1,7 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
-    internal static class Constants
+    internal static class GlobalConstants
     {
         public const string AppShortName = "apimtemplate";
         public const string AppLongName = "API Management Template";

@@ -14,20 +14,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.fileReader = fileReader;
         }
 
-        public PolicyTemplateResource CreateAPIPolicyTemplateResource(CreatorConfig creatorConfig, string[] dependsOn)
+        public PolicyTemplateResource CreateAPIPolicyTemplateResource(APIConfig api, string[] dependsOn)
         {
             Uri uriResult;
-            bool isUrl = Uri.TryCreate(creatorConfig.api.policy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            bool isUrl = Uri.TryCreate(api.policy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}/policy')]",
-                type = "Microsoft.ApiManagement/service/apis/policies",
+                name = $"[concat(parameters('ApimServiceName'), '/{api.name}/policy')]",
+                type = ResourceTypeConstants.APIPolicy,
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = isUrl ? "rawxml-link" : "rawxml",
-                    policyContent = isUrl ? creatorConfig.api.policy : this.fileReader.RetrieveLocalFileContents(creatorConfig.api.policy)
+                    policyContent = isUrl ? api.policy : this.fileReader.RetrieveLocalFileContents(api.policy)
                 },
                 dependsOn = dependsOn
             };
@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{policyPair.Key}/policy')]",
-                type = "Microsoft.ApiManagement/service/apis/operations/policies",
+                type = ResourceTypeConstants.APIOperationPolicy,
                 apiVersion = "2018-06-01-preview",
                 properties = new PolicyTemplateProperties()
                 {
@@ -54,13 +54,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return policyTemplateResource;
         }
 
-        public List<PolicyTemplateResource> CreateOperationPolicyTemplateResources(CreatorConfig creatorConfig, string[] dependsOn)
+        public List<PolicyTemplateResource> CreateOperationPolicyTemplateResources(APIConfig api, string[] dependsOn)
         {
             // create a policy resource for each policy listed in the config file and its associated provided xml file
             List<PolicyTemplateResource> policyTemplateResources = new List<PolicyTemplateResource>();
-            foreach (KeyValuePair<string, OperationsConfig> pair in creatorConfig.api.operations)
+            foreach (KeyValuePair<string, OperationsConfig> pair in api.operations)
             {
-                policyTemplateResources.Add(this.CreateOperationPolicyTemplateResource(pair, creatorConfig.api.name, dependsOn));
+                policyTemplateResources.Add(this.CreateOperationPolicyTemplateResource(pair, api.name, dependsOn));
             }
             return policyTemplateResources;
         }

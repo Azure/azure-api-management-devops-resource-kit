@@ -24,24 +24,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            // create apiVersionSet resource with properties
-            string versionSetId = (creatorConfig.apiVersionSet != null && creatorConfig.apiVersionSet.id != null) ? creatorConfig.apiVersionSet.id : "versionset";
-            APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
+            foreach(APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{versionSetId}')]",
-                type = "Microsoft.ApiManagement/service/api-version-sets",
-                apiVersion = "2018-06-01-preview",
-                properties = new APIVersionSetProperties()
+                // create apiVersionSet resource with properties
+                string versionSetId = (apiVersionSet != null && apiVersionSet.id != null) ? apiVersionSet.id : "versionset";
+                APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
                 {
-                    displayName = creatorConfig.apiVersionSet.displayName,
-                    description = creatorConfig.apiVersionSet.description,
-                    versionHeaderName = creatorConfig.apiVersionSet.versionHeaderName,
-                    versionQueryName = creatorConfig.apiVersionSet.versionQueryName,
-                    versioningScheme = creatorConfig.apiVersionSet.versioningScheme,
-                },
-                dependsOn = new string[] { }
-            };
-            resources.Add(apiVersionSetTemplateResource);
+                    name = $"[concat(parameters('ApimServiceName'), '/{versionSetId}')]",
+                    type = ResourceTypeConstants.APIVersionSet,
+                    apiVersion = "2018-06-01-preview",
+                    properties = new APIVersionSetProperties()
+                    {
+                        displayName = apiVersionSet.displayName,
+                        description = apiVersionSet.description,
+                        versionHeaderName = apiVersionSet.versionHeaderName,
+                        versionQueryName = apiVersionSet.versionQueryName,
+                        versioningScheme = apiVersionSet.versioningScheme,
+                    },
+                    dependsOn = new string[] { }
+                };
+                resources.Add(apiVersionSetTemplateResource);
+            }
 
             apiVersionSetTemplate.resources = resources.ToArray();
             return apiVersionSetTemplate;

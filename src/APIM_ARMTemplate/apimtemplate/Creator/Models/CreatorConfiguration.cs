@@ -12,8 +12,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         public string version { get; set; }
         public string apimServiceName { get; set; }
-        public APIVersionSetConfig apiVersionSet { get; set; }
-        public APIConfig api { get; set; }
+        public List<APIVersionSetConfig> apiVersionSets { get; set; }
+        public List<APIConfig> apis { get; set; }
+        public List<ProductsTemplateProperties> products { get; set; }
+        public List<LoggerConfig> loggers { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
@@ -50,7 +52,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string policy { get; set; }
     }
 
-    public class DiagnosticConfig: DiagnosticTemplateProperties
+    public class DiagnosticConfig : DiagnosticTemplateProperties
+    {
+        public string name { get; set; }
+    }
+
+    public class LoggerConfig : LoggerTemplateProperties
     {
         public string name { get; set; }
     }

@@ -13,9 +13,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         }
 
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
-            Template initialAPITemplate,
-            Template subsequentAPITemplate,
-            CreatorFileNames creatorFileNames)
+            Template productsTemplate,
+            Template loggersTemplate,
+            List<LinkedMasterTemplateAPIInformation> apiInformation,
+            CreatorFileNames creatorFileNames,
+            FileNameGenerator fileNameGenerator)
         {
             // create empty template
             Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
@@ -29,61 +31,52 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // apiVersionSet
             if (apiVersionSetTemplate != null)
             {
-                string apiVersionSetUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.apiVersionSet}')]";
+                string apiVersionSetUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.apiVersionSets}')]";
                 resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, new string[] { }));
             }
 
-            //api
-            string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.initialAPI}')]";
-            string[] initialAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]" } : new string[] { };
-            resources.Add(this.CreateLinkedMasterTemplateResource("initialAPITemplate", initialAPIUri, initialAPIDependsOn));
-
-            string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.subsequentAPI}')]";
-            string[] subsequentAPIDependsOn = apiVersionSetTemplate != null ? new string[] { "[resourceId('Microsoft.Resources/deployments', 'initialAPITemplate')]" } : new string[] { };
-            resources.Add(this.CreateLinkedMasterTemplateResource("subsequentAPITemplate", subsequentAPIUri, subsequentAPIDependsOn));
-
-            masterTemplate.resources = resources.ToArray();
-            return masterTemplate;
-        }
-
-        public Template CreateInitialUnlinkedMasterTemplate(Template apiVersionSetTemplate,
-            Template initialAPITemplate)
-        {
-            // create empty template
-            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
-
-            // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters(false);
-
-            // add all resources directly
-            List<TemplateResource> resources = new List<TemplateResource>();
-
-            // apiVersionSet
-            if (apiVersionSetTemplate != null)
+            // product
+            if (productsTemplate != null)
             {
-                resources.AddRange(apiVersionSetTemplate.resources);
+                string productsUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.products}')]";
+                resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }));
             }
 
-            //api
-            resources.AddRange(initialAPITemplate.resources);
+            // logger
+            if (loggersTemplate != null)
+            {
+                string loggersUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.loggers}')]";
+                resources.Add(this.CreateLinkedMasterTemplateResource("loggersTemplate", loggersUri, new string[] { }));
+            }
 
-            masterTemplate.resources = resources.ToArray();
-            return masterTemplate;
-        }
+            // api info stores api name as the key and whether the api depends on the version set template as the value
+            foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
+            {
+                string initialAPIDeploymentResourceName = $"{apiInfo.name}-InitialAPITemplate";
+                string subsequentAPIDeploymentResourceName = $"{apiInfo.name}-SubsequentAPITemplate";
 
-        public Template CreateSubsequentUnlinkedMasterTemplate(Template subequentAPITemplate)
-        {
-            // create empty template
-            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
+                string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, true);
+                string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
+                List<string> initialAPIDependsOn = new List<string>();
+                if (apiVersionSetTemplate != null && apiInfo.dependsOnVersionSets == true)
+                {
+                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
+                }
+                if (productsTemplate != null && apiInfo.dependsOnProducts == true)
+                {
+                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
+                }
+                if (loggersTemplate != null && apiInfo.dependsOnLoggers == true)
+                {
+                    initialAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
+                }
+                resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn.ToArray()));
 
-            // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters(false);
-
-            // add all resources directly
-            List<TemplateResource> resources = new List<TemplateResource>();
-
-            //api
-            resources.AddRange(subequentAPITemplate.resources);
+                string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, false);
+                string subsequentAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{subsequentAPIFileName}')]";
+                string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
+                resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
+            }
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
@@ -128,7 +121,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 type = "string"
             };
             parameters.Add("ApimServiceName", apimServiceNameProperties);
-            if(linked == true)
+            if (linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
@@ -167,5 +160,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             masterTemplate.parameters = parameters;
             return masterTemplate;
         }
+
+        public bool DetermineIfAPIDependsOnLogger(APIConfig api, FileReader fileReader)
+        {
+            if (api.diagnostic != null && api.diagnostic.loggerId != null)
+            {
+                // capture api diagnostic dependent on logger
+                return true;
+            }
+            string apiPolicy = api.policy != null ? fileReader.RetrieveLocalFileContents(api.policy) : "";
+            if (apiPolicy.Contains("logger"))
+            {
+                // capture api policy dependent on logger
+                return true;
+            }
+            if (api.operations != null)
+            {
+                foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
+                {
+                    string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
+                    if (operation.Value.policy != null && operation.Value.policy.Contains("logger"))
+                    {
+                        // capture operation policy dependent on logger
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
+
+    public class LinkedMasterTemplateAPIInformation
+    {
+        public string name { get; set; }
+        public bool dependsOnVersionSets { get; set; }
+        public bool dependsOnProducts { get; set; }
+        public bool dependsOnLoggers { get; set; }
+    }
+
 }

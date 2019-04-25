@@ -14,8 +14,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
     {
         public ExtractCommand()
         {
-            this.Name = Constants.ExtractName;
-            this.Description = Constants.ExtractDescription;
+            this.Name = GlobalConstants.ExtractName;
+            this.Description = GlobalConstants.ExtractDescription;
 
             var apiManagementName = this.Option("--name <apimname>", "API Management name", CommandOptionType.SingleValue);
             var resourceGroupName = this.Option("--resourceGroup <resourceGroup>", "Resource Group name", CommandOptionType.SingleValue);
@@ -66,12 +66,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             oApi = FormatoApi(singleApiName, oApi);
 
             Console.WriteLine("{0} API's found ...", ((JContainer)oApi["value"]).Count.ToString());
-
-            if (singleApiName == null)
-            {
-                GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder);
-                GenerateLoggerTemplate(resourceGroup, apimname, fileFolder);
-            }
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -215,14 +209,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     {
                         string apiProductName = ((JValue)item["name"]).Value.ToString();
                         Console.WriteLine($" -- {apiProductName} Product found to {oApiName} API");
-                        ApiProductsTemplateResource apiProductsResource = JsonConvert.DeserializeObject<ApiProductsTemplateResource>(apiProducts);
-                        apiProductsResource.type = "Microsoft.ApiManagement/service/products/apis";
-                        apiProductsResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]";
-                        apiProductsResource.apiVersion = "2018-06-01-preview";
-                        apiProductsResource.scale = null;
-                        apiProductsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+                        ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(apiProducts);
+                        productAPIResource.type = ResourceTypeConstants.ProductAPI;
+                        productAPIResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]";
+                        productAPIResource.apiVersion = "2018-06-01-preview";
+                        productAPIResource.scale = null;
+                        productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
-                        templateResources.Add(apiProductsResource);
+                        templateResources.Add(productAPIResource);
 
                     }
                 }
@@ -245,7 +239,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                     DiagnosticTemplateResource diagnosticResource = diagnostic.ToObject<DiagnosticTemplateResource>();
                     diagnosticResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{diagnosticName}')]";
-                    diagnosticResource.type = "Microsoft.ApiManagement/service/apis/diagnostics";
+                    diagnosticResource.type = ResourceTypeConstants.APIDiagnostic;
                     diagnosticResource.apiVersion = "2018-06-01-preview";
                     diagnosticResource.scale = null;
                     diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
@@ -268,9 +262,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     fileWriter = new FileWriter();
                     fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + oApiName + "-template.json");
-                    templateResources = new List<TemplateResource>();
                 }
             }
+
+            // extract resources that do not fall under api. Pass in the single api name and associated resources for the single api case
+            GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
+            GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder, singleApiName, templateResources);
+            GenerateLoggerTemplate(resourceGroup, apimname, fileFolder, singleApiName, templateResources);
 
             if (singleApiName == null)
             {
@@ -322,10 +320,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
 
-        private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder)
+        private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
         {
             APIExtractor apiExtractor = new APIExtractor();
             Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            // isolate product api associations in the case of a single api extraction
+            var productAPIResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductAPI);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -340,12 +341,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 string productDetails = apiExtractor.GetProductDetails(apimname, resourceGroup, productName).Result;
 
-                ProductsDetailsTemplateResource productsDetailsResource = JsonConvert.DeserializeObject<ProductsDetailsTemplateResource>(productDetails);
-                productsDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
-                productsDetailsResource.apiVersion = "2018-06-01-preview";
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                };
 
-                templateResources.Add(productsDetailsResource);
+                ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails, settings);
+                productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
+                productsTemplateResource.apiVersion = "2018-06-01-preview";
 
+                // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
+                if (singleApiName == null || productAPIResources.SingleOrDefault(p => p.name.Contains(productName)) != null)
+                {
+                    templateResources.Add(productsTemplateResource);
+                }
             }
 
             armTemplate.resources = templateResources.ToArray();
@@ -386,12 +396,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return templateResources;
         }
 
-        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder)
+        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting loggers from service");
             LoggerExtractor loggerExtractor = new LoggerExtractor();
             Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            // isolate product api associations in the case of a single api extraction
+            var diagnosticResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIDiagnostic);
+            var policyResources = armTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -400,16 +414,46 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-                Console.WriteLine("'{0}' Logger found", loggerName);
 
                 string fullLoggerResource = await loggerExtractor.GetLogger(apimname, resourceGroup, loggerName);
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
                 loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
-                loggerResource.type = "Microsoft.ApiManagement/service/loggers";
+                loggerResource.type = ResourceTypeConstants.Logger;
                 loggerResource.apiVersion = "2018-06-01-preview";
                 loggerResource.scale = null;
 
-                templateResources.Add(loggerResource);
+                if (singleApiName == null)
+                {
+                    // if the user is extracting all apis, extract all the loggers
+                    Console.WriteLine("'{0}' Logger found", loggerName);
+                    templateResources.Add(loggerResource);
+                }
+                else
+                {
+                    // if the user is extracting a single api, extract the loggers referenced by its diagnostics and api policies
+                    bool isReferencedInPolicy = false;
+                    bool isReferencedInDiagnostic = false;
+                    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+                    {
+                        if (policyTemplateResource.properties.policyContent.Contains(loggerName))
+                        {
+                            isReferencedInPolicy = true;
+                        }
+                    }
+                    foreach (DiagnosticTemplateResource diagnosticTemplateResource in diagnosticResources)
+                    {
+                        if (diagnosticTemplateResource.properties.loggerId.Contains(loggerName))
+                        {
+                            isReferencedInPolicy = true;
+                        }
+                    }
+                    if (isReferencedInPolicy == true || isReferencedInDiagnostic == true)
+                    {
+                        // logger was used in policy or diagnostic, extract it
+                        Console.WriteLine("'{0}' Logger found", loggerName);
+                        templateResources.Add(loggerResource);
+                    }
+                };
             }
 
             armTemplate.resources = templateResources.ToArray();
@@ -417,7 +461,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
         }
 
-        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder)
+        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting named values from service");
@@ -432,16 +476,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             foreach (var extractedProperty in oProperties["value"])
             {
                 string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
-                Console.WriteLine("'{0}' Named value found", propertyName);
 
                 string fullLoggerResource = await propertyExtractor.GetProperty(apimname, resourceGroup, propertyName);
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullLoggerResource);
                 propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
-                propertyTemplateResource.type = "Microsoft.ApiManagement/service/properties";
+                propertyTemplateResource.type = ResourceTypeConstants.Property;
                 propertyTemplateResource.apiVersion = "2018-06-01-preview";
                 propertyTemplateResource.scale = null;
 
-                templateResources.Add(propertyTemplateResource);
+                if (singleApiName == null)
+                {
+                    // if the user is executing a full extraction, extract all the loggers
+                    Console.WriteLine("'{0}' Named value found", propertyName);
+                    templateResources.Add(propertyTemplateResource);
+                }
+                else
+                {
+                    // TODO - if the user is executing a single api, extract all the named values used in the template resources
+                    Console.WriteLine("'{0}' Named value found", propertyName);
+                    templateResources.Add(propertyTemplateResource);
+                };
             }
 
             armTemplate.resources = templateResources.ToArray();

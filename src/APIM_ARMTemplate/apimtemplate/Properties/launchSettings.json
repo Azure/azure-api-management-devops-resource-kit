@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --name apiphany --resourceGroup vlvinogr-apim --fileFolder C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\ExtractedTemplates"
+      "commandLineArgs": "create --configFile ./Creator/ExampleFiles/YAMLConfigs/validTesting.yml"
     }
   }
 }
