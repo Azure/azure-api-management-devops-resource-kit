@@ -267,8 +267,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // extract resources that do not fall under api. Pass in the single api name and associated resources for the single api case
             GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
-            GenerateNamedValuesTemplate(resourceGroup, apimname, fileFolder, singleApiName, templateResources);
-            GenerateLoggerTemplate(resourceGroup, apimname, fileFolder, singleApiName, templateResources);
+            GenerateLoggerTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
+            GenerateAuthorizationServersARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
+            GenerateNamedValuesTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
 
             if (singleApiName == null)
             {
@@ -318,6 +319,55 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, filePath);
+        }
+
+        private void GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
+        {
+            AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // isolate api resources in the case of a single api extraction, as they may reference authorization servers
+            var apiResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
+
+            string authorizationServers = authorizationServerExtractor.GetAuthorizationServers(apimname, resourceGroup).Result;
+            JObject oAuthorizationServers = JObject.Parse(authorizationServers);
+
+            foreach (var item in oAuthorizationServers["value"])
+            {
+                string authorizationServerName = ((JValue)item["name"]).Value.ToString();
+
+                Console.WriteLine("'{0}' Authorization Server found", authorizationServerName);
+
+                string authorizationServer = authorizationServerExtractor.GetAuthorizationServer(apimname, resourceGroup, authorizationServerName).Result;
+
+                AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);
+                authorizationServerTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{authorizationServerName}')]";
+                authorizationServerTemplateResource.apiVersion = "2018-06-01-preview";
+
+                // only extract the authorization server if this is a full extraction, or in the case of a single api, if it is referenced by one of the api's authentication settings
+                bool isReferencedByAPI = false;
+                foreach(APITemplateResource apiResource in apiResources)
+                {
+                    if(apiResource.properties.authenticationSettings != null && 
+                        apiResource.properties.authenticationSettings.oAuth2 != null &&
+                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId != null &&
+                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId.Contains(authorizationServerName))
+                    {
+                        isReferencedByAPI = true;
+                    }
+                }
+                if (singleApiName == null || isReferencedByAPI)
+                {
+                    templateResources.Add(authorizationServerTemplateResource);
+                }
+            }
+
+            armTemplate.resources = templateResources.ToArray();
+            FileWriter fileWriter = new FileWriter();
+            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
+
         }
 
         private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
@@ -396,7 +446,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return templateResources;
         }
 
-        private async void GenerateLoggerTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
+        private async void GenerateLoggerTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting loggers from service");
@@ -461,7 +511,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
         }
 
-        private async void GenerateNamedValuesTemplate(string resourceGroup, string apimname, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
+        private async void GenerateNamedValuesTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting named values from service");
