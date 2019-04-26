@@ -269,6 +269,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
             GenerateLoggerTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
             GenerateAuthorizationServersARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
+            GenerateBackendsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
             GenerateNamedValuesTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
 
             if (singleApiName == null)
@@ -321,6 +322,59 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
 
+        private void GenerateBackendsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
+        {
+            BackendExtractor backendExtractor = new BackendExtractor();
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // isolate api and operation policy resources in the case of a single api extraction, as they may reference backends
+            var policyResources = armTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
+
+            string backends = backendExtractor.GetBackends(apimname, resourceGroup).Result;
+            JObject oBackends = JObject.Parse(backends);
+
+            foreach (var item in oBackends["value"])
+            {
+                string backendName = ((JValue)item["name"]).Value.ToString();
+                string backend = backendExtractor.GetBackend(apimname, resourceGroup, backendName).Result;
+
+                BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
+                backendTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{backendName}')]";
+                backendTemplateResource.apiVersion = "2018-06-01-preview";
+
+                // only extract the backend if this is a full extraction, or in the case of a single api, if it is referenced by one of the policies
+                if (singleApiName == null)
+                {
+                    // if the user is extracting all apis, extract all the backends
+                    Console.WriteLine("'{0}' Backend found", backendName);
+                    templateResources.Add(backendTemplateResource);
+                }
+                else
+                {
+                    bool isReferencedInPolicy = false;
+                    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+                    {
+                        if (policyTemplateResource.properties.policyContent.Contains(backendName))
+                        {
+                            isReferencedInPolicy = true;
+                        }
+                    }
+                    if (isReferencedInPolicy == true)
+                    {
+                        // backend was used in policy, extract it
+                        Console.WriteLine("'{0}' Backend found", backendName);
+                        templateResources.Add(backendTemplateResource);
+                    }
+                }
+            }
+
+            armTemplate.resources = templateResources.ToArray();
+            FileWriter fileWriter = new FileWriter();
+            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-backends.json");
+        }
+
         private void GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
         {
             AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
@@ -337,9 +391,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             foreach (var item in oAuthorizationServers["value"])
             {
                 string authorizationServerName = ((JValue)item["name"]).Value.ToString();
-
-                Console.WriteLine("'{0}' Authorization Server found", authorizationServerName);
-
                 string authorizationServer = authorizationServerExtractor.GetAuthorizationServer(apimname, resourceGroup, authorizationServerName).Result;
 
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);
@@ -348,9 +399,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 // only extract the authorization server if this is a full extraction, or in the case of a single api, if it is referenced by one of the api's authentication settings
                 bool isReferencedByAPI = false;
-                foreach(APITemplateResource apiResource in apiResources)
+                foreach (APITemplateResource apiResource in apiResources)
                 {
-                    if(apiResource.properties.authenticationSettings != null && 
+                    if (apiResource.properties.authenticationSettings != null &&
                         apiResource.properties.authenticationSettings.oAuth2 != null &&
                         apiResource.properties.authenticationSettings.oAuth2.authorizationServerId != null &&
                         apiResource.properties.authenticationSettings.oAuth2.authorizationServerId.Contains(authorizationServerName))
@@ -360,6 +411,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 if (singleApiName == null || isReferencedByAPI)
                 {
+                    Console.WriteLine("'{0}' Authorization Server found", authorizationServerName);
                     templateResources.Add(authorizationServerTemplateResource);
                 }
             }
@@ -367,7 +419,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             armTemplate.resources = templateResources.ToArray();
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
-
         }
 
         private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
