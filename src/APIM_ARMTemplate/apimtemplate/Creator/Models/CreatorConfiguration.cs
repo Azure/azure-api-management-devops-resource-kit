@@ -16,6 +16,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public List<APIConfig> apis { get; set; }
         public List<ProductsTemplateProperties> products { get; set; }
         public List<LoggerConfig> loggers { get; set; }
+        public List<AuthorizationServerTemplateProperties> authorizationServers { get; set; }
+        public List<BackendTemplateProperties> backends { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }

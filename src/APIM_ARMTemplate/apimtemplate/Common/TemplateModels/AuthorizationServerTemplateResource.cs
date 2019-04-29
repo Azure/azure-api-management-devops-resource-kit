@@ -3,10 +3,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     public class AuthorizationServerTemplateResource : TemplateResource
     {
-        public AuthorizationServerProperties properties { get; set; }
+        public AuthorizationServerTemplateProperties properties { get; set; }
     }
 
-    public class AuthorizationServerProperties
+    public class AuthorizationServerTemplateProperties
     {
         public string description { get; set; }
         public string[] authorizationMethods { get; set; }
