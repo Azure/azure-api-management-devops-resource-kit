@@ -15,6 +15,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
             Template productsTemplate,
             Template loggersTemplate,
+            Template backendsTemplate,
+            Template authorizationServersTemplate,
             List<LinkedMasterTemplateAPIInformation> apiInformation,
             CreatorFileNames creatorFileNames,
             FileNameGenerator fileNameGenerator)
@@ -207,6 +209,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
             return false;
         }
+
+        public bool DetermineIfAPIDependsOnBackend(APIConfig api, FileReader fileReader)
+        {
+            string apiPolicy = api.policy != null ? fileReader.RetrieveLocalFileContents(api.policy) : "";
+            if (apiPolicy.Contains("set-backend-service"))
+            {
+                // capture api policy dependent on logger
+                return true;
+            }
+            if (api.operations != null)
+            {
+                foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
+                {
+                    string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
+                    if (operation.Value.policy != null && operation.Value.policy.Contains("set-backend-service"))
+                    {
+                        // capture operation policy dependent on logger
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     public class LinkedMasterTemplateAPIInformation
@@ -216,6 +241,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool dependsOnVersionSets { get; set; }
         public bool dependsOnProducts { get; set; }
         public bool dependsOnLoggers { get; set; }
+        public bool dependsOnBackends { get; set; }
+        public bool dependsOnAuthorizationServers { get; set; }
     }
 
 }

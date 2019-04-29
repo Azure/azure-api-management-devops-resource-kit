@@ -14,6 +14,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 apiVersionSets = @"/api-version-sets.template.json",
                 products = @"/products.template.json",
                 loggers = @"/loggers.template.json",
+                backends = @"/backends.template.json",
+                authorizationServers = @"/authorizationServers.template.json",
                 linkedMaster = @"/master.template.json",
                 linkedParameters = @"/master.parameters.json",
                 unlinkedParameters = @"/parameters.json"

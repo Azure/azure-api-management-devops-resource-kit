@@ -37,6 +37,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
                     LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator(templateCreator);
                     ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(templateCreator);
+                    BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator(templateCreator);
+                    AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator(templateCreator);
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
@@ -48,6 +50,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
+                    Template backendsTemplate = creatorConfig.backends != null ? backendTemplateCreator.CreateBackendTemplate(creatorConfig) : null;
+                    Template authorizationServersTemplate = creatorConfig.authorizationServers != null ? authorizationServerTemplateCreator.CreateAuthorizationServerTemplate(creatorConfig) : null;
                     // store name and whether the api will depend on the version set template each api necessary to build linked templates
                     List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
                     // create parameters file
@@ -66,7 +70,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                             isSplit = api.apiVersion != null,
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
-                            dependsOnLoggers = masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader)
+                            dependsOnLoggers = masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader),
+                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
+                            dependsOnBackends = masterTemplateCreator.DetermineIfAPIDependsOnBackend(api, fileReader)
                         });
                     }
 
@@ -74,7 +80,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, apiInformation, creatorFileNames, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, creatorFileNames, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
                     }
                     foreach (Template apiTemplate in apiTemplates)
@@ -96,6 +102,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (loggersTemplate != null)
                     {
                         fileWriter.WriteJSONToFile(loggersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.loggers));
+                    }
+                    if (backendsTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(backendsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.backends));
+                    }
+                    if (authorizationServersTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.authorizationServers));
                     }
                     // write parameters to outputLocation
                     fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorConfig.linked == true ? creatorFileNames.linkedParameters : creatorFileNames.unlinkedParameters));
