@@ -51,6 +51,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 resources.Add(this.CreateLinkedMasterTemplateResource("loggersTemplate", loggersUri, new string[] { }));
             }
 
+            // backend
+            if (backendsTemplate != null)
+            {
+                string backendsUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.backends}')]";
+                resources.Add(this.CreateLinkedMasterTemplateResource("backendsTemplate", backendsUri, new string[] { }));
+            }
+
+            // authorizationServer
+            if (authorizationServersTemplate != null)
+            {
+                string authorizationServersUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{creatorFileNames.authorizationServers}')]";
+                resources.Add(this.CreateLinkedMasterTemplateResource("authorizationServersTemplate", authorizationServersUri, new string[] { }));
+            }
+
             // each api has an associated api info class that determines whether the api is split and its dependencies on other resources
             foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
             {
@@ -61,7 +75,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                     string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
-                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(apiVersionSetTemplate, productsTemplate, loggersTemplate, apiInfo);
+                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInfo);
                     resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn));
 
                     string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, apiInfo.isSplit, false);
@@ -73,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string unifiedAPIDeploymentResourceName = $"{apiInfo.name}-APITemplate";
                     string unifiedAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string unifiedAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{unifiedAPIFileName}')]";
-                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(apiVersionSetTemplate, productsTemplate, loggersTemplate, apiInfo);
+                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInfo);
                     resources.Add(this.CreateLinkedMasterTemplateResource(unifiedAPIDeploymentResourceName, unifiedAPIUri, unifiedAPIDependsOn));
                 }
             }
@@ -85,6 +99,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string[] CreateAPIResourceDependencies(Template apiVersionSetTemplate,
             Template productsTemplate,
             Template loggersTemplate,
+            Template backendsTemplate,
+            Template authorizationServersTemplate,
             LinkedMasterTemplateAPIInformation apiInfo)
         {
             List<string> apiDependsOn = new List<string>();
@@ -99,6 +115,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (loggersTemplate != null && apiInfo.dependsOnLoggers == true)
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
+            }
+            if (backendsTemplate != null && apiInfo.dependsOnBackends == true)
+            {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'backendsTemplate')]");
+            }
+            if (authorizationServersTemplate != null && apiInfo.dependsOnAuthorizationServers == true)
+            {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
             }
             return apiDependsOn.ToArray();
         }
@@ -200,7 +224,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
                 {
                     string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
-                    if (operation.Value.policy != null && operation.Value.policy.Contains("logger"))
+                    if (operationPolicy.Contains("logger"))
                     {
                         // capture operation policy dependent on logger
                         return true;
@@ -223,7 +247,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
                 {
                     string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
-                    if (operation.Value.policy != null && operation.Value.policy.Contains("set-backend-service"))
+                    if (operationPolicy.Contains("set-backend-service"))
                     {
                         // capture operation policy dependent on logger
                         return true;
