@@ -345,29 +345,36 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 backendTemplateResource.apiVersion = "2018-06-01-preview";
 
                 // only extract the backend if this is a full extraction, or in the case of a single api, if it is referenced by one of the policies
-                if (singleApiName == null)
-                {
-                    // if the user is extracting all apis, extract all the backends
-                    Console.WriteLine("'{0}' Backend found", backendName);
-                    templateResources.Add(backendTemplateResource);
-                }
-                else
-                {
-                    bool isReferencedInPolicy = false;
-                    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
-                    {
-                        if (policyTemplateResource.properties.policyContent.Contains(backendName))
-                        {
-                            isReferencedInPolicy = true;
-                        }
-                    }
-                    if (isReferencedInPolicy == true)
-                    {
-                        // backend was used in policy, extract it
-                        Console.WriteLine("'{0}' Backend found", backendName);
-                        templateResources.Add(backendTemplateResource);
-                    }
-                }
+                //if (singleApiName == null)
+                //{
+                //    // if the user is extracting all apis, extract all the backends
+                //    Console.WriteLine("'{0}' Backend found", backendName);
+                //    templateResources.Add(backendTemplateResource);
+                //}
+                //else
+                //{
+                //    bool isReferencedInPolicy = false;
+                //    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+                //    {
+                //        // the backend is used in a policy if the xml contains a set-backend-service policy, which will reference the backend's url or id
+                //        string policyContent = policyTemplateResource.properties.policyContent;
+                //        if (policyContent.Contains(backendName) || policyContent.Contains(backendTemplateResource.properties.url) || policyContent.Contains(backendTemplateResource.properties.resourceId))
+                //        {
+                //            isReferencedInPolicy = true;
+                //        }
+                //    }
+                //    if (isReferencedInPolicy == true)
+                //    {
+                //        // backend was used in policy, extract it
+                //        Console.WriteLine("'{0}' Backend found", backendName);
+                //        templateResources.Add(backendTemplateResource);
+                //    }
+                //}
+
+
+                // extract all the backends in both cases for the time being
+                Console.WriteLine("'{0}' Backend found", backendName);
+                templateResources.Add(backendTemplateResource);
             }
 
             armTemplate.resources = templateResources.ToArray();
