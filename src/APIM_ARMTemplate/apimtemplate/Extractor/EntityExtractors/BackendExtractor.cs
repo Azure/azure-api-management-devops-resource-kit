@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
                 backendTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{backendName}')]";
-                backendTemplateResource.apiVersion = "2018-06-01-preview";
+                backendTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 //only extract the backend if this is a full extraction, or in the case of a single api, if it is referenced by one of the policies
                 if (singleApiName == null)

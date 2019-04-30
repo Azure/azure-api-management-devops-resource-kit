@@ -159,7 +159,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 apiResource.type = ((JValue)oApiDetails["type"]).Value.ToString();
                 apiResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}')]";
-                apiResource.apiVersion = "2018-06-01-preview";
+                apiResource.apiVersion = GlobalConstants.APIVersion;
                 apiResource.scale = null;
 
                 if (apiResource.properties.apiVersionSetId != null)
@@ -200,7 +200,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     OperationTemplateResource operationResource = JsonConvert.DeserializeObject<OperationTemplateResource>(operationDetails);
                     string operationResourceName = operationResource.name;
                     operationResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}')]";
-                    operationResource.apiVersion = "2018-06-01-preview";
+                    operationResource.apiVersion = GlobalConstants.APIVersion;
                     operationResource.scale = null;
 
                     // depend on api and schemas if necessary
@@ -241,7 +241,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         Console.WriteLine($" - Policy found to {operationName} operation");
                         PolicyTemplateResource operationPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(operationPolicy);
                         operationPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/policy')]";
-                        operationPolicyResource.apiVersion = "2018-06-01-preview";
+                        operationPolicyResource.apiVersion = GlobalConstants.APIVersion;
                         operationPolicyResource.scale = null;
                         operationPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
 
@@ -262,7 +262,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Console.WriteLine("API Policy found!");
                     PolicyTemplateResource apiPoliciesResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(apiPolicies);
 
-                    apiPoliciesResource.apiVersion = "2018-06-01-preview";
+                    apiPoliciesResource.apiVersion = GlobalConstants.APIVersion;
                     apiPoliciesResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiPoliciesResource.name}')]";
                     apiPoliciesResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
@@ -288,7 +288,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(apiProducts);
                         productAPIResource.type = ResourceTypeConstants.ProductAPI;
                         productAPIResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]";
-                        productAPIResource.apiVersion = "2018-06-01-preview";
+                        productAPIResource.apiVersion = GlobalConstants.APIVersion;
                         productAPIResource.scale = null;
                         productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
@@ -315,7 +315,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     DiagnosticTemplateResource diagnosticResource = diagnostic.ToObject<DiagnosticTemplateResource>();
                     diagnosticResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{diagnosticName}')]";
                     diagnosticResource.type = ResourceTypeConstants.APIDiagnostic;
-                    diagnosticResource.apiVersion = "2018-06-01-preview";
+                    diagnosticResource.apiVersion = GlobalConstants.APIVersion;
                     diagnosticResource.scale = null;
                     diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
@@ -370,7 +370,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format(versionSetResource.name, "/", "-") + ".json";
 
             versionSetResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetResource.name}')]";
-            versionSetResource.apiVersion = "2018-06-01-preview";
+            versionSetResource.apiVersion = GlobalConstants.APIVersion;
 
             templateResources.Add(versionSetResource);
             armTemplate.resources = templateResources.ToArray();
@@ -400,7 +400,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 SchemaTemplateResource schemaDetailsResource = JsonConvert.DeserializeObject<SchemaTemplateResource>(schemaDetails);
                 schemaDetailsResource.properties.document.value = JsonConvert.SerializeObject(restReturnedSchemaTemplate.properties.document);
                 schemaDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{schemaName}')]";
-                schemaDetailsResource.apiVersion = "2018-06-01-preview";
+                schemaDetailsResource.apiVersion = GlobalConstants.APIVersion;
                 schemaDetailsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
                 templateResources.Add(schemaDetailsResource);

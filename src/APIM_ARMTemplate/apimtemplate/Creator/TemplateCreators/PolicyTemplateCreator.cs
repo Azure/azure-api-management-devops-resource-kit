@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{api.name}/policy')]",
                 type = ResourceTypeConstants.APIPolicy,
-                apiVersion = "2018-06-01-preview",
+                apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = isUrl ? "rawxml-link" : "rawxml",
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{policyPair.Key}/policy')]",
                 type = ResourceTypeConstants.APIOperationPolicy,
-                apiVersion = "2018-06-01-preview",
+                apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
                 {
                     contentFormat = isUrl ? "rawxml-link" : "rawxml",

@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
                 loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
                 loggerResource.type = ResourceTypeConstants.Logger;
-                loggerResource.apiVersion = "2018-06-01-preview";
+                loggerResource.apiVersion = GlobalConstants.APIVersion;
                 loggerResource.scale = null;
 
                 if (singleApiName == null)

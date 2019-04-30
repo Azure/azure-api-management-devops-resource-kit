@@ -57,7 +57,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails, settings);
                 productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
-                productsTemplateResource.apiVersion = "2018-06-01-preview";
+                productsTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
                 if (singleApiName == null || productAPIResources.SingleOrDefault(p => p.name.Contains(productName)) != null)

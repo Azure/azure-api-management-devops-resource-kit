@@ -95,7 +95,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{api.name}')]",
                 type = ResourceTypeConstants.API,
-                apiVersion = "2018-06-01-preview",
+                apiVersion = GlobalConstants.APIVersion,
                 properties = new APITemplateProperties(),
                 // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
                 dependsOn = new string[] { }

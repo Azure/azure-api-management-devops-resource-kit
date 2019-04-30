@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 {
                     name = $"[concat(parameters('ApimServiceName'), '/{backendTemplatePropeties.title}')]",
                     type = ResourceTypeConstants.Backend,
-                    apiVersion = "2018-06-01-preview",
+                    apiVersion = GlobalConstants.APIVersion,
                     properties = backendTemplatePropeties,
                     dependsOn = new string[] { }
                 };

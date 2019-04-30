@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 {
                     name = $"[concat(parameters('ApimServiceName'), '/{authorizationServerTemplateProperties.displayName}')]",
                     type = ResourceTypeConstants.AuthorizationServer,
-                    apiVersion = "2018-06-01-preview",
+                    apiVersion = GlobalConstants.APIVersion,
                     properties = authorizationServerTemplateProperties,
                     dependsOn = new string[] { }
                 };

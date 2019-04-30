@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullLoggerResource);
                 propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
                 propertyTemplateResource.type = ResourceTypeConstants.Property;
-                propertyTemplateResource.apiVersion = "2018-06-01-preview";
+                propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
                 propertyTemplateResource.scale = null;
 
                 if (singleApiName == null)

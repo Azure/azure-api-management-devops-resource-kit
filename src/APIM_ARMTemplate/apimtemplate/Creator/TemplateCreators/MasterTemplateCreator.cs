@@ -134,7 +134,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = name,
                 type = "Microsoft.Resources/deployments",
-                apiVersion = "2018-01-01",
+                apiVersion = GlobalConstants.LinkedAPIVersion,
                 properties = new MasterTemplateProperties()
                 {
                     mode = "Incremental",

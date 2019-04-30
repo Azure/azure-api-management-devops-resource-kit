@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{productID}/{apiName}')]",
                 type = ResourceTypeConstants.ProductAPI,
-                apiVersion = "2018-06-01-preview",
+                apiVersion = GlobalConstants.APIVersion,
                 properties = new ProductAPITemplateProperties(),
                 dependsOn = dependsOn
             };
