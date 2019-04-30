@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    class LoggerExtractor
+    public class LoggerExtractor: EntityExtractor
     {
-        static string baseUrl = "https://management.azure.com";
-        internal Authentication auth = new Authentication();
-
         public async Task<string> GetLoggers(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -31,20 +30,67 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        private static async Task<string> CallApiManagement(string azToken, string requestUrl)
+        public async Task<Template> GenerateLoggerTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> armTemplateResources)
         {
-            using (HttpClient httpClient = new HttpClient())
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Getting loggers from service");
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            // isolate product api associations in the case of a single api extraction
+            var diagnosticResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIDiagnostic);
+            var policyResources = armTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
+
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            string loggers = await GetLoggers(apimname, resourceGroup);
+            JObject oLoggers = JObject.Parse(loggers);
+            foreach (var extractedLogger in oLoggers["value"])
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+                string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
 
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
+                string fullLoggerResource = await GetLogger(apimname, resourceGroup, loggerName);
+                LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
+                loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
+                loggerResource.type = ResourceTypeConstants.Logger;
+                loggerResource.apiVersion = "2018-06-01-preview";
+                loggerResource.scale = null;
 
-                HttpResponseMessage response = await httpClient.SendAsync(request);
-
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return responseBody;
+                if (singleApiName == null)
+                {
+                    // if the user is extracting all apis, extract all the loggers
+                    Console.WriteLine("'{0}' Logger found", loggerName);
+                    templateResources.Add(loggerResource);
+                }
+                else
+                {
+                    // if the user is extracting a single api, extract the loggers referenced by its diagnostics and api policies
+                    bool isReferencedInPolicy = false;
+                    bool isReferencedInDiagnostic = false;
+                    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+                    {
+                        if (policyTemplateResource.properties.policyContent.Contains(loggerName))
+                        {
+                            isReferencedInPolicy = true;
+                        }
+                    }
+                    foreach (DiagnosticTemplateResource diagnosticTemplateResource in diagnosticResources)
+                    {
+                        if (diagnosticTemplateResource.properties.loggerId.Contains(loggerName))
+                        {
+                            isReferencedInPolicy = true;
+                        }
+                    }
+                    if (isReferencedInPolicy == true || isReferencedInDiagnostic == true)
+                    {
+                        // logger was used in policy or diagnostic, extract it
+                        Console.WriteLine("'{0}' Logger found", loggerName);
+                        templateResources.Add(loggerResource);
+                    }
+                };
             }
+
+            armTemplate.resources = templateResources.ToArray();
+            return armTemplate;
         }
     }
 }

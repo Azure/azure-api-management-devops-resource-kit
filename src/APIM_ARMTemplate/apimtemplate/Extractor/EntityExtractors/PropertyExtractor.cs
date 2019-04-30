@@ -1,15 +1,14 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class PropertyExtractor
+    public class PropertyExtractor: EntityExtractor
     {
-        static string baseUrl = "https://management.azure.com";
-        internal Authentication auth = new Authentication();
-
         public async Task<string> GetProperties(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -30,22 +29,44 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        private static async Task<string> CallApiManagement(string azToken, string requestUrl)
+        public async Task<Template> GenerateNamedValuesTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> armTemplateResources)
         {
-            using (HttpClient httpClient = new HttpClient())
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Getting named values from service");
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // pull named values for later credential reference
+            string properties = await GetProperties(apimname, resourceGroup);
+            JObject oProperties = JObject.Parse(properties);
+            foreach (var extractedProperty in oProperties["value"])
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+                string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
 
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
+                string fullLoggerResource = await GetProperty(apimname, resourceGroup, propertyName);
+                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullLoggerResource);
+                propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
+                propertyTemplateResource.type = ResourceTypeConstants.Property;
+                propertyTemplateResource.apiVersion = "2018-06-01-preview";
+                propertyTemplateResource.scale = null;
 
-                HttpResponseMessage response = await httpClient.SendAsync(request);
-
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return responseBody;
+                if (singleApiName == null)
+                {
+                    // if the user is executing a full extraction, extract all the loggers
+                    Console.WriteLine("'{0}' Named value found", propertyName);
+                    templateResources.Add(propertyTemplateResource);
+                }
+                else
+                {
+                    // TODO - if the user is executing a single api, extract all the named values used in the template resources
+                    Console.WriteLine("'{0}' Named value found", propertyName);
+                    templateResources.Add(propertyTemplateResource);
+                };
             }
+
+            armTemplate.resources = templateResources.ToArray();
+            return armTemplate;
         }
     }
-
-
 }

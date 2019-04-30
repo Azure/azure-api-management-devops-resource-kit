@@ -54,11 +54,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             });
         }
 
-        private void GenerateARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName)
+        private async void GenerateARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName)
         {
             #region API's
-            FileWriter fileWriter;
+            FileWriter fileWriter = new FileWriter();
             APIExtractor apiExtractor = new APIExtractor();
+            AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
+            BackendExtractor backendExtractor = new BackendExtractor();
+            LoggerExtractor loggerExtractor = new LoggerExtractor();
+            PropertyExtractor propertyExtractor = new PropertyExtractor();
+            ProductExtractor productExtractor = new ProductExtractor();
+
             string apis = apiExtractor.GetAPIs(apimname, resourceGroup).Result;
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
@@ -260,21 +266,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 if (singleApiName != null)
                 {
-                    fileWriter = new FileWriter();
                     fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + oApiName + "-template.json");
                 }
             }
 
             // extract resources that do not fall under api. Pass in the single api name and associated resources for the single api case
-            GenerateProductsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
-            GenerateLoggerTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
-            GenerateAuthorizationServersARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
-            GenerateBackendsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
-            GenerateNamedValuesTemplate(apimname, resourceGroup, fileFolder, singleApiName, templateResources);
+            Template authorizationTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(apimname, resourceGroup, singleApiName, templateResources);
+            Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(apimname, resourceGroup, singleApiName, templateResources);
+            Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(apimname, resourceGroup, singleApiName, templateResources);
+            Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplate(apimname, resourceGroup, singleApiName, templateResources);
+            Template productTemplate = await productExtractor.GenerateProductsARMTemplate(apimname, resourceGroup, singleApiName, templateResources);
+
+            fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
+            fileWriter.WriteJSONToFile(backendTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-backends.json");
+            fileWriter.WriteJSONToFile(loggerTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
+            fileWriter.WriteJSONToFile(namedValueTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-namedValues.json");
+            fileWriter.WriteJSONToFile(productTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-products.json");
 
             if (singleApiName == null)
             {
-                fileWriter = new FileWriter();
                 fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json");
             }
             #endregion
@@ -320,157 +330,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteJSONToFile(armTemplate, filePath);
-        }
+        }        
 
-        private void GenerateBackendsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
-        {
-            BackendExtractor backendExtractor = new BackendExtractor();
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // isolate api and operation policy resources in the case of a single api extraction, as they may reference backends
-            var policyResources = armTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
-
-            string backends = backendExtractor.GetBackends(apimname, resourceGroup).Result;
-            JObject oBackends = JObject.Parse(backends);
-
-            foreach (var item in oBackends["value"])
-            {
-                string backendName = ((JValue)item["name"]).Value.ToString();
-                string backend = backendExtractor.GetBackend(apimname, resourceGroup, backendName).Result;
-
-                BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
-                backendTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{backendName}')]";
-                backendTemplateResource.apiVersion = "2018-06-01-preview";
-
-                // only extract the backend if this is a full extraction, or in the case of a single api, if it is referenced by one of the policies
-                //if (singleApiName == null)
-                //{
-                //    // if the user is extracting all apis, extract all the backends
-                //    Console.WriteLine("'{0}' Backend found", backendName);
-                //    templateResources.Add(backendTemplateResource);
-                //}
-                //else
-                //{
-                //    bool isReferencedInPolicy = false;
-                //    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
-                //    {
-                //        // the backend is used in a policy if the xml contains a set-backend-service policy, which will reference the backend's url or id
-                //        string policyContent = policyTemplateResource.properties.policyContent;
-                //        if (policyContent.Contains(backendName) || policyContent.Contains(backendTemplateResource.properties.url) || policyContent.Contains(backendTemplateResource.properties.resourceId))
-                //        {
-                //            isReferencedInPolicy = true;
-                //        }
-                //    }
-                //    if (isReferencedInPolicy == true)
-                //    {
-                //        // backend was used in policy, extract it
-                //        Console.WriteLine("'{0}' Backend found", backendName);
-                //        templateResources.Add(backendTemplateResource);
-                //    }
-                //}
-
-
-                // extract all the backends in both cases for the time being
-                Console.WriteLine("'{0}' Backend found", backendName);
-                templateResources.Add(backendTemplateResource);
-            }
-
-            armTemplate.resources = templateResources.ToArray();
-            FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-backends.json");
-        }
-
-        private void GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
-        {
-            AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // isolate api resources in the case of a single api extraction, as they may reference authorization servers
-            var apiResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
-
-            string authorizationServers = authorizationServerExtractor.GetAuthorizationServers(apimname, resourceGroup).Result;
-            JObject oAuthorizationServers = JObject.Parse(authorizationServers);
-
-            foreach (var item in oAuthorizationServers["value"])
-            {
-                string authorizationServerName = ((JValue)item["name"]).Value.ToString();
-                string authorizationServer = authorizationServerExtractor.GetAuthorizationServer(apimname, resourceGroup, authorizationServerName).Result;
-
-                AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);
-                authorizationServerTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{authorizationServerName}')]";
-                authorizationServerTemplateResource.apiVersion = "2018-06-01-preview";
-
-                // only extract the authorization server if this is a full extraction, or in the case of a single api, if it is referenced by one of the api's authentication settings
-                bool isReferencedByAPI = false;
-                foreach (APITemplateResource apiResource in apiResources)
-                {
-                    if (apiResource.properties.authenticationSettings != null &&
-                        apiResource.properties.authenticationSettings.oAuth2 != null &&
-                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId != null &&
-                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId.Contains(authorizationServerName))
-                    {
-                        isReferencedByAPI = true;
-                    }
-                }
-                if (singleApiName == null || isReferencedByAPI)
-                {
-                    Console.WriteLine("'{0}' Authorization Server found", authorizationServerName);
-                    templateResources.Add(authorizationServerTemplateResource);
-                }
-            }
-
-            armTemplate.resources = templateResources.ToArray();
-            FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
-        }
-
-        private void GenerateProductsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
-        {
-            APIExtractor apiExtractor = new APIExtractor();
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
-
-            // isolate product api associations in the case of a single api extraction
-            var productAPIResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductAPI);
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            string products = apiExtractor.GetProducts(apimname, resourceGroup).Result;
-            JObject oProducts = JObject.Parse(products);
-
-            foreach (var item in oProducts["value"])
-            {
-                string productName = ((JValue)item["name"]).Value.ToString();
-
-                Console.WriteLine("'{0}' Product found", productName);
-
-                string productDetails = apiExtractor.GetProductDetails(apimname, resourceGroup, productName).Result;
-
-                var settings = new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                };
-
-                ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails, settings);
-                productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
-                productsTemplateResource.apiVersion = "2018-06-01-preview";
-
-                // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (singleApiName == null || productAPIResources.SingleOrDefault(p => p.name.Contains(productName)) != null)
-                {
-                    templateResources.Add(productsTemplateResource);
-                }
-            }
-
-            armTemplate.resources = templateResources.ToArray();
-            FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-products.json");
-
-        }
+        
 
         private List<TemplateResource> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
         {
@@ -502,113 +364,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             }
             return templateResources;
-        }
-
-        private async void GenerateLoggerTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
-        {
-            Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting loggers from service");
-            LoggerExtractor loggerExtractor = new LoggerExtractor();
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
-
-            // isolate product api associations in the case of a single api extraction
-            var diagnosticResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIDiagnostic);
-            var policyResources = armTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            string loggers = loggerExtractor.GetLoggers(apimname, resourceGroup).Result;
-            JObject oLoggers = JObject.Parse(loggers);
-            foreach (var extractedLogger in oLoggers["value"])
-            {
-                string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-
-                string fullLoggerResource = await loggerExtractor.GetLogger(apimname, resourceGroup, loggerName);
-                LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
-                loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
-                loggerResource.type = ResourceTypeConstants.Logger;
-                loggerResource.apiVersion = "2018-06-01-preview";
-                loggerResource.scale = null;
-
-                if (singleApiName == null)
-                {
-                    // if the user is extracting all apis, extract all the loggers
-                    Console.WriteLine("'{0}' Logger found", loggerName);
-                    templateResources.Add(loggerResource);
-                }
-                else
-                {
-                    // if the user is extracting a single api, extract the loggers referenced by its diagnostics and api policies
-                    bool isReferencedInPolicy = false;
-                    bool isReferencedInDiagnostic = false;
-                    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
-                    {
-                        if (policyTemplateResource.properties.policyContent.Contains(loggerName))
-                        {
-                            isReferencedInPolicy = true;
-                        }
-                    }
-                    foreach (DiagnosticTemplateResource diagnosticTemplateResource in diagnosticResources)
-                    {
-                        if (diagnosticTemplateResource.properties.loggerId.Contains(loggerName))
-                        {
-                            isReferencedInPolicy = true;
-                        }
-                    }
-                    if (isReferencedInPolicy == true || isReferencedInDiagnostic == true)
-                    {
-                        // logger was used in policy or diagnostic, extract it
-                        Console.WriteLine("'{0}' Logger found", loggerName);
-                        templateResources.Add(loggerResource);
-                    }
-                };
-            }
-
-            armTemplate.resources = templateResources.ToArray();
-            FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
-        }
-
-        private async void GenerateNamedValuesTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, List<TemplateResource> armTemplateResources)
-        {
-            Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting named values from service");
-            PropertyExtractor propertyExtractor = new PropertyExtractor();
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // pull named values for later credential reference
-            string properties = propertyExtractor.GetProperties(apimname, resourceGroup).Result;
-            JObject oProperties = JObject.Parse(properties);
-            foreach (var extractedProperty in oProperties["value"])
-            {
-                string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
-
-                string fullLoggerResource = await propertyExtractor.GetProperty(apimname, resourceGroup, propertyName);
-                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullLoggerResource);
-                propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
-                propertyTemplateResource.type = ResourceTypeConstants.Property;
-                propertyTemplateResource.apiVersion = "2018-06-01-preview";
-                propertyTemplateResource.scale = null;
-
-                if (singleApiName == null)
-                {
-                    // if the user is executing a full extraction, extract all the loggers
-                    Console.WriteLine("'{0}' Named value found", propertyName);
-                    templateResources.Add(propertyTemplateResource);
-                }
-                else
-                {
-                    // TODO - if the user is executing a single api, extract all the named values used in the template resources
-                    Console.WriteLine("'{0}' Named value found", propertyName);
-                    templateResources.Add(propertyTemplateResource);
-                };
-            }
-
-            armTemplate.resources = templateResources.ToArray();
-            FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteJSONToFile(armTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-namedvalues.json");
         }
 
         public Template GenerateEmptyTemplateWithParameters()

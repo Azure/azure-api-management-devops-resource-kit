@@ -56,24 +56,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             return await CallApiManagement(azToken, requestUrl);
         }
-        public async Task<string> GetProducts(string ApiManagementName, string ResourceGroupName)
-        {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
-                                                                                                                          
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
-
-            return await CallApiManagement(azToken, requestUrl);
-        }
-        public async Task<string> GetProductDetails(string ApiManagementName, string ResourceGroupName, string ProductName)
-        {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
-
-            return await CallApiManagement(azToken, requestUrl);
-        }
         public async Task<string> GetAPIs(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();

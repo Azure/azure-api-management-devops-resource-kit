@@ -1,15 +1,15 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Linq;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class AuthorizationServerExtractor
+    public class AuthorizationServerExtractor: EntityExtractor
     {
-        static string baseUrl = "https://management.azure.com";
-        internal Authentication auth = new Authentication();
-
         public async Task<string> GetAuthorizationServers(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -30,22 +30,50 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        private static async Task<string> CallApiManagement(string azToken, string requestUrl)
+        public async Task<Template> GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> armTemplateResources)
         {
-            using (HttpClient httpClient = new HttpClient())
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Getting authorization servers from service");
+            Template armTemplate = GenerateEmptyTemplateWithParameters();
+
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // isolate api resources in the case of a single api extraction, as they may reference authorization servers
+            var apiResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
+
+            string authorizationServers = await GetAuthorizationServers(apimname, resourceGroup);
+            JObject oAuthorizationServers = JObject.Parse(authorizationServers);
+
+            foreach (var item in oAuthorizationServers["value"])
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+                string authorizationServerName = ((JValue)item["name"]).Value.ToString();
+                string authorizationServer = await GetAuthorizationServer(apimname, resourceGroup, authorizationServerName);
 
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
+                AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);
+                authorizationServerTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{authorizationServerName}')]";
+                authorizationServerTemplateResource.apiVersion = "2018-06-01-preview";
 
-                HttpResponseMessage response = await httpClient.SendAsync(request);
-
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return responseBody;
+                // only extract the authorization server if this is a full extraction, or in the case of a single api, if it is referenced by one of the api's authentication settings
+                bool isReferencedByAPI = false;
+                foreach (APITemplateResource apiResource in apiResources)
+                {
+                    if (apiResource.properties.authenticationSettings != null &&
+                        apiResource.properties.authenticationSettings.oAuth2 != null &&
+                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId != null &&
+                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId.Contains(authorizationServerName))
+                    {
+                        isReferencedByAPI = true;
+                    }
+                }
+                if (singleApiName == null || isReferencedByAPI)
+                {
+                    Console.WriteLine("'{0}' Authorization Server found", authorizationServerName);
+                    templateResources.Add(authorizationServerTemplateResource);
+                }
             }
+
+            armTemplate.resources = templateResources.ToArray();
+            return armTemplate;
         }
     }
-
-
 }
