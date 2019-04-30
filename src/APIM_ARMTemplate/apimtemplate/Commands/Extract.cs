@@ -1,11 +1,8 @@
 using System;
 using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using System.IO;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
@@ -59,9 +56,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
                 Template productTemplate = await productExtractor.GenerateProductsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
                 Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
-                Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
+                List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
+                Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources, namedValueResources);
 
-                string apiFileName = singleApiName == null ? @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json" : @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + singleApiName + "-template.json";
+                string apiFileName = singleApiName == null ? @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json" : @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + singleApiName + "-api-template.json";
                 fileWriter.WriteJSONToFile(apiTemplate, apiFileName);
                 fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
                 fileWriter.WriteJSONToFile(backendTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-backends.json");
