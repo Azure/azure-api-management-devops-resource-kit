@@ -59,7 +59,7 @@ If you have any questions or feedback, please raise issues in the repository or 
 
 ## Kudos
 
-This project was inspired by Mattias Lögdberg's [API Management ARM Template Creator](http://mlogdberg.com/apimanagement/arm-template-creator) and Eldert Grootenboer's [series of blog posts](https://blog.eldert.net/api-management-ci-cd-using-arm-templates-api-management-instance/) on CI/CD with API Management. We have also received feedback from many members in our community. Thank you to all who have contributed in the project!
+This project was inspired by Mattias Lögdberg's [API Management ARM Template Creator](http://mlogdberg.com/apimanagement/arm-template-creator) and Eldert Grootenboer's [series of blog posts](http://blog.eldert.net/api-management-ci-cd-using-arm-templates-api-management-instance/) on CI/CD with API Management. We have also received feedback from many members in our community. Thank you to all who have contributed in the project!
 
 ## License
 
