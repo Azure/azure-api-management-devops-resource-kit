@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public async Task<List<Template>> CreateAPITemplates(CreatorConfig creatorConfig, APIConfig api)
         {
-            bool isSplit = api.apiVersion != null;
+            bool isSplit = isSplitAPI(api);
 
             List<Template> apiTemplates = new List<Template>();
             if (isSplit == true)
@@ -154,6 +154,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 protocols.Add(server.Url.Split(":")[0]);
             }
             return protocols.ToArray();
+        }
+
+        public bool isSplitAPI(APIConfig apiConfig)
+        {
+            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null;
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
                         {
                             name = api.name,
-                            isSplit = api.apiVersion != null,
+                            isSplit = apiTemplateCreator.isSplitAPI(api),
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
                             dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader),
@@ -88,7 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
                         APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name));
                         // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
-                        string apiFileName = fileNameGenerator.GenerateAPIFileName(providedAPIConfiguration.name, providedAPIConfiguration.apiVersion != null, apiResource.properties.contentValue == null);
+                        string apiFileName = fileNameGenerator.GenerateAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.contentValue == null);
                         fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
                     }
                     if (apiVersionSetsTemplate != null)
