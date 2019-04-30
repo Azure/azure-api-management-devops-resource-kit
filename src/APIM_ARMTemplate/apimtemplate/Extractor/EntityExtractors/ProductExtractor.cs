@@ -30,14 +30,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateProductsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> armTemplateResources)
+        public async Task<Template> GenerateProductsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting products from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             // isolate product api associations in the case of a single api extraction
-            var productAPIResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductAPI);
+            var productAPIResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductAPI);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

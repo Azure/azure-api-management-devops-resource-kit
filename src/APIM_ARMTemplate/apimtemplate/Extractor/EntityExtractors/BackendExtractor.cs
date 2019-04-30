@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateBackendsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> armTemplateResources)
+        public async Task<Template> GenerateBackendsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting backends from service");
@@ -39,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // isolate api and operation policy resources in the case of a single api extraction, as they may reference backends
-            var policyResources = armTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
+            var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
 
             string backends = await GetBackends(apimname, resourceGroup);
             JObject oBackends = JObject.Parse(backends);

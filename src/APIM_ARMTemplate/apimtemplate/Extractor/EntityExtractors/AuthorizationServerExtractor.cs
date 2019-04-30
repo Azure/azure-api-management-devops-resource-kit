@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> armTemplateResources)
+        public async Task<Template> GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Getting authorization servers from service");
@@ -39,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // isolate api resources in the case of a single api extraction, as they may reference authorization servers
-            var apiResources = armTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
+            var apiResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
 
             string authorizationServers = await GetAuthorizationServers(apimname, resourceGroup);
             JObject oAuthorizationServers = JObject.Parse(authorizationServers);
