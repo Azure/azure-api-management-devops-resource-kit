@@ -124,9 +124,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]";
                 }
                 // set the authorization server id
-                if (api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null)
+                if (api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null
+                    && apiTemplateResource.properties.authenticationSettings != null && apiTemplateResource.properties.authenticationSettings.oAuth2 != null && apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId != null)
                 {
-                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/authorizationServers', parameters('ApimServiceName'), '{api.authenticationSettings.oAuth2.authorizationServerId}')]";
+                    apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = $"[resourceId('Microsoft.ApiManagement/service/authorizationServers', parameters('ApimServiceName'), '{api.authenticationSettings.oAuth2.authorizationServerId}')]";
                 }
             }
             if (!isSplit || !isInitial)

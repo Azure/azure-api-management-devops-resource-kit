@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -206,14 +207,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return masterTemplate;
         }
 
-        public bool DetermineIfAPIDependsOnLogger(APIConfig api, FileReader fileReader)
+        public async Task<bool> DetermineIfAPIDependsOnLogger(APIConfig api, FileReader fileReader)
         {
             if (api.diagnostic != null && api.diagnostic.loggerId != null)
             {
                 // capture api diagnostic dependent on logger
                 return true;
             }
-            string apiPolicy = api.policy != null ? fileReader.RetrieveLocalFileContents(api.policy) : "";
+            string apiPolicy = api.policy != null ? await fileReader.RetrieveFileContentsAsync(api.policy) : "";
             if (apiPolicy.Contains("logger"))
             {
                 // capture api policy dependent on logger
@@ -223,7 +224,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
                 {
-                    string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
+                    string operationPolicy = operation.Value.policy != null ?  await fileReader.RetrieveFileContentsAsync(operation.Value.policy) : "";
                     if (operationPolicy.Contains("logger"))
                     {
                         // capture operation policy dependent on logger
@@ -234,9 +235,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return false;
         }
 
-        public bool DetermineIfAPIDependsOnBackend(APIConfig api, FileReader fileReader)
+        public async Task<bool> DetermineIfAPIDependsOnBackend(APIConfig api, FileReader fileReader)
         {
-            string apiPolicy = api.policy != null ? fileReader.RetrieveLocalFileContents(api.policy) : "";
+            string apiPolicy = api.policy != null ? await fileReader.RetrieveFileContentsAsync(api.policy) : "";
             if (apiPolicy.Contains("set-backend-service"))
             {
                 // capture api policy dependent on logger
@@ -246,7 +247,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
                 {
-                    string operationPolicy = operation.Value.policy != null ? fileReader.RetrieveLocalFileContents(operation.Value.policy) : "";
+                    string operationPolicy = operation.Value.policy != null ? await fileReader.RetrieveFileContentsAsync(operation.Value.policy) : "";
                     if (operationPolicy.Contains("set-backend-service"))
                     {
                         // capture operation policy dependent on logger

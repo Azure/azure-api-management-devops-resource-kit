@@ -61,5 +61,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         {
             return File.ReadAllText(fileLocation);
         }
+
+        public async Task<string> RetrieveFileContentsAsync(string fileLocation)
+        {
+            // determine whether file location is local file path or remote url and convert appropriately
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(fileLocation, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            if (isUrl)
+            {
+                // make a request to the provided url and convert the response's content
+                HttpClient client = new HttpClient();
+                HttpResponseMessage response = await client.GetAsync(uriResult);
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+                    return content;
+                }
+                else
+                {
+                    throw new Exception($"Unable to fetch remote file - {fileLocation}");
+                }
+            }
+            else
+            {
+                return RetrieveLocalFileContents(fileLocation);
+            }
+        }
     }
 }

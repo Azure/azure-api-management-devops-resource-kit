@@ -70,9 +70,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                             isSplit = api.apiVersion != null,
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
-                            dependsOnLoggers = masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader),
+                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader),
                             dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
-                            dependsOnBackends = masterTemplateCreator.DetermineIfAPIDependsOnBackend(api, fileReader)
+                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackend(api, fileReader)
                         });
                     }
 
