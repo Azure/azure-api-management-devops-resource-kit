@@ -61,8 +61,7 @@ apis:
               bytes: 512
         enableHttpCorrelationHeaders: true
 products:
-    - displayName: platinum
-      description: a test product
+    - description: a test product
       terms: some terms
       subscriptionRequired: true
       approvalRequired: true

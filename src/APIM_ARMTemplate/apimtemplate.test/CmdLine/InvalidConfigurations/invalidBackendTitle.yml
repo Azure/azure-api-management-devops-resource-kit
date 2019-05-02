@@ -95,8 +95,7 @@ authorizationServers:
       resourceOwnerUsername: un
       resourceOwnerPassword: pwd
 backends:
-    - title: myBackend
-      description: description5308
+    - description: description5308
       url: https://backendname2644/
       protocol: http
       credentials:

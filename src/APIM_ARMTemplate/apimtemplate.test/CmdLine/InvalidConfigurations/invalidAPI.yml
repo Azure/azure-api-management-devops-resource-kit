@@ -13,53 +13,6 @@ apiVersionSets:
       versioningScheme: Header
       versionQueryName: versionQuery
       versionHeaderName: versionHeader
-apis:
-    - name: myAPI
-      openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
-      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
-      suffix: conf
-      subscriptionRequired: true
-      apiVersion: v1
-      apiVersionDescription: My first version
-      apiVersionSetId: myAPIVersionSetID
-      revision: 1
-      revisionDescription: My first revision
-      operations:
-        addPet:
-          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
-        deletePet:
-          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
-      products: starter, platinum
-      authenticationSettings:
-        oAuth2:
-            authorizationServerId: myAuthServer
-            scope: myScope
-      diagnostic:
-        name: applicationinsights
-        alwaysLog: allErrors
-        loggerId: lucastestai
-        sampling:
-          samplingType: fixed
-          percentage: 50
-        frontend: 
-          request:
-            headers:
-            body: 
-              bytes: 512
-          response: 
-            headers:
-            body: 
-              bytes: 512
-        backend: 
-          request:
-            headers:
-            body: 
-              bytes: 512
-          response: 
-            headers:
-            body: 
-              bytes: 512
-        enableHttpCorrelationHeaders: true
 products:
     - displayName: platinum
       description: a test product

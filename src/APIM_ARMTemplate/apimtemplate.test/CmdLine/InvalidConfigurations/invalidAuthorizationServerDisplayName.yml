@@ -76,8 +76,7 @@ loggers:
         instrumentationKey: 45d4v88-fdfs-4b35-9232-731d82d4d1c6
       isBuffered: true
 authorizationServers:
-    - displayName: myAuthServer
-      description: test server
+    - description: test server
       clientRegistrationEndpoint: https://www.contoso.com/apps
       authorizationEndpoint: https://www.contoso.com/oauth2/auth
       authorizationMethods:

@@ -24,8 +24,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
+
                 // validate creator config
-                bool isValidCreatorConfig = ValidateCreatorConfig(creatorConfig);
+                CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
+                bool isValidCreatorConfig = creatorConfigurationValidator.ValidateCreatorConfig(creatorConfig);
                 if (isValidCreatorConfig == true)
                 {
                     // required parameters have been supplied
@@ -120,85 +122,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 }
                 return 0;
             });
-        }
-
-        public bool ValidateCreatorConfig(CreatorConfig creatorConfig)
-        {
-            bool isValid = true;
-            // ensure required parameters have been passed in
-            if (creatorConfig.outputLocation == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "Output location is required");
-            }
-            if (creatorConfig.version == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "Version is required");
-            }
-            if (creatorConfig.apimServiceName == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "APIM service name is required");
-            }
-            if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
-            }
-            foreach (APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
-            {
-                if (apiVersionSet != null && apiVersionSet.displayName == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "Display name is required if an API Version Set is provided");
-                }
-                if (apiVersionSet != null && apiVersionSet.versioningScheme == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "Versioning scheme is required if an API Version Set is provided");
-                }
-            }
-            foreach (APIConfig api in creatorConfig.apis)
-            {
-                if (api == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "API configuration is required");
-                }
-                if (api.openApiSpec == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "Open API Spec is required");
-                }
-                if (api.suffix == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "API suffix is required");
-                }
-                if (api.name == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "API name is required");
-                }
-                if (api.operations != null)
-                {
-                    foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
-                    {
-                        if (operation.Value == null || operation.Value.policy == null)
-                        {
-                            isValid = false;
-                            throw new CommandParsingException(this, "Policy XML is required if an API operation is provided");
-                        }
-                    }
-                }
-                if (api.diagnostic != null && api.diagnostic.loggerId == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "LoggerId is required if an API diagnostic is provided");
-                }
-            }
-            return isValid;
         }
     }
 }

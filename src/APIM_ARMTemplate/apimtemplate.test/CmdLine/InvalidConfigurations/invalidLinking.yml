@@ -119,5 +119,4 @@ backends:
         validateCertificateChain: false
         validateCertificateName: false
 outputLocation: C:\Users\myUsername\GeneratedTemplates
-linked: false
-linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
+linked: true

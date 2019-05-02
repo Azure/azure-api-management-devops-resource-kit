@@ -7,7 +7,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public static MasterTemplateCreator GenerateMasterTemplateCreator()
         {
             TemplateCreator templateCreator = new TemplateCreator();
-            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             return masterTemplateCreator;
         }
     }

@@ -1,5 +1,0 @@
-version: 0.0.1
-apimServiceName: MyAPIMService
-outputLocation: C:\Users\myUsername\GeneratedTemplates
-linked: false
-linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer

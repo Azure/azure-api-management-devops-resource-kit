@@ -37,7 +37,6 @@ apis:
       diagnostic:
         name: applicationinsights
         alwaysLog: allErrors
-        loggerId: lucastestai
         sampling:
           samplingType: fixed
           percentage: 50

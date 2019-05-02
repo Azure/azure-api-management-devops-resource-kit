@@ -15,7 +15,6 @@ apiVersionSets:
       versionHeaderName: versionHeader
 apis:
     - name: myAPI
-      openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
       suffix: conf
       subscriptionRequired: true

@@ -61,58 +61,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(uriLink, masterTemplateResource.properties.templateLink.uri);
             Assert.Equal(dependsOn, masterTemplateResource.dependsOn);
         }
-
-        [Fact]
-        public void ShouldCreateCorrectNumberOfResourcesInSubsequentUnlinkedMasterTemplate()
-        {
-            // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
-            Template subsequentAPITemplate = new Template();
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-            int count = 3;
-            for (int i = 0; i < count; i++)
-            {
-                templateResources.Add(new TemplateResource());
-            };
-            subsequentAPITemplate.resources = templateResources.ToArray();
-
-            // act
-            Template subsequentUnlinkedMasterTemplate = masterTemplateCreator.CreateSubsequentUnlinkedMasterTemplate(subsequentAPITemplate);
-
-            // assert
-            Assert.Equal(count, subsequentUnlinkedMasterTemplate.resources.Length);
-        }
-
-        [Fact]
-        public void ShouldCreateCorrectNumberOfResourcesInInitialUnlinkedMasterTemplate()
-        {
-            // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
-            Template initialAPITemplate = new Template();
-            List<TemplateResource> initialAPITemplateResources = new List<TemplateResource>();
-            int apiTemplateCount = 1;
-            for (int i = 0; i < apiTemplateCount; i++)
-            {
-                initialAPITemplateResources.Add(new TemplateResource());
-            };
-            initialAPITemplate.resources = initialAPITemplateResources.ToArray();
-
-            Template apiVersionSetTemplate = new Template();
-            List<TemplateResource> apiVersionSetResources = new List<TemplateResource>();
-            int apiVersionSetTemplateCount = 1;
-            for (int i = 0; i < apiVersionSetTemplateCount; i++)
-            {
-                apiVersionSetResources.Add(new TemplateResource());
-            };
-            apiVersionSetTemplate.resources = apiVersionSetResources.ToArray();
-
-            int count = apiTemplateCount + apiVersionSetTemplateCount;
-
-            // act
-            Template initialLinkedMasterTemplate = masterTemplateCreator.CreateInitialUnlinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate);
-
-            // assert
-            Assert.Equal(count, initialLinkedMasterTemplate.resources.Length);
-        }
     }
 }

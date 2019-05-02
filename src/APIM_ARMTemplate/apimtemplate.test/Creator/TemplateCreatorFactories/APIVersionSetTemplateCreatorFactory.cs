@@ -7,7 +7,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public static APIVersionSetTemplateCreator GenerateAPIVersionSetTemplateCreator()
         {
             TemplateCreator templateCreator = new TemplateCreator();
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
             return apiVersionSetTemplateCreator;
         }
     }
