@@ -4,15 +4,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class MasterTemplateCreator
+    public class MasterTemplateCreator : TemplateCreator
     {
-        private TemplateCreator templateCreator;
-
-        public MasterTemplateCreator(TemplateCreator templateCreator)
-        {
-            this.templateCreator = templateCreator;
-        }
-
         public Template CreateLinkedMasterTemplate(Template apiVersionSetTemplate,
             Template productsTemplate,
             Template loggersTemplate,
@@ -23,12 +16,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             FileNameGenerator fileNameGenerator)
         {
             // create empty template
-            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
+            Template masterTemplate = CreateEmptyTemplate();
 
             // add parameters
             masterTemplate.parameters = this.CreateMasterTemplateParameters(true);
 
-            // add links to all resources
+            // add deployment resources that links to all resource files
             List<TemplateResource> resources = new List<TemplateResource>();
 
             // apiVersionSet
@@ -71,6 +64,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 if(apiInfo.isSplit == true)
                 {
+                    // add a deployment resource for both api template files
                     string initialAPIDeploymentResourceName = $"{apiInfo.name}-InitialAPITemplate";
                     string subsequentAPIDeploymentResourceName = $"{apiInfo.name}-SubsequentAPITemplate";
 
@@ -85,6 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
                 } else
                 {
+                    // add a deployment resource for the unified api template file
                     string unifiedAPIDeploymentResourceName = $"{apiInfo.name}-APITemplate";
                     string unifiedAPIFileName = fileNameGenerator.GenerateAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string unifiedAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{unifiedAPIFileName}')]";
@@ -130,6 +125,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public MasterTemplateResource CreateLinkedMasterTemplateResource(string name, string uriLink, string[] dependsOn)
         {
+            // create deployment resource with provided arguments
             MasterTemplateResource masterTemplateResource = new MasterTemplateResource()
             {
                 name = name,
@@ -167,6 +163,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 type = "string"
             };
             parameters.Add("ApimServiceName", apimServiceNameProperties);
+            // add remote location of template files for linked option
             if (linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
@@ -186,7 +183,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = this.templateCreator.CreateEmptyTemplate();
+            Template masterTemplate = CreateEmptyTemplate();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
@@ -240,7 +237,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string apiPolicy = api.policy != null ? await fileReader.RetrieveFileContentsAsync(api.policy) : "";
             if (apiPolicy.Contains("set-backend-service"))
             {
-                // capture api policy dependent on logger
+                // capture api policy dependent on backend
                 return true;
             }
             if (api.operations != null)
@@ -250,7 +247,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string operationPolicy = operation.Value.policy != null ? await fileReader.RetrieveFileContentsAsync(operation.Value.policy) : "";
                     if (operationPolicy.Contains("set-backend-service"))
                     {
-                        // capture operation policy dependent on logger
+                        // capture operation policy dependent on backend
                         return true;
                     }
                 }

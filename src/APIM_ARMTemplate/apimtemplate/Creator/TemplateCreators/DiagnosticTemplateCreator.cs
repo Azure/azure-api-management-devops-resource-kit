@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 },
                 dependsOn = dependsOn
             };
-            // set the version set id
+            // reference the provided logger if loggerId is provided
             if (api.diagnostic.loggerId != null)
             {
                 diagnosticTemplateResource.properties.loggerId = $"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), '{api.diagnostic.loggerId}')]";

@@ -3,19 +3,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class BackendTemplateCreator
+    public class BackendTemplateCreator : TemplateCreator
     {
-        private TemplateCreator templateCreator;
-
-        public BackendTemplateCreator(TemplateCreator templateCreator)
-        {
-            this.templateCreator = templateCreator;
-        }
-
         public Template CreateBackendTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template backendTemplate = this.templateCreator.CreateEmptyTemplate();
+            Template backendTemplate = CreateEmptyTemplate();
 
             // add parameters
             backendTemplate.parameters = new Dictionary<string, TemplateParameterProperties>

@@ -30,21 +30,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 {
                     // required parameters have been supplied
 
-                    // initialize helper classes
+                    // initialize file helper classes
                     FileWriter fileWriter = new FileWriter();
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
-                    TemplateCreator templateCreator = new TemplateCreator();
-                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
-                    LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator(templateCreator);
-                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(templateCreator);
-                    BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator(templateCreator);
-                    AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator(templateCreator);
+                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
+
+                    // initialize template creator classes
+                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
+                    LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator();
+                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator();
+                    BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator();
+                    AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator();
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, templateCreator, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
-                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
-                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
+                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
                     Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
@@ -52,16 +53,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
                     Template backendsTemplate = creatorConfig.backends != null ? backendTemplateCreator.CreateBackendTemplate(creatorConfig) : null;
                     Template authorizationServersTemplate = creatorConfig.authorizationServers != null ? authorizationServerTemplateCreator.CreateAuthorizationServerTemplate(creatorConfig) : null;
+
                     // store name and whether the api will depend on the version set template each api necessary to build linked templates
                     List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
-                    // create parameters file
-                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-
                     List<Template> apiTemplates = new List<Template>();
                     foreach (APIConfig api in creatorConfig.apis)
                     {
-                        // create api templates from provided api config. If the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
-                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplates(creatorConfig, api);
+                        // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
+                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(creatorConfig, api);
                         apiTemplates.AddRange(apiTemplateSet);
                         // create the relevant info that will be needed to properly link to the api template(s) from the master template
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
@@ -75,6 +74,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                             dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackend(api, fileReader)
                         });
                     }
+
+                    // create parameters file
+                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
                     // write templates to outputLocation
                     if (creatorConfig.linked == true)
@@ -111,6 +113,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.authorizationServers));
                     }
+
                     // write parameters to outputLocation
                     fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorConfig.linked == true ? creatorFileNames.linkedParameters : creatorFileNames.unlinkedParameters));
                     ColoredConsole.WriteLine("Templates written to output location");

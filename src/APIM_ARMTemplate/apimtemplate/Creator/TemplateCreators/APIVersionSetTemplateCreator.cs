@@ -3,19 +3,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class APIVersionSetTemplateCreator
+    public class APIVersionSetTemplateCreator : TemplateCreator
     {
-        private TemplateCreator templateCreator;
-
-        public APIVersionSetTemplateCreator(TemplateCreator templateCreator)
-        {
-            this.templateCreator = templateCreator;
-        }
-
         public Template CreateAPIVersionSetTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template apiVersionSetTemplate = this.templateCreator.CreateEmptyTemplate();
+            Template apiVersionSetTemplate = CreateEmptyTemplate();
 
             // add parameters
             apiVersionSetTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
@@ -27,6 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             foreach(APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
             {
                 // create apiVersionSet resource with properties
+                // default version set id to version set if id is not provided
                 string versionSetId = (apiVersionSet != null && apiVersionSet.id != null) ? apiVersionSet.id : "versionset";
                 APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
                 {

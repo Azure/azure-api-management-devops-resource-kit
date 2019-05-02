@@ -7,25 +7,24 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class APITemplateCreator
+    public class APITemplateCreator : TemplateCreator
     {
         private FileReader fileReader;
-        private TemplateCreator templateCreator;
         private PolicyTemplateCreator policyTemplateCreator;
         private ProductAPITemplateCreator productAPITemplateCreator;
         private DiagnosticTemplateCreator diagnosticTemplateCreator;
 
-        public APITemplateCreator(FileReader fileReader, TemplateCreator templateCreator, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator)
+        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator)
         {
             this.fileReader = fileReader;
-            this.templateCreator = templateCreator;
             this.policyTemplateCreator = policyTemplateCreator;
             this.productAPITemplateCreator = productAPITemplateCreator;
             this.diagnosticTemplateCreator = diagnosticTemplateCreator;
         }
 
-        public async Task<List<Template>> CreateAPITemplates(CreatorConfig creatorConfig, APIConfig api)
+        public async Task<List<Template>> CreateAPITemplatesAsync(CreatorConfig creatorConfig, APIConfig api)
         {
+            // determine if api needs to be split into multiple templates
             bool isSplit = isSplitAPI(api);
 
             List<Template> apiTemplates = new List<Template>();
@@ -46,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public async Task<Template> CreateAPITemplateAsync(CreatorConfig creatorConfig, APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
-            Template apiTemplate = this.templateCreator.CreateEmptyTemplate();
+            Template apiTemplate = CreateEmptyTemplate();
 
             // add parameters
             apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
@@ -97,7 +96,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 type = ResourceTypeConstants.API,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new APITemplateProperties(),
-                // if the template is not linked the depends on for the apiVersionSet needs to be inlined here
                 dependsOn = new string[] { }
             };
 
@@ -121,6 +119,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // set the version set id
                 if (api.apiVersionSetId != null)
                 {
+                    // point to the supplied version set if the apiVersionSetId is provided
                     apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]";
                 }
                 // set the authorization server id
@@ -137,6 +136,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 bool isUrl = Uri.TryCreate(api.openApiSpec, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
                 // used to escape sequences in local swagger json
                 object deserializedFileContents = isUrl ? null : JsonConvert.DeserializeObject<object>(this.fileReader.RetrieveLocalFileContents(api.openApiSpec));
+                // if openApiSpec is a url inline the url, if it is a local file inline the file contents
                 apiTemplateResource.properties.contentFormat = isUrl ? "swagger-link-json" : "swagger-json";
                 apiTemplateResource.properties.contentValue = isUrl ? api.openApiSpec : JsonConvert.SerializeObject(deserializedFileContents);
                 // supplied via optional arguments
@@ -158,6 +158,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public bool isSplitAPI(APIConfig apiConfig)
         {
+            // the api needs to be split into multiple templates if the user has supplied a version or version set - deploying swagger related properties at the same time as api version related properties fails, so they must be written and deployed separately
             return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null;
         }
     }

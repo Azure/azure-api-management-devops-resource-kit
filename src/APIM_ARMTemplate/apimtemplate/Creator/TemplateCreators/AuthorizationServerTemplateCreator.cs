@@ -3,19 +3,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class AuthorizationServerTemplateCreator
+    public class AuthorizationServerTemplateCreator : TemplateCreator
     {
-        private TemplateCreator templateCreator;
-
-        public AuthorizationServerTemplateCreator(TemplateCreator templateCreator)
-        {
-            this.templateCreator = templateCreator;
-        }
-
         public Template CreateAuthorizationServerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template authorizationTemplate = this.templateCreator.CreateEmptyTemplate();
+            Template authorizationTemplate = CreateEmptyTemplate();
 
             // add parameters
             authorizationTemplate.parameters = new Dictionary<string, TemplateParameterProperties>

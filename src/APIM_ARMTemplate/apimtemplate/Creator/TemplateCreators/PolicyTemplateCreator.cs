@@ -26,6 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
                 {
+                    // if policy is a url inline the url, if it is a local file inline the file contents
                     contentFormat = isUrl ? "rawxml-link" : "rawxml",
                     policyContent = isUrl ? api.policy : this.fileReader.RetrieveLocalFileContents(api.policy)
                 },
@@ -46,6 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
                 {
+                    // if policy is a url inline the url, if it is a local file inline the file contents
                     contentFormat = isUrl ? "rawxml-link" : "rawxml",
                     policyContent = isUrl ? policyPair.Value.policy : this.fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
                 },
