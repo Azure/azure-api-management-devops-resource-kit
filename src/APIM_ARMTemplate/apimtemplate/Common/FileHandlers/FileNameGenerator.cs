@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.IO;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
