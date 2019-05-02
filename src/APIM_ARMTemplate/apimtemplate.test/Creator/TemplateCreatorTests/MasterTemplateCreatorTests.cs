@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfParameterValuesWhenLinked()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             CreatorConfig creatorConfig = new CreatorConfig()
             {
                 apimServiceName = "apimServiceName",
@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfParametersWhenUnlinked()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             bool linked = false;
             // unlinked templates result in 1 value
             int count = 1;
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateLinkedMasterTemplateResourceFromValues()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             string name = "name";
             string uriLink = "uriLink";
             string[] dependsOn = new string[] { "dependsOn" };
