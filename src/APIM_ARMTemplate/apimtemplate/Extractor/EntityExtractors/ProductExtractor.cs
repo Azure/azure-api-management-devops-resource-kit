@@ -41,6 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
+            // pull all products for service
             string products = await GetProducts(apimname, resourceGroup);
             JObject oProducts = JObject.Parse(products);
 
@@ -49,13 +50,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string productName = ((JValue)item["name"]).Value.ToString();
                 string productDetails = await GetProductDetails(apimname, resourceGroup, productName);
 
-                var settings = new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                };
-
-                ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails, settings);
+                // convert returned product to template resource class
+                ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails);
                 productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
                 productsTemplateResource.apiVersion = GlobalConstants.APIVersion;
 

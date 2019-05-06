@@ -41,6 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // isolate api resources in the case of a single api extraction, as they may reference authorization servers
             var apiResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
 
+            // pull all authorization servers for service
             string authorizationServers = await GetAuthorizationServers(apimname, resourceGroup);
             JObject oAuthorizationServers = JObject.Parse(authorizationServers);
 
@@ -49,6 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string authorizationServerName = ((JValue)item["name"]).Value.ToString();
                 string authorizationServer = await GetAuthorizationServer(apimname, resourceGroup, authorizationServerName);
 
+                // convert returned authorization server to template resource class
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);
                 authorizationServerTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{authorizationServerName}')]";
                 authorizationServerTemplateResource.apiVersion = GlobalConstants.APIVersion;

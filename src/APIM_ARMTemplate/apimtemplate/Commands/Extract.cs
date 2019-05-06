@@ -27,6 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 if (!resourceGroupName.HasValue()) throw new Exception("Missing parameter <resourceGroup>.");
                 if (!fileFolderName.HasValue()) throw new Exception("Missing parameter <filefolder>.");
 
+                // isolate cli parameters
                 string resourceGroup = resourceGroupName.Values[0].ToString();
                 string apimname = apiManagementName.Values[0].ToString();
                 string fileFolder = fileFolderName.Values[0].ToString();
@@ -41,6 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Console.WriteLine();
                 Console.WriteLine("Connecting to {0} API Management Service on {1} Resource Group ...", apimname, resourceGroup);
 
+                // initialize entity extractor classes
                 FileWriter fileWriter = new FileWriter();
                 APIExtractor apiExtractor = new APIExtractor();
                 AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
@@ -49,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 PropertyExtractor propertyExtractor = new PropertyExtractor();
                 ProductExtractor productExtractor = new ProductExtractor();
 
-                // extract resources that do not fall under api. Pass in the single api name and associated resources for the single api case
+                // extract templates from apim service
                 Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName);
                 List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
                 Template authorizationTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
@@ -59,6 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
                 Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources, namedValueResources);
 
+                // write templates to output file location
                 string apiFileName = singleApiName == null ? @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json" : @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + singleApiName + "-api-template.json";
                 fileWriter.WriteJSONToFile(apiTemplate, apiFileName);
                 fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");

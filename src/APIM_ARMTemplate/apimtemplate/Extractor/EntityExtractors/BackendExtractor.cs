@@ -42,6 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy));
             var namedValueResources = propertyResources.Where(resource => (resource.type == ResourceTypeConstants.Property));
 
+            // pull all backends for service
             string backends = await GetBackends(apimname, resourceGroup);
             JObject oBackends = JObject.Parse(backends);
 
@@ -50,6 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string backendName = ((JValue)item["name"]).Value.ToString();
                 string backend = await GetBackend(apimname, resourceGroup, backendName);
 
+                // convert returned backend to template resource class
                 BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
                 backendTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{backendName}')]";
                 backendTemplateResource.apiVersion = GlobalConstants.APIVersion;
@@ -85,6 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public bool DoesPolicyReferenceBackend(string policyContent, IEnumerable<TemplateResource> namedValueResources, string backendName, BackendTemplateResource backendTemplateResource)
         {
+            // a policy is referenced by a backend with the set-backend-service policy, which will reference use the backends name or url, or through referencing a named value that applies to the backend
             var namedValueResourcesUsedByBackend = namedValueResources.Where(resource => DoesBackendReferenceNamedValue(resource, backendTemplateResource));
             if (policyContent.Contains(backendName) || policyContent.Contains(backendTemplateResource.properties.url) || policyContent.Contains(backendTemplateResource.properties.resourceId))
             {

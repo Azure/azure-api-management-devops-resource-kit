@@ -42,13 +42,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
+            // pull all loggers for service
             string loggers = await GetLoggers(apimname, resourceGroup);
             JObject oLoggers = JObject.Parse(loggers);
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-
                 string fullLoggerResource = await GetLogger(apimname, resourceGroup, loggerName);
+
+                // convert returned logger to template resource class
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
                 loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
                 loggerResource.type = ResourceTypeConstants.Logger;

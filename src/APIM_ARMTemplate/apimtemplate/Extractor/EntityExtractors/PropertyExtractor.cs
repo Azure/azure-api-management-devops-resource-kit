@@ -37,15 +37,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
-            // pull named values for later credential reference
+            // pull all named values (properties) for service
             string properties = await GetProperties(apimname, resourceGroup);
             JObject oProperties = JObject.Parse(properties);
+
             foreach (var extractedProperty in oProperties["value"])
             {
                 string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
+                string fullPropertyResource = await GetProperty(apimname, resourceGroup, propertyName);
 
-                string fullLoggerResource = await GetProperty(apimname, resourceGroup, propertyName);
-                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullLoggerResource);
+                // convert returned named value to template resource class
+                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
                 propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
                 propertyTemplateResource.type = ResourceTypeConstants.Property;
                 propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
