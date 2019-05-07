@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     public class FileNameGenerator
     {
-        public CreatorFileNames GenerateCreatorLinkedFileNames(CreatorConfig creatorConfig)
+        public CreatorFileNames GenerateCreatorLinkedFileNames()
         {
             // generate useable object with file names for consistency throughout project
             return new CreatorFileNames()

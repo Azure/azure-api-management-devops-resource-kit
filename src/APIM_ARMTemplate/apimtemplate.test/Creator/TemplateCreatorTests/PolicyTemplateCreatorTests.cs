@@ -21,7 +21,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             creatorConfig.apis.Add(api);
             string[] dependsOn = new string[] { "dependsOn" };
 
-
             // act
             PolicyTemplateResource policyTemplateResource = policyTemplateCreator.CreateAPIPolicyTemplateResource(api, dependsOn);
 
@@ -40,7 +39,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             KeyValuePair<string, OperationsConfig> policyPair = new KeyValuePair<string, OperationsConfig>("key", new OperationsConfig() { policy = "http://someurl.com" });
             string apiName = "apiName";
             string[] dependsOn = new string[] { "dependsOn" };
-
 
             // act
             PolicyTemplateResource policyTemplateResource = policyTemplateCreator.CreateOperationPolicyTemplateResource(policyPair, apiName, dependsOn);

@@ -8,6 +8,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
     public class MasterTemplateCreatorTests
     {
         [Fact]
+        public void ShouldCreateCorrectNumberOfDeploymentResources()
+        {
+            // arrange
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            Template apiVersionSetsTemplate = new Template();
+            Template productsTemplate = new Template();
+            Template loggersTemplate = new Template();
+            List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
+            FileNameGenerator fileNameGenerator = new FileNameGenerator();
+            CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames();
+
+            // should create 5 resources (apiVersionSet, product, logger, both api templates)
+            int count = 5;
+
+            // act
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, fileNameGenerator);
+
+            // assert
+            Assert.Equal(count, masterTemplate.resources.Length);
+        }
+
+        [Fact]
         public void ShouldCreateCorrectNumberOfParameterValuesWhenLinked()
         {
             // arrange
