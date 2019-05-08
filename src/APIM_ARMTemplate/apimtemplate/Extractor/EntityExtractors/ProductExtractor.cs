@@ -51,7 +51,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string productDetails = await GetProductDetails(apimname, resourceGroup, productName);
 
                 // convert returned product to template resource class
-                ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails);
+                JsonSerializerSettings settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                };
+                ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails, settings);
                 productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
                 productsTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
