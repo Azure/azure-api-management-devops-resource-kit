@@ -89,7 +89,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             // a policy is referenced by a backend with the set-backend-service policy, which will reference use the backends name or url, or through referencing a named value that applies to the backend
             var namedValueResourcesUsedByBackend = namedValueResources.Where(resource => DoesBackendReferenceNamedValue(resource, backendTemplateResource));
-            if (policyContent.Contains(backendName) || policyContent.Contains(backendTemplateResource.properties.url) || policyContent.Contains(backendTemplateResource.properties.resourceId))
+            if ((backendName != null && policyContent.Contains(backendName)) || 
+                (backendTemplateResource.properties.url != null && policyContent.Contains(backendTemplateResource.properties.url)) || 
+                (backendTemplateResource.properties.resourceId != null && policyContent.Contains(backendTemplateResource.properties.resourceId)))
             {
                 return true;
             }
