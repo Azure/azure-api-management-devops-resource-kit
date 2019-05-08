@@ -94,6 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var namedValueResourcesUsedByBackend = namedValueResources.Where(resource => DoesBackendReferenceNamedValue(resource, backendTemplateResource));
             if ((backendName != null && policyContent.Contains(backendName)) || 
                 (backendTemplateResource.properties.url != null && policyContent.Contains(backendTemplateResource.properties.url)) || 
+                (backendTemplateResource.properties.title != null && policyContent.Contains(backendTemplateResource.properties.title)) ||
                 (backendTemplateResource.properties.resourceId != null && policyContent.Contains(backendTemplateResource.properties.resourceId)))
             {
                 return true;
