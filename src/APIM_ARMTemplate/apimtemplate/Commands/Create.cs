@@ -50,15 +50,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
+                    Console.WriteLine("Creating API version set template");
+                    Console.WriteLine("------------------------------------------");
                     Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating product template");
+                    Console.WriteLine("------------------------------------------");
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating logger template");
+                    Console.WriteLine("------------------------------------------");
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating backend template");
+                    Console.WriteLine("------------------------------------------");
                     Template backendsTemplate = creatorConfig.backends != null ? backendTemplateCreator.CreateBackendTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating authorization server template");
+                    Console.WriteLine("------------------------------------------");
                     Template authorizationServersTemplate = creatorConfig.authorizationServers != null ? authorizationServerTemplateCreator.CreateAuthorizationServerTemplate(creatorConfig) : null;
 
                     // store name and whether the api will depend on the version set template each api necessary to build linked templates
                     List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
                     List<Template> apiTemplates = new List<Template>();
+                    Console.WriteLine("Creating API templates");
+                    Console.WriteLine("------------------------------------------");
                     foreach (APIConfig api in creatorConfig.apis)
                     {
                         // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
