@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using System.IO;
 using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
@@ -49,16 +46,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
-
-            return await CallApiManagement(azToken, requestUrl);
-        }
-
-        public async Task<string> GetAPIVersionSet(string ApiManagementName, string ResourceGroupName, string VersionSetName)
-        {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/{4}?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, VersionSetName, GlobalConstants.APIVersion);
 
             return await CallApiManagement(azToken, requestUrl);
         }
@@ -167,7 +154,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 if (apiResource.properties.apiVersionSetId != null)
                 {
-                    // extract the version set if referenced by an
                     apiResource.dependsOn = new string[] { };
 
                     string versionSetName = apiResource.properties.apiVersionSetId;
@@ -175,7 +161,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                     versionSetName = versionSetName.Substring(versionSetPosition, (versionSetName.Length - versionSetPosition));
                     apiResource.properties.apiVersionSetId = $"[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/{versionSetName}')]";
-                    GenerateVersionSetARMTemplate(apimname, resourceGroup, versionSetName, fileFolder);
                 }
                 else
                 {
@@ -371,30 +356,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
 
             return oApi;
-        }
-
-        public async void GenerateVersionSetARMTemplate(string apimname, string resourceGroup, string versionSetName, string fileFolder)
-        {
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // pull version set resource
-            string versionSet = await GetAPIVersionSet(apimname, resourceGroup, versionSetName);
-            // convert returned version set to template resource
-            APIVersionSetTemplateResource versionSetResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSet);
-
-            string filePath = fileFolder + Path.DirectorySeparatorChar + string.Format(versionSetResource.name, "/", "-") + ".json";
-
-            versionSetResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetResource.name}')]";
-            versionSetResource.apiVersion = GlobalConstants.APIVersion;
-
-            templateResources.Add(versionSetResource);
-            armTemplate.resources = templateResources.ToArray();
-
-            // write version set template to output file location
-            FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteJSONToFile(armTemplate, filePath);
         }
 
         public async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)

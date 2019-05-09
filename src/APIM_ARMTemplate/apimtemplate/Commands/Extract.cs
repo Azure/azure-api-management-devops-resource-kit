@@ -45,6 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // initialize entity extractor classes
                 FileWriter fileWriter = new FileWriter();
                 APIExtractor apiExtractor = new APIExtractor();
+                APIVersionSetExtractor apiVersionSetExtractor = new APIVersionSetExtractor();
                 AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
                 BackendExtractor backendExtractor = new BackendExtractor();
                 LoggerExtractor loggerExtractor = new LoggerExtractor();
@@ -54,6 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // extract templates from apim service
                 Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName);
                 List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
+                Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
                 Template authorizationTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
                 Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
                 Template productTemplate = await productExtractor.GenerateProductsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
@@ -64,7 +66,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // write templates to output file location
                 string apiFileName = singleApiName == null ? @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json" : @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + singleApiName + "-api-template.json";
                 fileWriter.WriteJSONToFile(apiTemplate, apiFileName);
-                fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
+                fileWriter.WriteJSONToFile(apiVersionSetTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
+                fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apiVersionSets.json");
                 fileWriter.WriteJSONToFile(backendTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-backends.json");
                 fileWriter.WriteJSONToFile(loggerTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
                 fileWriter.WriteJSONToFile(namedValueTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-namedValues.json");
