@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     bool isReferencedInDiagnostic = false;
                     foreach (PolicyTemplateResource policyTemplateResource in policyResources)
                     {
-                        if (policyTemplateResource.properties.policyContent.Contains(loggerName))
+                        if (policyTemplateResource.properties.value.Contains(loggerName))
                         {
                             isReferencedInPolicy = true;
                         }

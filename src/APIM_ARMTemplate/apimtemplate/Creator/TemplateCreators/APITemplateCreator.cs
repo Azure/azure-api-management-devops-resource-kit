@@ -114,6 +114,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.apiVersionDescription = api.apiVersionDescription;
                 apiTemplateResource.properties.authenticationSettings = api.authenticationSettings;
                 apiTemplateResource.properties.path = api.suffix;
+                apiTemplateResource.properties.isCurrent = api.isCurrent;
                 apiTemplateResource.properties.displayName = api.name;
                 apiTemplateResource.properties.protocols = this.CreateProtocols(doc);
                 // set the version set id
@@ -137,8 +138,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // used to escape sequences in local swagger json
                 object deserializedFileContents = isUrl ? null : JsonConvert.DeserializeObject<object>(this.fileReader.RetrieveLocalFileContents(api.openApiSpec));
                 // if openApiSpec is a url inline the url, if it is a local file inline the file contents
-                apiTemplateResource.properties.contentFormat = isUrl ? "swagger-link-json" : "swagger-json";
-                apiTemplateResource.properties.contentValue = isUrl ? api.openApiSpec : JsonConvert.SerializeObject(deserializedFileContents);
+                apiTemplateResource.properties.format = isUrl ? "swagger-link-json" : "swagger-json";
+                apiTemplateResource.properties.value = isUrl ? api.openApiSpec : JsonConvert.SerializeObject(deserializedFileContents);
                 // supplied via optional arguments
                 apiTemplateResource.properties.path = api.suffix;
             }

@@ -9,9 +9,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
     public class PropertyResourceProperties
     {
-        public string displayName { get; set; }
-        public string value { get; set; }
         public IList<string> tags { get; set; }
         public bool secret { get; set; }
+        public string displayName { get; set; }
+        public string value { get; set; }
     }
 }

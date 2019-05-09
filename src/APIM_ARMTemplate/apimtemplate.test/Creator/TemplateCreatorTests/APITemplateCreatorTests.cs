@@ -80,8 +80,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal("swagger-link-json", apiTemplateResource.properties.contentFormat);
-            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.contentValue);
+            Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
+            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
         }
 
         [Fact]
@@ -136,8 +136,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.authenticationSettings.openid.openidProviderId, apiTemplateResource.properties.authenticationSettings.openid.openidProviderId);
             Assert.Equal(api.authenticationSettings.openid.bearerTokenSendingMethods, apiTemplateResource.properties.authenticationSettings.openid.bearerTokenSendingMethods);
             Assert.Equal(api.authenticationSettings.subscriptionKeyRequired, apiTemplateResource.properties.authenticationSettings.subscriptionKeyRequired);
-            Assert.Equal("swagger-link-json", apiTemplateResource.properties.contentFormat);
-            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.contentValue);
+            Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
+            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
         }
 
         [Fact]

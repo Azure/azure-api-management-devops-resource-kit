@@ -38,6 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string suffix { get; set; }
         public bool subscriptionRequired { get; set; }
         public string apiVersion { get; set; }
+        public bool isCurrent { get; set; }
         public string apiVersionDescription { get; set; }
         public string apiVersionSetId { get; set; }
         public string revision { get; set; }

@@ -27,8 +27,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 properties = new PolicyTemplateProperties()
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
-                    contentFormat = isUrl ? "rawxml-link" : "rawxml",
-                    policyContent = isUrl ? api.policy : this.fileReader.RetrieveLocalFileContents(api.policy)
+                    format = isUrl ? "rawxml-link" : "rawxml",
+                    value = isUrl ? api.policy : this.fileReader.RetrieveLocalFileContents(api.policy)
                 },
                 dependsOn = dependsOn
             };
@@ -48,8 +48,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 properties = new PolicyTemplateProperties()
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
-                    contentFormat = isUrl ? "rawxml-link" : "rawxml",
-                    policyContent = isUrl ? policyPair.Value.policy : this.fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
+                    format = isUrl ? "rawxml-link" : "rawxml",
+                    value = isUrl ? policyPair.Value.policy : this.fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
                 },
                 dependsOn = dependsOn
             };

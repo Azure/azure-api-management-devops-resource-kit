@@ -26,8 +26,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/policy')]", policyTemplateResource.name);
-            Assert.Equal("rawxml-link", policyTemplateResource.properties.contentFormat);
-            Assert.Equal(api.policy, policyTemplateResource.properties.policyContent);
+            Assert.Equal("rawxml-link", policyTemplateResource.properties.format);
+            Assert.Equal(api.policy, policyTemplateResource.properties.value);
             Assert.Equal(dependsOn, policyTemplateResource.dependsOn);
         }
 
@@ -45,8 +45,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{apiName}/{policyPair.Key}/policy')]", policyTemplateResource.name);
-            Assert.Equal("rawxml-link", policyTemplateResource.properties.contentFormat);
-            Assert.Equal(policyPair.Value.policy, policyTemplateResource.properties.policyContent);
+            Assert.Equal("rawxml-link", policyTemplateResource.properties.format);
+            Assert.Equal(policyPair.Value.policy, policyTemplateResource.properties.value);
             Assert.Equal(dependsOn, policyTemplateResource.dependsOn);
         }
     }

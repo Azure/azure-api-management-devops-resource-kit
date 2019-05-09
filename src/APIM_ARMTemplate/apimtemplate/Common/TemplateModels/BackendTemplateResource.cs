@@ -38,6 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string name { get; set; }
         public string issuerCertificateThumbprint { get; set; }
     }
+
     public class BackendCredentials
     {
         public string[] certificate { get; set; }
