@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --name LucasBlankUnlinked --resourceGroup LucasHuetHudsonInternal --fileFolder C:\\\\\\\\\\\\\\\\Users\\\\\\\\\\\\\\\\lucashh\\\\\\\\\\\\\\\\Desktop\\\\\\\\\\\\\\\\Projects\\\\\\\\\\\\\\\\APIM-ARM\\\\\\\\\\\\\\\\ExtractedTemplates\\\\\\\\Full"
+      "commandLineArgs": "extract  --name LucasBlankUnlinked --resourceGroup LucasHuetHudsonInternal --fileFolder C:\\\\\\\\\\\\\\\\Users\\\\\\\\\\\\\\\\lucashh\\\\\\\\\\\\\\\\Desktop\\\\\\\\\\\\\\\\Projects\\\\\\\\\\\\\\\\APIM-ARM\\\\\\\\\\\\\\\\ExtractedTemplates\\\\\\SingleAPI --apiName firstAPI"
     }
   }
 }

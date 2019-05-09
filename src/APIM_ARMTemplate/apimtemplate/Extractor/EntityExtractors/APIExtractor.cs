@@ -130,7 +130,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string apiDetails = await GetAPIDetails(apimname, resourceGroup, apiName);
 
                 Console.WriteLine("------------------------------------------");
-                Console.WriteLine("Getting operations from {0} API:", apiName);
+                Console.WriteLine("Extracting resources from {0} API:", apiName);
 
                 // convert returned api to template resource class
                 JObject oApiDetails = JObject.Parse(apiDetails);
@@ -147,7 +147,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     apiResource.dependsOn = new string[] { };
 
                     string versionSetName = apiResource.properties.apiVersionSetId;
-                    int versionSetPosition = versionSetName.IndexOf("api-version-sets/");
+                    int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
 
                     versionSetName = versionSetName.Substring(versionSetPosition, (versionSetName.Length - versionSetPosition));
                     apiResource.properties.apiVersionSetId = $"[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/{versionSetName}')]";
@@ -221,7 +221,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     try
                     {
                         string operationPolicy = await GetOperationPolicy(apimname, resourceGroup, oApiName, operationName);
-                        Console.WriteLine($" - Policy found to {operationName} operation");
+                        Console.WriteLine($" - Operation policy found for {operationName} operation");
                         PolicyTemplateResource operationPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(operationPolicy);
                         operationPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/policy')]";
                         operationPolicyResource.apiVersion = GlobalConstants.APIVersion;
@@ -230,10 +230,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                         templateResources.Add(operationPolicyResource);
                     }
-                    catch (Exception)
-                    {
-                        Console.WriteLine($" - No policy found for {operationName} operation");
-                    }
+                    catch (Exception) { }
                 }
                 #endregion
 
@@ -241,9 +238,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // add api policy resource to api template
                 try
                 {
-                    Console.WriteLine("Getting API Policy from {0} API: ", apiName);
                     string apiPolicies = await GetAPIPolicies(apimname, resourceGroup, apiName);
-                    Console.WriteLine("API Policy found!");
+                    Console.WriteLine("API policy found");
                     PolicyTemplateResource apiPoliciesResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(apiPolicies);
 
                     apiPoliciesResource.apiVersion = GlobalConstants.APIVersion;
@@ -252,18 +248,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                     templateResources.Add(apiPoliciesResource);
                 }
-                catch (Exception)
-                {
-                    Console.WriteLine("No API policy!");
-                }
+                catch (Exception) { }
                 #endregion
 
                 // add product api associations to template
                 #region API Products
                 try
                 {
-                    Console.WriteLine("Getting API Products from {0} API: ", apiName);
-
                     // pull product api associations
                     string apiProducts = await GetAPIProducts(apimname, resourceGroup, apiName);
                     JObject oApiProducts = JObject.Parse(apiProducts);
@@ -271,7 +262,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     foreach (var item in oApiProducts["value"])
                     {
                         string apiProductName = ((JValue)item["name"]).Value.ToString();
-                        Console.WriteLine($" -- {apiProductName} Product found to {oApiName} API");
+                        Console.WriteLine("'{0}' Product association found", apiProductName);
 
                         // convert returned api product associations to template resource class
                         ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(apiProducts);
@@ -284,16 +275,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         templateResources.Add(productAPIResource);
                     }
                 }
-                catch (Exception)
-                {
-                    Console.WriteLine("No API products!");
-                }
+                catch (Exception) { }
                 #endregion
 
                 #region Diagnostics
                 // add diagnostics to template
-                Console.WriteLine("------------------------------------------");
-                Console.WriteLine("Getting diagnostics from {0} API:", apiName);
                 // pull diagnostics for api
                 string diagnostics = await GetAPIDiagnostics(apimname, resourceGroup, apiName);
                 JObject oDiagnostics = JObject.Parse(diagnostics);
@@ -350,8 +336,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
         {
-            Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting operation schemas from service");
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all schemas from service
@@ -361,7 +345,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             foreach (var item in oSchemas["value"])
             {
                 string schemaName = ((JValue)item["name"]).Value.ToString();
-                Console.WriteLine("'{0}' Schema found", schemaName);
+                Console.WriteLine("'{0}' Operation schema found", schemaName);
 
                 string schemaDetails = await GetAPISchemaDetails(apimServiceName, resourceGroup, apiName, schemaName);
 

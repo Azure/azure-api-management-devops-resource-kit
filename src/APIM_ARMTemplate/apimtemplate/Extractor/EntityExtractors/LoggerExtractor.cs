@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateLoggerTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting loggers from service");
+            Console.WriteLine("Extracting loggers from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             // isolate product api associations in the case of a single api extraction

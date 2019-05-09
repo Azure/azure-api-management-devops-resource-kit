@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateNamedValuesTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting named values from service");
+            Console.WriteLine("Extracting named values from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();

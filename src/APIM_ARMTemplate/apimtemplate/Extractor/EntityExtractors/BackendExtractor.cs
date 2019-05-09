@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateBackendsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources)
         {
             Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting backends from service");
+            Console.WriteLine("Extracting backends from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();

@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateAPIVersionSetsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting API Version Sets from service");
+            Console.WriteLine("Extracting API version sets from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             // isolate apis in the case of a single api extraction
@@ -51,19 +51,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string versionSetDetails = await GetAPIVersionSetDetails(apimname, resourceGroup, versionSetName);
 
                 // convert returned product to template resource class
-                JsonSerializerSettings settings = new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                };
-                APIVersionSetTemplateResource versionSetTemplateResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSetDetails, settings);
+                APIVersionSetTemplateResource versionSetTemplateResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSetDetails);
                 versionSetTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetName}')]";
                 versionSetTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (singleApiName == null || apiResources.SingleOrDefault(api => (api as APITemplateResource).properties.apiVersionSetId.Contains(versionSetName)) != null)
+                if (singleApiName == null || apiResources.SingleOrDefault(api => (api as APITemplateResource).properties.apiVersionSetId != null && (api as APITemplateResource).properties.apiVersionSetId.Contains(versionSetName)) != null)
                 {
-                    Console.WriteLine("'{0}' API Version Set found", versionSetName);
+                    Console.WriteLine("'{0}' API version set found", versionSetName);
                     templateResources.Add(versionSetTemplateResource);
                 }
             }

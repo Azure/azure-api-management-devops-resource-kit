@@ -41,6 +41,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Console.WriteLine("API Management Template");
                 Console.WriteLine();
                 Console.WriteLine("Connecting to {0} API Management Service on {1} Resource Group ...", apimname, resourceGroup);
+                if (singleApiName != null)
+                {
+                    Console.WriteLine("Executing extraction for {0} API ...", singleApiName);
+                }
+                else
+                {
+                    Console.WriteLine("Executing full extraction ...", singleApiName);
+                }
 
                 // initialize entity extractor classes
                 FileWriter fileWriter = new FileWriter();
@@ -66,8 +74,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // write templates to output file location
                 string apiFileName = singleApiName == null ? @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json" : @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + singleApiName + "-api-template.json";
                 fileWriter.WriteJSONToFile(apiTemplate, apiFileName);
-                fileWriter.WriteJSONToFile(apiVersionSetTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
-                fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apiVersionSets.json");
+                fileWriter.WriteJSONToFile(apiVersionSetTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apiVersionSets.json");
+                fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
                 fileWriter.WriteJSONToFile(backendTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-backends.json");
                 fileWriter.WriteJSONToFile(loggerTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
                 fileWriter.WriteJSONToFile(namedValueTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-namedValues.json");

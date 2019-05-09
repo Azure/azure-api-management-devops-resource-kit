@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Getting authorization servers from service");
+            Console.WriteLine("Extracting authorization servers from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 if (singleApiName == null || isReferencedByAPI)
                 {
-                    Console.WriteLine("'{0}' Authorization Server found", authorizationServerName);
+                    Console.WriteLine("'{0}' Authorization server found", authorizationServerName);
                     templateResources.Add(authorizationServerTemplateResource);
                 }
             }

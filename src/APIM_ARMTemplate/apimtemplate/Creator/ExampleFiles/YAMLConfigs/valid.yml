@@ -19,6 +19,7 @@ apis:
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
       suffix: conf
       subscriptionRequired: true
+      isCurrent: true
       apiVersion: v1
       apiVersionDescription: My first version
       apiVersionSetId: myAPIVersionSetID
