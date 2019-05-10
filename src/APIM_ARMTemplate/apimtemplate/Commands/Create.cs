@@ -24,69 +24,88 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
+
                 // validate creator config
-                bool isValidCreatorConfig = ValidateCreatorConfig(creatorConfig);
+                CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
+                bool isValidCreatorConfig = creatorConfigurationValidator.ValidateCreatorConfig(creatorConfig);
                 if (isValidCreatorConfig == true)
                 {
                     // required parameters have been supplied
 
-                    // initialize helper classes
+                    // initialize file helper classes
                     FileWriter fileWriter = new FileWriter();
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
-                    TemplateCreator templateCreator = new TemplateCreator();
-                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(templateCreator);
-                    LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator(templateCreator);
-                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(templateCreator);
+                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames();
+
+                    // initialize template creator classes
+                    APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
+                    LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator();
+                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator();
+                    BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator();
+                    AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator();
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, templateCreator, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
-                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(templateCreator);
-                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames(creatorConfig);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
+                    MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
+                    Console.WriteLine("Creating API version set template");
+                    Console.WriteLine("------------------------------------------");
                     Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating product template");
+                    Console.WriteLine("------------------------------------------");
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating logger template");
+                    Console.WriteLine("------------------------------------------");
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
-                    // store name and full template on each api necessary to build unlinked templates
-                    Dictionary<string, Template> initialAPITemplates = new Dictionary<string, Template>();
-                    Dictionary<string, Template> subsequentAPITemplates = new Dictionary<string, Template>();
+                    Console.WriteLine("Creating backend template");
+                    Console.WriteLine("------------------------------------------");
+                    Template backendsTemplate = creatorConfig.backends != null ? backendTemplateCreator.CreateBackendTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating authorization server template");
+                    Console.WriteLine("------------------------------------------");
+                    Template authorizationServersTemplate = creatorConfig.authorizationServers != null ? authorizationServerTemplateCreator.CreateAuthorizationServerTemplate(creatorConfig) : null;
+
                     // store name and whether the api will depend on the version set template each api necessary to build linked templates
                     List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
-                    // create parameters file
-                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-
+                    List<Template> apiTemplates = new List<Template>();
+                    Console.WriteLine("Creating API templates");
+                    Console.WriteLine("------------------------------------------");
                     foreach (APIConfig api in creatorConfig.apis)
                     {
-                        Template initialAPITemplate = await apiTemplateCreator.CreateInitialAPITemplateAsync(creatorConfig, api);
-                        Template subsequentAPITemplate = apiTemplateCreator.CreateSubsequentAPITemplate(api);
-                        initialAPITemplates.Add(api.name, initialAPITemplate);
-                        subsequentAPITemplates.Add(api.name, subsequentAPITemplate);
+                        // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
+                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(creatorConfig, api);
+                        apiTemplates.AddRange(apiTemplateSet);
+                        // create the relevant info that will be needed to properly link to the api template(s) from the master template
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
                         {
                             name = api.name,
+                            isSplit = apiTemplateCreator.isSplitAPI(api),
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
-                            dependsOnLoggers = masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader)
+                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader),
+                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
+                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackend(api, fileReader)
                         });
                     }
+
+                    // create parameters file
+                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
                     // write templates to outputLocation
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, apiInformation, creatorFileNames, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, creatorFileNames, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
                     }
-                    foreach (KeyValuePair<string, Template> initialAPITemplatePair in initialAPITemplates)
+                    foreach (Template apiTemplate in apiTemplates)
                     {
-                        string initialAPIFileName = fileNameGenerator.GenerateAPIFileName(initialAPITemplatePair.Key, true);
-                        fileWriter.WriteJSONToFile(initialAPITemplatePair.Value, String.Concat(creatorConfig.outputLocation, initialAPIFileName));
-                    }
-                    foreach (KeyValuePair<string, Template> subsequentAPITemplatePair in subsequentAPITemplates)
-                    {
-                        string subsequentAPIFileName = fileNameGenerator.GenerateAPIFileName(subsequentAPITemplatePair.Key, false);
-                        fileWriter.WriteJSONToFile(subsequentAPITemplatePair.Value, String.Concat(creatorConfig.outputLocation, subsequentAPIFileName));
+                        APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
+                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name));
+                        // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
+                        string apiFileName = fileNameGenerator.GenerateAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value == null);
+                        fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
                     }
                     if (apiVersionSetsTemplate != null)
                     {
@@ -100,91 +119,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         fileWriter.WriteJSONToFile(loggersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.loggers));
                     }
+                    if (backendsTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(backendsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.backends));
+                    }
+                    if (authorizationServersTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.authorizationServers));
+                    }
+
                     // write parameters to outputLocation
                     fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorConfig.linked == true ? creatorFileNames.linkedParameters : creatorFileNames.unlinkedParameters));
-                    ColoredConsole.WriteLine("Templates written to output location");
+                    Console.WriteLine("Templates written to output location");
+                    Console.WriteLine("Press any key to exit process:");
+#if DEBUG
+                    Console.ReadKey();
+#endif
                 }
                 return 0;
             });
-        }
-
-        public bool ValidateCreatorConfig(CreatorConfig creatorConfig)
-        {
-            bool isValid = true;
-            // ensure required parameters have been passed in
-            if (creatorConfig.outputLocation == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "Output location is required");
-            }
-            if (creatorConfig.version == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "Version is required");
-            }
-            if (creatorConfig.apimServiceName == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "APIM service name is required");
-            }
-            if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
-            {
-                isValid = false;
-                throw new CommandParsingException(this, "LinkTemplatesBaseUrl is required for linked templates");
-            }
-            foreach (APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
-            {
-                if (apiVersionSet != null && apiVersionSet.displayName == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "Display name is required if an API Version Set is provided");
-                }
-                if (apiVersionSet != null && apiVersionSet.versioningScheme == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "Versioning scheme is required if an API Version Set is provided");
-                }
-            }
-            foreach (APIConfig api in creatorConfig.apis)
-            {
-                if (api == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "API configuration is required");
-                }
-                if (api.openApiSpec == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "Open API Spec is required");
-                }
-                if (api.suffix == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "API suffix is required");
-                }
-                if (api.name == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "API name is required");
-                }
-                if (api.operations != null)
-                {
-                    foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
-                    {
-                        if (operation.Value == null || operation.Value.policy == null)
-                        {
-                            isValid = false;
-                            throw new CommandParsingException(this, "Policy XML is required if an API operation is provided");
-                        }
-                    }
-                }
-                if (api.diagnostic != null && api.diagnostic.loggerId == null)
-                {
-                    isValid = false;
-                    throw new CommandParsingException(this, "LoggerId is required if an API diagnostic is provided");
-                }
-            }
-            return isValid;
         }
     }
 }

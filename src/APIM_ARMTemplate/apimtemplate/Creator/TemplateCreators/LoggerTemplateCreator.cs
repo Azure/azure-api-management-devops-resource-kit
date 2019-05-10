@@ -3,19 +3,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class LoggerTemplateCreator
+    public class LoggerTemplateCreator : TemplateCreator
     {
-        private TemplateCreator templateCreator;
-
-        public LoggerTemplateCreator(TemplateCreator templateCreator)
-        {
-            this.templateCreator = templateCreator;
-        }
-
         public Template CreateLoggerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template loggerTemplate = this.templateCreator.CreateEmptyTemplate();
+            Template loggerTemplate = CreateEmptyTemplate();
 
             // add parameters
             loggerTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
@@ -31,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 {
                     name = $"[concat(parameters('ApimServiceName'), '/{logger.name}')]",
                     type = ResourceTypeConstants.Logger,
-                    apiVersion = "2018-06-01-preview",
+                    apiVersion = GlobalConstants.APIVersion,
                     properties = new LoggerTemplateProperties()
                     {
                         loggerType = logger.loggerType,

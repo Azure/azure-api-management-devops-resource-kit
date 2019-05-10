@@ -15,6 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string type { get; set; }
         public string apiRevision { get; set; }
         public string apiVersion { get; set; }
+        public bool isCurrent { get; set; }
         public string apiRevisionDescription { get; set; }
         public string apiVersionDescription { get; set; }
         public string apiVersionSetId { get; set; }
@@ -23,9 +24,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string serviceUrl { get; set; }
         public string path { get; set; }
         public string[] protocols { get; set; }
-        public APITemplateVersionSet apiVersionSet { get; set; }
-        public string contentValue { get; set; }
-        public string contentFormat { get; set; }
+        public APITemplateAPIVersionSet apiVersionSet { get; set; }
+        public string value { get; set; }
+        public string format { get; set; }
         public APITemplateWSDLSelector wsdlSelector { get; set; }
         public string apiType { get; set; }
     }
@@ -68,6 +69,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     {
         public string openidProviderId { get; set; }
         public string[] bearerTokenSendingMethods { get; set; }
+    }
+
+    public class APITemplateAPIVersionSet
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string versionQueryName { get; set; }
+        public string versionHeaderName { get; set; }
+        public string versioningScheme { get; set; }
     }
 
     public abstract class APITemplateSubResource : TemplateResource { }

@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
             ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
             DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
-            APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, templateCreator, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
+            APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
             return apiTemplateCreator;
         }
     }

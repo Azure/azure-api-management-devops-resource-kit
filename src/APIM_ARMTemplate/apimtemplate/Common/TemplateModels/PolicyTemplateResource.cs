@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
     public class PolicyTemplateProperties
     {
-        public string policyContent { get; set; }
-        public string contentFormat { get; set; }
+        public string value { get; set; }
+        public string format { get; set; }
     }
 }

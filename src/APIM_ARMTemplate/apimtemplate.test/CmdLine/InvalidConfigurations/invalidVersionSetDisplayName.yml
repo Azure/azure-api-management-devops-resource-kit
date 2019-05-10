@@ -1,0 +1,122 @@
+version: 0.0.1
+apimServiceName: myAPIMService
+apiVersionSets:
+    - id: myAPIVersionSetID
+      description: a description
+      versioningScheme: Query
+      versionQueryName: versionQuery
+      versionHeaderName: versionHeader
+    - id: secondAPIVersionSetID
+      displayName: secondSet
+      description: another description
+      versioningScheme: Header
+      versionQueryName: versionQuery
+      versionHeaderName: versionHeader
+apis:
+    - name: myAPI
+      openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
+      suffix: conf
+      subscriptionRequired: true
+      apiVersion: v1
+      apiVersionDescription: My first version
+      apiVersionSetId: myAPIVersionSetID
+      revision: 1
+      revisionDescription: My first revision
+      operations:
+        addPet:
+          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
+        deletePet:
+          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
+      products: starter, platinum
+      authenticationSettings:
+        oAuth2:
+            authorizationServerId: myAuthServer
+            scope: myScope
+      diagnostic:
+        name: applicationinsights
+        alwaysLog: allErrors
+        loggerId: lucastestai
+        sampling:
+          samplingType: fixed
+          percentage: 50
+        frontend: 
+          request:
+            headers:
+            body: 
+              bytes: 512
+          response: 
+            headers:
+            body: 
+              bytes: 512
+        backend: 
+          request:
+            headers:
+            body: 
+              bytes: 512
+          response: 
+            headers:
+            body: 
+              bytes: 512
+        enableHttpCorrelationHeaders: true
+products:
+    - displayName: platinum
+      description: a test product
+      terms: some terms
+      subscriptionRequired: true
+      approvalRequired: true
+      subscriptionsLimit: 1
+      state: notPublished
+loggers:
+    - name: myAppInsights
+      loggerType: applicationInsights
+      description: a test app insights
+      credentials:
+        instrumentationKey: 45d4v88-fdfs-4b35-9232-731d82d4d1c6
+      isBuffered: true
+authorizationServers:
+    - displayName: myAuthServer
+      description: test server
+      clientRegistrationEndpoint: https://www.contoso.com/apps
+      authorizationEndpoint: https://www.contoso.com/oauth2/auth
+      authorizationMethods:
+        - GET
+      tokenEndpoint: https://www.contoso.com/oauth2/token
+      supportState: true
+      defaultScope: read write
+      grantTypes:
+        - authorizationCode
+        - implicit
+      bearerTokenSendingMethods:
+        - authorizationHeader
+      clientId: 1
+      clientSecret: 2
+      resourceOwnerUsername: un
+      resourceOwnerPassword: pwd
+backends:
+    - title: myBackend
+      description: description5308
+      url: https://backendname2644/
+      protocol: http
+      credentials:
+        query: 
+          sv: 
+            - xx
+            - bb
+        header: 
+          x-my-1:
+            - val1
+            - val2
+        authorization: 
+          scheme: Basic
+          parameter: opensesma
+      proxy:
+        url: http://192.168.1.1:8080
+        username: Contoso\admin
+        password: opensesame
+      tls:
+        validateCertificateChain: false
+        validateCertificateName: false
+outputLocation: C:\Users\myUsername\GeneratedTemplates
+linked: false
+linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer

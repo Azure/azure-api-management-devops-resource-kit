@@ -9,12 +9,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
     public class IssueTemplateProperties
     {
+        public string state { get; set; }
+        public string apiId { get; set; }
         public string title { get; set; }
         public string description { get; set; }
-        public string createdDate { get; set; }
-        public string state { get; set; }
         public string userId { get; set; }
-        public string apiId { get; set; }
     }
 
     public class IssueTemplateAttachment : IssueTemplateSubResource
@@ -37,7 +36,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     public class IssueTemplateCommentProperties
     {
         public string text { get; set; }
-        public string createdDate { get; set; }
         public string userId { get; set; }
     }
 

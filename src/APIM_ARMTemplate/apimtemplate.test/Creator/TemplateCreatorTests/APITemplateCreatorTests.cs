@@ -2,6 +2,7 @@
 using Xunit;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
@@ -12,101 +13,131 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig()
+            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
+            APIConfig api = new APIConfig()
             {
-                api = new APIConfig()
+                name = "name",
+                apiVersion = "apiVersion",
+                apiVersionDescription = "apiVersionDescription",
+                apiVersionSetId = "apiVersionSetId",
+                revision = "revision",
+                revisionDescription = "revisionDescription",
+                suffix = "suffix",
+                subscriptionRequired = true,
+                authenticationSettings = new APITemplateAuthenticationSettings()
                 {
-                    name = "name",
-                    apiVersion = "apiVersion",
-                    apiVersionDescription = "apiVersionDescription",
-                    apiVersionSetId = "apiVersionSetId",
-                    revision = "revision",
-                    revisionDescription = "revisionDescription",
-                    suffix = "suffix",
-                    subscriptionRequired = true,
-                    authenticationSettings = new APITemplateAuthenticationSettings()
+                    oAuth2 = new APITemplateOAuth2()
                     {
-                        oAuth2 = new APITemplateOAuth2()
-                        {
-                            authorizationServerId = "",
-                            scope = ""
-                        },
-                        openid = new APITemplateOpenID()
-                        {
-                            openidProviderId = "",
-                            bearerTokenSendingMethods = new string[] { }
-                        },
-                        subscriptionKeyRequired = true
+                        authorizationServerId = "",
+                        scope = ""
                     },
-                    openApiSpec = "https://petstore.swagger.io/v2/swagger.json"
-                }
-            };
-
-            // act
-            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateInitialAPITemplateResourceAsync(creatorConfig);
-
-            // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]", apiTemplateResource.name);
-            Assert.Equal(creatorConfig.api.name, apiTemplateResource.properties.displayName);
-            Assert.Equal(creatorConfig.api.apiVersion, apiTemplateResource.properties.apiVersion);
-            Assert.Equal(creatorConfig.api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
-            Assert.Equal(creatorConfig.api.apiVersionSetId, apiTemplateResource.properties.apiVersionSetId);
-            Assert.Equal(creatorConfig.api.revision, apiTemplateResource.properties.apiRevision);
-            Assert.Equal(creatorConfig.api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
-            Assert.Equal(creatorConfig.api.suffix, apiTemplateResource.properties.path);
-            Assert.Equal(creatorConfig.api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
-            Assert.Equal(creatorConfig.api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);
-            Assert.Equal(creatorConfig.api.authenticationSettings.oAuth2.scope, apiTemplateResource.properties.authenticationSettings.oAuth2.scope);
-            Assert.Equal(creatorConfig.api.authenticationSettings.openid.openidProviderId, apiTemplateResource.properties.authenticationSettings.openid.openidProviderId);
-            Assert.Equal(creatorConfig.api.authenticationSettings.openid.bearerTokenSendingMethods, apiTemplateResource.properties.authenticationSettings.openid.bearerTokenSendingMethods);
-            Assert.Equal(creatorConfig.api.authenticationSettings.subscriptionKeyRequired, apiTemplateResource.properties.authenticationSettings.subscriptionKeyRequired);
-        }
-
-        [Fact]
-        public async void ShouldUseDefaultVersionSetIdWithoutProvidedVersionSet()
-        {
-            // arrange
-            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig()
-            {
-                apiVersionSet = new APIVersionSetConfig()
-                {
-
+                    openid = new APITemplateOpenID()
+                    {
+                        openidProviderId = "",
+                        bearerTokenSendingMethods = new string[] { }
+                    },
+                    subscriptionKeyRequired = true
                 },
-                api = new APIConfig()
-                {
-                    openApiSpec = "https://petstore.swagger.io/v2/swagger.json"
-                }
+                openApiSpec = "https://petstore.swagger.io/v2/swagger.json"
             };
+            creatorConfig.apis.Add(api);
 
             // act
-            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateInitialAPITemplateResourceAsync(creatorConfig);
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal("[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), 'versionset')]", apiTemplateResource.properties.apiVersionSetId);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal(api.name, apiTemplateResource.properties.displayName);
+            Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
+            Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
+            Assert.Equal(api.revision, apiTemplateResource.properties.apiRevision);
+            Assert.Equal(api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
+            Assert.Equal(api.suffix, apiTemplateResource.properties.path);
+            Assert.Equal(api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
+            Assert.Equal(api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);
+            Assert.Equal(api.authenticationSettings.oAuth2.scope, apiTemplateResource.properties.authenticationSettings.oAuth2.scope);
+            Assert.Equal(api.authenticationSettings.openid.openidProviderId, apiTemplateResource.properties.authenticationSettings.openid.openidProviderId);
+            Assert.Equal(api.authenticationSettings.openid.bearerTokenSendingMethods, apiTemplateResource.properties.authenticationSettings.openid.bearerTokenSendingMethods);
+            Assert.Equal(api.authenticationSettings.subscriptionKeyRequired, apiTemplateResource.properties.authenticationSettings.subscriptionKeyRequired);
         }
 
         [Fact]
-        public void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithCorrectContent()
+        public async void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithCorrectContent()
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig()
+            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
+            APIConfig api = new APIConfig()
             {
-                api = new APIConfig()
-                {
-                    name = "name",
-                    openApiSpec = "https://petstore.swagger.io/v2/swagger.json"
-                }
+                name = "name",
+                openApiSpec = "https://petstore.swagger.io/v2/swagger.json"
             };
+            creatorConfig.apis.Add(api);
 
             // act
-            APITemplateResource apiTemplateResource = apiTemplateCreator.CreateSubsequentAPITemplateResource(creatorConfig);
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{creatorConfig.api.name}')]", apiTemplateResource.name);
-            Assert.Equal("swagger-link-json", apiTemplateResource.properties.contentFormat);
-            Assert.Equal(creatorConfig.api.openApiSpec, apiTemplateResource.properties.contentValue);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
+            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
+        }
+
+        [Fact]
+        public async void ShouldCreateUnifiedAPITemplateResourceFromCreatorConfig()
+        {
+            // arrange
+            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
+            APIConfig api = new APIConfig()
+            {
+                name = "name",
+                apiVersion = "apiVersion",
+                apiVersionDescription = "apiVersionDescription",
+                apiVersionSetId = "apiVersionSetId",
+                revision = "revision",
+                revisionDescription = "revisionDescription",
+                suffix = "suffix",
+                subscriptionRequired = true,
+                authenticationSettings = new APITemplateAuthenticationSettings()
+                {
+                    oAuth2 = new APITemplateOAuth2()
+                    {
+                        authorizationServerId = "",
+                        scope = ""
+                    },
+                    openid = new APITemplateOpenID()
+                    {
+                        openidProviderId = "",
+                        bearerTokenSendingMethods = new string[] { }
+                    },
+                    subscriptionKeyRequired = true
+                },
+                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+            };
+            creatorConfig.apis.Add(api);
+
+            // act
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, false, true);
+
+            // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal(api.name, apiTemplateResource.properties.displayName);
+            Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
+            Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
+            Assert.Equal(api.revision, apiTemplateResource.properties.apiRevision);
+            Assert.Equal(api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
+            Assert.Equal(api.suffix, apiTemplateResource.properties.path);
+            Assert.Equal(api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
+            Assert.Equal(api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);
+            Assert.Equal(api.authenticationSettings.oAuth2.scope, apiTemplateResource.properties.authenticationSettings.oAuth2.scope);
+            Assert.Equal(api.authenticationSettings.openid.openidProviderId, apiTemplateResource.properties.authenticationSettings.openid.openidProviderId);
+            Assert.Equal(api.authenticationSettings.openid.bearerTokenSendingMethods, apiTemplateResource.properties.authenticationSettings.openid.bearerTokenSendingMethods);
+            Assert.Equal(api.authenticationSettings.subscriptionKeyRequired, apiTemplateResource.properties.authenticationSettings.subscriptionKeyRequired);
+            Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
+            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
         }
 
         [Fact]

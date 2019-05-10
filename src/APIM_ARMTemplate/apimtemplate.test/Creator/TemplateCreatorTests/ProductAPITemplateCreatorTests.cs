@@ -29,18 +29,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         {
             // arrange
             ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig()
+            CreatorConfig creatorConfig = new CreatorConfig();
+            APIConfig api = new APIConfig()
             {
-                api = new APIConfig()
-                {
-                    products = "1, 2, 3"
-                }
+                products = "1, 2, 3"
             };
             int count = 3;
             string[] dependsOn = new string[] { "dependsOn" };
 
             // act
-            List<ProductAPITemplateResource> productAPITemplateResources = productAPITemplateCreator.CreateProductAPITemplateResources(creatorConfig, dependsOn);
+            List<ProductAPITemplateResource> productAPITemplateResources = productAPITemplateCreator.CreateProductAPITemplateResources(api, dependsOn);
 
             // assert
             Assert.Equal(count, productAPITemplateResources.Count);

@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{api.name}/{api.diagnostic.name}')]",
                 type = ResourceTypeConstants.APIDiagnostic,
-                apiVersion = "2018-06-01-preview",
+                apiVersion = GlobalConstants.APIVersion,
                 properties = new DiagnosticTemplateProperties()
                 {
                     alwaysLog = api.diagnostic.alwaysLog,
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 },
                 dependsOn = dependsOn
             };
-            // set the version set id
+            // reference the provided logger if loggerId is provided
             if (api.diagnostic.loggerId != null)
             {
                 diagnosticTemplateResource.properties.loggerId = $"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), '{api.diagnostic.loggerId}')]";

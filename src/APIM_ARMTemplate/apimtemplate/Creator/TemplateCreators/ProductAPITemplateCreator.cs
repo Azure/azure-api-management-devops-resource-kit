@@ -12,8 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 name = $"[concat(parameters('ApimServiceName'), '/{productID}/{apiName}')]",
                 type = ResourceTypeConstants.ProductAPI,
-                apiVersion = "2018-06-01-preview",
-                properties = new ProductAPITemplateProperties(),
+                apiVersion = GlobalConstants.APIVersion,
                 dependsOn = dependsOn
             };
             return productAPITemplateResource;
@@ -23,6 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // create a products/apis association resource for each product provided in the config file
             List<ProductAPITemplateResource> productAPITemplates = new List<ProductAPITemplateResource>();
+            // products is comma separated list of productIds
             string[] productIDs = api.products.Split(", ");
             foreach (string productID in productIDs)
             {

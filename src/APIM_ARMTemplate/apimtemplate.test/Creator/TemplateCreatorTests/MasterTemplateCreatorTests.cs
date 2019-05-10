@@ -8,10 +8,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
     public class MasterTemplateCreatorTests
     {
         [Fact]
+        public void ShouldCreateCorrectNumberOfDeploymentResources()
+        {
+            // arrange
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            Template apiVersionSetsTemplate = new Template();
+            Template productsTemplate = new Template();
+            Template loggersTemplate = new Template();
+            List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
+            FileNameGenerator fileNameGenerator = new FileNameGenerator();
+            CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames();
+
+            // should create 5 resources (apiVersionSet, product, logger, both api templates)
+            int count = 5;
+
+            // act
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, fileNameGenerator);
+
+            // assert
+            Assert.Equal(count, masterTemplate.resources.Length);
+        }
+
+        [Fact]
         public void ShouldCreateCorrectNumberOfParameterValuesWhenLinked()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             CreatorConfig creatorConfig = new CreatorConfig()
             {
                 apimServiceName = "apimServiceName",
@@ -32,7 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfParametersWhenUnlinked()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             bool linked = false;
             // unlinked templates result in 1 value
             int count = 1;
@@ -48,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateLinkedMasterTemplateResourceFromValues()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             string name = "name";
             string uriLink = "uriLink";
             string[] dependsOn = new string[] { "dependsOn" };
@@ -60,59 +82,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(name, masterTemplateResource.name);
             Assert.Equal(uriLink, masterTemplateResource.properties.templateLink.uri);
             Assert.Equal(dependsOn, masterTemplateResource.dependsOn);
-        }
-
-        [Fact]
-        public void ShouldCreateCorrectNumberOfResourcesInSubsequentUnlinkedMasterTemplate()
-        {
-            // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
-            Template subsequentAPITemplate = new Template();
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-            int count = 3;
-            for (int i = 0; i < count; i++)
-            {
-                templateResources.Add(new TemplateResource());
-            };
-            subsequentAPITemplate.resources = templateResources.ToArray();
-
-            // act
-            Template subsequentUnlinkedMasterTemplate = masterTemplateCreator.CreateSubsequentUnlinkedMasterTemplate(subsequentAPITemplate);
-
-            // assert
-            Assert.Equal(count, subsequentUnlinkedMasterTemplate.resources.Length);
-        }
-
-        [Fact]
-        public void ShouldCreateCorrectNumberOfResourcesInInitialUnlinkedMasterTemplate()
-        {
-            // arrange
-            MasterTemplateCreator masterTemplateCreator = MasterTemplateCreatorFactory.GenerateMasterTemplateCreator();
-            Template initialAPITemplate = new Template();
-            List<TemplateResource> initialAPITemplateResources = new List<TemplateResource>();
-            int apiTemplateCount = 1;
-            for (int i = 0; i < apiTemplateCount; i++)
-            {
-                initialAPITemplateResources.Add(new TemplateResource());
-            };
-            initialAPITemplate.resources = initialAPITemplateResources.ToArray();
-
-            Template apiVersionSetTemplate = new Template();
-            List<TemplateResource> apiVersionSetResources = new List<TemplateResource>();
-            int apiVersionSetTemplateCount = 1;
-            for (int i = 0; i < apiVersionSetTemplateCount; i++)
-            {
-                apiVersionSetResources.Add(new TemplateResource());
-            };
-            apiVersionSetTemplate.resources = apiVersionSetResources.ToArray();
-
-            int count = apiTemplateCount + apiVersionSetTemplateCount;
-
-            // act
-            Template initialLinkedMasterTemplate = masterTemplateCreator.CreateInitialUnlinkedMasterTemplate(apiVersionSetTemplate, initialAPITemplate);
-
-            // assert
-            Assert.Equal(count, initialLinkedMasterTemplate.resources.Length);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
@@ -10,41 +11,39 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateAPIVersionSetTemplateFromCreatorConfig()
         {
             // arrange
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = APIVersionSetTemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig()
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apiVersionSets = new List<APIVersionSetConfig>() };
+            APIVersionSetConfig apiVersionSet = new APIVersionSetConfig()
             {
-                apiVersionSet = new APIVersionSetConfig()
-                {
-                    id = "id",
-                    description = "description",
-                    displayName = "displayName",
-                    versionHeaderName = "versionHeaderName",
-                    versioningScheme = "versioningScheme",
-                    versionQueryName = "versionQueryName"
-                }
+                id = "id",
+                description = "description",
+                displayName = "displayName",
+                versionHeaderName = "versionHeaderName",
+                versioningScheme = "versioningScheme",
+                versionQueryName = "versionQueryName"
             };
+            creatorConfig.apiVersionSets.Add(apiVersionSet);
 
             // act
             Template versionSetTemplate = apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig);
             APIVersionSetTemplateResource apiVersionSetTemplateResource = (APIVersionSetTemplateResource)versionSetTemplate.resources[0];
 
             // assert
-            Assert.Equal(creatorConfig.apiVersionSet.description, apiVersionSetTemplateResource.properties.description);
-            Assert.Equal(creatorConfig.apiVersionSet.displayName, apiVersionSetTemplateResource.properties.displayName);
-            Assert.Equal(creatorConfig.apiVersionSet.versionHeaderName, apiVersionSetTemplateResource.properties.versionHeaderName);
-            Assert.Equal(creatorConfig.apiVersionSet.versioningScheme, apiVersionSetTemplateResource.properties.versioningScheme);
-            Assert.Equal(creatorConfig.apiVersionSet.versionQueryName, apiVersionSetTemplateResource.properties.versionQueryName);
+            Assert.Equal(apiVersionSet.description, apiVersionSetTemplateResource.properties.description);
+            Assert.Equal(apiVersionSet.displayName, apiVersionSetTemplateResource.properties.displayName);
+            Assert.Equal(apiVersionSet.versionHeaderName, apiVersionSetTemplateResource.properties.versionHeaderName);
+            Assert.Equal(apiVersionSet.versioningScheme, apiVersionSetTemplateResource.properties.versioningScheme);
+            Assert.Equal(apiVersionSet.versionQueryName, apiVersionSetTemplateResource.properties.versionQueryName);
         }
 
         [Fact]
         public void ShouldUseDefaultResourceNameWithoutProvidedId()
         {
             // arrange
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = APIVersionSetTemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig()
-            {
-                apiVersionSet = new APIVersionSetConfig()                
-            };
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apiVersionSets = new List<APIVersionSetConfig>() };
+            APIVersionSetConfig apiVersionSet = new APIVersionSetConfig();
+            creatorConfig.apiVersionSets.Add(apiVersionSet);
 
             // act
             Template versionSetTemplate = apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig);
@@ -58,21 +57,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldUseProvidedIdInResourceName()
         {
             // arrange
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = APIVersionSetTemplateCreatorFactory.GenerateAPIVersionSetTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig()
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apiVersionSets = new List<APIVersionSetConfig>() };
+            APIVersionSetConfig apiVersionSet = new APIVersionSetConfig()
             {
-                apiVersionSet = new APIVersionSetConfig()
-                {
-                    id = "id"
-                }
+                id = "id"
             };
+            creatorConfig.apiVersionSets.Add(apiVersionSet);
 
             // act
             Template versionSetTemplate = apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig);
             APIVersionSetTemplateResource apiVersionSetTemplateResource = (APIVersionSetTemplateResource)versionSetTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{creatorConfig.apiVersionSet.id}')]", apiVersionSetTemplateResource.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{apiVersionSet.id}')]", apiVersionSetTemplateResource.name);
         }
     }
 }
