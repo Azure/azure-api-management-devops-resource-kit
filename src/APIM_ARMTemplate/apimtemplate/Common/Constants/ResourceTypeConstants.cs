@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     internal static class ResourceTypeConstants
     {
         public const string API = "Microsoft.ApiManagement/service/apis";
-        public const string APIVersionSet = "Microsoft.ApiManagement/service/api-version-sets";
+        public const string APIVersionSet = "Microsoft.ApiManagement/service/apiVersionSets";
         public const string APIDiagnostic = "Microsoft.ApiManagement/service/apis/diagnostics";
         public const string APIOperation = "Microsoft.ApiManagement/service/apis/operations";
         public const string APIOperationPolicy = "Microsoft.ApiManagement/service/apis/operations/policies";
