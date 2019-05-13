@@ -127,7 +127,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if (api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null
                     && apiTemplateResource.properties.authenticationSettings != null && apiTemplateResource.properties.authenticationSettings.oAuth2 != null && apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId != null)
                 {
-                    apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = $"[resourceId('Microsoft.ApiManagement/service/authorizationServers', parameters('ApimServiceName'), '{api.authenticationSettings.oAuth2.authorizationServerId}')]";
+                    apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = api.authenticationSettings.oAuth2.authorizationServerId;
                 }
             }
             if (!isSplit || !isInitial)
@@ -160,7 +160,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool isSplitAPI(APIConfig apiConfig)
         {
             // the api needs to be split into multiple templates if the user has supplied a version or version set - deploying swagger related properties at the same time as api version related properties fails, so they must be written and deployed separately
-            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null;
+            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null || (apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.oAuth2 != null && apiConfig.authenticationSettings.oAuth2.authorizationServerId != null);
         }
     }
 }
