@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
             Assert.Equal(api.revision, apiTemplateResource.properties.apiRevision);
             Assert.Equal(api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.properties.path);
@@ -126,7 +126,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
             Assert.Equal(api.revision, apiTemplateResource.properties.apiRevision);
             Assert.Equal(api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.properties.path);

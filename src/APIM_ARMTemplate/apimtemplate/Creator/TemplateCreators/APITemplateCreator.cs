@@ -121,7 +121,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if (api.apiVersionSetId != null)
                 {
                     // point to the supplied version set if the apiVersionSetId is provided
-                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/api-version-sets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]";
+                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]";
                 }
                 // set the authorization server id
                 if (api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null
