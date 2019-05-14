@@ -11,19 +11,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfDeploymentResources()
         {
             // arrange
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService" };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             Template apiVersionSetsTemplate = new Template();
             Template productsTemplate = new Template();
             Template loggersTemplate = new Template();
             List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
-            CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames();
+            FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
             // should create 5 resources (apiVersionSet, product, logger, both api templates)
             int count = 5;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);

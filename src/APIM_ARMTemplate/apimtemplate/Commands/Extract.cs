@@ -50,8 +50,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Console.WriteLine("Executing full extraction ...", singleApiName);
                 }
 
-                // initialize entity extractor classes
+                // initialize file helper classes
                 FileWriter fileWriter = new FileWriter();
+                FileNameGenerator fileNameGenerator = new FileNameGenerator();
+                FileNames fileNames = fileNameGenerator.GenerateFileNames(apimname);
+
+                // initialize entity extractor classes
                 APIExtractor apiExtractor = new APIExtractor();
                 APIVersionSetExtractor apiVersionSetExtractor = new APIVersionSetExtractor();
                 AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
@@ -72,14 +76,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources, namedValueResources);
 
                 // write templates to output file location
-                string apiFileName = singleApiName == null ? @fileFolder + Path.DirectorySeparatorChar + apimname + "-apis-template.json" : @fileFolder + Path.DirectorySeparatorChar + apimname + "-" + singleApiName + "-api-template.json";
-                fileWriter.WriteJSONToFile(apiTemplate, apiFileName);
-                fileWriter.WriteJSONToFile(apiVersionSetTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-apiVersionSets.json");
-                fileWriter.WriteJSONToFile(authorizationTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-authorizationServers.json");
-                fileWriter.WriteJSONToFile(backendTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-backends.json");
-                fileWriter.WriteJSONToFile(loggerTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-loggers.json");
-                fileWriter.WriteJSONToFile(namedValueTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-namedValues.json");
-                fileWriter.WriteJSONToFile(productTemplate, @fileFolder + Path.DirectorySeparatorChar + apimname + "-products.json");
+                string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, apimname);
+                fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@fileFolder, apiFileName));
+                fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(@fileFolder, fileNames.apiVersionSets));
+                fileWriter.WriteJSONToFile(authorizationTemplate, String.Concat(@fileFolder, fileNames.authorizationServers));
+                fileWriter.WriteJSONToFile(backendTemplate, String.Concat(@fileFolder, fileNames.backends));
+                fileWriter.WriteJSONToFile(loggerTemplate, String.Concat(@fileFolder, fileNames.loggers));
+                fileWriter.WriteJSONToFile(namedValueTemplate, String.Concat(@fileFolder, fileNames.namedValues));
+                fileWriter.WriteJSONToFile(productTemplate, String.Concat(@fileFolder, fileNames.products));
 
                 Console.WriteLine("Templates written to output location");
                 Console.WriteLine("Press any key to exit process:");
