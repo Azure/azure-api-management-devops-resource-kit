@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
         public string GenerateExtractorAPIFileName(string singleAPIName, string apimServiceName)
         {
-            return singleAPIName == null ? $@"{apimServiceName}-apis.template.json" : $@"{apimServiceName}-{singleAPIName}-api.template.json";
+            return singleAPIName == null ? $@"/{apimServiceName}-apis.template.json" : $@"/{apimServiceName}-{singleAPIName}-api.template.json";
         }
     }
 

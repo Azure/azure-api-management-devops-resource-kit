@@ -90,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     }
 
                     // create parameters file
-                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+                    Template templateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
                     // write templates to outputLocation
                     if (creatorConfig.linked == true)
@@ -129,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     }
 
                     // write parameters to outputLocation
-                    fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, fileNames.parameters));
+                    fileWriter.WriteJSONToFile(templateParameters, String.Concat(creatorConfig.outputLocation, fileNames.parameters));
                     Console.WriteLine("Templates written to output location");
                     Console.WriteLine("Press any key to exit process:");
 #if DEBUG
