@@ -14,7 +14,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.Name = GlobalConstants.ExtractName;
             this.Description = GlobalConstants.ExtractDescription;
 
-            var apiManagementName = this.Option("--name <apimname>", "API Management name", CommandOptionType.SingleValue);
+            var sourceApimName = this.Option("--sourceApimName <sourceApimName>", "Source API Management name", CommandOptionType.SingleValue);
+            var destinationAPIManagementName = this.Option("--destinationApimName <destinationApimName>", "Destination API Management name", CommandOptionType.SingleValue);
             var resourceGroupName = this.Option("--resourceGroup <resourceGroup>", "Resource Group name", CommandOptionType.SingleValue);
             var fileFolderName = this.Option("--fileFolder <filefolder>", "ARM Template files folder", CommandOptionType.SingleValue);
             var apiName = this.Option("--apiName <apiName>", "API name", CommandOptionType.SingleValue);
@@ -24,13 +25,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             this.OnExecute(async () =>
             {
-                if (!apiManagementName.HasValue()) throw new Exception("Missing parameter <apimname>.");
+                if (!sourceApimName.HasValue()) throw new Exception("Missing parameter <sourceApimName>.");
+                if (!destinationAPIManagementName.HasValue()) throw new Exception("Missing parameter <destinationApimName>.");
                 if (!resourceGroupName.HasValue()) throw new Exception("Missing parameter <resourceGroup>.");
                 if (!fileFolderName.HasValue()) throw new Exception("Missing parameter <filefolder>.");
 
                 // isolate cli parameters
                 string resourceGroup = resourceGroupName.Values[0].ToString();
-                string apimname = apiManagementName.Values[0].ToString();
+                string sourceApim = sourceApimName.Values[0].ToString();
+                string destinationApim = destinationAPIManagementName.Values[0].ToString();
                 string fileFolder = fileFolderName.Values[0].ToString();
                 string linkedBaseUrl = linkedBaseUrlName.Values[0].ToString();
                 string singleApiName = null;
@@ -42,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 Console.WriteLine("API Management Template");
                 Console.WriteLine();
-                Console.WriteLine("Connecting to {0} API Management Service on {1} Resource Group ...", apimname, resourceGroup);
+                Console.WriteLine("Connecting to {0} API Management Service on {1} Resource Group ...", sourceApim, resourceGroup);
                 if (singleApiName != null)
                 {
                     Console.WriteLine("Executing extraction for {0} API ...", singleApiName);
@@ -55,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // initialize file helper classes
                 FileWriter fileWriter = new FileWriter();
                 FileNameGenerator fileNameGenerator = new FileNameGenerator();
-                FileNames fileNames = fileNameGenerator.GenerateFileNames(apimname);
+                FileNames fileNames = fileNameGenerator.GenerateFileNames(sourceApim);
 
                 // initialize entity extractor classes
                 APIExtractor apiExtractor = new APIExtractor();
@@ -68,21 +71,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
                 // extract templates from apim service
-                Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(apimname, resourceGroup, fileFolder, singleApiName);
+                Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(sourceApim, resourceGroup, fileFolder, singleApiName);
                 List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
-                Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
-                Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
-                Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
-                Template productTemplate = await productExtractor.GenerateProductsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
-                Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources);
+                Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
+                Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
+                Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
+                Template productTemplate = await productExtractor.GenerateProductsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
+                Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
                 List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
-                Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(apimname, resourceGroup, singleApiName, apiTemplateResources, namedValueResources);
+                Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources);
 
                 // create parameters file
-                Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(apimname, linkedBaseUrl);
+                Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(destinationApim, linkedBaseUrl);
 
                 // write templates to output file location
-                string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, apimname);
+                string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
                 fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@fileFolder, apiFileName));
                 fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(@fileFolder, fileNames.apiVersionSets));
                 fileWriter.WriteJSONToFile(authorizationServerTemplate, String.Concat(@fileFolder, fileNames.authorizationServers));
@@ -94,7 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 if (linkedBaseUrl != null)
                 {
                     // create a master template that links to all other templates
-                    Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames);
+                    Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames, apiFileName);
                     fileWriter.WriteJSONToFile(masterTemplate, String.Concat(@fileFolder, fileNames.linkedMaster));
                 }
 

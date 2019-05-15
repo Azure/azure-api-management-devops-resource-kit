@@ -15,7 +15,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template backendsTemplate,
             Template authorizationServersTemplate,
             Template namedValuesTemplate,
-            FileNames fileNames)
+            FileNames fileNames,
+            string apiFileName)
         {
             // create empty template
             Template masterTemplate = GenerateEmptyTemplate();
@@ -74,8 +75,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // api
             if (apiTemplate != null)
             {
-                string authorizationServersUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{fileNames.authorizationServers}')]";
-                resources.Add(this.CreateLinkedMasterTemplateResource("authorizationServersTemplate", authorizationServersUri, GenerateAPIResourceDependencies(apiTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, namedValueDeploymentResourceName)));
+                string apisUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{apiFileName}')]";
+                resources.Add(this.CreateLinkedMasterTemplateResource("apisTemplate", apisUri, GenerateAPIResourceDependencies(apiTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, namedValueDeploymentResourceName)));
             }
 
             masterTemplate.resources = resources.ToArray();
