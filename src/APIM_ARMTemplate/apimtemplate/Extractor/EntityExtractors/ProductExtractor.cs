@@ -30,6 +30,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
+        public async Task<string> GetProductPolicy(string ApiManagementName, string ResourceGroupName, string ProductName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies/policy?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+
+            return await CallApiManagement(azToken, requestUrl);
+        }
+
         public async Task<Template> GenerateProductsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
@@ -65,6 +75,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     Console.WriteLine("'{0}' Product found", productName);
                     templateResources.Add(productsTemplateResource);
+
+                    // add product policy resource to template
+                    try
+                    {
+                        string productPolicy = await GetProductPolicy(apimname, resourceGroup, productName);
+                        Console.WriteLine($" - Product policy found for {productName} product");
+                        PolicyTemplateResource productPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(productPolicy);
+                        productPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}/policy')]";
+                        productPolicyResource.apiVersion = GlobalConstants.APIVersion;
+                        productPolicyResource.scale = null;
+                        productPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+
+                        templateResources.Add(productPolicyResource);
+                    }
+                    catch (Exception) { }
                 }
             }
 
