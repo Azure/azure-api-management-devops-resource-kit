@@ -108,9 +108,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 OpenApiDocument doc = await openAPISpecReader.ConvertOpenAPISpecToDoc(api.openApiSpec);
                 // supplied via optional arguments
                 apiTemplateResource.properties.apiVersion = api.apiVersion;
+                apiTemplateResource.properties.serviceUrl = api.serviceUrl;
+                apiTemplateResource.properties.type = api.type;
+                apiTemplateResource.properties.apiType = api.type;
+                apiTemplateResource.properties.description = api.description;
                 apiTemplateResource.properties.subscriptionRequired = api.subscriptionRequired;
-                apiTemplateResource.properties.apiRevision = api.revision;
-                apiTemplateResource.properties.apiRevisionDescription = api.revisionDescription;
+                apiTemplateResource.properties.apiRevision = api.apiRevision;
+                apiTemplateResource.properties.apiRevisionDescription = api.apiRevisionDescription;
                 apiTemplateResource.properties.apiVersionDescription = api.apiVersionDescription;
                 apiTemplateResource.properties.authenticationSettings = api.authenticationSettings;
                 apiTemplateResource.properties.path = api.suffix;

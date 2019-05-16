@@ -22,6 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string apiVersionDescription { get; set; }
         public string apiVersionSetId { get; set; }
         public Nullable<bool> subscriptionRequired { get; set; }
+        public string sourceApiId { get; set; }
         public string displayName { get; set; }
         public string serviceUrl { get; set; }
         public string path { get; set; }
