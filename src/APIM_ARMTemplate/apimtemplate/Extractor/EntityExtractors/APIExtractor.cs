@@ -271,6 +271,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         productAPIResource.apiVersion = GlobalConstants.APIVersion;
                         productAPIResource.scale = null;
                         productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+                        // deployment throws errors if resource does not have a properties object
+                        if (productAPIResource.properties == null)
+                        {
+                            productAPIResource.properties = new ProductAPITemplateProperties();
+                        }
 
                         templateResources.Add(productAPIResource);
                     }
