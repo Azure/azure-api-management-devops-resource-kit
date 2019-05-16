@@ -72,6 +72,7 @@ products:
       approvalRequired: true
       subscriptionsLimit: 1
       state: notPublished
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml   # Optional, can be url or local file
 loggers:
     - name: myAppInsights
       loggerType: applicationInsights

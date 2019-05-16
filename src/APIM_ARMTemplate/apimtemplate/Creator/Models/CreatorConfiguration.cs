@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string apimServiceName { get; set; }
         public List<APIVersionSetConfig> apiVersionSets { get; set; }
         public List<APIConfig> apis { get; set; }
-        public List<ProductsTemplateProperties> products { get; set; }
+        public List<ProductConfig> products { get; set; }
         public List<LoggerConfig> loggers { get; set; }
         public List<AuthorizationServerTemplateProperties> authorizationServers { get; set; }
         public List<BackendTemplateProperties> backends { get; set; }
@@ -72,5 +72,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string name { get; set; }
     }
 
-
+    public class ProductConfig : ProductsTemplateProperties
+    {
+        // policy file location (local or url)
+        public string policy { get; set; }
+    }
+    
 }

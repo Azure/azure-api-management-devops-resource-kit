@@ -40,12 +40,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // initialize template creator classes
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
                     LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator();
-                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator();
                     BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator();
                     AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator();
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
+                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator);
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
