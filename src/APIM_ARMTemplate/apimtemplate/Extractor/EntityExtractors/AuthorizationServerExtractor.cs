@@ -30,11 +30,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
+        public async Task<Template> GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting authorization servers from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

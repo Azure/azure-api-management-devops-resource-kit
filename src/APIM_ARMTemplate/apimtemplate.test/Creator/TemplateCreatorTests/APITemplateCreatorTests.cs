@@ -20,8 +20,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                 apiVersion = "apiVersion",
                 apiVersionDescription = "apiVersionDescription",
                 apiVersionSetId = "apiVersionSetId",
-                revision = "revision",
-                revisionDescription = "revisionDescription",
+                apiRevision = "revision",
+                apiRevisionDescription = "revisionDescription",
                 suffix = "suffix",
                 subscriptionRequired = true,
                 authenticationSettings = new APITemplateAuthenticationSettings()
@@ -51,8 +51,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
             Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
-            Assert.Equal(api.revision, apiTemplateResource.properties.apiRevision);
-            Assert.Equal(api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
+            Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
+            Assert.Equal(api.apiRevisionDescription, apiTemplateResource.properties.apiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.properties.path);
             Assert.Equal(api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
             Assert.Equal(api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);
@@ -96,8 +96,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                 apiVersion = "apiVersion",
                 apiVersionDescription = "apiVersionDescription",
                 apiVersionSetId = "apiVersionSetId",
-                revision = "revision",
-                revisionDescription = "revisionDescription",
+                apiRevision = "revision",
+                apiRevisionDescription = "revisionDescription",
                 suffix = "suffix",
                 subscriptionRequired = true,
                 authenticationSettings = new APITemplateAuthenticationSettings()
@@ -127,8 +127,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
             Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
-            Assert.Equal(api.revision, apiTemplateResource.properties.apiRevision);
-            Assert.Equal(api.revisionDescription, apiTemplateResource.properties.apiRevisionDescription);
+            Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
+            Assert.Equal(api.apiRevisionDescription, apiTemplateResource.properties.apiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.properties.path);
             Assert.Equal(api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
             Assert.Equal(api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);

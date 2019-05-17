@@ -30,11 +30,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateLoggerTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
+        public async Task<Template> GenerateLoggerTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
             // isolate product api associations in the case of a single api extraction
             var diagnosticResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIDiagnostic);

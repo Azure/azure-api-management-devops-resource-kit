@@ -16,13 +16,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template authorizationServersTemplate,
             Template namedValuesTemplate,
             FileNames fileNames,
-            string apiFileName)
+            string apiFileName,
+            string policyXMLBaseUrl)
         {
             // create empty template
             Template masterTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters(true);
+            masterTemplate.parameters = this.CreateMasterTemplateParameters(true, policyXMLBaseUrl);
 
             // add deployment resources that links to all resource files
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -131,7 +132,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return masterTemplateResource;
         }
 
-        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(bool linked)
+        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(bool linked, string policyXMLBaseUrl)
         {
             // used to create the parameter metatadata, etc (not value) for use in file with resources
             // add parameters with metatdata properties
@@ -152,16 +153,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     metadata = new TemplateParameterMetadata()
                     {
-                        description = "Base URL of the repository"
+                        description = "Base URL of the repository that contains the generated templates"
                     },
                     type = "string"
                 };
                 parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
             }
+            if (policyXMLBaseUrl != null)
+            {
+                TemplateParameterProperties policyTemplateBaseUrlProperties = new TemplateParameterProperties()
+                {
+                    metadata = new TemplateParameterMetadata()
+                    {
+                        description = "Base URL of the repository that contains the generated policy files"
+                    },
+                    type = "string"
+                };
+                parameters.Add("PolicyXMLBaseUrl", policyTemplateBaseUrlProperties);
+            }
             return parameters;
         }
 
-        public Template CreateMasterTemplateParameterValues(string apimServiceName, string linkedTemplatesBaseUrl)
+        public Template CreateMasterTemplateParameterValues(string apimServiceName, string linkedTemplatesBaseUrl, string policyXMLBaseUrl)
         {
             // used to create the parameter values for use in parameters file
             // create empty template
@@ -181,6 +194,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     value = linkedTemplatesBaseUrl
                 };
                 parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
+            }
+            if (policyXMLBaseUrl != null)
+            {
+                TemplateParameterProperties policyTemplateBaseUrlProperties = new TemplateParameterProperties()
+                {
+                    value = policyXMLBaseUrl
+                };
+                parameters.Add("PolicyXMLBaseUrl", policyTemplateBaseUrlProperties);
             }
             masterTemplate.parameters = parameters;
             return masterTemplate;

@@ -11,9 +11,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateProductFromCreatorConfig()
         {
             // arrange
-            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductsTemplateProperties>() };
-            ProductsTemplateProperties product = new ProductsTemplateProperties()
+            ProductTemplateCreator productTemplateCreator = ProductTemplateCreatorFactory.GenerateProductTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
+            ProductConfig product = new ProductConfig()
             {
                 displayName = "displayName",
                 description = "description",
@@ -21,7 +21,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                 subscriptionRequired = true,
                 approvalRequired = true,
                 subscriptionsLimit = 1,
-                state = "state"
+                state = "state",
+                policy = "<inbound></inbound>"
             };
             creatorConfig.products.Add(product);
 

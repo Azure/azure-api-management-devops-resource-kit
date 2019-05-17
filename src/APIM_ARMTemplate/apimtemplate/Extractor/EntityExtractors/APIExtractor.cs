@@ -110,12 +110,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAPIsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName)
+        public async Task<Template> GenerateAPIsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, string policyXMLBaseUrl)
         {
             // pull all apis from service
             string apis = await GetAPIs(apimname, resourceGroup);
             // initialize arm template
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
             JObject oApi = JObject.Parse(apis);
             oApi = FormatoApi(singleApiName, oApi);

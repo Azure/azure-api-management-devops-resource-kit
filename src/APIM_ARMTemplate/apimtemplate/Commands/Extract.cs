@@ -19,7 +19,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var resourceGroupName = this.Option("--resourceGroup <resourceGroup>", "Resource Group name", CommandOptionType.SingleValue);
             var fileFolderName = this.Option("--fileFolder <filefolder>", "ARM Template files folder", CommandOptionType.SingleValue);
             var apiName = this.Option("--apiName <apiName>", "API name", CommandOptionType.SingleValue);
-            var linkedBaseUrlName = this.Option("--linkedBaseUrl <apiName>", "Creates a master template with links", CommandOptionType.SingleValue);
+            var linkedBaseUrlName = this.Option("--linkedBaseUrl <linkedBaseUrl>", "Creates a master template with links", CommandOptionType.SingleValue);
+            var policyXMLBaseUrlName = this.Option("--policyXMLBaseUrl <policyXMLBaseUrl>", "Writes policies to local XML files that require deployment to remote folder", CommandOptionType.SingleValue);
 
             this.HelpOption();
 
@@ -35,7 +36,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string sourceApim = sourceApimName.Values[0].ToString();
                 string destinationApim = destinationAPIManagementName.Values[0].ToString();
                 string fileFolder = fileFolderName.Values[0].ToString();
-                string linkedBaseUrl = linkedBaseUrlName.Values[0].ToString();
+                string linkedBaseUrl = linkedBaseUrlName.HasValue() ? linkedBaseUrlName.Value().ToString() : null;
+                string policyXMLBaseUrl = policyXMLBaseUrlName.HasValue() ? policyXMLBaseUrlName.Value().ToString() : null;
                 string singleApiName = null;
 
                 if (apiName.Values.Count > 0)
@@ -71,18 +73,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
                 // extract templates from apim service
-                Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(sourceApim, resourceGroup, fileFolder, singleApiName);
+                Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(sourceApim, resourceGroup, fileFolder, singleApiName, policyXMLBaseUrl);
                 List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
-                Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
-                Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
-                Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
-                Template productTemplate = await productExtractor.GenerateProductsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
-                Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
+                Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
+                Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
+                Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
+                Template productTemplate = await productExtractor.GenerateProductsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
+                Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
                 List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
-                Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources);
+                Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl);
 
                 // create parameters file
-                Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(destinationApim, linkedBaseUrl);
+                Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(destinationApim, linkedBaseUrl, policyXMLBaseUrl);
 
                 // write templates to output file location
                 string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
@@ -97,7 +99,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 if (linkedBaseUrl != null)
                 {
                     // create a master template that links to all other templates
-                    Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames, apiFileName);
+                    Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames, apiFileName, policyXMLBaseUrl);
                     fileWriter.WriteJSONToFile(masterTemplate, String.Concat(@fileFolder, fileNames.linkedMaster));
                 }
 
