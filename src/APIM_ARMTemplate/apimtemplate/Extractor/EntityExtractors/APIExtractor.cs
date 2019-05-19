@@ -10,6 +10,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class APIExtractor : EntityExtractor
     {
+        private FileWriter fileWriter;
+
+        public APIExtractor(FileWriter fileWriter)
+        {
+            this.fileWriter = fileWriter;
+        }
+
         public async Task<string> GetAPIOperations(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -110,7 +117,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAPIsARMTemplate(string apimname, string resourceGroup, string fileFolder, string singleApiName, string policyXMLBaseUrl)
+        public async Task<Template> GenerateAPIsARMTemplate(string apimname, string resourceGroup, string singleApiName, string policyXMLBaseUrl, string fileFolder)
         {
             // pull all apis from service
             string apis = await GetAPIs(apimname, resourceGroup);
@@ -228,6 +235,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         operationPolicyResource.scale = null;
                         operationPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
 
+                        // write policy xml content to file and point to it if policyXMLBaseUrl is provided
+                        if (policyXMLBaseUrl != null)
+                        {
+                            string policyXMLContent = operationPolicyResource.properties.value;
+                            string policyFolder = String.Concat(fileFolder, $@"/policies");
+                            string operationPolicyFileName = $@"/{operationName}-operationPolicy.xml";
+                            this.fileWriter.CreateFolderIfNotExists(policyFolder);
+                            this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, operationPolicyFileName));
+                            operationPolicyResource.properties.format = "rawxml-link";
+                            operationPolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{operationPolicyFileName}')]";
+                        }
+
                         templateResources.Add(operationPolicyResource);
                     }
                     catch (Exception) { }
@@ -246,6 +265,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     apiPoliciesResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiPoliciesResource.name}')]";
                     apiPoliciesResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
 
+                    // write policy xml content to file and point to it if policyXMLBaseUrl is provided
+                    if (policyXMLBaseUrl != null)
+                    {
+                        string policyXMLContent = apiPoliciesResource.properties.value;
+                        string policyFolder = String.Concat(fileFolder, $@"/policies");
+                        string apiPolicyFileName = $@"/{apiName}-apiPolicy.xml";
+                        this.fileWriter.CreateFolderIfNotExists(policyFolder);
+                        this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, apiPolicyFileName));
+                        apiPoliciesResource.properties.format = "rawxml-link";
+                        apiPoliciesResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{apiPolicyFileName}')]";
+                    }
                     templateResources.Add(apiPoliciesResource);
                 }
                 catch (Exception) { }

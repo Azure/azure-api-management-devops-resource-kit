@@ -10,6 +10,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class ProductExtractor : EntityExtractor
     {
+        private FileWriter fileWriter;
+
+        public ProductExtractor(FileWriter fileWriter)
+        {
+            this.fileWriter = fileWriter;
+        }
+
         public async Task<string> GetProducts(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -40,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagement(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateProductsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateProductsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl, string fileFolder)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting products from service");
@@ -86,6 +93,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         productPolicyResource.apiVersion = GlobalConstants.APIVersion;
                         productPolicyResource.scale = null;
                         productPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+
+                        // write policy xml content to file and point to it if policyXMLBaseUrl is provided
+                        if (policyXMLBaseUrl != null)
+                        {
+                            string policyXMLContent = productPolicyResource.properties.value;
+                            string policyFolder = String.Concat(fileFolder, $@"/policies");
+                            string productPolicyFileName = $@"/{productName}-productPolicy.xml";
+                            this.fileWriter.CreateFolderIfNotExists(policyFolder);
+                            this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, productPolicyFileName));
+                            productPolicyResource.properties.format = "rawxml-link";
+                            productPolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{productPolicyFileName}')]";
+                        }
 
                         templateResources.Add(productPolicyResource);
                     }

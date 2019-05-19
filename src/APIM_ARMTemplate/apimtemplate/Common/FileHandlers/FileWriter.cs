@@ -17,5 +17,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                             });
             File.WriteAllText(location, jsonString);
         }
+
+        public void WriteXMLToFile(string xmlContent, string location)
+        {
+            // writes xml content to provided location
+            File.WriteAllText(location, xmlContent);
+        }
+
+        public void CreateFolderIfNotExists(string folderLocation)
+        {
+            // creates directory if it does not already exist
+            System.IO.Directory.CreateDirectory(folderLocation);
+        }
     }
 }

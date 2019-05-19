@@ -63,22 +63,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 FileNames fileNames = fileNameGenerator.GenerateFileNames(sourceApim);
 
                 // initialize entity extractor classes
-                APIExtractor apiExtractor = new APIExtractor();
+                APIExtractor apiExtractor = new APIExtractor(fileWriter);
                 APIVersionSetExtractor apiVersionSetExtractor = new APIVersionSetExtractor();
                 AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
                 BackendExtractor backendExtractor = new BackendExtractor();
                 LoggerExtractor loggerExtractor = new LoggerExtractor();
                 PropertyExtractor propertyExtractor = new PropertyExtractor();
-                ProductExtractor productExtractor = new ProductExtractor();
+                ProductExtractor productExtractor = new ProductExtractor(fileWriter);
                 MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
                 // extract templates from apim service
-                Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(sourceApim, resourceGroup, fileFolder, singleApiName, policyXMLBaseUrl);
+                Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplate(sourceApim, resourceGroup, singleApiName, policyXMLBaseUrl, fileFolder);
                 List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
                 Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
                 Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
                 Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
-                Template productTemplate = await productExtractor.GenerateProductsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
+                Template productTemplate = await productExtractor.GenerateProductsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, fileFolder);
                 Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
                 List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
                 Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplate(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl);
