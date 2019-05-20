@@ -172,7 +172,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<string> protocols = new List<string>();
             foreach (OpenApiServer server in doc.Servers)
             {
-                protocols.Add(server.Url.Split(":")[0]);
+                string protocol = server.Url.Split(":")[0];
+                if (protocols.Exists(p => p == protocol) == false)
+                {
+                    protocols.Add(protocol);
+                }
             }
             return protocols.ToArray();
         }
