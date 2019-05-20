@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract  --sourceApimName LucasBlankLinked  --destinationApimName LucasBlankUnlinked --resourceGroup LucasHuetHudsonInternal --fileFolder C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\GeneratedTemplates\\Extractor\\Full --linkedTemplatesBaseUrl https://lucasarmtemplates.blob.core.windows.net/linked-templates "
+      "commandLineArgs": "create --configFile ./Creator/ExampleFiles/YAMLConfigs/validTesting.yml"
     }
   }
 }

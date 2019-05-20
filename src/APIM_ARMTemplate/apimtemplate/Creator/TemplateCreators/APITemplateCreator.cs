@@ -13,36 +13,49 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         private PolicyTemplateCreator policyTemplateCreator;
         private ProductAPITemplateCreator productAPITemplateCreator;
         private DiagnosticTemplateCreator diagnosticTemplateCreator;
+        private ReleaseTemplateCreator releaseTemplateCreator;
 
-        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator)
+        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator, ReleaseTemplateCreator releaseTemplateCreator)
         {
             this.fileReader = fileReader;
             this.policyTemplateCreator = policyTemplateCreator;
             this.productAPITemplateCreator = productAPITemplateCreator;
             this.diagnosticTemplateCreator = diagnosticTemplateCreator;
+            this.releaseTemplateCreator = releaseTemplateCreator;
         }
 
-        public async Task<List<Template>> CreateAPITemplatesAsync(CreatorConfig creatorConfig, APIConfig api)
+        public async Task<List<Template>> CreateAPITemplatesAsync(APIConfig api)
         {
             // determine if api needs to be split into multiple templates
             bool isSplit = isSplitAPI(api);
+
+            // update api name if necessary (apiRevision > 1 and isCurrent = true) 
+            int revisionNumber = 0;
+            if (Int32.TryParse(api.apiRevision, out revisionNumber))
+            {
+                if (revisionNumber > 1 && api.isCurrent == true)
+                {
+                    string currentAPIName = api.name;
+                    api.name += $";rev={revisionNumber}";
+                }
+            }
 
             List<Template> apiTemplates = new List<Template>();
             if (isSplit == true)
             {
                 // create 2 templates, an initial template with metadata and a subsequent template with the swagger content
-                apiTemplates.Add(await CreateAPITemplateAsync(creatorConfig, api, isSplit, true));
-                apiTemplates.Add(await CreateAPITemplateAsync(creatorConfig, api, isSplit, false));
+                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, true));
+                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, false));
             }
             else
             {
                 // create a unified template that includes both the metadata and swagger content 
-                apiTemplates.Add(await CreateAPITemplateAsync(creatorConfig, api, isSplit, false));
+                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, false));
             }
             return apiTemplates;
         }
 
-        public async Task<Template> CreateAPITemplateAsync(CreatorConfig creatorConfig, APIConfig api, bool isSplit, bool isInitial)
+        public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
             Template apiTemplate = CreateEmptyTemplate();
@@ -77,12 +90,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<PolicyTemplateResource> operationPolicyResources = api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(api, dependsOn) : null;
             List<ProductAPITemplateResource> productAPIResources = api.products != null ? this.productAPITemplateCreator.CreateProductAPITemplateResources(api, dependsOn) : null;
             DiagnosticTemplateResource diagnosticTemplateResource = api.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn) : null;
+            // add release resource if the name has been appended with ;rev{revisionNumber}
+            ReleaseTemplateResource releaseTemplateResource = api.name.Contains(";rev") == true ? this.releaseTemplateCreator.CreateAPIReleaseTemplateResource(api, dependsOn) : null;
 
             // add resources if not null
             if (apiPolicyResource != null) resources.Add(apiPolicyResource);
             if (operationPolicyResources != null) resources.AddRange(operationPolicyResources);
             if (productAPIResources != null) resources.AddRange(productAPIResources);
             if (diagnosticTemplateResource != null) resources.Add(diagnosticTemplateResource);
+            if (releaseTemplateResource != null) resources.Add(releaseTemplateResource);
 
             return resources;
         }

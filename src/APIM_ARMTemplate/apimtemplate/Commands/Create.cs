@@ -45,8 +45,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
+                    ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
                     ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator);
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
@@ -74,7 +75,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     foreach (APIConfig api in creatorConfig.apis)
                     {
                         // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
-                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(creatorConfig, api);
+                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
                         apiTemplates.AddRange(apiTemplateSet);
                         // create the relevant info that will be needed to properly link to the api template(s) from the master template
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()

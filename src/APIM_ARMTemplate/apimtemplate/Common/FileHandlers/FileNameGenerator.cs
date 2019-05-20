@@ -23,13 +23,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
         public string GenerateCreatorAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI, string apimServiceName)
         {
+            // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
+            string sanitizedAPIName = apiName.Split(";")[0];
             if (isSplitAPI == true)
             {
-                return isInitialAPI == true ? $@"/{apimServiceName}-{apiName}-initial.api.template.json" : $@"/{apimServiceName}-{apiName}-subsequent.api.template.json";
+                return isInitialAPI == true ? $@"/{apimServiceName}-{sanitizedAPIName}-initial.api.template.json" : $@"/{apimServiceName}-{sanitizedAPIName}-subsequent.api.template.json";
             }
             else
             {
-                return $@"/{apimServiceName}-{apiName}.api.template.json";
+                return $@"/{apimServiceName}-{sanitizedAPIName}.api.template.json";
             }
         }
 
