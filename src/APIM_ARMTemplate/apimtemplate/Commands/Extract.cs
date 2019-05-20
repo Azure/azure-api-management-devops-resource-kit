@@ -19,7 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var resourceGroupName = this.Option("--resourceGroup <resourceGroup>", "Resource Group name", CommandOptionType.SingleValue);
             var fileFolderName = this.Option("--fileFolder <filefolder>", "ARM Template files folder", CommandOptionType.SingleValue);
             var apiName = this.Option("--apiName <apiName>", "API name", CommandOptionType.SingleValue);
-            var linkedBaseUrlName = this.Option("--linkedBaseUrl <linkedBaseUrl>", "Creates a master template with links", CommandOptionType.SingleValue);
+            var linkedTemplatesBaseUrlName = this.Option("--linkedTemplatesBaseUrl <linkedTemplatesBaseUrl>", "Creates a master template with links", CommandOptionType.SingleValue);
             var policyXMLBaseUrlName = this.Option("--policyXMLBaseUrl <policyXMLBaseUrl>", "Writes policies to local XML files that require deployment to remote folder", CommandOptionType.SingleValue);
 
             this.HelpOption();
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string sourceApim = sourceApimName.Values[0].ToString();
                 string destinationApim = destinationAPIManagementName.Values[0].ToString();
                 string fileFolder = fileFolderName.Values[0].ToString();
-                string linkedBaseUrl = linkedBaseUrlName.HasValue() ? linkedBaseUrlName.Value().ToString() : null;
+                string linkedBaseUrl = linkedTemplatesBaseUrlName.HasValue() ? linkedTemplatesBaseUrlName.Value().ToString() : null;
                 string policyXMLBaseUrl = policyXMLBaseUrlName.HasValue() ? policyXMLBaseUrlName.Value().ToString() : null;
                 string singleApiName = null;
 
