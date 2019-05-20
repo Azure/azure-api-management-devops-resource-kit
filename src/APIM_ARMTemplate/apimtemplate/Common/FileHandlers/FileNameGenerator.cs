@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string GenerateCreatorAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI, string apimServiceName)
         {
             // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
-            string sanitizedAPIName = apiName.Split(";")[0];
+            string sanitizedAPIName = GenerateOriginalAPIName(apiName);
             if (isSplitAPI == true)
             {
                 return isInitialAPI == true ? $@"/{apimServiceName}-{sanitizedAPIName}-initial.api.template.json" : $@"/{apimServiceName}-{sanitizedAPIName}-subsequent.api.template.json";
@@ -38,6 +38,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string GenerateExtractorAPIFileName(string singleAPIName, string apimServiceName)
         {
             return singleAPIName == null ? $@"/{apimServiceName}-apis.template.json" : $@"/{apimServiceName}-{singleAPIName}-api.template.json";
+        }
+
+        public string GenerateOriginalAPIName(string apiName)
+        {
+            // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
+            string originalName = apiName.Split(";")[0];
+            return originalName;
         }
     }
 

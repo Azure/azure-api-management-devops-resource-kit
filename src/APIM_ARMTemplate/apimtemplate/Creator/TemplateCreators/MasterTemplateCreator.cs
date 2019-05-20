@@ -66,8 +66,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if(apiInfo.isSplit == true)
                 {
                     // add a deployment resource for both api template files
-                    string initialAPIDeploymentResourceName = $"{apiInfo.name}-InitialAPITemplate";
-                    string subsequentAPIDeploymentResourceName = $"{apiInfo.name}-SubsequentAPITemplate";
+                    string originalAPIName = fileNameGenerator.GenerateOriginalAPIName(apiInfo.name);
+                    string initialAPIDeploymentResourceName = $"{originalAPIName}-InitialAPITemplate";
+                    string subsequentAPIDeploymentResourceName = $"{originalAPIName}-SubsequentAPITemplate";
 
                     string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true, apimServiceName);
                     string initialAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{initialAPIFileName}')]";
@@ -81,7 +82,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 } else
                 {
                     // add a deployment resource for the unified api template file
-                    string unifiedAPIDeploymentResourceName = $"{apiInfo.name}-APITemplate";
+                    string originalAPIName = fileNameGenerator.GenerateOriginalAPIName(apiInfo.name);
+                    string unifiedAPIDeploymentResourceName = $"{originalAPIName}-APITemplate";
                     string unifiedAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true, apimServiceName);
                     string unifiedAPIUri = $"[concat(parameters('LinkedTemplatesBaseUrl'), '{unifiedAPIFileName}')]";
                     string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInfo);
