@@ -15,7 +15,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new ReleaseTemplateProperties()
                 {
-                    notes = $"Release created to make revision {api.apiRevision} current."
+                    notes = $"Release created to make revision {api.apiRevision} current.",
+                    apiId = $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{api.name}')]"
                 },
                 dependsOn = dependsOn
             };
