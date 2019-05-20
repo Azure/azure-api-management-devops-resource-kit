@@ -21,14 +21,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                 subscriptionRequired = true,
                 approvalRequired = true,
                 subscriptionsLimit = 1,
-                state = "state",
-                policy = "<inbound></inbound>"
+                state = "state"
             };
             creatorConfig.products.Add(product);
 
             // act
-            Template loggerTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);
-            ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)loggerTemplate.resources[0];
+            Template productTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);
+            ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)productTemplate.resources[0];
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.displayName}')]", productsTemplateResource.name);

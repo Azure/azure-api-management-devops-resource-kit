@@ -3,6 +3,7 @@ using Xunit;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
@@ -138,6 +139,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.authenticationSettings.subscriptionKeyRequired, apiTemplateResource.properties.authenticationSettings.subscriptionKeyRequired);
             Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
             Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
+        }
+
+        [Fact]
+        public async void ShouldAppendRevisionToAPIName()
+        {
+            // arrange
+            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
+            APIConfig api = new APIConfig()
+            {
+                name = "name",
+                apiRevision = "2",
+                isCurrent = true,
+                suffix = "suffix",
+                subscriptionRequired = true,
+                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+            };
+            creatorConfig.apis.Add(api);
+
+            // act
+            // the above api config will create a unified api template with a single resource
+            List<Template> apiTemplates = await apiTemplateCreator.CreateAPITemplatesAsync(api);
+            APITemplateResource apiTemplateResource = apiTemplates.FirstOrDefault().resources[0] as APITemplateResource;
+
+            // assert
+            Assert.Contains(";rev", apiTemplateResource.name);
         }
 
         [Fact]
