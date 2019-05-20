@@ -35,8 +35,4 @@
     <PackageReference Include="YamlDotNet" Version="5.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Creator\ExampleFiles\OpenAPISpecs\" />
-  </ItemGroup>
-
 </Project>
