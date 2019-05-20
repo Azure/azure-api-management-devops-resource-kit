@@ -295,17 +295,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         Console.WriteLine("'{0}' Product association found", apiProductName);
 
                         // convert returned api product associations to template resource class
-                        ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(apiProducts);
+                        ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(item.ToString());
                         productAPIResource.type = ResourceTypeConstants.ProductAPI;
                         productAPIResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]";
                         productAPIResource.apiVersion = GlobalConstants.APIVersion;
                         productAPIResource.scale = null;
                         productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
-                        // deployment throws errors if resource does not have a properties object
-                        if (productAPIResource.properties == null)
-                        {
-                            productAPIResource.properties = new ProductAPITemplateProperties();
-                        }
 
                         templateResources.Add(productAPIResource);
                     }
