@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string baseUrl = "https://management.azure.com";
         internal Authentication auth = new Authentication();
 
-        public static async Task<string> CallApiManagement(string azToken, string requestUrl)
+        public static async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
         {
             using (HttpClient httpClient = new HttpClient())
             {

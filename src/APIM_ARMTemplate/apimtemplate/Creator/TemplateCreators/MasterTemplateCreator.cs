@@ -207,7 +207,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return masterTemplate;
         }
 
-        public async Task<bool> DetermineIfAPIDependsOnLogger(APIConfig api, FileReader fileReader)
+        public async Task<bool> DetermineIfAPIDependsOnLoggerAsync(APIConfig api, FileReader fileReader)
         {
             if (api.diagnostic != null && api.diagnostic.loggerId != null)
             {
@@ -235,7 +235,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return false;
         }
 
-        public async Task<bool> DetermineIfAPIDependsOnBackend(APIConfig api, FileReader fileReader)
+        public async Task<bool> DetermineIfAPIDependsOnBackendAsync(APIConfig api, FileReader fileReader)
         {
             string apiPolicy = api.policy != null ? await fileReader.RetrieveFileContentsAsync(api.policy) : "";
             if (apiPolicy.Contains("set-backend-service"))

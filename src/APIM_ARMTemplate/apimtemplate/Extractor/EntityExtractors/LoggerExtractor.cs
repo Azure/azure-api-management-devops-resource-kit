@@ -10,27 +10,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class LoggerExtractor: EntityExtractor
     {
-        public async Task<string> GetLoggers(string ApiManagementName, string ResourceGroupName)
+        public async Task<string> GetLoggersAsync(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers?api-version={4}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetLogger(string ApiManagementName, string ResourceGroupName, string loggerName)
+        public async Task<string> GetLoggerDetailsAsync(string ApiManagementName, string ResourceGroupName, string loggerName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, loggerName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateLoggerTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateLoggerTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
@@ -43,12 +43,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all loggers for service
-            string loggers = await GetLoggers(apimname, resourceGroup);
+            string loggers = await GetLoggersAsync(apimname, resourceGroup);
             JObject oLoggers = JObject.Parse(loggers);
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-                string fullLoggerResource = await GetLogger(apimname, resourceGroup, loggerName);
+                string fullLoggerResource = await GetLoggerDetailsAsync(apimname, resourceGroup, loggerName);
 
                 // convert returned logger to template resource class
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);

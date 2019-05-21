@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.releaseTemplateCreator = releaseTemplateCreator;
         }
 
-        public async Task<List<Template>> CreateAPITemplatesAsync(APIConfig api)
+        public List<Template> CreateAPITemplates(APIConfig api)
         {
             // determine if api needs to be split into multiple templates
             bool isSplit = isSplitAPI(api);
@@ -43,18 +43,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (isSplit == true)
             {
                 // create 2 templates, an initial template with metadata and a subsequent template with the swagger content
-                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, true));
-                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, false));
+                apiTemplates.Add(CreateAPITemplate(api, isSplit, true));
+                apiTemplates.Add(CreateAPITemplate(api, isSplit, false));
             }
             else
             {
                 // create a unified template that includes both the metadata and swagger content 
-                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, false));
+                apiTemplates.Add(CreateAPITemplate(api, isSplit, false));
             }
             return apiTemplates;
         }
 
-        public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
+        public Template CreateAPITemplate(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
             Template apiTemplate = CreateEmptyTemplate();
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource 
-            APITemplateResource apiTemplateResource = await this.CreateAPITemplateResourceAsync(api, isSplit, isInitial);
+            APITemplateResource apiTemplateResource = this.CreateAPITemplateResource(api, isSplit, isInitial);
             resources.Add(apiTemplateResource);
             // add the api child resources (api policies, diagnostics, etc) if this is the unified or subsequent template
             if (!isSplit || !isInitial)
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return resources;
         }
 
-        public async Task<APITemplateResource> CreateAPITemplateResourceAsync(APIConfig api, bool isSplit, bool isInitial)
+        public APITemplateResource CreateAPITemplateResource(APIConfig api, bool isSplit, bool isInitial)
         {
             // create api resource
             APITemplateResource apiTemplateResource = new APITemplateResource()

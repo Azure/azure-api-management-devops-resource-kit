@@ -9,27 +9,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class PropertyExtractor: EntityExtractor
     {
-        public async Task<string> GetProperties(string ApiManagementName, string ResourceGroupName)
+        public async Task<string> GetPropertiesAsync(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/properties?api-version={4}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetProperty(string ApiManagementName, string ResourceGroupName, string propertyName)
+        public async Task<string> GetPropertyDetailsAsync(string ApiManagementName, string ResourceGroupName, string propertyName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/properties/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, propertyName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateNamedValuesTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateNamedValuesTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting named values from service");
@@ -38,13 +38,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (properties) for service
-            string properties = await GetProperties(apimname, resourceGroup);
+            string properties = await GetPropertiesAsync(apimname, resourceGroup);
             JObject oProperties = JObject.Parse(properties);
 
             foreach (var extractedProperty in oProperties["value"])
             {
                 string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
-                string fullPropertyResource = await GetProperty(apimname, resourceGroup, propertyName);
+                string fullPropertyResource = await GetPropertyDetailsAsync(apimname, resourceGroup, propertyName);
 
                 // convert returned named value to template resource class
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);

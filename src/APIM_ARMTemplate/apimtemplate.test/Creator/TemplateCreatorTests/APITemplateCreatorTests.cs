@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
     public class APITemplateCreatorTests
     {
         [Fact]
-        public async void ShouldCreateInitialAPITemplateResourceFromCreatorConfig()
+        public void ShouldCreateInitialAPITemplateResourceFromCreatorConfig()
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             creatorConfig.apis.Add(api);
 
             // act
-            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
+            APITemplateResource apiTemplateResource = apiTemplateCreator.CreateAPITemplateResource(api, true, true);
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         }
 
         [Fact]
-        public async void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithCorrectContent()
+        public void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithCorrectContent()
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
@@ -83,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             creatorConfig.apis.Add(api);
 
             // act
-            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
+            APITemplateResource apiTemplateResource = apiTemplateCreator.CreateAPITemplateResource(api, true, false);
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
@@ -92,7 +92,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         }
 
         [Fact]
-        public async void ShouldCreateUnifiedAPITemplateResourceFromCreatorConfig()
+        public void ShouldCreateUnifiedAPITemplateResourceFromCreatorConfig()
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
@@ -129,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             creatorConfig.apis.Add(api);
 
             // act
-            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, false, true);
+            APITemplateResource apiTemplateResource = apiTemplateCreator.CreateAPITemplateResource(api, false, true);
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
@@ -155,7 +155,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         }
 
         [Fact]
-        public async void ShouldAppendRevisionToAPIName()
+        public void ShouldAppendRevisionToAPIName()
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
@@ -173,7 +173,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // act
             // the above api config will create a unified api template with a single resource
-            List<Template> apiTemplates = await apiTemplateCreator.CreateAPITemplatesAsync(api);
+            List<Template> apiTemplates = apiTemplateCreator.CreateAPITemplates(api);
             APITemplateResource apiTemplateResource = apiTemplates.FirstOrDefault().resources[0] as APITemplateResource;
 
             // assert

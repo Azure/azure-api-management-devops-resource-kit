@@ -1,5 +1,4 @@
 using McMaster.Extensions.CommandLineUtils;
-using Colors.Net;
 using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
@@ -75,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     foreach (APIConfig api in creatorConfig.apis)
                     {
                         // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
-                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
+                        List<Template> apiTemplateSet = apiTemplateCreator.CreateAPITemplates(api);
                         apiTemplates.AddRange(apiTemplateSet);
                         // create the relevant info that will be needed to properly link to the api template(s) from the master template
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
@@ -84,9 +83,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                             isSplit = apiTemplateCreator.isSplitAPI(api),
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
-                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader),
+                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
                             dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
-                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackend(api, fileReader)
+                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader)
                         });
                     }
 
