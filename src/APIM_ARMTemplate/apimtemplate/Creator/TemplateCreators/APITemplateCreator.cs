@@ -136,7 +136,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.path = api.suffix;
                 apiTemplateResource.properties.isCurrent = api.isCurrent;
                 apiTemplateResource.properties.displayName = api.name;
-                apiTemplateResource.properties.protocols = this.CreateProtocols(doc);
+                apiTemplateResource.properties.protocols = this.CreateProtocols(api);
                 // set the version set id
                 if (api.apiVersionSetId != null)
                 {
@@ -166,19 +166,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return apiTemplateResource;
         }
 
-        public string[] CreateProtocols(OpenApiDocument doc)
+        public string[] CreateProtocols(APIConfig api)
         {
-            // pull protocols from swagger OpenApiDocument
-            List<string> protocols = new List<string>();
-            foreach (OpenApiServer server in doc.Servers)
+            string[] protocols;
+            if (api.protocols != null)
             {
-                string protocol = server.Url.Split(":")[0];
-                if (protocols.Exists(p => p == protocol) == false)
-                {
-                    protocols.Add(protocol);
-                }
+                protocols = api.protocols.Split(", ");
             }
-            return protocols.ToArray();
+            else
+            {
+                protocols = new string[1] { "https" };
+            }
+            return protocols;
         }
 
         public bool isSplitAPI(APIConfig apiConfig)

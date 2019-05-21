@@ -39,7 +39,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                     },
                     subscriptionKeyRequired = true
                 },
-                openApiSpec = "https://petstore.swagger.io/v2/swagger.json"
+                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+                protocols = "https"
             };
             creatorConfig.apis.Add(api);
 
@@ -51,6 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
+            Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
             Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
             Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
             Assert.Equal(api.apiRevisionDescription, apiTemplateResource.properties.apiRevisionDescription);
@@ -116,6 +118,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                     subscriptionKeyRequired = true
                 },
                 openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+                protocols = "https"
             };
             creatorConfig.apis.Add(api);
 
@@ -126,6 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
+            Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
             Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
             Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
@@ -166,27 +170,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             // assert
             Assert.Contains(";rev", apiTemplateResource.name);
         }
-
-        [Fact]
-        public void ShouldCreateProtocolsFromOpenApiDocument()
-        {
-            // arrange
-            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
-            OpenApiDocument openApiDocument = new OpenApiDocument();
-            int count = 2;
-            for (int i = 0; i < count; i++)
-            {
-                openApiDocument.Servers.Add(new OpenApiServer()
-                {
-                    Url = $"{i}:{i}"
-                });
-            }
-
-            // act
-            string[] protocols = apiTemplateCreator.CreateProtocols(openApiDocument);
-
-            // assert
-            Assert.Equal(count, protocols.Length);
-        }
     }
+
 }
