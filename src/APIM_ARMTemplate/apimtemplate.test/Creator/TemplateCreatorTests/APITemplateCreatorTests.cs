@@ -139,7 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
             Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
         }
-
+        /*
         [Fact]
         public void ShouldCreateProtocolsFromOpenApiDocument()
         {
@@ -161,5 +161,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             // assert
             Assert.Equal(count, protocols.Length);
         }
+         */
     }
+
 }

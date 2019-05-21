@@ -46,6 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public Dictionary<string, OperationsConfig> operations { get; set; }
         public APITemplateAuthenticationSettings authenticationSettings { get; set; }
         public string products { get; set; }
+        public string protocols { get; set; }
         public DiagnosticConfig diagnostic { get; set; }
     }
 
