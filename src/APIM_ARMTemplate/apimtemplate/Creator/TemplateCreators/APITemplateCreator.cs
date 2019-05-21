@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Microsoft.OpenApi.Models;
 using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
@@ -119,10 +118,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (!isSplit || isInitial)
             {
                 // add metadata properties for initial and unified templates
-                // protocols can be pulled by converting the OpenApiSpec into the OpenApiDocument class
-                OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
-                OpenApiDocument doc = await openAPISpecReader.ConvertOpenAPISpecToDoc(api.openApiSpec);
-                // supplied via optional arguments
                 apiTemplateResource.properties.apiVersion = api.apiVersion;
                 apiTemplateResource.properties.serviceUrl = api.serviceUrl;
                 apiTemplateResource.properties.type = api.type;

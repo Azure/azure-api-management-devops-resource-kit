@@ -1,5 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
-using Xunit;
+﻿using Xunit;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using System.Collections.Generic;
@@ -40,7 +39,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                     subscriptionKeyRequired = true
                 },
                 openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
-                protocols = "https"
+                protocols = "https",
+                isCurrent = true,
+                type = "http"
             };
             creatorConfig.apis.Add(api);
 
@@ -52,6 +53,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
+            Assert.Equal(api.type, apiTemplateResource.properties.type);
+            Assert.Equal(api.type, apiTemplateResource.properties.apiType);
+            Assert.Equal(api.isCurrent, apiTemplateResource.properties.isCurrent);
             Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
             Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
             Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
@@ -118,7 +122,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                     subscriptionKeyRequired = true
                 },
                 openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
-                protocols = "https"
+                protocols = "https",
+                isCurrent = true,
+                type = "http"
             };
             creatorConfig.apis.Add(api);
 
@@ -129,6 +135,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
+            Assert.Equal(api.type, apiTemplateResource.properties.type);
+            Assert.Equal(api.type, apiTemplateResource.properties.apiType);
+            Assert.Equal(api.isCurrent, apiTemplateResource.properties.isCurrent);
             Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
             Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
