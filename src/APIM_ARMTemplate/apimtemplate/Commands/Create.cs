@@ -1,5 +1,4 @@
 using McMaster.Extensions.CommandLineUtils;
-using Colors.Net;
 using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
@@ -35,18 +34,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // initialize file helper classes
                     FileWriter fileWriter = new FileWriter();
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
-                    CreatorFileNames creatorFileNames = fileNameGenerator.GenerateCreatorLinkedFileNames();
+                    FileNames fileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
                     // initialize template creator classes
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
                     LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator();
-                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator();
                     BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator();
                     AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator();
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator);
+                    ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
+                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     foreach (APIConfig api in creatorConfig.apis)
                     {
                         // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
-                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(creatorConfig, api);
+                        List<Template> apiTemplateSet = apiTemplateCreator.CreateAPITemplates(api);
                         apiTemplates.AddRange(apiTemplateSet);
                         // create the relevant info that will be needed to properly link to the api template(s) from the master template
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
@@ -83,53 +83,53 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                             isSplit = apiTemplateCreator.isSplitAPI(api),
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
-                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLogger(api, fileReader),
+                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
                             dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
-                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackend(api, fileReader)
+                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader)
                         });
                     }
 
                     // create parameters file
-                    Template masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+                    Template templateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
                     // write templates to outputLocation
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, creatorFileNames, fileNameGenerator);
-                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.linkedMaster));
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
+                        fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
                     }
                     foreach (Template apiTemplate in apiTemplates)
                     {
                         APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
                         APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name));
                         // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
-                        string apiFileName = fileNameGenerator.GenerateAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value == null);
+                        string apiFileName = fileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value == null, creatorConfig.apimServiceName);
                         fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
                     }
                     if (apiVersionSetsTemplate != null)
                     {
-                        fileWriter.WriteJSONToFile(apiVersionSetsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.apiVersionSets));
+                        fileWriter.WriteJSONToFile(apiVersionSetsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.apiVersionSets));
                     }
                     if (productsTemplate != null)
                     {
-                        fileWriter.WriteJSONToFile(productsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.products));
+                        fileWriter.WriteJSONToFile(productsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.products));
                     }
                     if (loggersTemplate != null)
                     {
-                        fileWriter.WriteJSONToFile(loggersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.loggers));
+                        fileWriter.WriteJSONToFile(loggersTemplate, String.Concat(creatorConfig.outputLocation, fileNames.loggers));
                     }
                     if (backendsTemplate != null)
                     {
-                        fileWriter.WriteJSONToFile(backendsTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.backends));
+                        fileWriter.WriteJSONToFile(backendsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.backends));
                     }
                     if (authorizationServersTemplate != null)
                     {
-                        fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, creatorFileNames.authorizationServers));
+                        fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, fileNames.authorizationServers));
                     }
 
                     // write parameters to outputLocation
-                    fileWriter.WriteJSONToFile(masterTemplateParameters, String.Concat(creatorConfig.outputLocation, creatorConfig.linked == true ? creatorFileNames.linkedParameters : creatorFileNames.unlinkedParameters));
+                    fileWriter.WriteJSONToFile(templateParameters, String.Concat(creatorConfig.outputLocation, fileNames.parameters));
                     Console.WriteLine("Templates written to output location");
                     Console.WriteLine("Press any key to exit process:");
 #if DEBUG

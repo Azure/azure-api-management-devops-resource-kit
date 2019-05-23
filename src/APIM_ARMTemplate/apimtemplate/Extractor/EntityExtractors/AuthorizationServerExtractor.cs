@@ -10,31 +10,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class AuthorizationServerExtractor: EntityExtractor
     {
-        public async Task<string> GetAuthorizationServers(string ApiManagementName, string ResourceGroupName)
+        public async Task<string> GetAuthorizationServersAsync(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/authorizationServers?api-version={4}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAuthorizationServer(string ApiManagementName, string ResourceGroupName, string authorizationServerName)
+        public async Task<string> GetAuthorizationServerDetailsAsync(string ApiManagementName, string ResourceGroupName, string authorizationServerName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/authorizationServers/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, authorizationServerName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAuthorizationServersARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
+        public async Task<Template> GenerateAuthorizationServersARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting authorization servers from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -42,13 +42,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var apiResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
 
             // pull all authorization servers for service
-            string authorizationServers = await GetAuthorizationServers(apimname, resourceGroup);
+            string authorizationServers = await GetAuthorizationServersAsync(apimname, resourceGroup);
             JObject oAuthorizationServers = JObject.Parse(authorizationServers);
 
             foreach (var item in oAuthorizationServers["value"])
             {
                 string authorizationServerName = ((JValue)item["name"]).Value.ToString();
-                string authorizationServer = await GetAuthorizationServer(apimname, resourceGroup, authorizationServerName);
+                string authorizationServer = await GetAuthorizationServerDetailsAsync(apimname, resourceGroup, authorizationServerName);
 
                 // convert returned authorization server to template resource class
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);

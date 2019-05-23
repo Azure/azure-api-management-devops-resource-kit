@@ -10,31 +10,48 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class ProductExtractor : EntityExtractor
     {
-        public async Task<string> GetProducts(string ApiManagementName, string ResourceGroupName)
+        private FileWriter fileWriter;
+
+        public ProductExtractor(FileWriter fileWriter)
+        {
+            this.fileWriter = fileWriter;
+        }
+
+        public async Task<string> GetProductsAsync(string ApiManagementName, string ResourceGroupName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetProductDetails(string ApiManagementName, string ResourceGroupName, string ProductName)
+        public async Task<string> GetProductDetailsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
-            return await CallApiManagement(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateProductsARMTemplate(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
+        public async Task<string> GetProductPolicyAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies/policy?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
+
+        public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl, string fileFolder)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting products from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
             // isolate product api associations in the case of a single api extraction
             var productAPIResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductAPI);
@@ -42,13 +59,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all products for service
-            string products = await GetProducts(apimname, resourceGroup);
+            string products = await GetProductsAsync(apimname, resourceGroup);
             JObject oProducts = JObject.Parse(products);
 
             foreach (var item in oProducts["value"])
             {
                 string productName = ((JValue)item["name"]).Value.ToString();
-                string productDetails = await GetProductDetails(apimname, resourceGroup, productName);
+                string productDetails = await GetProductDetailsAsync(apimname, resourceGroup, productName);
 
                 // convert returned product to template resource class
                 JsonSerializerSettings settings = new JsonSerializerSettings
@@ -65,6 +82,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     Console.WriteLine("'{0}' Product found", productName);
                     templateResources.Add(productsTemplateResource);
+
+                    // add product policy resource to template
+                    try
+                    {
+                        string productPolicy = await GetProductPolicyAsync(apimname, resourceGroup, productName);
+                        Console.WriteLine($" - Product policy found for {productName} product");
+                        PolicyTemplateResource productPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(productPolicy);
+                        productPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}/policy')]";
+                        productPolicyResource.apiVersion = GlobalConstants.APIVersion;
+                        productPolicyResource.scale = null;
+                        productPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+
+                        // write policy xml content to file and point to it if policyXMLBaseUrl is provided
+                        if (policyXMLBaseUrl != null)
+                        {
+                            string policyXMLContent = productPolicyResource.properties.value;
+                            string policyFolder = String.Concat(fileFolder, $@"/policies");
+                            string productPolicyFileName = $@"/{productName}-productPolicy.xml";
+                            this.fileWriter.CreateFolderIfNotExists(policyFolder);
+                            this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, productPolicyFileName));
+                            productPolicyResource.properties.format = "rawxml-link";
+                            productPolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{productPolicyFileName}')]";
+                        }
+
+                        templateResources.Add(productPolicyResource);
+                    }
+                    catch (Exception) { }
                 }
             }
 
