@@ -41,7 +41,7 @@ apis:
       diagnostic:
         name: applicationinsights
         alwaysLog: allErrors
-        loggerId: lucastestai
+        loggerId: myAppInsights
         sampling:
           samplingType: fixed
           percentage: 50
@@ -72,7 +72,7 @@ products:
       approvalRequired: true
       subscriptionsLimit: 1
       state: notPublished
-      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml   # Optional, can be url or local file
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
 loggers:
     - name: myAppInsights
       loggerType: applicationInsights
