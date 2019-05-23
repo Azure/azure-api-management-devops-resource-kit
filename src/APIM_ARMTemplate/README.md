@@ -262,13 +262,22 @@ Below are the steps to run the Extractor from the source code:
 az login
 az account set --subscription <subscription_id>
 ```
-- Run the Extractor with the following command to extract a single API: 
+
+#### Extractor Arguments
+
+| Property              | Required              | Value                                             |
+|-----------------------|-----------------------|---------------------------------------------------|
+| sourceApimName        | Yes                   | Name of the source APIM instance.                 |
+| destinationApimName   | Yes                   | Name of the destination APIM instance.            |
+| resourceGroup         | Yes                   | Name of the resource group.                       |
+| fileFolder            | Yes                   | Path to output folder                             |
+| apiName               | No                    | Name of API. If provided, Extractor executes single API extraction. Otherwise, Extractor executes full extraction.      |
+| linkedTemplatesBaseUrl| No                    | Linked templates remote location. If provided, Extractor generates master template and requires linked templates pushed to remote location.                                   |
+| policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
+
+To run the Extractor with all arguments (executing a single API extraction with linked templates and policy file generation), use the following command: 
 ```
-dotnet run extract --name <name_of_the_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --apiName <api_name>
-```
-- Or run the Extractor with the following command to extract all APIs: 
-```
-dotnet run extract --name <name_of_the_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder>
+dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --apiName <api_name> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location>
 ```
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
