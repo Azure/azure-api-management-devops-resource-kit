@@ -8,7 +8,7 @@
 
 # Creator
 
-This utility creates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) for an API based on the [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) of the API. Optionaly, you can provide policies you wish to apply to the API and its operations in seperate files.
+This utility creates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) for an API based on the [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) of the API. Optionally, you can provide policies you wish to apply to the API and its operations in seperate files.
 
 <a name="creator1"></a>
 
