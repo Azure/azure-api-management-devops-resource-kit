@@ -32,6 +32,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         }
 
         [Fact]
+        public void ShouldCreateProductPolicyTemplateResourceFromCreatorConfigWithCorrectContent()
+        {
+            // arrange
+            PolicyTemplateCreator policyTemplateCreator = PolicyTemplateCreatorFactory.GeneratePolicyTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
+            ProductConfig product = new ProductConfig()
+            {
+                displayName = "displayName",
+                description = "description",
+                terms = "terms",
+                subscriptionRequired = true,
+                approvalRequired = true,
+                subscriptionsLimit = 1,
+                state = "state",
+                policy = "http://someurl.com"
+
+            };
+            creatorConfig.products.Add(product);
+            string[] dependsOn = new string[] { "dependsOn" };
+
+            // act
+            PolicyTemplateResource policyTemplateResource = policyTemplateCreator.CreateProductPolicyTemplateResource(product, dependsOn);
+
+            // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.displayName}/policy')]", policyTemplateResource.name);
+            Assert.Equal("rawxml-link", policyTemplateResource.properties.format);
+            Assert.Equal(product.policy, policyTemplateResource.properties.value);
+            Assert.Equal(dependsOn, policyTemplateResource.dependsOn);
+        }
+
+        [Fact]
         public void ShouldCreateOperationPolicyTemplateResourceFromPairWithCorrectContent()
         {
             // arrange

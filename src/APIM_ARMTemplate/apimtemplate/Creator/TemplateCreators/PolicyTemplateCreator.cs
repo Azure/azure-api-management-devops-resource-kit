@@ -35,6 +35,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return policyTemplateResource;
         }
 
+        public PolicyTemplateResource CreateProductPolicyTemplateResource(ProductConfig product, string[] dependsOn)
+        {
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(product.policy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            // create policy resource with properties
+            PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
+            {
+                name = $"[concat(parameters('ApimServiceName'), '/{product.displayName}/policy')]",
+                type = ResourceTypeConstants.ProductPolicy,
+                apiVersion = GlobalConstants.APIVersion,
+                properties = new PolicyTemplateProperties()
+                {
+                    // if policy is a url inline the url, if it is a local file inline the file contents
+                    format = isUrl ? "rawxml-link" : "rawxml",
+                    value = isUrl ? product.policy : this.fileReader.RetrieveLocalFileContents(product.policy)
+                },
+                dependsOn = dependsOn
+            };
+            return policyTemplateResource;
+        }
+
         public PolicyTemplateResource CreateOperationPolicyTemplateResource(KeyValuePair<string, OperationsConfig> policyPair, string apiName, string[] dependsOn)
         {
             Uri uriResult;

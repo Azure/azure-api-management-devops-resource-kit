@@ -11,9 +11,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateProductFromCreatorConfig()
         {
             // arrange
-            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductsTemplateProperties>() };
-            ProductsTemplateProperties product = new ProductsTemplateProperties()
+            ProductTemplateCreator productTemplateCreator = ProductTemplateCreatorFactory.GenerateProductTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
+            ProductConfig product = new ProductConfig()
             {
                 displayName = "displayName",
                 description = "description",
@@ -26,8 +26,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             creatorConfig.products.Add(product);
 
             // act
-            Template loggerTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);
-            ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)loggerTemplate.resources[0];
+            Template productTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);
+            ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)productTemplate.resources[0];
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.displayName}')]", productsTemplateResource.name);

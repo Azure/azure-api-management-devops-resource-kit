@@ -1,13 +1,11 @@
-﻿
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
-
     public class ReleaseTemplateResource : APITemplateSubResource
     {
-        public ReleasTemplateProperties properties { get; set; }
+        public ReleaseTemplateProperties properties { get; set; }
     }
 
-    public class ReleasTemplateProperties
+    public class ReleaseTemplateProperties
     {
         public string apiId { get; set; }
         public string notes { get; set; }

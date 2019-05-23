@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
     public class OperationsTemplateResponse
     {
-        public string statusCode { get; set; }
+        public int statusCode { get; set; }
         public string description { get; set; }
         public OperationTemplateParameter[] headers { get; set; }
         public OperationTemplateRepresentation[] representations { get; set; }

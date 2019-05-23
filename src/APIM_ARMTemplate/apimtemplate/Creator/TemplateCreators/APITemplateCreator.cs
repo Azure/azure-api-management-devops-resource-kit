@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Microsoft.OpenApi.Models;
 using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
@@ -13,36 +12,49 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         private PolicyTemplateCreator policyTemplateCreator;
         private ProductAPITemplateCreator productAPITemplateCreator;
         private DiagnosticTemplateCreator diagnosticTemplateCreator;
+        private ReleaseTemplateCreator releaseTemplateCreator;
 
-        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator)
+        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator, ReleaseTemplateCreator releaseTemplateCreator)
         {
             this.fileReader = fileReader;
             this.policyTemplateCreator = policyTemplateCreator;
             this.productAPITemplateCreator = productAPITemplateCreator;
             this.diagnosticTemplateCreator = diagnosticTemplateCreator;
+            this.releaseTemplateCreator = releaseTemplateCreator;
         }
 
-        public async Task<List<Template>> CreateAPITemplatesAsync(CreatorConfig creatorConfig, APIConfig api)
+        public List<Template> CreateAPITemplates(APIConfig api)
         {
             // determine if api needs to be split into multiple templates
             bool isSplit = isSplitAPI(api);
+
+            // update api name if necessary (apiRevision > 1 and isCurrent = true) 
+            int revisionNumber = 0;
+            if (Int32.TryParse(api.apiRevision, out revisionNumber))
+            {
+                if (revisionNumber > 1 && api.isCurrent == true)
+                {
+                    string currentAPIName = api.name;
+                    api.name += $";rev={revisionNumber}";
+                }
+            }
 
             List<Template> apiTemplates = new List<Template>();
             if (isSplit == true)
             {
                 // create 2 templates, an initial template with metadata and a subsequent template with the swagger content
-                apiTemplates.Add(await CreateAPITemplateAsync(creatorConfig, api, isSplit, true));
-                apiTemplates.Add(await CreateAPITemplateAsync(creatorConfig, api, isSplit, false));
+                apiTemplates.Add(CreateAPITemplate(api, isSplit, true));
+                apiTemplates.Add(CreateAPITemplate(api, isSplit, false));
             }
             else
             {
                 // create a unified template that includes both the metadata and swagger content 
-                apiTemplates.Add(await CreateAPITemplateAsync(creatorConfig, api, isSplit, false));
+                apiTemplates.Add(CreateAPITemplate(api, isSplit, false));
             }
             return apiTemplates;
         }
 
-        public async Task<Template> CreateAPITemplateAsync(CreatorConfig creatorConfig, APIConfig api, bool isSplit, bool isInitial)
+        public Template CreateAPITemplate(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
             Template apiTemplate = CreateEmptyTemplate();
@@ -55,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource 
-            APITemplateResource apiTemplateResource = await this.CreateAPITemplateResourceAsync(api, isSplit, isInitial);
+            APITemplateResource apiTemplateResource = this.CreateAPITemplateResource(api, isSplit, isInitial);
             resources.Add(apiTemplateResource);
             // add the api child resources (api policies, diagnostics, etc) if this is the unified or subsequent template
             if (!isSplit || !isInitial)
@@ -77,17 +89,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<PolicyTemplateResource> operationPolicyResources = api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(api, dependsOn) : null;
             List<ProductAPITemplateResource> productAPIResources = api.products != null ? this.productAPITemplateCreator.CreateProductAPITemplateResources(api, dependsOn) : null;
             DiagnosticTemplateResource diagnosticTemplateResource = api.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn) : null;
+            // add release resource if the name has been appended with ;rev{revisionNumber}
+            ReleaseTemplateResource releaseTemplateResource = api.name.Contains(";rev") == true ? this.releaseTemplateCreator.CreateAPIReleaseTemplateResource(api, dependsOn) : null;
 
             // add resources if not null
             if (apiPolicyResource != null) resources.Add(apiPolicyResource);
             if (operationPolicyResources != null) resources.AddRange(operationPolicyResources);
             if (productAPIResources != null) resources.AddRange(productAPIResources);
             if (diagnosticTemplateResource != null) resources.Add(diagnosticTemplateResource);
+            if (releaseTemplateResource != null) resources.Add(releaseTemplateResource);
 
             return resources;
         }
 
-        public async Task<APITemplateResource> CreateAPITemplateResourceAsync(APIConfig api, bool isSplit, bool isInitial)
+        public APITemplateResource CreateAPITemplateResource(APIConfig api, bool isSplit, bool isInitial)
         {
             // create api resource
             APITemplateResource apiTemplateResource = new APITemplateResource()
@@ -103,14 +118,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (!isSplit || isInitial)
             {
                 // add metadata properties for initial and unified templates
-                // protocols can be pulled by converting the OpenApiSpec into the OpenApiDocument class
-                OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
-                OpenApiDocument doc = await openAPISpecReader.ConvertOpenAPISpecToDoc(api.openApiSpec);
-                // supplied via optional arguments
                 apiTemplateResource.properties.apiVersion = api.apiVersion;
+                apiTemplateResource.properties.serviceUrl = api.serviceUrl;
+                apiTemplateResource.properties.type = api.type;
+                apiTemplateResource.properties.apiType = api.type;
+                apiTemplateResource.properties.description = api.description;
                 apiTemplateResource.properties.subscriptionRequired = api.subscriptionRequired;
-                apiTemplateResource.properties.apiRevision = api.revision;
-                apiTemplateResource.properties.apiRevisionDescription = api.revisionDescription;
+                apiTemplateResource.properties.apiRevision = api.apiRevision;
+                apiTemplateResource.properties.apiRevisionDescription = api.apiRevisionDescription;
                 apiTemplateResource.properties.apiVersionDescription = api.apiVersionDescription;
                 apiTemplateResource.properties.authenticationSettings = api.authenticationSettings;
                 apiTemplateResource.properties.path = api.suffix;
@@ -127,7 +142,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if (api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null
                     && apiTemplateResource.properties.authenticationSettings != null && apiTemplateResource.properties.authenticationSettings.oAuth2 != null && apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId != null)
                 {
-                    apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = $"[resourceId('Microsoft.ApiManagement/service/authorizationServers', parameters('ApimServiceName'), '{api.authenticationSettings.oAuth2.authorizationServerId}')]";
+                    apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = api.authenticationSettings.oAuth2.authorizationServerId;
                 }
             }
             if (!isSplit || !isInitial)
@@ -149,20 +164,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string[] CreateProtocols(APIConfig api)
         {
             string[] protocols;
-
-            if(api.protocols != null){
+            if (api.protocols != null)
+            {
                 protocols = api.protocols.Split(", ");
-            }else{
-                protocols = new string[1]{"https"};
             }
-            
+            else
+            {
+                protocols = new string[1] { "https" };
+            }
             return protocols;
         }
 
         public bool isSplitAPI(APIConfig apiConfig)
         {
             // the api needs to be split into multiple templates if the user has supplied a version or version set - deploying swagger related properties at the same time as api version related properties fails, so they must be written and deployed separately
-            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null;
+            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null || (apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.oAuth2 != null && apiConfig.authenticationSettings.oAuth2.authorizationServerId != null);
         }
     }
 }
