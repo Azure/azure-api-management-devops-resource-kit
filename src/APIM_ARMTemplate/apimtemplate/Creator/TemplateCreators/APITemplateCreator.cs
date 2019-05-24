@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
@@ -23,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.releaseTemplateCreator = releaseTemplateCreator;
         }
 
-        public List<Template> CreateAPITemplates(APIConfig api)
+        public async Task<List<Template>> CreateAPITemplatesAsync(APIConfig api)
         {
             // determine if api needs to be split into multiple templates
             bool isSplit = isSplitAPI(api);
@@ -43,18 +42,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (isSplit == true)
             {
                 // create 2 templates, an initial template with metadata and a subsequent template with the swagger content
-                apiTemplates.Add(CreateAPITemplate(api, isSplit, true));
-                apiTemplates.Add(CreateAPITemplate(api, isSplit, false));
+                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, true));
+                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, false));
             }
             else
             {
                 // create a unified template that includes both the metadata and swagger content 
-                apiTemplates.Add(CreateAPITemplate(api, isSplit, false));
+                apiTemplates.Add(await CreateAPITemplateAsync(api, isSplit, false));
             }
             return apiTemplates;
         }
 
-        public Template CreateAPITemplate(APIConfig api, bool isSplit, bool isInitial)
+        public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
             Template apiTemplate = CreateEmptyTemplate();
@@ -67,7 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource 
-            APITemplateResource apiTemplateResource = this.CreateAPITemplateResource(api, isSplit, isInitial);
+            APITemplateResource apiTemplateResource = await this.CreateAPITemplateResourceAsync(api, isSplit, isInitial);
             resources.Add(apiTemplateResource);
             // add the api child resources (api policies, diagnostics, etc) if this is the unified or subsequent template
             if (!isSplit || !isInitial)
@@ -102,7 +101,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return resources;
         }
 
-        public APITemplateResource CreateAPITemplateResource(APIConfig api, bool isSplit, bool isInitial)
+        public async Task<APITemplateResource> CreateAPITemplateResourceAsync(APIConfig api, bool isSplit, bool isInitial)
         {
             // create api resource
             APITemplateResource apiTemplateResource = new APITemplateResource()
@@ -147,15 +146,48 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
             if (!isSplit || !isInitial)
             {
-                // add swagger properties for subsequent and unified templates
+                // add open api spec properties for subsequent and unified templates
+                string format;
+                string value;
+
+                // determine if the open api spec is remote or local, yaml or json
                 Uri uriResult;
+                string fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
+                bool isJSON = this.fileReader.isJSON(fileContents);
                 bool isUrl = Uri.TryCreate(api.openApiSpec, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-                // used to escape sequences in local swagger json
-                object deserializedFileContents = isUrl ? null : JsonConvert.DeserializeObject<object>(this.fileReader.RetrieveLocalFileContents(api.openApiSpec));
-                // if openApiSpec is a url inline the url, if it is a local file inline the file contents
-                apiTemplateResource.properties.format = isUrl ? "swagger-link-json" : "swagger-json";
-                apiTemplateResource.properties.value = isUrl ? api.openApiSpec : JsonConvert.SerializeObject(deserializedFileContents);
-                // supplied via optional arguments
+
+                if (isUrl == true)
+                {
+                    value = api.openApiSpec;
+                    if (isJSON == true)
+                    {
+                        // open api spec is remote json file, use swagger-link-json for v2 and openapi-link for v3
+                        OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
+                        bool isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
+                        format = isVersionThree == false ? "swagger-link-json" : "openapi-link";
+                    }
+                    else
+                    {
+                        // open api spec is remote yaml file
+                        format = "openapi-link";
+                    }
+                } else
+                {
+                    value = fileContents;
+                    if (isJSON == true)
+                    {
+                        // open api spec is local json file, use swagger-json for v2 and openapi+json for v3
+                        OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
+                        bool isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
+                        format = isVersionThree == false ? "swagger-json" : "openapi+json";
+                    } else
+                    {
+                        // open api spec is local yaml file
+                        format = "openapi";
+                    }
+                }
+                apiTemplateResource.properties.format = format;
+                apiTemplateResource.properties.value = value;
                 apiTemplateResource.properties.path = api.suffix;
             }
             return apiTemplateResource;
