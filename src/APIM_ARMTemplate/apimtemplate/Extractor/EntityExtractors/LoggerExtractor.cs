@@ -79,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     {
                         if (diagnosticTemplateResource.properties.loggerId.Contains(loggerName))
                         {
-                            isReferencedInPolicy = true;
+                            isReferencedInDiagnostic = true;
                         }
                     }
                     if (isReferencedInPolicy == true || isReferencedInDiagnostic == true)
