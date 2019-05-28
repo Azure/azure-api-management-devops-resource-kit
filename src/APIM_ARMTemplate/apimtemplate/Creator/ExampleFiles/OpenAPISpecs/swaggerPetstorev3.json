@@ -39,6 +39,7 @@
         },
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -87,6 +88,7 @@
         },
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -324,6 +326,7 @@
         ],
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -384,6 +387,7 @@
         ],
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -641,6 +645,7 @@
         ],
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -689,6 +694,7 @@
         },
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -737,6 +743,7 @@
         },
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -785,6 +792,7 @@
         },
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -882,6 +890,7 @@
         "parameters": [],
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -993,6 +1002,7 @@
         },
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1042,6 +1052,7 @@
         ],
         "responses": {
           "200": {
+            "description": "successful operation",
             "content": {
               "text/plain": {
                 "schema": {
