@@ -34,7 +34,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                         CreatorConfig yamlObject = JsonConvert.DeserializeObject<CreatorConfig>(jsonText);
                         return yamlObject;
                     }
-                } else {
+                }
+                else
+                {
                     throw new Exception("Unable to fetch remote config YAML file.");
                 }
             }
@@ -85,6 +87,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             else
             {
                 return RetrieveLocalFileContents(fileLocation);
+            }
+        }
+
+        public bool isJSON(string fileContents)
+        {
+            try
+            {
+                object deserializedFileContents = JsonConvert.DeserializeObject<object>(fileContents);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
     }
