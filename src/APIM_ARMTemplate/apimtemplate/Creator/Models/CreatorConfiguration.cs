@@ -21,6 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
+        public bool singleMasterFile { get; set; }
     }
 
     public class APIVersionSetConfig: APIVersionSetProperties
@@ -30,8 +31,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
     public class APIConfig
     {
+        public string subscriptionHeaderName { get; set; }
+        public string subscriptionQueryName { get; set; }
+
         // used to build displayName and resource name from APITemplateResource schema
         public string name { get; set; }
+        
+        public string displayName { get; set; }
         public string description { get; set; }
         public string serviceUrl { get; set; }
         // used to build type and apiType from APITemplateResource schema

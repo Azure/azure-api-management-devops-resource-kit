@@ -129,8 +129,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.authenticationSettings = api.authenticationSettings;
                 apiTemplateResource.properties.path = api.suffix;
                 apiTemplateResource.properties.isCurrent = api.isCurrent;
-                apiTemplateResource.properties.displayName = api.name;
+                apiTemplateResource.properties.displayName = api.displayName ?? api.name;
                 apiTemplateResource.properties.protocols = this.CreateProtocols(api);
+                
+                if (api.subscriptionRequired)
+                {
+                    apiTemplateResource.properties.subscriptionKeyParameterNames =
+                        new APITemplateSubscriptionKeyParameterNames
+                        {
+                            header = api.subscriptionHeaderName,
+                            query = api.subscriptionQueryName
+                        };
+                }
+              
                 // set the version set id
                 if (api.apiVersionSetId != null)
                 {
