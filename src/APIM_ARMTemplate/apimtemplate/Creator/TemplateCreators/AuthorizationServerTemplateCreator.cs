@@ -29,6 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     dependsOn = new string[] { }
                 };
                 resources.Add(authorizationServerTemplateResource);
+                authorizationServerTemplateProperties.name = null; //remove for Serialize 
             }
 
             authorizationTemplate.resources = resources.ToArray();
