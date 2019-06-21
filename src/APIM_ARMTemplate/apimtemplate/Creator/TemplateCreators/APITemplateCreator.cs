@@ -137,8 +137,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     apiTemplateResource.properties.subscriptionKeyParameterNames =
                         new APITemplateSubscriptionKeyParameterNames
                         {
-                            header = api.subscriptionHeaderName,
-                            query = api.subscriptionQueryName
+                            header = api.subscriptionKeyHeaderName,
+                            query = api.subscriptionKeyQueryName
                         };
                 }
               

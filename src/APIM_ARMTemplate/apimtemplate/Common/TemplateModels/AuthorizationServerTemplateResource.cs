@@ -20,6 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string resourceOwnerUsername { get; set; }
         public string resourceOwnerPassword { get; set; }
         public string displayName { get; set; }
+        public string name { get; set; }
         public string clientRegistrationEndpoint { get; set; }
         public string authorizationEndpoint { get; set; }
         public string[] grantTypes { get; set; }

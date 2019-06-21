@@ -31,8 +31,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
     public class APIConfig
     {
-        public string subscriptionHeaderName { get; set; }
-        public string subscriptionQueryName { get; set; }
+        public string subscriptionKeyHeaderName { get; set; }
+        public string subscriptionKeyQueryName { get; set; }
 
         // used to build displayName and resource name from APITemplateResource schema
         public string name { get; set; }
