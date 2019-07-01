@@ -22,7 +22,7 @@ We believe the approach described below will address all these challenges.
 
 ## CI/CD with API Management
 
-The proposed approach is illustrated in the below picture.
+The proposed approach is illustrated in the below picture. You can also [watch this video](https://www.youtube.com/watch?v=4Sp2Qvmg6j8) which explains the approach as well as demonstrates a sample implementation. 
 
 ![alt](APIM-DevOps.png)
 
