@@ -99,6 +99,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error occured: " + ex.Message);
                 return false;
             }
         }
