@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
@@ -12,9 +13,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     {
         public async Task<CreatorConfig> ConvertConfigYAMLToCreatorConfigAsync(string configFileLocation)
         {
+            // substitute Environment Variables
+            var finalLocation = Environment.ExpandEnvironmentVariables(configFileLocation);
+
+
             // determine whether file location is local file path or remote url and convert appropriately
             Uri uriResult;
-            bool isUrl = Uri.TryCreate(configFileLocation, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            bool isUrl = Uri.TryCreate(finalLocation, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             if (isUrl)
             {
                 // make a request to the provided url and convert the response's content
@@ -42,18 +47,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             }
             else
             {
-                using (StreamReader reader = new StreamReader(configFileLocation))
+                using (StreamReader reader = new StreamReader(finalLocation))
                 {
-                    // deserialize provided file contents into yaml
+                    string originalYaml = await reader.ReadToEndAsync();
+
+                    var yamlSubstituted = Environment.ExpandEnvironmentVariables(originalYaml);
+
+                    // deserialize provided file contents into yaml object
                     Deserializer deserializer = new Deserializer();
-                    object deserializedYaml = deserializer.Deserialize(reader);
-                    JsonSerializer jsonSerializer = new JsonSerializer();
-                    StringWriter writer = new StringWriter();
-                    // serialize json from yaml object
-                    jsonSerializer.Serialize(writer, deserializedYaml);
-                    string jsonText = writer.ToString();
-                    // deserialize CreatorConfig from json string
-                    CreatorConfig yamlObject = JsonConvert.DeserializeObject<CreatorConfig>(jsonText);
+                    CreatorConfig yamlObject = deserializer.Deserialize<CreatorConfig>(yamlSubstituted);
+
                     return yamlObject;
                 }
             }

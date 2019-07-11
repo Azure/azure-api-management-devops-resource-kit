@@ -67,6 +67,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<TemplateResource> resources = new List<TemplateResource>();
             // create api resource 
             APITemplateResource apiTemplateResource = await this.CreateAPITemplateResourceAsync(api, isSplit, isInitial);
+
+
+            switch (apiTemplateResource.properties.format)
+            {
+                case "openapi-link":
+                case "swagger-link-json":
+                    apiTemplate.parameters.Add("OpenSpecApiUrl", new TemplateParameterProperties { type = "string", defaultValue = apiTemplateResource.properties.value });
+                    apiTemplateResource.properties.value = "[parameters('OpenSpecApiUrl')]";
+                    break;
+                default: break;
+
+            }
+
             resources.Add(apiTemplateResource);
             // add the api child resources (api policies, diagnostics, etc) if this is the unified or subsequent template
             if (!isSplit || !isInitial)
@@ -171,7 +184,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         // open api spec is remote yaml file
                         format = "openapi-link";
                     }
-                } else
+                }
+                else
                 {
                     value = fileContents;
                     if (isJSON == true)
@@ -180,7 +194,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
                         bool isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
                         format = isVersionThree == false ? "swagger-json" : "openapi+json";
-                    } else
+                    }
+                    else
                     {
                         // open api spec is local yaml file
                         format = "openapi";

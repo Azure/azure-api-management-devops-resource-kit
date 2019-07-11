@@ -3,6 +3,7 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -92,6 +93,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // create parameters file
                     Template templateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
+
+                    // Create Directory if it doesn't exist
+                    if (!Directory.Exists(creatorConfig.outputLocation))
+                    {
+                        Directory.CreateDirectory(creatorConfig.outputLocation);
+                    }
+
                     // write templates to outputLocation
                     if (creatorConfig.linked == true)
                     {
@@ -127,6 +135,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, fileNames.authorizationServers));
                     }
+
 
                     // write parameters to outputLocation
                     fileWriter.WriteJSONToFile(templateParameters, String.Concat(creatorConfig.outputLocation, fileNames.parameters));

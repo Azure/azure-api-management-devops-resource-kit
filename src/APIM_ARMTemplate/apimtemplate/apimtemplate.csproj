@@ -33,4 +33,40 @@
     <PackageReference Include="YamlDotNet" Version="5.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Creator\ExampleFiles\OpenAPISpecs\datagenAPIDefinition.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\OpenAPISpecs\remoteAPIMDatagenAPI.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\OpenAPISpecs\swaggerPetstore.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\OpenAPISpecs\swaggerPetstore.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\OpenAPISpecs\swaggerPetstorev3.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\XMLPolicies\productSetBodyBasic.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\XMLPolicies\setBackendService.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\YAMLConfigs\valid-envvar.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Creator\ExampleFiles\YAMLConfigs\valid.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
