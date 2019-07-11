@@ -50,14 +50,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 using (StreamReader reader = new StreamReader(finalLocation))
                 {
                     string originalYaml = await reader.ReadToEndAsync();
-
                     var yamlSubstituted = Environment.ExpandEnvironmentVariables(originalYaml);
 
-                    // deserialize provided file contents into yaml object
-                    Deserializer deserializer = new Deserializer();
-                    CreatorConfig yamlObject = deserializer.Deserialize<CreatorConfig>(yamlSubstituted);
-
-                    return yamlObject;
+                    // required as not YAML properties are mandatory
+                    using (TextReader newReader = new StringReader(yamlSubstituted))
+                    {
+                        Deserializer deserializer = new Deserializer();
+                        object deserializedYaml = deserializer.Deserialize(newReader);
+                        JsonSerializer jsonSerializer = new JsonSerializer();
+                        StringWriter writer = new StringWriter();
+                        // serialize json from yaml object
+                        jsonSerializer.Serialize(writer, deserializedYaml);
+                        string jsonText = writer.ToString();
+                        // deserialize CreatorConfig from json string
+                        CreatorConfig yamlObject = JsonConvert.DeserializeObject<CreatorConfig>(jsonText);
+                        return yamlObject;
+                    }                    
                 }
             }
         }
