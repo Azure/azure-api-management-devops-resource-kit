@@ -15,7 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
             ProductConfig product = new ProductConfig()
             {
-                displayName = "displayName",
+                name = "displayName",
                 description = "description",
                 terms = "terms",
                 subscriptionRequired = true,
@@ -30,8 +30,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)productTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.displayName}')]", productsTemplateResource.name);
-            Assert.Equal(product.displayName, productsTemplateResource.properties.displayName);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}')]", productsTemplateResource.name);
+            Assert.Equal(product.name, productsTemplateResource.properties.name);
             Assert.Equal(product.description, productsTemplateResource.properties.description);
             Assert.Equal(product.terms, productsTemplateResource.properties.terms);
             Assert.Equal(product.subscriptionsLimit, productsTemplateResource.properties.subscriptionsLimit);

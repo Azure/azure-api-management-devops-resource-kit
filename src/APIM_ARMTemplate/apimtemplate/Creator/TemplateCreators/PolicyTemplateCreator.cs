@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{product.displayName}/policy')]",
+                name = $"[concat(parameters('ApimServiceName'), '/{product.name}/policy')]",
                 type = ResourceTypeConstants.ProductPolicy,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()

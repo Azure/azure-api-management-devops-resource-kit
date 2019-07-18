@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 foreach (ProductsTemplateProperties product in creatorConfig.products)
                 {
-                    if (product.displayName == null)
+                    if (product.name == null)
                     {
                         isValid = false;
                         throw new CommandParsingException(commandLineApplication, "Display name is required if an Product is provided");
@@ -190,7 +190,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool ValidateAPIVersionSets(CreatorConfig creatorConfig)
         {
             bool isValid = true;
-            if(creatorConfig.apiVersionSets != null)
+            if (creatorConfig.apiVersionSets != null)
             {
                 foreach (APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
                 {
