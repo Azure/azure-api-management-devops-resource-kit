@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 foreach (ProductsTemplateProperties product in creatorConfig.products)
                 {
-                    if (product.name == null)
+                    if (product.GetName() == null)
                     {
                         isValid = false;
                         throw new CommandParsingException(commandLineApplication, "Display name is required if an Product is provided");

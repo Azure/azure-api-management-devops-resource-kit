@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // create product resource with properties
                 ProductsTemplateResource productsTemplateResource = new ProductsTemplateResource()
                 {
-                    name = $"[concat(parameters('ApimServiceName'), '/{product.name}')]",
+                    name = $"[concat(parameters('ApimServiceName'), '/{product.GetName()}')]",
                     type = ResourceTypeConstants.Product,
                     apiVersion = GlobalConstants.APIVersion,
                     properties = new ProductsTemplateProperties()
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // create product policy resource that depends on the product, if provided
                 if (product.policy != null)
                 {
-                    string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{product.name}')]" };
+                    string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{product.GetName()}')]" };
                     PolicyTemplateResource productPolicy = this.policyTemplateCreator.CreateProductPolicyTemplateResource(product, dependsOn);
                     resources.Add(productPolicy);
                 }

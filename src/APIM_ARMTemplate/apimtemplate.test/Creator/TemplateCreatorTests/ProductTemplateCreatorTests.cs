@@ -30,8 +30,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)productTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}')]", productsTemplateResource.name);
-            Assert.Equal(product.name, productsTemplateResource.properties.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.GetName()}')]", productsTemplateResource.name);
+            Assert.Equal(product.GetName(), productsTemplateResource.properties.name);
             Assert.Equal(product.description, productsTemplateResource.properties.description);
             Assert.Equal(product.terms, productsTemplateResource.properties.terms);
             Assert.Equal(product.subscriptionsLimit, productsTemplateResource.properties.subscriptionsLimit);
