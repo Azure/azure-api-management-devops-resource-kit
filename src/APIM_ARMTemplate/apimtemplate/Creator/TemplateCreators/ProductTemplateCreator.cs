@@ -40,7 +40,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         approvalRequired = product.approvalRequired,
                         subscriptionsLimit = product.subscriptionsLimit,
                         state = product.state,
-                        name = product.name,
                         displayName = product.displayName
                     },
                     dependsOn = new string[] { }
