@@ -38,6 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string type { get; set; }
         // openApiSpec file location (local or url), used to build protocols, value, and format from APITemplateResource schema
         public string openApiSpec { get; set; }
+        public string openApiSpecCopyToLocation {get; set;}
         // policy file location (local or url)
         public string policy { get; set; }
         // used to buld path from APITemplateResource schema
