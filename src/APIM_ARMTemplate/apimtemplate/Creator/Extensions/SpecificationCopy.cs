@@ -26,7 +26,8 @@ namespace apimtemplate.Creator.Extensions
                 _client = new HttpClient();
             }
 
-            await DownloadAsync(api.openApiSpec, api.openApiSpecCopyToLocation);
+            var url = string.IsNullOrEmpty(api.sasToken) ? api.openApiSpec : $"{api.openApiSpec}?{api.sasToken}";
+            await DownloadAsync(url, api.openApiSpecCopyToLocation);
             return api.openApiSpecCopyToLocation;
         }
 
@@ -44,7 +45,9 @@ namespace apimtemplate.Creator.Extensions
             }
             else
             {
-                throw new ArgumentException($"{response.StatusCode}: {response.Content.ReadAsStringAsync()}");
+                var msg = $"{response.StatusCode}: {response.Content.ReadAsStringAsync()}";
+                Console.WriteLine(msg);
+                throw new ArgumentException(msg);
             }
         }
     }
