@@ -28,7 +28,7 @@ namespace apimtemplate.Creator.Extensions
 
             Console.WriteLine("Downloading OpenApiSpec file:");
             Console.WriteLine($"uri = {api.openApiSpec} | sas = {api.sasToken} | destination = {api.openApiSpecCopyToLocation}");
-            var url = string.IsNullOrEmpty(api.sasToken) ? api.openApiSpec : $"{api.openApiSpec}?{api.sasToken}";
+            var url = string.IsNullOrEmpty(api.sasToken) ? api.openApiSpec : $"{api.openApiSpec}?{api.sasToken.Trim('"')}";
             await DownloadAsync(url, api.openApiSpecCopyToLocation);
             return api.openApiSpecCopyToLocation;
         }
