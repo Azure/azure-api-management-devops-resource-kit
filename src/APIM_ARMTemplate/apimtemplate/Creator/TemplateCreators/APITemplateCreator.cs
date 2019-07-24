@@ -161,6 +161,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 var processor = OpenApiDocumentProcessor.Load(fileContents, api);
                 processor.Process(new BackendServiceSetter());
                 processor.Process(new OperationPathReplace());
+                fileContents = processor.Generate();
 
                 if (isUrl == true)
                 {

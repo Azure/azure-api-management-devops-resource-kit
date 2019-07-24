@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 
@@ -75,6 +77,11 @@ namespace apimtemplate.Creator.OpenApiSpecEditors
         public void Process(IOpenApiDocumentProcessor processor)
         {
             processor.Process(_config, _document);
+        }
+
+        public string Generate()
+        {
+            return _document.Serialize(OpenApiSpecVersion.OpenApi2_0, OpenApiFormat.Json);
         }
     }
 }
