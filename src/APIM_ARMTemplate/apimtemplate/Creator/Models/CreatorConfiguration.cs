@@ -46,6 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool isCurrent { get; set; }
         public string apiVersion { get; set; }
         public string apiVersionDescription { get; set; }
+        public string pathsCleanUp { get; set; }
         public string apiVersionSetId { get; set; }
         public string apiRevision { get; set; }
         public string apiRevisionDescription { get; set; }

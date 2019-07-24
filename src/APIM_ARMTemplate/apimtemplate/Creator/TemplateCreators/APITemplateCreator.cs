@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using apimtemplate.Creator.OpenApiSpecEditors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
@@ -155,6 +156,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 string fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
                 bool isJSON = this.fileReader.isJSON(fileContents);
                 bool isUrl = Uri.TryCreate(api.openApiSpec, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+                // process
+                var processor = OpenApiDocumentProcessor.Load(fileContents, api);
+                processor.Process(new BackendServiceSetter());
+                processor.Process(new OperationPathReplace());
 
                 if (isUrl == true)
                 {
