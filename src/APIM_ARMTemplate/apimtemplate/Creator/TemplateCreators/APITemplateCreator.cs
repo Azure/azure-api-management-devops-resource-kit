@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
-using apimtemplate.Creator.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
@@ -152,20 +151,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 string value;
 
                 // determine if the open api spec is remote or local, yaml or json
-                var sourcePath = await SpecificationCopy.CopyOpenApiSpecification(api);
                 Uri uriResult;
-                string fileContents = await this.fileReader.RetrieveFileContentsAsync(sourcePath);
+                string fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
                 bool isJSON = this.fileReader.isJSON(fileContents);
-                bool isUrl = Uri.TryCreate(sourcePath, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                bool isUrl = Uri.TryCreate(api.openApiSpec, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
                 if (isUrl == true)
                 {
-                    value = sourcePath;
+                    value = api.openApiSpec;
                     if (isJSON == true)
                     {
                         // open api spec is remote json file, use swagger-link-json for v2 and openapi-link for v3
                         OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
-                        bool isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(sourcePath);
+                        bool isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
                         format = isVersionThree == false ? "swagger-link-json" : "openapi-link";
                     }
                     else
@@ -180,7 +178,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         // open api spec is local json file, use swagger-json for v2 and openapi+json for v3
                         OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
-                        bool isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(sourcePath);
+                        bool isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
                         format = isVersionThree == false ? "swagger-json" : "openapi+json";
                     } else
                     {
