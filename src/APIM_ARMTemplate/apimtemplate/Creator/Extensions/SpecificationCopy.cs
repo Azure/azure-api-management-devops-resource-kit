@@ -26,6 +26,8 @@ namespace apimtemplate.Creator.Extensions
                 _client = new HttpClient();
             }
 
+            Console.WriteLine("Downloading OpenApiSpec file:");
+            Console.WriteLine($"uri = {api.openApiSpec} | sas = {api.sasToken} | destination = {api.openApiSpecCopyToLocation}");
             var url = string.IsNullOrEmpty(api.sasToken) ? api.openApiSpec : $"{api.openApiSpec}?{api.sasToken}";
             await DownloadAsync(url, api.openApiSpecCopyToLocation);
             return api.openApiSpecCopyToLocation;
@@ -33,6 +35,7 @@ namespace apimtemplate.Creator.Extensions
 
         private static async Task DownloadAsync(string uri, string destination)
         {
+            Console.WriteLine($"Downloading OpenApiSpec file from : {uri}");
             var response = await _client.GetAsync(uri).ConfigureAwait(false);
             var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             
