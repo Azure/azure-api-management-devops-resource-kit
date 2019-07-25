@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     foreach (Template apiTemplate in apiTemplates)
                     {
                         APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
-                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name));
+                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.properties.displayName.Contains(api.name));
                         // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
                         string apiFileName = fileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value == null, creatorConfig.apimServiceName);
                         fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
