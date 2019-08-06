@@ -164,7 +164,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             {
                 name = "name",
                 apiRevision = "2",
-                isCurrent = true,
+                isCurrent = false,
                 suffix = "suffix",
                 subscriptionRequired = true,
                 openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
