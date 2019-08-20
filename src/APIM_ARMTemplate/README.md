@@ -274,7 +274,7 @@ az account set --subscription <subscription_id>
 | destinationApimName   | Yes                   | Name of the destination APIM instance.            |
 | resourceGroup         | Yes                   | Name of the resource group.                       |
 | fileFolder            | Yes                   | Path to output folder                             |
-| apiName               | No                    | Name of API. If provided, Extractor executes single API extraction. Otherwise, Extractor executes full extraction.      |
+| apiName               | No                    | Name of API. If provided, Extractor executes single API extraction. Otherwise, Extractor executes full extraction.  Note:  This is the "Name" value as seen in the API settings, not "Display Name" and is case sensitive.     |
 | linkedTemplatesBaseUrl| No                    | Linked templates remote location. If provided, Extractor generates master template and requires linked templates pushed to remote location.                                   |
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 
