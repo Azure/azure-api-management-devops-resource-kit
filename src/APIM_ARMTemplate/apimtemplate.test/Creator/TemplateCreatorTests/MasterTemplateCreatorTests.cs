@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             int count = 5;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator, false, null);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);
@@ -43,6 +43,50 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             };
             // linked templates result in 2 values
             int count = 2;
+
+            // act
+            Template masterTemplate = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+
+            // assert
+            Assert.Equal(count, masterTemplate.parameters.Count);
+        }
+
+        [Fact]
+        public void ShouldCreateSasTokenParameterWhenSasTokenRequested()
+        {
+            // arrange
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig()
+            {
+                apimServiceName = "apimServiceName",
+                linked = true,
+                includeSasTokenVariable = true,
+                linkedTemplatesBaseUrl = "linkedTemplatesBaseUrl"
+            };
+            // linked templates result in 3 values
+            int count = 3;
+
+            // act
+            Template masterTemplate = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
+
+            // assert
+            Assert.Equal(count, masterTemplate.parameters.Count);
+        }
+
+        [Fact]
+        public void ShouldIgnoreSasTokenParameterWhenSasTokenRequestedButLinkedSetToFalse()
+        {
+            // arrange
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig()
+            {
+                apimServiceName = "apimServiceName",
+                linked = false,
+                includeSasTokenVariable = true,
+                linkedTemplatesBaseUrl = "linkedTemplatesBaseUrl"
+            };
+            // linked templates result in 3 values
+            int count = 1;
 
             // act
             Template masterTemplate = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);

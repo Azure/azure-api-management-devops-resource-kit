@@ -91,12 +91,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                     // create parameters file
                     Template templateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
-
+                    
                     // write templates to outputLocation
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator, creatorConfig.includeSasTokenVariable, templateParameters.parameters);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
                     }
                     foreach (Template apiTemplate in apiTemplates)
