@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "create --configFile C:\\Users\\michal.kosowski\\source\\repos\\solteq\\FleetManagement-apim-ci-cd-arm\\config_local.yml"
+      "commandLineArgs": "create --configFile ./Creator/ExampleFiles/YAMLConfigs/validTesting.yml"
     }
   }
 }
