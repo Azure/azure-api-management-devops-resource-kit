@@ -4,7 +4,7 @@
     * [Create the Config File](#creator1)
     * [Running the Creator](#creator2)
 2. [ Extractor ](#Extractor)
-    * [Running the Extractor](#extrator1)
+    * [Running the Extractor](#running-the-extractor)
 
 # Creator
 
