@@ -271,6 +271,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
             return false;
         }
+
+        private Dictionary<string, TemplateParameterProperties> ChangeValueToDefaultValueForTemplate(
+            Dictionary<string, TemplateParameterProperties> templateParameterPropertieses)
+        {
+            var resultDict = new Dictionary<string, TemplateParameterProperties>();
+            foreach (var key in templateParameterPropertieses.Keys)
+            {
+                var parameter = templateParameterPropertieses[key];
+                resultDict.Add(key, new TemplateParameterProperties
+                {
+                    allowedValues = parameter.allowedValues,
+                    defaultValue = parameter.value,
+                    metadata = parameter.metadata,
+                    type = parameter.type
+                });
+            }
+
+            return resultDict;
+        }
     }
 
     public class LinkedMasterTemplateAPIInformation
