@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Template masterTemplate = CreateEmptyTemplate();
 
             // add parameters
-            masterTemplate.parameters = properties ?? this.CreateMasterTemplateParameters(true);
+            masterTemplate.parameters = ChangeValueToDefaultValueForTemplate(properties) ?? this.CreateMasterTemplateParameters(true);
 
             // add deployment resources that links to all resource files
             List<TemplateResource> resources = new List<TemplateResource>();
