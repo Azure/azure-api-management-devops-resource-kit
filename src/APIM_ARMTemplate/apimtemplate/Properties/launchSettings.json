@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract --sourceApimName businessstoremgmtapippe --destinationApimName commercemgmt --resourceGroup Api-Default-West-US --fileFolder C:\\Tools\\ --apiName assets-v2 --revisionName 1 --policyXMLBaseUrl C:\\Tools\\Policies"
+      "commandLineArgs": "create --configFile ./Creator/ExampleFiles/YAMLConfigs/validTesting.yml"
     }
   }
 }
