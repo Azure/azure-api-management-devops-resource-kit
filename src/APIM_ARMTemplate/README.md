@@ -272,12 +272,13 @@ az account set --subscription <subscription_id>
 | resourceGroup         | Yes                   | Name of the resource group.                       |
 | fileFolder            | Yes                   | Path to output folder                             |
 | apiName               | No                    | Name of API. If provided, Extractor executes single API extraction. Otherwise, Extractor executes full extraction.  Note:  This is the "Name" value as seen in the API settings, not "Display Name" and is case sensitive.     |
+| revisionName          | No                    | Revision Number. If provided with apiName, Extractor extracts specific revision of the API.     |
 | linkedTemplatesBaseUrl| No                    | Linked templates remote location. If provided, Extractor generates master template and requires linked templates pushed to remote location.                                   |
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 
 To run the Extractor with all arguments (executing a single API extraction with linked templates and policy file generation), use the following command: 
 ```
-dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --apiName <api_name> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location>
+dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --apiName <api_name> --revisionName <revision_number> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location>
 ```
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
