@@ -123,12 +123,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 			Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
 			JObject oApi;
-			if (singleApiName !=null && singleRevisionName != null)
+			if (singleApiName != null && singleRevisionName != null)
 			{
-				var api = JObject.Parse(await GetAPIDetailsAsync(apimname, resourceGroup, $"{singleApiName};rev={singleRevisionName}"));
-				var value = new JArray();
-				value.Add(api);
-				oApi = new JObject(new JProperty("value", value));
+				try
+				{
+					var api = JObject.Parse(await GetAPIDetailsAsync(apimname, resourceGroup, $"{singleApiName};rev={singleRevisionName}"));
+					var value = new JArray();
+					value.Add(api);
+					oApi = new JObject(new JProperty("value", value));
+				}
+				catch (Exception)
+				{
+					throw new Exception($"{singleApiName} API, {singleRevisionName} Revision not found");
+				}
 			}
 			else
 			{
