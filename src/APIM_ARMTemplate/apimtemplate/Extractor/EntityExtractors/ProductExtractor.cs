@@ -41,7 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies/policy?api-version={5}",
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies/policy?api-version={5}&format=rawxml",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
             return await CallApiManagementAsync(azToken, requestUrl);

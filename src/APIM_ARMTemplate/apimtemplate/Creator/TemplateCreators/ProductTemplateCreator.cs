@@ -37,8 +37,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         description = product.description,
                         terms = product.terms,
                         subscriptionRequired = product.subscriptionRequired,
-                        approvalRequired = product.approvalRequired,
-                        subscriptionsLimit = product.subscriptionsLimit,
+                        approvalRequired = product.subscriptionRequired ? product.approvalRequired : null,
+                        subscriptionsLimit = product.subscriptionRequired ? product.subscriptionsLimit : null,
                         state = product.state,
                         displayName = product.displayName
                     },
