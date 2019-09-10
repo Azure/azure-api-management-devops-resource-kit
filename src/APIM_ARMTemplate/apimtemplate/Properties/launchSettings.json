@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "create --configFile ./Creator/ExampleFiles/YAMLConfigs/validTesting.yml"
+      "commandLineArgs": "create --configFile C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\azure-api-management-devops-example\\src\\APIM_ARMTemplate\\apimtemplate\\Creator\\ExampleFiles\\YAMLConfigs\\validTesting.yml"
     }
   }
 }

@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfDeploymentResources()
         {
             // arrange
-            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService" };
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             Template apiVersionSetsTemplate = new Template();
             Template productsTemplate = new Template();
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             int count = 5;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);
@@ -55,13 +55,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfParametersWhenUnlinked()
         {
             // arrange
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = false };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
-            bool linked = false;
             // unlinked templates result in 1 value
             int count = 1;
 
             // act
-            Dictionary<string, TemplateParameterProperties> masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameters(linked);
+            Dictionary<string, TemplateParameterProperties> masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameters(creatorConfig);
 
             // assert
             Assert.Equal(count, masterTemplateParameters.Keys.Count);
