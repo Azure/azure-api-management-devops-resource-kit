@@ -19,6 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var fileFolderName = this.Option("--fileFolder <filefolder>", "ARM Template files folder", CommandOptionType.SingleValue);
             var apiName = this.Option("--apiName <apiName>", "API name", CommandOptionType.SingleValue);
             var linkedTemplatesBaseUrlName = this.Option("--linkedTemplatesBaseUrl <linkedTemplatesBaseUrl>", "Creates a master template with links", CommandOptionType.SingleValue);
+            var linkedTemplatesUrlQueryString = this.Option("--linkedTemplatesUrlQueryString <linkedTemplatesUrlQueryString>", "Query string appended to linked templates uris that enables retrieval from private storage", CommandOptionType.SingleValue);
             var policyXMLBaseUrlName = this.Option("--policyXMLBaseUrl <policyXMLBaseUrl>", "Writes policies to local XML files that require deployment to remote folder", CommandOptionType.SingleValue);
 
             this.HelpOption();
@@ -33,17 +34,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     if (!fileFolderName.HasValue()) throw new Exception("Missing parameter <filefolder>.");
 
                     // isolate cli parameters
-                    string resourceGroup = resourceGroupName.Values[0].ToString();
-                    string sourceApim = sourceApimName.Values[0].ToString();
-                    string destinationApim = destinationAPIManagementName.Values[0].ToString();
-                    string fileFolder = fileFolderName.Values[0].ToString();
+                    string resourceGroup = resourceGroupName.Value().ToString();
+                    string sourceApim = sourceApimName.Value().ToString();
+                    string destinationApim = destinationAPIManagementName.Value().ToString();
+                    string fileFolder = fileFolderName.Value().ToString();
                     string linkedBaseUrl = linkedTemplatesBaseUrlName.HasValue() ? linkedTemplatesBaseUrlName.Value().ToString() : null;
+                    string linkedUrlQueryString = linkedTemplatesUrlQueryString.HasValue() ? linkedTemplatesUrlQueryString.Value().ToString() : null;
                     string policyXMLBaseUrl = policyXMLBaseUrlName.HasValue() ? policyXMLBaseUrlName.Value().ToString() : null;
                     string singleApiName = null;
 
                     if (apiName.Values.Count > 0)
                     {
-                        singleApiName = apiName.Values[0].ToString();
+                        singleApiName = apiName.Value().ToString();
                     }
 
                     Console.WriteLine("API Management Template");
@@ -85,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl);
 
                     // create parameters file
-                    Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(destinationApim, linkedBaseUrl, policyXMLBaseUrl);
+                    Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(destinationApim, linkedBaseUrl, linkedUrlQueryString, policyXMLBaseUrl);
 
                     // write templates to output file location
                     string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
@@ -100,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     if (linkedBaseUrl != null)
                     {
                         // create a master template that links to all other templates
-                        Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames, apiFileName, policyXMLBaseUrl);
+                        Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames, apiFileName, linkedUrlQueryString, policyXMLBaseUrl);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(@fileFolder, fileNames.linkedMaster));
                     }
 
