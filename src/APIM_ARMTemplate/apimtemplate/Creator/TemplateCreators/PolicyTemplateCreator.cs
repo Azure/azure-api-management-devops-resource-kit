@@ -14,6 +14,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.fileReader = fileReader;
         }
 
+        public PolicyTemplateResource CreateGlobalServicePolicyTemplateResource(string globalServicePolicy)
+        {
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(globalServicePolicy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            // create policy resource with properties
+            PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
+            {
+                name = $"[concat(parameters('ApimServiceName'), '/policy')]",
+                type = ResourceTypeConstants.GlobalServicePolicy,
+                apiVersion = GlobalConstants.APIVersion,
+                properties = new PolicyTemplateProperties()
+                {
+                    // if policy is a url inline the url, if it is a local file inline the file contents
+                    format = isUrl ? "rawxml-link" : "rawxml",
+                    value = isUrl ? globalServicePolicy : this.fileReader.RetrieveLocalFileContents(globalServicePolicy)
+                },
+                dependsOn = new string[] { }
+            };
+            return policyTemplateResource;
+        }
+
         public PolicyTemplateResource CreateAPIPolicyTemplateResource(APIConfig api, string[] dependsOn)
         {
             Uri uriResult;

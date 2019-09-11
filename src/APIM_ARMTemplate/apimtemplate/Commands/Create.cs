@@ -50,6 +50,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
+                    Console.WriteLine("Creating global service policy template");
+                    Console.WriteLine("------------------------------------------");
+                    Template globalServicePolicyTemplate = creatorConfig.policy != null ? policyTemplateCreator.CreateGlobalServicePolicyTemplateResource(creatorConfig.policy) : null;
                     Console.WriteLine("Creating API version set template");
                     Console.WriteLine("------------------------------------------");
                     Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;

@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract --sourceApimName lucas-create-push --destinationApimName lucas-extract-push --resourceGroup LucasHuetHudsonInternal --fileFolder C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\GeneratedTemplates\\Extractor\\Full --linkedTemplatesBaseUrl https://lucasapimstorage.blob.core.windows.net/linked-templates --linkedTemplatesUrlQueryString ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-24T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFGlpJEYPH81OQVzKb7q9nLq0Xt%2Bu35UTqpATIZo6uc%3D"
+      "commandLineArgs": "create --configFile C:\\Users\\lucashh\\Desktop\\Projects\\APIM-ARM\\azure-api-management-devops-example\\src\\APIM_ARMTemplate\\apimtemplate\\Creator\\ExampleFiles\\YAMLConfigs\\validTesting.yml"
     }
   }
 }
