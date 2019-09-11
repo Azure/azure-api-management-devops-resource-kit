@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
-using System.Threading.Tasks;
 using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
@@ -9,6 +7,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
     public class MasterTemplateExtractor : EntityExtractor
     {
         public Template GenerateLinkedMasterTemplate(Template apiTemplate,
+            Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
             Template loggersTemplate,
@@ -37,6 +36,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 string namedValuesUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.namedValues);
                 resources.Add(this.CreateLinkedMasterTemplateResource(namedValueDeploymentResourceName, namedValuesUri, new string[] { }));
+            }
+
+            // globalServicePolicy
+            if (globalServicePolicyTemplate != null)
+            {
+                string globalServicePolicyUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.globalServicePolicy);
+                resources.Add(this.CreateLinkedMasterTemplateResource("globalServicePolicyTemplate", globalServicePolicyUri, dependsOnNamedValues));
             }
 
             // apiVersionSet
@@ -78,7 +84,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (apiTemplate != null)
             {
                 string apisUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, apiFileName);
-                resources.Add(this.CreateLinkedMasterTemplateResource("apisTemplate", apisUri, GenerateAPIResourceDependencies(apiTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, namedValueDeploymentResourceName)));
+                resources.Add(this.CreateLinkedMasterTemplateResource("apisTemplate", apisUri, GenerateAPIResourceDependencies(apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, namedValueDeploymentResourceName)));
             }
 
             masterTemplate.resources = resources.ToArray();
@@ -86,6 +92,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         }
 
         public string[] GenerateAPIResourceDependencies(Template apiTemplate,
+            Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
             Template loggersTemplate,
@@ -98,6 +105,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // add dependency on all other template files by default for now
             apiDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]");
+            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'globalServicePolicyTemplate')]");
             apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
             apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
             apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");

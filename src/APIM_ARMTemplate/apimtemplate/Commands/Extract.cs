@@ -71,11 +71,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     AuthorizationServerExtractor authorizationServerExtractor = new AuthorizationServerExtractor();
                     BackendExtractor backendExtractor = new BackendExtractor();
                     LoggerExtractor loggerExtractor = new LoggerExtractor();
+                    PolicyExtractor policyExtractor = new PolicyExtractor(fileWriter);
                     PropertyExtractor propertyExtractor = new PropertyExtractor();
                     ProductExtractor productExtractor = new ProductExtractor(fileWriter);
                     MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
                     // extract templates from apim service
+                    Template globalServicePolicyTemplate = await policyExtractor.GenerateGlobalServicePolicyTemplateAsync(sourceApim, resourceGroup, policyXMLBaseUrl, fileFolder);
                     Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, policyXMLBaseUrl, fileFolder);
                     List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
                     Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
@@ -98,11 +100,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     fileWriter.WriteJSONToFile(loggerTemplate, String.Concat(@fileFolder, fileNames.loggers));
                     fileWriter.WriteJSONToFile(namedValueTemplate, String.Concat(@fileFolder, fileNames.namedValues));
                     fileWriter.WriteJSONToFile(productTemplate, String.Concat(@fileFolder, fileNames.products));
+                    fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(@fileFolder, fileNames.globalServicePolicy));
 
                     if (linkedBaseUrl != null)
                     {
                         // create a master template that links to all other templates
-                        Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames, apiFileName, linkedUrlQueryString, policyXMLBaseUrl);
+                        Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate, fileNames, apiFileName, linkedUrlQueryString, policyXMLBaseUrl);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(@fileFolder, fileNames.linkedMaster));
                     }
 
