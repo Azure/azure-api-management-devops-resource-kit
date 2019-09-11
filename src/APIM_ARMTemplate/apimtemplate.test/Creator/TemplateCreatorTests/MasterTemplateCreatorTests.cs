@@ -21,8 +21,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 5 resources (apiVersionSet, product, logger, both api templates)
-            int count = 5;
+            // should create 6 resources (globalServicePolicy, apiVersionSet, product, logger, both api templates)
+            int count = 6;
 
             // act
             Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
@@ -84,6 +84,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(name, masterTemplateResource.name);
             Assert.Equal(uriLink, masterTemplateResource.properties.templateLink.uri);
             Assert.Equal(dependsOn, masterTemplateResource.dependsOn);
+        }
+
+        [Fact]
+        public void ShouldCreateCorrectLinkedUri()
+        {
+            // arrange
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true, linkedTemplatesBaseUrl = "http://someurl.com", linkedTemplatesUrlQueryString = "?param=1" };
+            string apiVersionSetFileName = "/versionSet1-apiVersionSets.template.json";
+
+            // act
+            string linkedResourceUri = masterTemplateCreator.GenerateLinkedTemplateUri(creatorConfig, apiVersionSetFileName);
+
+            // assert
+            Assert.Equal($"[concat(parameters('LinkedTemplatesBaseUrl'), '{apiVersionSetFileName}', parameters('LinkedTemplatesUrlQueryString'))]", linkedResourceUri);
         }
     }
 }

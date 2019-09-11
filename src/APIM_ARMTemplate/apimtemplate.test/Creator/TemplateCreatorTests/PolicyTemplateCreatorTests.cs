@@ -8,6 +8,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
     public class PolicyTemplateCreatorTests
     {
         [Fact]
+        public void ShouldCreateGlobalServicePolicyTemplateResourceFromCreatorConfigWithCorrectContent()
+        {
+            // arrange
+            PolicyTemplateCreator policyTemplateCreator = PolicyTemplateCreatorFactory.GeneratePolicyTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { policy = "http://someurl.com" };
+
+            // act
+            Template policyTemplate = policyTemplateCreator.CreateGlobalServicePolicyTemplate(creatorConfig);
+            PolicyTemplateResource policyTemplateResource = policyTemplate.resources[0] as PolicyTemplateResource;
+
+            // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/policy')]", policyTemplateResource.name);
+            Assert.Equal("rawxml-link", policyTemplateResource.properties.format);
+            Assert.Equal(creatorConfig.policy, policyTemplateResource.properties.value);
+        }
+
+        [Fact]
         public void ShouldCreateAPIPolicyTemplateResourceFromCreatorConfigWithCorrectContent()
         {
             // arrange
