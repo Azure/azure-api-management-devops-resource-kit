@@ -5,7 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class PolicyTemplateCreator
+    public class PolicyTemplateCreator: TemplateCreator
     {
         private FileReader fileReader;
 
@@ -14,8 +14,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.fileReader = fileReader;
         }
 
-        public PolicyTemplateResource CreateGlobalServicePolicyTemplateResource(string globalServicePolicy)
+        public Template CreateGlobalServicePolicyTemplate(CreatorConfig creatorConfig)
         {
+            // create empty template
+            Template policyTemplate = CreateEmptyTemplate();
+
+            // add parameters
+            policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
+            List<TemplateResource> resources = new List<TemplateResource>();
+
+            // create global service policy resource with properties
+            string globalServicePolicy = creatorConfig.policy;
             Uri uriResult;
             bool isUrl = Uri.TryCreate(globalServicePolicy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             // create policy resource with properties
@@ -32,7 +45,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 },
                 dependsOn = new string[] { }
             };
-            return policyTemplateResource;
+            resources.Add(policyTemplateResource);
+
+            policyTemplate.resources = resources.ToArray();
+            return policyTemplate;
         }
 
         public PolicyTemplateResource CreateAPIPolicyTemplateResource(APIConfig api, string[] dependsOn)

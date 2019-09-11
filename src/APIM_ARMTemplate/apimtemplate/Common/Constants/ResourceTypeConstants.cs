@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string APISchema = "Microsoft.ApiManagement/service/apis/schemas";
         public const string AuthorizationServer = "Microsoft.ApiManagement/service/authorizationServers";
         public const string Backend = "Microsoft.ApiManagement/service/backends";
-        public const string GlobalServicePolicy = "Microsoft.ApiManagement/service/policy";
+        public const string GlobalServicePolicy = "Microsoft.ApiManagement/service/policies";
         public const string Logger = "Microsoft.ApiManagement/service/loggers";
         public const string ProductAPI = "Microsoft.ApiManagement/service/products/apis";
         public const string Product = "Microsoft.ApiManagement/service/products";

@@ -14,6 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             Template apiVersionSetsTemplate = new Template();
+            Template globalServicePolicyTemplate = new Template();
             Template productsTemplate = new Template();
             Template loggersTemplate = new Template();
             List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
@@ -24,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             int count = 5;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);
