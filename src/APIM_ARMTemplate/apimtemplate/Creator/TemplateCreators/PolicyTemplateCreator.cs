@@ -5,13 +5,50 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class PolicyTemplateCreator
+    public class PolicyTemplateCreator: TemplateCreator
     {
         private FileReader fileReader;
 
         public PolicyTemplateCreator(FileReader fileReader)
         {
             this.fileReader = fileReader;
+        }
+
+        public Template CreateGlobalServicePolicyTemplate(CreatorConfig creatorConfig)
+        {
+            // create empty template
+            Template policyTemplate = CreateEmptyTemplate();
+
+            // add parameters
+            policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+            };
+
+            List<TemplateResource> resources = new List<TemplateResource>();
+
+            // create global service policy resource with properties
+            string globalServicePolicy = creatorConfig.policy;
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(globalServicePolicy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            // create policy resource with properties
+            PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
+            {
+                name = $"[concat(parameters('ApimServiceName'), '/policy')]",
+                type = ResourceTypeConstants.GlobalServicePolicy,
+                apiVersion = GlobalConstants.APIVersion,
+                properties = new PolicyTemplateProperties()
+                {
+                    // if policy is a url inline the url, if it is a local file inline the file contents
+                    format = isUrl ? "rawxml-link" : "rawxml",
+                    value = isUrl ? globalServicePolicy : this.fileReader.RetrieveLocalFileContents(globalServicePolicy)
+                },
+                dependsOn = new string[] { }
+            };
+            resources.Add(policyTemplateResource);
+
+            policyTemplate.resources = resources.ToArray();
+            return policyTemplate;
         }
 
         public PolicyTemplateResource CreateAPIPolicyTemplateResource(APIConfig api, string[] dependsOn)

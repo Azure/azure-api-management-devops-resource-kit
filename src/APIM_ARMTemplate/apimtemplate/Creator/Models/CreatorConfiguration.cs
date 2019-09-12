@@ -12,6 +12,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         public string version { get; set; }
         public string apimServiceName { get; set; }
+        // policy file location (local or url)
+        public string policy { get; set; }
         public List<APIVersionSetConfig> apiVersionSets { get; set; }
         public List<APIConfig> apis { get; set; }
         public List<ProductConfig> products { get; set; }
@@ -21,6 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
+        public string linkedTemplatesUrlQueryString { get; set; }
     }
 
     public class APIVersionSetConfig: APIVersionSetProperties
