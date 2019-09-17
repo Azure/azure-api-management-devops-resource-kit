@@ -20,6 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var apiName = this.Option("--apiName <apiName>", "API name", CommandOptionType.SingleValue);
             var linkedTemplatesBaseUrlName = this.Option("--linkedTemplatesBaseUrl <linkedTemplatesBaseUrl>", "Creates a master template with links", CommandOptionType.SingleValue);
             var policyXMLBaseUrlName = this.Option("--policyXMLBaseUrl <policyXMLBaseUrl>", "Writes policies to local XML files that require deployment to remote folder", CommandOptionType.SingleValue);
+            var overrideApimFileName = this.Option("--overrideApimFileName <overrideApimFileName>", "Overrides sourceApimName value when naming extracted template files.", CommandOptionType.SingleValue);
 
             this.HelpOption();
 
@@ -39,6 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     string fileFolder = fileFolderName.Values[0].ToString();
                     string linkedBaseUrl = linkedTemplatesBaseUrlName.HasValue() ? linkedTemplatesBaseUrlName.Value().ToString() : null;
                     string policyXMLBaseUrl = policyXMLBaseUrlName.HasValue() ? policyXMLBaseUrlName.Value().ToString() : null;
+                    string overrideApimFile = overrideApimFileName.HasValue() ? overrideApimFileName.Value().ToString() : null;
                     string singleApiName = null;
 
                     if (apiName.Values.Count > 0)
@@ -57,11 +59,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     {
                         Console.WriteLine("Executing full extraction ...", singleApiName);
                     }
-
                     // initialize file helper classes
                     FileWriter fileWriter = new FileWriter();
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
-                    FileNames fileNames = fileNameGenerator.GenerateFileNames(sourceApim);
+
+                    string apimFileTemplateName = overrideApimFile != null ? overrideApimFile : sourceApim;
+                    FileNames fileNames = fileNameGenerator.GenerateFileNames(apimFileTemplateName);
 
                     // initialize entity extractor classes
                     APIExtractor apiExtractor = new APIExtractor(fileWriter);
@@ -88,7 +91,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(destinationApim, linkedBaseUrl, policyXMLBaseUrl);
 
                     // write templates to output file location
-                    string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
+                    string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, apimFileTemplateName);
                     fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@fileFolder, apiFileName));
                     fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(@fileFolder, fileNames.apiVersionSets));
                     fileWriter.WriteJSONToFile(authorizationServerTemplate, String.Concat(@fileFolder, fileNames.authorizationServers));

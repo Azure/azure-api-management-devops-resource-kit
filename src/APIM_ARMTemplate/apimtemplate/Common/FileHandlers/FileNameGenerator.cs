@@ -21,6 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             };
         }
 
+        //TODO: Change to support override file name
         public string GenerateCreatorAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI, string apimServiceName)
         {
             // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
@@ -35,6 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             }
         }
 
+        //TODO: Change to support override file name
         public string GenerateExtractorAPIFileName(string singleAPIName, string apimServiceName)
         {
             return singleAPIName == null ? $@"/{apimServiceName}-apis.template.json" : $@"/{apimServiceName}-{singleAPIName}-api.template.json";
