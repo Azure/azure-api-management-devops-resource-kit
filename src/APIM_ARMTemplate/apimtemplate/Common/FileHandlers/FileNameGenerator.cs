@@ -11,13 +11,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             return new FileNames()
             {
                 apiVersionSets = $@"/{apimServiceName}-apiVersionSets.template.json",
-                products = $@"/{apimServiceName}-products.template.json",
-                loggers = $@"/{apimServiceName}-loggers.template.json",
-                backends = $@"/{apimServiceName}-backends.template.json",
-                namedValues = $@"/{apimServiceName}-namedValues.template.json",
                 authorizationServers = $@"/{apimServiceName}-authorizationServers.template.json",
-                linkedMaster = $@"/{apimServiceName}-master.template.json",
-                parameters = $@"/{apimServiceName}-parameters.json"
+                backends = $@"/{apimServiceName}-backends.template.json",
+                globalServicePolicy = $@"/{apimServiceName}-globalServicePolicy.template.json",
+                loggers = $@"/{apimServiceName}-loggers.template.json",
+                namedValues = $@"/{apimServiceName}-namedValues.template.json",
+                products = $@"/{apimServiceName}-products.template.json",
+                parameters = $@"/{apimServiceName}-parameters.json",
+                linkedMaster = $@"/{apimServiceName}-master.template.json"
             };
         }
 
@@ -53,11 +54,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     public class FileNames
     {
         public string apiVersionSets { get; set; }
-        public string products { get; set; }
-        public string loggers { get; set; }
         public string authorizationServers { get; set; }
         public string backends { get; set; }
+        public string globalServicePolicy { get; set; }
+        public string loggers { get; set; }
         public string namedValues { get; set; }
+        public string products { get; set; }
         public string parameters { get; set; }
         // linked property outputs 1 master template
         public string linkedMaster { get; set; }

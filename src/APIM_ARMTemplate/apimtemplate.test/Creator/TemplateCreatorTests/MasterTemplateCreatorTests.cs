@@ -11,20 +11,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfDeploymentResources()
         {
             // arrange
-            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService" };
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
             Template apiVersionSetsTemplate = new Template();
+            Template globalServicePolicyTemplate = new Template();
             Template productsTemplate = new Template();
             Template loggersTemplate = new Template();
             List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 5 resources (apiVersionSet, product, logger, both api templates)
-            int count = 5;
+            // should create 6 resources (globalServicePolicy, apiVersionSet, product, logger, both api templates)
+            int count = 6;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);
@@ -55,13 +56,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldCreateCorrectNumberOfParametersWhenUnlinked()
         {
             // arrange
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = false };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
-            bool linked = false;
             // unlinked templates result in 1 value
             int count = 1;
 
             // act
-            Dictionary<string, TemplateParameterProperties> masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameters(linked);
+            Dictionary<string, TemplateParameterProperties> masterTemplateParameters = masterTemplateCreator.CreateMasterTemplateParameters(creatorConfig);
 
             // assert
             Assert.Equal(count, masterTemplateParameters.Keys.Count);
@@ -83,6 +84,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(name, masterTemplateResource.name);
             Assert.Equal(uriLink, masterTemplateResource.properties.templateLink.uri);
             Assert.Equal(dependsOn, masterTemplateResource.dependsOn);
+        }
+
+        [Fact]
+        public void ShouldCreateCorrectLinkedUri()
+        {
+            // arrange
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true, linkedTemplatesBaseUrl = "http://someurl.com", linkedTemplatesUrlQueryString = "?param=1" };
+            string apiVersionSetFileName = "/versionSet1-apiVersionSets.template.json";
+
+            // act
+            string linkedResourceUri = masterTemplateCreator.GenerateLinkedTemplateUri(creatorConfig, apiVersionSetFileName);
+
+            // assert
+            Assert.Equal($"[concat(parameters('LinkedTemplatesBaseUrl'), '{apiVersionSetFileName}', parameters('LinkedTemplatesUrlQueryString'))]", linkedResourceUri);
         }
     }
 }

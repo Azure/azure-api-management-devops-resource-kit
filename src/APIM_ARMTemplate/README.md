@@ -25,6 +25,7 @@ The utility supports the following arguments:
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | version               | string                | Yes                   | Configuration version.                            |
 | apimServiceName       | string                | Yes                   | Name of the APIM service to deploy resources into.    |
+| policy                | string                | No                    | Location of the global service policy XML file. Can be url or local file.           |
 | apiVersionSets         | Array<[APIVersionSetConfiguration](#APIVersionSetConfiguration)> | No               | List of API Version Set configurations.                        |
 | apis                   | Array<[APIConfiguration](#APIConfiguration)>      | Yes                   | List of API configurations.                                |
 | products                   | Array<[ProductConfiguration](#ProductConfiguration)>      | No                   | List of Product configurations.                                |
@@ -34,6 +35,7 @@ The utility supports the following arguments:
 | outputLocation        | string                | Yes                   | Local folder the utility will write templates to. |
 | linked                | boolean               | No                    | Determines whether the utility should create a master template that links to all generated templates. |
 | linkedTemplatesBaseUrl| string                | No                    | Location that stores linked templates. Required if 'linked' is set to true. |
+| linkedTemplatesUrlQueryString| string                | No                    | Query string appended to linked templates uris that enables retrieval from private storage. |
 
 #### APIConfiguration
 
@@ -104,6 +106,7 @@ The following is a full config.yml file with each property listed:
 ```
 version: 0.0.1
 apimServiceName: myAPIMService
+policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\globalServicePolicy.xml
 apiVersionSets:
     - id: myAPIVersionSetID
       displayName: swaggerPetstoreVersionSetLinked
@@ -230,6 +233,7 @@ backends:
 outputLocation: C:\Users\myUsername\GeneratedTemplates
 linked: false
 linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
+linkedTemplatesUrlQueryString : ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-22T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFTldJEYPH888QVzKb7q7eLq0Xt%2Bu35UTqpFGUYo6uc%3D
 ```
 
 <a name="creator2"></a>
@@ -276,6 +280,7 @@ az account set --subscription <subscription_id>
 | fileFolder            | Yes                   | Path to output folder                             |
 | apiName               | No                    | Name of API. If provided, Extractor executes single API extraction. Otherwise, Extractor executes full extraction.  Note:  This is the "Name" value as seen in the API settings, not "Display Name" and is case sensitive.     |
 | linkedTemplatesBaseUrl| No                    | Linked templates remote location. If provided, Extractor generates master template and requires linked templates pushed to remote location.                                   |
+| linkedTemplatesUrlQueryString | string | No   | Query string appended to linked templates uris that enables retrieval from private storage. |
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 | overrideApimFileName  | No                    | Overrides the APIM name for template file name generation.  If provided, the Extractor generates the template files with a value overriding `sourceApimName` property value.	|
 

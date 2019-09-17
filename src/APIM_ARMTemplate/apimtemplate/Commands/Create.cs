@@ -54,6 +54,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
+                    Console.WriteLine("Creating global service policy template");
+                    Console.WriteLine("------------------------------------------");
+                    Template globalServicePolicyTemplate = creatorConfig.policy != null ? policyTemplateCreator.CreateGlobalServicePolicyTemplate(creatorConfig) : null;
                     Console.WriteLine("Creating API version set template");
                     Console.WriteLine("------------------------------------------");
                     Template apiVersionSetsTemplate = creatorConfig.apiVersionSets != null ? apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig) : null;
@@ -85,6 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         {
                             name = api.name,
                             isSplit = apiTemplateCreator.isSplitAPI(api),
+                            dependsOnGlobalServicePolicies = creatorConfig.policy != null,
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnProducts = api.products != null,
                             dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
@@ -100,16 +104,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, fileNames, apimFileTemplateName, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInformation, fileNames, apimFileTemplateName, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
                     }
                     foreach (Template apiTemplate in apiTemplates)
                     {
                         APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
-                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.properties.displayName.Equals(api.name, StringComparison.Ordinal));
+                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name, StringComparison.Ordinal));
                         // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
                         string apiFileName = fileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value == null, apimFileTemplateName);
                         fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
+                    }
+                    if (globalServicePolicyTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(creatorConfig.outputLocation, fileNames.globalServicePolicy));
                     }
                     if (apiVersionSetsTemplate != null)
                     {
