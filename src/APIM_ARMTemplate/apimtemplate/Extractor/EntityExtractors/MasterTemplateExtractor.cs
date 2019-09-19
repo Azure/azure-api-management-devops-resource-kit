@@ -133,7 +133,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     },
                     parameters = new Dictionary<string, TemplateParameterProperties>
                     {
-                        { "ApimServiceName", new TemplateParameterProperties(){ value = "[parameters('ApimServiceName')]" } }
+                        { "ApimServiceName", new TemplateParameterProperties(){ value = "[parameters('ApimServiceName')]" } },
+                        { "PolicyXMLBaseUrl", new TemplateParameterProperties(){ value = "[parameters('PolicyXMLBaseUrl')]" } }                        
                     }
                 },
                 dependsOn = dependsOn
