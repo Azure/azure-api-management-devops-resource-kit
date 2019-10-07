@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetOperationTagAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationId)
+        public async Task<string> GetOperationTagsAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationId)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
@@ -87,6 +87,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
+        public async Task<string> GetAPITagsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/tags?api-version={5}",
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
         public async Task<string> GetAPIDiagnosticsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -262,19 +271,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     catch (Exception) { }
                      
 
-                    // add tag - api operation associations to template 
+                    // add tags associated with the operation to template 
                     try
                     {
-                        string apiOperationTags = await GetOperationTagAsync(apimname, resourceGroup, oApiName, operationName);
+                        // pull tags associated with the operation
+                        string apiOperationTags = await GetOperationTagsAsync(apimname, resourceGroup, oApiName, operationName);
                         JObject oApiOperationTags = JObject.Parse(apiOperationTags);
 
                         foreach (var tag in oApiOperationTags["value"])
                         {
-                            // pull tag - api operation associations
                             string apiOperationTagName = ((JValue)tag["name"]).Value.ToString();
-                            Console.WriteLine($" - Operation tag {apiOperationTagName} found for {operationName} operation");  
+                            Console.WriteLine(" - '{0}' Tag association found for {1} operation", apiOperationTagName, operationResourceName);
 
-                            // convert returned tag - api operation associations to template resource class
+                            // convert operation tag association to template resource class
                             TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
                             operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/{apiOperationTagName}')]";
                             operationTagResource.apiVersion = GlobalConstants.APIVersion;
@@ -315,6 +324,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 catch (Exception) { }
                 #endregion
+
+                // add tags associated with the api to template 
+                try
+                {
+                    // pull tags associated with the api
+                    string apiTags = await GetAPITagsAsync(apimname, resourceGroup, apiName);
+                    JObject oApiTags = JObject.Parse(apiTags);
+
+                    foreach (var tag in oApiTags["value"])
+                    {
+                        string apiTagName = ((JValue)tag["name"]).Value.ToString();
+                        Console.WriteLine("'{0}' Tag association found", apiTagName);
+
+                        // convert associations between api and tags to template resource class
+                        TagTemplateResource apiTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
+                        apiTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiTagName}')]";
+                        apiTagResource.apiVersion = GlobalConstants.APIVersion;
+                        apiTagResource.scale = null;
+                        apiTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+                        apiTagResource.properties = new TagTemplateProperties();
+                        templateResources.Add(apiTagResource);
+                    }
+                }
+                catch (Exception) { }
 
                 // add product api associations to template
                 #region API Products
