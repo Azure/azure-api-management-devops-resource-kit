@@ -47,6 +47,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
+        public async Task<string> GetOperationTagAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationId)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/tags?api-version={6}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationId, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
+
         public async Task<string> GetAPIDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -248,6 +258,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         }
 
                         templateResources.Add(operationPolicyResource);
+                    }
+                    catch (Exception) { }
+
+                    // add operation tag resources to api template
+                   try
+                    {
+                        string operationTags = await GetOperationTagAsync(apimname, resourceGroup, oApiName, operationName);
+                        Console.WriteLine($" - Operation tags found for {operationName} operation");                       
+                        TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(operationTags);
+                        operationTagResource.type = ResourceTypeConstants.APIOperationTag;
+                        operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/resident-service-request')]";
+                        operationTagResource.apiVersion = GlobalConstants.APIVersion;
+                        operationTagResource.scale = null;
+                        operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
+                         operationTagResource.properties = new TagTemplateProperties();
+                        templateResources.Add(operationTagResource);
                     }
                     catch (Exception) { }
                 }
