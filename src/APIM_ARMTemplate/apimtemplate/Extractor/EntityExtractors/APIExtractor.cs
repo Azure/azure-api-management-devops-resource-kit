@@ -260,23 +260,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         templateResources.Add(operationPolicyResource);
                     }
                     catch (Exception) { }
+                     
 
-                    // add operation tag resources to api template     
+                    // add tag - api operation associations to template 
                     try
                     {
-                        string response = await GetOperationTagAsync(apimname, resourceGroup, oApiName, operationName);
-                        JToken tags = JObject.Parse(response).SelectToken("$.value");                                                      
-                        List<TagTemplateResource> operationTagResources = tags.ToObject<List<TagTemplateResource>>();
-                        
-                        foreach(TagTemplateResource operationTagResource in operationTagResources) {
-                            Console.WriteLine($" - Operation tag {operationTagResource.name} found for {operationName} operation");     
-                            operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/{operationTagResource.name}')]";
+                        string apiOperationTags = await GetOperationTagAsync(apimname, resourceGroup, oApiName, operationName);
+                        JObject oApiOperationTags = JObject.Parse(apiOperationTags);
+
+                        foreach (var tag in oApiOperationTags["value"])
+                        {
+                            // pull tag - api operation associations
+                            string apiOperationTagName = ((JValue)tag["name"]).Value.ToString();
+                            Console.WriteLine($" - Operation tag {apiOperationTagName} found for {operationName} operation");  
+
+                            // convert returned tag - api operation associations to template resource class
+                            TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
+                            operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/{apiOperationTagName}')]";
                             operationTagResource.apiVersion = GlobalConstants.APIVersion;
                             operationTagResource.scale = null;
                             operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
                             operationTagResource.properties = new TagTemplateProperties();
                             templateResources.Add(operationTagResource);
-                        }                        
+                        }
                     }
                     catch (Exception) { }
                 }
