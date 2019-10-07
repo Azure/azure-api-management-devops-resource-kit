@@ -51,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/tags?api-version={6}",
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/tags?api-version={6}&format=rawxml",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationId, GlobalConstants.APIVersion);
 
             return await CallApiManagementAsync(azToken, requestUrl);
@@ -261,19 +261,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     }
                     catch (Exception) { }
 
-                    // add operation tag resources to api template
-                   try
+                    // add operation tag resources to api template     
+                    try
                     {
-                        string operationTags = await GetOperationTagAsync(apimname, resourceGroup, oApiName, operationName);
-                        Console.WriteLine($" - Operation tags found for {operationName} operation");                       
-                        TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(operationTags);
-                        operationTagResource.type = ResourceTypeConstants.APIOperationTag;
-                        operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/resident-service-request')]";
-                        operationTagResource.apiVersion = GlobalConstants.APIVersion;
-                        operationTagResource.scale = null;
-                        operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
-                         operationTagResource.properties = new TagTemplateProperties();
-                        templateResources.Add(operationTagResource);
+                        string response = await GetOperationTagAsync(apimname, resourceGroup, oApiName, operationName);
+                        JToken tags = JObject.Parse(response).SelectToken("$.value");                                                      
+                        List<TagTemplateResource> operationTagResources = tags.ToObject<List<TagTemplateResource>>();
+                        
+                        foreach(TagTemplateResource operationTagResource in operationTagResources) {
+                            Console.WriteLine($" - Operation tag {operationTagResource.name} found for {operationName} operation");     
+                            operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/{operationTagResource.name}')]";
+                            operationTagResource.apiVersion = GlobalConstants.APIVersion;
+                            operationTagResource.scale = null;
+                            operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
+                            operationTagResource.properties = new TagTemplateProperties();
+                            templateResources.Add(operationTagResource);
+                        }                        
                     }
                     catch (Exception) { }
                 }
