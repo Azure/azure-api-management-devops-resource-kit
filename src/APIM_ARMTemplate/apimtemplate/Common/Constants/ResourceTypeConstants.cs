@@ -17,6 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string Logger = "Microsoft.ApiManagement/service/loggers";
         public const string ProductAPI = "Microsoft.ApiManagement/service/products/apis";
         public const string Product = "Microsoft.ApiManagement/service/products";
+        public const string ProductGroup = "Microsoft.ApiManagement/service/products/groups";
         public const string ProductPolicy = "Microsoft.ApiManagement/service/products/policies";
         public const string Property = "Microsoft.ApiManagement/service/properties";
     }
