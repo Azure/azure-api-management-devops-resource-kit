@@ -289,7 +289,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             operationTagResource.apiVersion = GlobalConstants.APIVersion;
                             operationTagResource.scale = null;
                             operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
-                            operationTagResource.properties = new TagTemplateProperties();
                             templateResources.Add(operationTagResource);
                         }
                     }
@@ -343,7 +342,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         apiTagResource.apiVersion = GlobalConstants.APIVersion;
                         apiTagResource.scale = null;
                         apiTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
-                        apiTagResource.properties = new TagTemplateProperties();
                         templateResources.Add(apiTagResource);
                     }
                 }

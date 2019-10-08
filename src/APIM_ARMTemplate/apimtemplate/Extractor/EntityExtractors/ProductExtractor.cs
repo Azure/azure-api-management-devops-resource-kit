@@ -139,7 +139,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             productTagResource.apiVersion = GlobalConstants.APIVersion;
                             productTagResource.scale = null;
                             productTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
-                            productTagResource.properties = new TagTemplateProperties();
                             templateResources.Add(productTagResource);
                         }
                     }

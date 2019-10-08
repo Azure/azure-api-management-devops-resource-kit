@@ -20,5 +20,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string Product = "Microsoft.ApiManagement/service/products";
         public const string ProductPolicy = "Microsoft.ApiManagement/service/products/policies";
         public const string Property = "Microsoft.ApiManagement/service/properties";
+        public const string Tag = "Microsoft.ApiManagement/service/Tags";
     }
 }

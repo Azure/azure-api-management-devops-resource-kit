@@ -9,5 +9,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
     public class TagTemplateProperties
     { 
+        public string displayName {get; set;}
     }
 }

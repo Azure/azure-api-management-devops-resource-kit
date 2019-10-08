@@ -73,6 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     LoggerExtractor loggerExtractor = new LoggerExtractor();
                     PolicyExtractor policyExtractor = new PolicyExtractor(fileWriter);
                     PropertyExtractor propertyExtractor = new PropertyExtractor();
+                    TagExtractor tagExtractor = new TagExtractor();
                     ProductExtractor productExtractor = new ProductExtractor(fileWriter);
                     MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
@@ -85,6 +86,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
                     Template productTemplate = await productExtractor.GenerateProductsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, fileFolder);
                     Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
+                    Template tagTemplate = await tagExtractor.GenerateTagsTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
                     List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
                     Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl);
 
@@ -99,6 +101,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     fileWriter.WriteJSONToFile(backendTemplate, String.Concat(@fileFolder, fileNames.backends));
                     fileWriter.WriteJSONToFile(loggerTemplate, String.Concat(@fileFolder, fileNames.loggers));
                     fileWriter.WriteJSONToFile(namedValueTemplate, String.Concat(@fileFolder, fileNames.namedValues));
+                    fileWriter.WriteJSONToFile(tagTemplate, String.Concat(@fileFolder, fileNames.tags));
                     fileWriter.WriteJSONToFile(productTemplate, String.Concat(@fileFolder, fileNames.products));
                     fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(@fileFolder, fileNames.globalServicePolicy));
 
