@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -25,6 +26,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Console.WriteLine("Extracting tags from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
+            // isolate tag and api operation associations in the case of a single api extraction
+            var APIOperationTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIOperationTag);
+            // isolate tag and api associations in the case of a single api extraction
+            var APITagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APITag);
+
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (Tags) for service
@@ -42,18 +48,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 TagTemplateResource.apiVersion = GlobalConstants.APIVersion;
                 TagTemplateResource.scale = null;
 
-                if (singleApiName == null)
-                {
-                    // if the user is executing a full extraction, extract all the tags
+                // only extract the tag if this is a full extraction, 
+                // or in the case of a single api, if it is found in tags associated with the api operations
+                // if it is found in tags associated with the api
+                if (singleApiName == null 
+                        || APIOperationTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null
+                        || APITagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null)
+                {                
                     Console.WriteLine("'{0}' Tag found", TagName);
                     templateResources.Add(TagTemplateResource);
-                }
-                else
-                {
-                    // TODO - if the user is executing a single api, extract all the tags used in the template resources
-                    Console.WriteLine("'{0}' Tag found", TagName);
-                    templateResources.Add(TagTemplateResource);
-                };
+                }                 
             }
 
             armTemplate.resources = templateResources.ToArray();
