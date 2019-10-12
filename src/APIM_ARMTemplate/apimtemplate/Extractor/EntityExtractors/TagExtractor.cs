@@ -20,16 +20,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateTagsTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateTagsTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources, string policyXMLBaseUrl)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting tags from service");
             Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
 
             // isolate tag and api operation associations in the case of a single api extraction
-            var APIOperationTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIOperationTag);
+            var apiOperationTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIOperationTag);
+           
             // isolate tag and api associations in the case of a single api extraction
-            var APITagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APITag);
+            var apiTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APITag);
+
+            // isolate product api associations in the case of a single api extraction
+            var productAPIResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductAPI);
+
+            // isolate tag and product associations in the case of a single api extraction
+            var productTagResources = productTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductTag);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -50,10 +57,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 // only extract the tag if this is a full extraction, 
                 // or in the case of a single api, if it is found in tags associated with the api operations
-                // if it is found in tags associated with the api
+                // or if it is found in tags associated with the api
+                // or if it is found in tags associated with the products associated with the api
                 if (singleApiName == null 
-                        || APIOperationTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null
-                        || APITagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null)
+                        || apiOperationTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null
+                        || apiTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null
+                        || (productAPIResources.SingleOrDefault(t => t.name.Contains($"/{singleApiName}")) != null
+                            && productTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null))
                 {                
                     Console.WriteLine("'{0}' Tag found", TagName);
                     templateResources.Add(TagTemplateResource);
