@@ -60,10 +60,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // or if it is found in tags associated with the api
                 // or if it is found in tags associated with the products associated with the api
                 if (singleApiName == null 
-                        || apiOperationTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null
-                        || apiTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null
-                        || (productAPIResources.SingleOrDefault(t => t.name.Contains($"/{singleApiName}")) != null
-                            && productTagResources.SingleOrDefault(t => t.name.Contains($"/{TagName}")) != null))
+                        || apiOperationTagResources.FirstOrDefault(t => t.name.Contains($"/{TagName}")) != null
+                        || apiTagResources.FirstOrDefault(t => t.name.Contains($"/{TagName}")) != null
+                        || (productAPIResources.FirstOrDefault(t => t.name.Contains($"/{singleApiName}")) != null
+                            && productTagResources.FirstOrDefault(t => t.name.Contains($"/{TagName}")) != null))
                 {                
                     Console.WriteLine("'{0}' Tag found", TagName);
                     templateResources.Add(TagTemplateResource);
