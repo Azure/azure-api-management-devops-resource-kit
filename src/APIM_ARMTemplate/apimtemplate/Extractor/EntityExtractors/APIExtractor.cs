@@ -391,7 +391,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // pull returned schema and convert to template resource
                 RESTReturnedSchemaTemplate restReturnedSchemaTemplate = JsonConvert.DeserializeObject<RESTReturnedSchemaTemplate>(schemaDetails);
                 SchemaTemplateResource schemaDetailsResource = JsonConvert.DeserializeObject<SchemaTemplateResource>(schemaDetails);
-                schemaDetailsResource.properties.document.value = JsonConvert.SerializeObject(restReturnedSchemaTemplate.properties.document);
+                schemaDetailsResource.properties.document.value = GetSchemaValueBasedOnContentType(restReturnedSchemaTemplate.properties);
                 schemaDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{schemaName}')]";
                 schemaDetailsResource.apiVersion = GlobalConstants.APIVersion;
                 schemaDetailsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
@@ -400,6 +400,34 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             }
             return templateResources;
+        }
+
+        private string GetSchemaValueBasedOnContentType(RESTReturnedSchemaTemplateProperties schemaTemplateProperties)
+        {
+            if (!(schemaTemplateProperties.document is JToken))
+            {
+                return JsonConvert.SerializeObject(schemaTemplateProperties.document);
+            }
+
+            var schemaJson = schemaTemplateProperties.document as JToken;
+
+            switch (schemaTemplateProperties.contentType.ToLowerInvariant())
+            {
+                case "application/vnd.ms-azure-apim.swagger.definitions+json":
+                    if (schemaJson["definitions"] != null && schemaJson.Count() == 1)
+                    {
+                        schemaJson = schemaJson["definitions"];
+                    }
+                    break;
+                case "application/vnd.ms-azure-apim.xsd+xml":
+                    if (schemaJson["value"] != null && schemaJson.Count() == 1)
+                    {
+                        return schemaJson["value"].ToString();
+                    }
+                    break;
+            }
+
+            return JsonConvert.SerializeObject(schemaJson);
         }
     }
 }
