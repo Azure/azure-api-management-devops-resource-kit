@@ -192,35 +192,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     operationResource.apiVersion = GlobalConstants.APIVersion;
                     operationResource.scale = null;
 
-                    // add api and schemas to operation dependsOn, if necessary
+                    // add operation dependencies and fix sample value if necessary
                     List<string> operationDependsOn = new List<string>() { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
                     foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationResource.properties.request.representations)
                     {
-                        if (operationTemplateRepresentation.schemaId != null)
-                        {
-                            string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('ApimServiceName'), '{oApiName}', '{operationTemplateRepresentation.schemaId}')]";
-                            // add value to list if schema has not already been added
-                            if (!operationDependsOn.Exists(o => o == dependsOn))
-                            {
-                                operationDependsOn.Add(dependsOn);
-                            }
-                        }
+                        AddSchemaDependencyToOperationIfNecessary(oApiName, operationDependsOn, operationTemplateRepresentation);
+                        ArmEscapeSampleValueIfNecessary(operationTemplateRepresentation);
                     }
+
                     foreach (OperationsTemplateResponse operationTemplateResponse in operationResource.properties.responses)
                     {
                         foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationTemplateResponse.representations)
                         {
-                            if (operationTemplateRepresentation.schemaId != null)
-                            {
-                                string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('ApimServiceName'), '{oApiName}', '{operationTemplateRepresentation.schemaId}')]";
-                                // add value to list if schema has not already been added
-                                if (!operationDependsOn.Exists(o => o == dependsOn))
-                                {
-                                    operationDependsOn.Add(dependsOn);
-                                }
-                            }
+                            AddSchemaDependencyToOperationIfNecessary(oApiName, operationDependsOn, operationTemplateRepresentation);
+                            ArmEscapeSampleValueIfNecessary(operationTemplateRepresentation);
                         }
                     }
+
                     operationResource.dependsOn = operationDependsOn.ToArray();
                     templateResources.Add(operationResource);
 
@@ -342,7 +330,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return armTemplate;
         }
 
-        public static JObject FormatoApi(string singleApiName, JObject oApi)
+        private static void ArmEscapeSampleValueIfNecessary(OperationTemplateRepresentation operationTemplateRepresentation)
+        {
+            if (!string.IsNullOrWhiteSpace(operationTemplateRepresentation.sample) && operationTemplateRepresentation.contentType == "application/json" && JToken.Parse(operationTemplateRepresentation.sample).Type == JTokenType.Array)
+            {
+                operationTemplateRepresentation.sample = "[" + operationTemplateRepresentation.sample;
+            }
+        }
+
+        private static void AddSchemaDependencyToOperationIfNecessary(string oApiName, List<string> operationDependsOn, OperationTemplateRepresentation operationTemplateRepresentation)
+        {
+            if (operationTemplateRepresentation.schemaId != null)
+            {
+                string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('ApimServiceName'), '{oApiName}', '{operationTemplateRepresentation.schemaId}')]";
+                // add value to list if schema has not already been added
+                if (!operationDependsOn.Exists(o => o == dependsOn))
+                {
+                    operationDependsOn.Add(dependsOn);
+                }
+            }
+        }
+
+        private static JObject FormatoApi(string singleApiName, JObject oApi)
         {
             if (singleApiName != null)
             {
@@ -364,7 +373,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return oApi;
         }
 
-        public async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
+        private async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -382,7 +391,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // pull returned schema and convert to template resource
                 RESTReturnedSchemaTemplate restReturnedSchemaTemplate = JsonConvert.DeserializeObject<RESTReturnedSchemaTemplate>(schemaDetails);
                 SchemaTemplateResource schemaDetailsResource = JsonConvert.DeserializeObject<SchemaTemplateResource>(schemaDetails);
-                schemaDetailsResource.properties.document.value = JsonConvert.SerializeObject(restReturnedSchemaTemplate.properties.document);
+                schemaDetailsResource.properties.document.value = GetSchemaValueBasedOnContentType(restReturnedSchemaTemplate.properties);
                 schemaDetailsResource.name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{schemaName}')]";
                 schemaDetailsResource.apiVersion = GlobalConstants.APIVersion;
                 schemaDetailsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
@@ -391,6 +400,34 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             }
             return templateResources;
+        }
+
+        private string GetSchemaValueBasedOnContentType(RESTReturnedSchemaTemplateProperties schemaTemplateProperties)
+        {
+            if (!(schemaTemplateProperties.document is JToken))
+            {
+                return JsonConvert.SerializeObject(schemaTemplateProperties.document);
+            }
+
+            var schemaJson = schemaTemplateProperties.document as JToken;
+
+            switch (schemaTemplateProperties.contentType.ToLowerInvariant())
+            {
+                case "application/vnd.ms-azure-apim.swagger.definitions+json":
+                    if (schemaJson["definitions"] != null && schemaJson.Count() == 1)
+                    {
+                        schemaJson = schemaJson["definitions"];
+                    }
+                    break;
+                case "application/vnd.ms-azure-apim.xsd+xml":
+                    if (schemaJson["value"] != null && schemaJson.Count() == 1)
+                    {
+                        return schemaJson["value"].ToString();
+                    }
+                    break;
+            }
+
+            return JsonConvert.SerializeObject(schemaJson);
         }
     }
 }
