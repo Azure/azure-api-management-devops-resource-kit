@@ -139,10 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // write parameters to outputLocation
                     fileWriter.WriteJSONToFile(templateParameters, String.Concat(creatorConfig.outputLocation, fileNames.parameters));
                     Console.WriteLine("Templates written to output location");
-                    Console.WriteLine("Press any key to exit process:");
-#if DEBUG
-                    Console.ReadKey();
-#endif
+
                 }
                 return 0;
             });
