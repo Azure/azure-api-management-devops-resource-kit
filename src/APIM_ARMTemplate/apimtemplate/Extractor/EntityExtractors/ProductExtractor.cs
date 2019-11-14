@@ -47,6 +47,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
+
+        public async Task<string> GetProductTagsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/tags?api-version={5}&format=rawxml",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
+
         public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl, string fileFolder)
         {
             Console.WriteLine("------------------------------------------");
@@ -109,7 +120,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         templateResources.Add(productPolicyResource);
                     }
                     catch (Exception) { }
-                }
+
+                     // add tags associated with the product to template 
+                    try
+                    {
+                        // pull tags associated with the product
+                        string productTags = await GetProductTagsAsync(apimname, resourceGroup, productName);
+                        JObject oProductTags = JObject.Parse(productTags);
+
+                        foreach (var tag in oProductTags["value"])
+                        {
+                            string productTagName = ((JValue)tag["name"]).Value.ToString();
+                            Console.WriteLine(" - '{0}' Tag association found for {1} product", productTagName, productName);
+
+                            // convert associations between product and tags to template resource class
+                            TagTemplateResource productTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
+                            productTagResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}/{productTagName}')]";
+                            productTagResource.apiVersion = GlobalConstants.APIVersion;
+                            productTagResource.scale = null;
+                            productTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+                            templateResources.Add(productTagResource);
+                        }
+                    }
+                    catch (Exception) { }
+                    }
             }
 
             armTemplate.resources = templateResources.ToArray();
