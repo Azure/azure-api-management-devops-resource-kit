@@ -14,6 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template backendsTemplate,
             Template authorizationServersTemplate,
             Template namedValuesTemplate,
+            Template tagTemplate,
             FileNames fileNames,
             string apiFileName,
             string linkedTemplatesUrlQueryString,
@@ -57,6 +58,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 string productsUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.products);
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, dependsOnNamedValues));
+            }
+
+            if (tagTemplate != null) {
+                string tagUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.tags);
+                resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, dependsOnNamedValues));
             }
 
             // logger
@@ -111,6 +117,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
             apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'backendsTemplate')]");
             apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
+            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
 
             return apiDependsOn.ToArray();
         }
