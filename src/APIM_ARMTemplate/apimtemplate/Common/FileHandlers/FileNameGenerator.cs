@@ -16,6 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 globalServicePolicy = $@"/{apimServiceName}-globalServicePolicy.template.json",
                 loggers = $@"/{apimServiceName}-loggers.template.json",
                 namedValues = $@"/{apimServiceName}-namedValues.template.json",
+                tags = $@"/{apimServiceName}-tags.template.json",
                 products = $@"/{apimServiceName}-products.template.json",
                 parameters = $@"/{apimServiceName}-parameters.json",
                 linkedMaster = $@"/{apimServiceName}-master.template.json"
@@ -57,6 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string globalServicePolicy { get; set; }
         public string loggers { get; set; }
         public string namedValues { get; set; }
+        public string tags { get; set; }
         public string products { get; set; }
         public string parameters { get; set; }
         // linked property outputs 1 master template

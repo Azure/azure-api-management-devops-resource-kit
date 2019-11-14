@@ -277,7 +277,7 @@ az account set --subscription <subscription_id>
 | fileFolder            | Yes                   | Path to output folder                             |
 | apiName               | No                    | Name of API. If provided, Extractor executes single API extraction. Otherwise, Extractor executes full extraction.  Note:  This is the "Name" value as seen in the API settings, not "Display Name" and is case sensitive.     |
 | linkedTemplatesBaseUrl| No                    | Linked templates remote location. If provided, Extractor generates master template and requires linked templates pushed to remote location.                                   |
-| linkedTemplatesUrlQueryString | string | No   | Query string appended to linked templates uris that enables retrieval from private storage. |
+| linkedTemplatesUrlQueryString | No | String   | Query string appended to linked templates uris that enables retrieval from private storage. |
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 
 To run the Extractor with all arguments (executing a single API extraction with linked templates and policy file generation), use the following command: 
