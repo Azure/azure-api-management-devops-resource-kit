@@ -47,7 +47,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
+        public async Task<string> GetProductGroupsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
 
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/groups?api-version={5}",
+            baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
+        
         public async Task<string> GetProductTagsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -57,7 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             return await CallApiManagementAsync(azToken, requestUrl);
         }
-
+        
         public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl, string fileFolder)
         {
             Console.WriteLine("------------------------------------------");
@@ -88,6 +97,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
                 productsTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
+                string productGroupDetails = await GetProductGroupsAsync(apimname, resourceGroup, productName);
+                ProductGroupsTemplateResource productGroupsDetails = JsonConvert.DeserializeObject<ProductGroupsTemplateResource>(productGroupDetails, settings);
+
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
                 if (singleApiName == null || productAPIResources.SingleOrDefault(p => p.name.Contains($"/{productName}/")) != null)
                 {
@@ -97,13 +109,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     // add product policy resource to template
                     try
                     {
+                        var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+                        foreach (ProductGroupsValue ProductGroup in productGroupsDetails.value)
+                        {
+                            ProductGroup.name = $"[concat(parameters('ApimServiceName'), '/{productName}/{ProductGroup.name}')]";
+                            ProductGroup.apiVersion = GlobalConstants.APIVersion;
+                            ProductGroup.dependsOn = productResourceId;
+                            templateResources.Add(ProductGroup);
+                        }
                         string productPolicy = await GetProductPolicyAsync(apimname, resourceGroup, productName);
                         Console.WriteLine($" - Product policy found for {productName} product");
                         PolicyTemplateResource productPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(productPolicy);
                         productPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}/policy')]";
                         productPolicyResource.apiVersion = GlobalConstants.APIVersion;
                         productPolicyResource.scale = null;
-                        productPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+                        productPolicyResource.dependsOn = productResourceId;
 
                         // write policy xml content to file and point to it if policyXMLBaseUrl is provided
                         if (policyXMLBaseUrl != null)
