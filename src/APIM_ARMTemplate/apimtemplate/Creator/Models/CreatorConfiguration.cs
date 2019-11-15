@@ -20,6 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public List<LoggerConfig> loggers { get; set; }
         public List<AuthorizationServerTemplateProperties> authorizationServers { get; set; }
         public List<BackendTemplateProperties> backends { get; set; }
+        public List<TagTemplateProperties> tags { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
@@ -55,6 +56,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public Dictionary<string, OperationsConfig> operations { get; set; }
         public APITemplateAuthenticationSettings authenticationSettings { get; set; }
         public string products { get; set; }
+        public string tags { get; set; }
         public string protocols { get; set; }
         public DiagnosticConfig diagnostic { get; set; }
         // does not currently include subscriptionKeyParameterNames, sourceApiId, and wsdlSelector from APITemplateResource schema
