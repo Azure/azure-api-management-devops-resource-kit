@@ -16,16 +16,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Template apiVersionSetsTemplate = new Template();
             Template globalServicePolicyTemplate = new Template();
             Template productsTemplate = new Template();
+            Template tagTemplate = new Template();
             Template loggersTemplate = new Template();
             List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 6 resources (globalServicePolicy, apiVersionSet, product, logger, both api templates)
-            int count = 6;
+            // should create 7 resources (globalServicePolicy, apiVersionSet, product, tag, logger, both api templates)
+            int count = 7;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);
