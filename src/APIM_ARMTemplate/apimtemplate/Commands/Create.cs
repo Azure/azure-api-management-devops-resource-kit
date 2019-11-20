@@ -42,12 +42,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator();
                     AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator();
                     ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
+                    TagAPITemplateCreator tagAPITemplateCreator = new TagAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
                     ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
                     ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator);
                     TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
@@ -60,9 +61,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Console.WriteLine("Creating product template");
                     Console.WriteLine("------------------------------------------");
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
-                    Console.WriteLine("Creating tag template");
-                    Console.WriteLine("------------------------------------------");
-                    Template tagTemplate = creatorConfig.tags != null ? tagTemplateCreator.CreateTagTemplate(creatorConfig) : null;
                     Console.WriteLine("Creating logger template");
                     Console.WriteLine("------------------------------------------");
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
@@ -97,6 +95,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                             dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader)
                         });
                     }
+
+                    Console.WriteLine("Creating tag template");
+                    Console.WriteLine("------------------------------------------");
+                    Template tagTemplate = creatorConfig.tags != null ? tagTemplateCreator.CreateTagTemplate(creatorConfig) : null;
 
                     // create parameters file
                     Template templateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
