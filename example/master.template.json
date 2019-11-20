@@ -99,7 +99,7 @@
                }
             },
             "dependsOn": [
-             "[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]",
+             "[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]"
             ]
          },
          {
