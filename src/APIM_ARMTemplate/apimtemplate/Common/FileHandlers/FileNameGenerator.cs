@@ -19,7 +19,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 tags = $@"/{apimServiceName}-tags.template.json",
                 products = $@"/{apimServiceName}-products.template.json",
                 parameters = $@"/{apimServiceName}-parameters.json",
-                linkedMaster = $@"/{apimServiceName}-master.template.json"
+                linkedMaster = $@"/{apimServiceName}-master.template.json",
+                apis = "/Apis",
+                splitAPIs = "/SplitAPIs"
             };
         }
 
@@ -63,5 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string parameters { get; set; }
         // linked property outputs 1 master template
         public string linkedMaster { get; set; }
+        public string apis { get; set; }
+        public string splitAPIs { get; set; }
     }
 }
