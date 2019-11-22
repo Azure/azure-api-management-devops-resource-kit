@@ -60,7 +60,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, dependsOnNamedValues));
             }
 
-            if (tagTemplate != null) {
+            if (tagTemplate != null)
+            {
                 string tagUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.tags);
                 resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, dependsOnNamedValues));
             }
@@ -141,7 +142,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     parameters = new Dictionary<string, TemplateParameterProperties>
                     {
                         { "ApimServiceName", new TemplateParameterProperties(){ value = "[parameters('ApimServiceName')]" } },
-                        { "PolicyXMLBaseUrl", new TemplateParameterProperties(){ value = "[parameters('PolicyXMLBaseUrl')]" } }                        
+                        { "PolicyXMLBaseUrl", new TemplateParameterProperties(){ value = "[parameters('PolicyXMLBaseUrl')]" } }
                     }
                 },
                 dependsOn = dependsOn
