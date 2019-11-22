@@ -82,23 +82,64 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         // pull all apis from service
                         string apis = await apiExtractor.GetAPIsAsync(sourceApim, resourceGroup);
                         JObject oApi = JObject.Parse(apis);
+
+                        // Generate folders based on all apiversionset
+                        var apiDictionary = new Dictionary<string, List<string>>();
                         for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
                         {
-                            string apiName = ((JValue)oApi["value"][i]["name"]).Value.ToString();
+                            string apiDisplayName = ((JValue)oApi["value"][i]["properties"]["displayName"]).Value.ToString();
+                            if (!apiDictionary.ContainsKey(apiDisplayName))
+                            {
+                                List<string> apiVersionSet = new List<string>();
+                                apiVersionSet.Add(((JValue)oApi["value"][i]["name"]).Value.ToString());
+                                apiDictionary[apiDisplayName] = apiVersionSet;
+                            }
+                            else
+                            {
+                                apiDictionary[apiDisplayName].Add(((JValue)oApi["value"][i]["name"]).Value.ToString());
+                            }
+                        }
 
-                            // create folder for each API
-                            string apiFileFolder = String.Concat(@dirName, $@"/{apiName}");
-                            System.IO.Directory.CreateDirectory(apiFileFolder);
+                        // Generate templates based on each API/APIversionSet
+                        foreach (KeyValuePair<string, List<string>> versionSetEntry in apiDictionary)
+                        {
+                            string apiFileFolder = dirName;
 
-                            // generate templates for each API
-                            await this.GenerateTemplates(sourceApim, destinationApim, apiName, resourceGroup, policyXMLBaseUrl, apiFileFolder, linkedBaseUrl, linkedUrlQueryString, fileNameGenerator, fileNames, fileWriter);
+                            // Check if it's APIVersionSet
+                            if (versionSetEntry.Value.Count > 1)
+                            {
+                                // this API has VersionSet
+                                string apiDisplayName = versionSetEntry.Key;
 
-                            Console.WriteLine($@"Finish extracting API {apiName}");
+                                // create apiVersionSet folder
+                                apiFileFolder = String.Concat(@apiFileFolder, $@"/{apiDisplayName}");
+                                System.IO.Directory.CreateDirectory(apiFileFolder);
+
+                                // create master templates for each apiVersionSet
+                                string versionSetFolder = String.Concat(@apiFileFolder, fileNames.versionSetMasterFolder);
+                                System.IO.Directory.CreateDirectory(versionSetFolder);
+                                await this.GenerateTemplates(sourceApim, destinationApim, null, versionSetEntry.Value, resourceGroup, policyXMLBaseUrl, versionSetFolder, linkedBaseUrl, linkedUrlQueryString, fileNameGenerator, fileNames, fileWriter);
+
+                                Console.WriteLine($@"Finish extracting APIVersionSet {versionSetEntry.Key}");
+                            }
+
+                            // Generate templates
+                            foreach (string apiName in versionSetEntry.Value)
+                            {
+                                // create folder for each API
+                                string tempFileFolder = String.Concat(@apiFileFolder, $@"/{apiName}");
+                                System.IO.Directory.CreateDirectory(tempFileFolder);
+
+                                // generate templates for each API
+                                await this.GenerateTemplates(sourceApim, destinationApim, apiName, null, resourceGroup, policyXMLBaseUrl, tempFileFolder, linkedBaseUrl, linkedUrlQueryString, fileNameGenerator, fileNames, fileWriter);
+
+                                Console.WriteLine($@"Finish extracting API {apiName}");
+                            }
                         }
                     }
                     else
                     {
-                        await this.GenerateTemplates(sourceApim, destinationApim, singleApiName, resourceGroup, policyXMLBaseUrl, dirName, linkedBaseUrl, linkedUrlQueryString, fileNameGenerator, fileNames, fileWriter);
+                        await this.GenerateTemplates(sourceApim, destinationApim, singleApiName, null, resourceGroup, policyXMLBaseUrl, dirName, linkedBaseUrl, linkedUrlQueryString, fileNameGenerator, fileNames, fileWriter);
                     }
                     Console.WriteLine("Templates written to output location");
                     Console.WriteLine("Press any key to exit process:");
@@ -113,7 +154,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
             });
         }
-        private async Task<Boolean> GenerateTemplates(string sourceApim, string destinationApim, string singleApiName, string resourceGroup, string policyXMLBaseUrl, string dirName, string linkedBaseUrl, string linkedUrlQueryString, FileNameGenerator fileNameGenerator, FileNames fileNames, FileWriter fileWriter)
+        private async Task<Boolean> GenerateTemplates(string sourceApim, string destinationApim, string singleApiName, List<string> multipleApiNams, string resourceGroup, string policyXMLBaseUrl, string dirName, string linkedBaseUrl, string linkedUrlQueryString, FileNameGenerator fileNameGenerator, FileNames fileNames, FileWriter fileWriter)
         {
             // initialize entity extractor classes
             APIExtractor apiExtractor = new APIExtractor(fileWriter);
@@ -129,7 +170,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // extract templates from apim service
             Template globalServicePolicyTemplate = await policyExtractor.GenerateGlobalServicePolicyTemplateAsync(sourceApim, resourceGroup, policyXMLBaseUrl, dirName);
-            Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, policyXMLBaseUrl, dirName);
+            Template apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, multipleApiNams, policyXMLBaseUrl, dirName);
             List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
             Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
             Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl);
