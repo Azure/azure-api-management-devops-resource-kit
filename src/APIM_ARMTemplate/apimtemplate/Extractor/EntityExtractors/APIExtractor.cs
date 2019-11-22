@@ -136,262 +136,288 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAPIsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, string policyXMLBaseUrl, string fileFolder)
+        public async Task<List<TemplateResource>> GenerateSingleAPIResourceAsync(string apiName, string apimname, string resourceGroup, string fileFolder, string policyXMLBaseUrl)
         {
-            // pull all apis from service
-            string apis = await GetAPIsAsync(apimname, resourceGroup);
-            // initialize arm template
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
-
-            JObject oApi = JObject.Parse(apis);
-            oApi = FormatoApi(singleApiName, oApi);
-
-            Console.WriteLine("{0} API's found ...", ((JContainer)oApi["value"]).Count.ToString());
-
             List<TemplateResource> templateResources = new List<TemplateResource>();
+            string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, apiName);
 
-            for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Extracting resources from {0} API:", apiName);
+
+            // convert returned api to template resource class
+            JObject oApiDetails = JObject.Parse(apiDetails);
+            APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
+            string oApiName = ((JValue)oApiDetails["name"]).Value.ToString();
+
+            apiResource.type = ((JValue)oApiDetails["type"]).Value.ToString();
+            apiResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}')]";
+            apiResource.apiVersion = GlobalConstants.APIVersion;
+            apiResource.scale = null;
+
+            if (apiResource.properties.apiVersionSetId != null)
             {
-                string apiName = ((JValue)oApi["value"][i]["name"]).Value.ToString();
-                string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, apiName);
+                apiResource.dependsOn = new string[] { };
 
-                Console.WriteLine("------------------------------------------");
-                Console.WriteLine("Extracting resources from {0} API:", apiName);
+                string versionSetName = apiResource.properties.apiVersionSetId;
+                int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
 
-                // convert returned api to template resource class
-                JObject oApiDetails = JObject.Parse(apiDetails);
-                APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
-                string oApiName = ((JValue)oApiDetails["name"]).Value.ToString();
+                versionSetName = versionSetName.Substring(versionSetPosition, (versionSetName.Length - versionSetPosition));
+                apiResource.properties.apiVersionSetId = $"[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/{versionSetName}')]";
+            }
+            else
+            {
+                apiResource.dependsOn = new string[] { };
+            }
 
-                apiResource.type = ((JValue)oApiDetails["type"]).Value.ToString();
-                apiResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}')]";
-                apiResource.apiVersion = GlobalConstants.APIVersion;
-                apiResource.scale = null;
+            templateResources.Add(apiResource);
 
-                if (apiResource.properties.apiVersionSetId != null)
+            #region Schemas
+            // add schema resources to api template
+            List<TemplateResource> schemaResources = await GenerateSchemasARMTemplate(apimname, apiName, resourceGroup, fileFolder);
+            templateResources.AddRange(schemaResources);
+            #endregion
+
+            #region Operations
+
+            // pull api operations for service
+            string operations = await GetAPIOperationsAsync(apimname, resourceGroup, apiName);
+            JObject oOperations = JObject.Parse(operations);
+
+            foreach (var item in oOperations["value"])
+            {
+                string operationName = ((JValue)item["name"]).Value.ToString();
+                string operationDetails = await GetAPIOperationDetailsAsync(apimname, resourceGroup, apiName, operationName);
+
+                Console.WriteLine("'{0}' Operation found", operationName);
+
+                // convert returned operation to template resource class
+                OperationTemplateResource operationResource = JsonConvert.DeserializeObject<OperationTemplateResource>(operationDetails);
+                string operationResourceName = operationResource.name;
+                operationResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}')]";
+                operationResource.apiVersion = GlobalConstants.APIVersion;
+                operationResource.scale = null;
+
+                // add operation dependencies and fix sample value if necessary
+                List<string> operationDependsOn = new List<string>() { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+                foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationResource.properties.request.representations)
                 {
-                    apiResource.dependsOn = new string[] { };
-
-                    string versionSetName = apiResource.properties.apiVersionSetId;
-                    int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
-
-                    versionSetName = versionSetName.Substring(versionSetPosition, (versionSetName.Length - versionSetPosition));
-                    apiResource.properties.apiVersionSetId = $"[concat(resourceId('Microsoft.ApiManagement/service', parameters('ApimServiceName')), '/{versionSetName}')]";
+                    AddSchemaDependencyToOperationIfNecessary(oApiName, operationDependsOn, operationTemplateRepresentation);
+                    ArmEscapeSampleValueIfNecessary(operationTemplateRepresentation);
                 }
-                else
+
+                foreach (OperationsTemplateResponse operationTemplateResponse in operationResource.properties.responses)
                 {
-                    apiResource.dependsOn = new string[] { };
-                }
-
-                templateResources.Add(apiResource);
-
-                #region Schemas
-                // add schema resources to api template
-                List<TemplateResource> schemaResources = await GenerateSchemasARMTemplate(apimname, apiName, resourceGroup, fileFolder);
-                templateResources.AddRange(schemaResources);
-                #endregion
-
-                #region Operations
-
-                // pull api operations for service
-                string operations = await GetAPIOperationsAsync(apimname, resourceGroup, apiName);
-                JObject oOperations = JObject.Parse(operations);
-
-                foreach (var item in oOperations["value"])
-                {
-                    string operationName = ((JValue)item["name"]).Value.ToString();
-                    string operationDetails = await GetAPIOperationDetailsAsync(apimname, resourceGroup, apiName, operationName);
-
-                    Console.WriteLine("'{0}' Operation found", operationName);
-
-                    // convert returned operation to template resource class
-                    OperationTemplateResource operationResource = JsonConvert.DeserializeObject<OperationTemplateResource>(operationDetails);
-                    string operationResourceName = operationResource.name;
-                    operationResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}')]";
-                    operationResource.apiVersion = GlobalConstants.APIVersion;
-                    operationResource.scale = null;
-
-                    // add operation dependencies and fix sample value if necessary
-                    List<string> operationDependsOn = new List<string>() { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
-                    foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationResource.properties.request.representations)
+                    foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationTemplateResponse.representations)
                     {
                         AddSchemaDependencyToOperationIfNecessary(oApiName, operationDependsOn, operationTemplateRepresentation);
                         ArmEscapeSampleValueIfNecessary(operationTemplateRepresentation);
                     }
-
-                    foreach (OperationsTemplateResponse operationTemplateResponse in operationResource.properties.responses)
-                    {
-                        foreach (OperationTemplateRepresentation operationTemplateRepresentation in operationTemplateResponse.representations)
-                        {
-                            AddSchemaDependencyToOperationIfNecessary(oApiName, operationDependsOn, operationTemplateRepresentation);
-                            ArmEscapeSampleValueIfNecessary(operationTemplateRepresentation);
-                        }
-                    }
-
-                    operationResource.dependsOn = operationDependsOn.ToArray();
-                    templateResources.Add(operationResource);
-
-                    // add operation policy resource to api template
-                    try
-                    {
-                        string operationPolicy = await GetOperationPolicyAsync(apimname, resourceGroup, oApiName, operationName);
-                        Console.WriteLine($" - Operation policy found for {operationName} operation");
-                        PolicyTemplateResource operationPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(operationPolicy);
-                        operationPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/policy')]";
-                        operationPolicyResource.apiVersion = GlobalConstants.APIVersion;
-                        operationPolicyResource.scale = null;
-                        operationPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
-
-                        // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-                        if (policyXMLBaseUrl != null)
-                        {
-                            string policyXMLContent = operationPolicyResource.properties.value;
-                            string policyFolder = String.Concat(fileFolder, $@"/policies");
-                            string operationPolicyFileName = $@"/{operationName}-operationPolicy.xml";
-                            this.fileWriter.CreateFolderIfNotExists(policyFolder);
-                            this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, operationPolicyFileName));
-                            operationPolicyResource.properties.format = "rawxml-link";
-                            operationPolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{operationPolicyFileName}')]";
-                        }
-
-                        templateResources.Add(operationPolicyResource);
-                    }
-                    catch (Exception) { }
-                     
-
-                    // add tags associated with the operation to template 
-                    try
-                    {
-                        // pull tags associated with the operation
-                        string apiOperationTags = await GetOperationTagsAsync(apimname, resourceGroup, oApiName, operationName);
-                        JObject oApiOperationTags = JObject.Parse(apiOperationTags);
-
-                        foreach (var tag in oApiOperationTags["value"])
-                        {
-                            string apiOperationTagName = ((JValue)tag["name"]).Value.ToString();
-                            Console.WriteLine(" - '{0}' Tag association found for {1} operation", apiOperationTagName, operationResourceName);
-
-                            // convert operation tag association to template resource class
-                            TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
-                            operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/{apiOperationTagName}')]";
-                            operationTagResource.apiVersion = GlobalConstants.APIVersion;
-                            operationTagResource.scale = null;
-                            operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
-                            templateResources.Add(operationTagResource);
-                        }
-                    }
-                    catch (Exception) { }
                 }
-                #endregion
 
-                #region API Policies
-                // add api policy resource to api template
+                operationResource.dependsOn = operationDependsOn.ToArray();
+                templateResources.Add(operationResource);
+
+                // add operation policy resource to api template
                 try
                 {
-                    string apiPolicies = await GetAPIPolicyAsync(apimname, resourceGroup, apiName);
-                    Console.WriteLine("API policy found");
-                    PolicyTemplateResource apiPoliciesResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(apiPolicies);
-
-                    apiPoliciesResource.apiVersion = GlobalConstants.APIVersion;
-                    apiPoliciesResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiPoliciesResource.name}')]";
-                    apiPoliciesResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
+                    string operationPolicy = await GetOperationPolicyAsync(apimname, resourceGroup, oApiName, operationName);
+                    Console.WriteLine($" - Operation policy found for {operationName} operation");
+                    PolicyTemplateResource operationPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(operationPolicy);
+                    operationPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/policy')]";
+                    operationPolicyResource.apiVersion = GlobalConstants.APIVersion;
+                    operationPolicyResource.scale = null;
+                    operationPolicyResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
 
                     // write policy xml content to file and point to it if policyXMLBaseUrl is provided
                     if (policyXMLBaseUrl != null)
                     {
-                        string policyXMLContent = apiPoliciesResource.properties.value;
+                        string policyXMLContent = operationPolicyResource.properties.value;
                         string policyFolder = String.Concat(fileFolder, $@"/policies");
-                        string apiPolicyFileName = $@"/{apiName}-apiPolicy.xml";
+                        string operationPolicyFileName = $@"/{operationName}-operationPolicy.xml";
                         this.fileWriter.CreateFolderIfNotExists(policyFolder);
-                        this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, apiPolicyFileName));
-                        apiPoliciesResource.properties.format = "rawxml-link";
-                        apiPoliciesResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{apiPolicyFileName}')]";
+                        this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, operationPolicyFileName));
+                        operationPolicyResource.properties.format = "rawxml-link";
+                        operationPolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{operationPolicyFileName}')]";
                     }
-                    templateResources.Add(apiPoliciesResource);
+
+                    templateResources.Add(operationPolicyResource);
                 }
                 catch (Exception) { }
-                #endregion
 
-                // add tags associated with the api to template 
+
+                // add tags associated with the operation to template 
                 try
                 {
-                    // pull tags associated with the api
-                    string apiTags = await GetAPITagsAsync(apimname, resourceGroup, apiName);
-                    JObject oApiTags = JObject.Parse(apiTags);
+                    // pull tags associated with the operation
+                    string apiOperationTags = await GetOperationTagsAsync(apimname, resourceGroup, oApiName, operationName);
+                    JObject oApiOperationTags = JObject.Parse(apiOperationTags);
 
-                    foreach (var tag in oApiTags["value"])
+                    foreach (var tag in oApiOperationTags["value"])
                     {
-                        string apiTagName = ((JValue)tag["name"]).Value.ToString();
-                        Console.WriteLine("'{0}' Tag association found", apiTagName);
+                        string apiOperationTagName = ((JValue)tag["name"]).Value.ToString();
+                        Console.WriteLine(" - '{0}' Tag association found for {1} operation", apiOperationTagName, operationResourceName);
 
-                        // convert associations between api and tags to template resource class
-                        TagTemplateResource apiTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
-                        apiTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiTagName}')]";
-                        apiTagResource.apiVersion = GlobalConstants.APIVersion;
-                        apiTagResource.scale = null;
-                        apiTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
-                        templateResources.Add(apiTagResource);
+                        // convert operation tag association to template resource class
+                        TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
+                        operationTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{operationResourceName}/{apiOperationTagName}')]";
+                        operationTagResource.apiVersion = GlobalConstants.APIVersion;
+                        operationTagResource.scale = null;
+                        operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), '{oApiName}', '{operationResourceName}')]" };
+                        templateResources.Add(operationTagResource);
                     }
                 }
                 catch (Exception) { }
-
-                // add product api associations to template
-                #region API Products
-                try
-                {
-                    // pull product api associations
-                    string apiProducts = await GetAPIProductsAsync(apimname, resourceGroup, apiName);
-                    JObject oApiProducts = JObject.Parse(apiProducts);
-
-                    foreach (var item in oApiProducts["value"])
-                    {
-                        string apiProductName = ((JValue)item["name"]).Value.ToString();
-                        Console.WriteLine("'{0}' Product association found", apiProductName);
-
-                        // convert returned api product associations to template resource class
-                        ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(item.ToString());
-                        productAPIResource.type = ResourceTypeConstants.ProductAPI;
-                        productAPIResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]";
-                        productAPIResource.apiVersion = GlobalConstants.APIVersion;
-                        productAPIResource.scale = null;
-                        productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
-
-                        templateResources.Add(productAPIResource);
-                    }
-                }
-                catch (Exception) { }
-                #endregion
-
-                #region Diagnostics
-                // add diagnostics to template
-                // pull diagnostics for api
-                string diagnostics = await GetAPIDiagnosticsAsync(apimname, resourceGroup, apiName);
-                JObject oDiagnostics = JObject.Parse(diagnostics);
-                foreach (var diagnostic in oDiagnostics["value"])
-                {
-                    string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
-                    Console.WriteLine("'{0}' Diagnostic found", diagnosticName);
-
-                    // convert returned diagnostic to template resource class
-                    DiagnosticTemplateResource diagnosticResource = diagnostic.ToObject<DiagnosticTemplateResource>();
-                    diagnosticResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{diagnosticName}')]";
-                    diagnosticResource.type = ResourceTypeConstants.APIDiagnostic;
-                    diagnosticResource.apiVersion = GlobalConstants.APIVersion;
-                    diagnosticResource.scale = null;
-                    diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
-
-                    if (!diagnosticName.Contains("applicationinsights"))
-                    {
-                        // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
-                        diagnosticResource.properties.enableHttpCorrelationHeaders = null;
-                    }
-
-                    templateResources.Add(diagnosticResource);
-
-                }
-                #endregion
             }
+            #endregion
 
+            #region API Policies
+            // add api policy resource to api template
+            try
+            {
+                string apiPolicies = await GetAPIPolicyAsync(apimname, resourceGroup, apiName);
+                Console.WriteLine("API policy found");
+                PolicyTemplateResource apiPoliciesResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(apiPolicies);
+
+                apiPoliciesResource.apiVersion = GlobalConstants.APIVersion;
+                apiPoliciesResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiPoliciesResource.name}')]";
+                apiPoliciesResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
+
+                // write policy xml content to file and point to it if policyXMLBaseUrl is provided
+                if (policyXMLBaseUrl != null)
+                {
+                    string policyXMLContent = apiPoliciesResource.properties.value;
+                    string policyFolder = String.Concat(fileFolder, $@"/policies");
+                    string apiPolicyFileName = $@"/{apiName}-apiPolicy.xml";
+                    this.fileWriter.CreateFolderIfNotExists(policyFolder);
+                    this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, apiPolicyFileName));
+                    apiPoliciesResource.properties.format = "rawxml-link";
+                    apiPoliciesResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{apiPolicyFileName}')]";
+                }
+                templateResources.Add(apiPoliciesResource);
+            }
+            catch (Exception) { }
+            #endregion
+
+            // add tags associated with the api to template 
+            try
+            {
+                // pull tags associated with the api
+                string apiTags = await GetAPITagsAsync(apimname, resourceGroup, apiName);
+                JObject oApiTags = JObject.Parse(apiTags);
+
+                foreach (var tag in oApiTags["value"])
+                {
+                    string apiTagName = ((JValue)tag["name"]).Value.ToString();
+                    Console.WriteLine("'{0}' Tag association found", apiTagName);
+
+                    // convert associations between api and tags to template resource class
+                    TagTemplateResource apiTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
+                    apiTagResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{apiTagName}')]";
+                    apiTagResource.apiVersion = GlobalConstants.APIVersion;
+                    apiTagResource.scale = null;
+                    apiTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+                    templateResources.Add(apiTagResource);
+                }
+            }
+            catch (Exception) { }
+
+            // add product api associations to template
+            #region API Products
+            try
+            {
+                // pull product api associations
+                string apiProducts = await GetAPIProductsAsync(apimname, resourceGroup, apiName);
+                JObject oApiProducts = JObject.Parse(apiProducts);
+
+                foreach (var item in oApiProducts["value"])
+                {
+                    string apiProductName = ((JValue)item["name"]).Value.ToString();
+                    Console.WriteLine("'{0}' Product association found", apiProductName);
+
+                    // convert returned api product associations to template resource class
+                    ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(item.ToString());
+                    productAPIResource.type = ResourceTypeConstants.ProductAPI;
+                    productAPIResource.name = $"[concat(parameters('ApimServiceName'), '/{apiProductName}/{oApiName}')]";
+                    productAPIResource.apiVersion = GlobalConstants.APIVersion;
+                    productAPIResource.scale = null;
+                    productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+
+                    templateResources.Add(productAPIResource);
+                }
+            }
+            catch (Exception) { }
+            #endregion
+
+            #region Diagnostics
+            // add diagnostics to template
+            // pull diagnostics for api
+            string diagnostics = await GetAPIDiagnosticsAsync(apimname, resourceGroup, apiName);
+            JObject oDiagnostics = JObject.Parse(diagnostics);
+            foreach (var diagnostic in oDiagnostics["value"])
+            {
+                string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
+                Console.WriteLine("'{0}' Diagnostic found", diagnosticName);
+
+                // convert returned diagnostic to template resource class
+                DiagnosticTemplateResource diagnosticResource = diagnostic.ToObject<DiagnosticTemplateResource>();
+                diagnosticResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}/{diagnosticName}')]";
+                diagnosticResource.type = ResourceTypeConstants.APIDiagnostic;
+                diagnosticResource.apiVersion = GlobalConstants.APIVersion;
+                diagnosticResource.scale = null;
+                diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
+
+                if (!diagnosticName.Contains("applicationinsights"))
+                {
+                    // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
+                    diagnosticResource.properties.enableHttpCorrelationHeaders = null;
+                }
+
+                templateResources.Add(diagnosticResource);
+
+            }
+            #endregion
+            return templateResources;
+        }
+
+        public async Task<Template> GenerateAPIsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<string> multipleApiNames, string policyXMLBaseUrl, string fileFolder)
+        {
+            // initialize arm template
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
+            JObject oApi = await GetAllAPIsFromAPIM(apimname, resourceGroup, policyXMLBaseUrl);
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // when extract single API
+            if (singleApiName != null)
+            {
+                // check if this api exist
+                if (!CheckAPIExist(singleApiName, oApi))
+                {
+                    throw new Exception($"{singleApiName} API not found!");
+                }
+                Console.WriteLine("{0} API found ...", singleApiName);
+
+                templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
+            }
+            // when extract multiple APIs and generate one master template
+            else if (multipleApiNames != null)
+            {
+                Console.WriteLine("{0} APIs found ...", multipleApiNames.Count().ToString());
+                foreach(string apiName in multipleApiNames)
+                {
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
+                }
+            }
+            // when extract all APIs and generate one master template
+            else
+            {
+                Console.WriteLine("{0} APIs found ...", ((JContainer)oApi["value"]).Count.ToString());
+
+                for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
+                {
+                    string apiName = ((JValue)oApi["value"][i]["name"]).Value.ToString();
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
+                }
+            }
             armTemplate.resources = templateResources.ToArray();
             return armTemplate;
         }
@@ -417,25 +443,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
         }
 
-        private static JObject FormatoApi(string singleApiName, JObject oApi)
+        private static bool CheckAPIExist(string singleApiName, JObject oApi)
         {
-            if (singleApiName != null)
+            for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
             {
-                string json = @"{ 'value': [] }";
-
-                JObject value = JObject.Parse(json);
-                JArray item2 = new JArray();
-                var objectSelector = string.Format("$.value[?(@.name == '{0}')]", singleApiName);
-                var selectedApi = (JObject)oApi.SelectTokens(objectSelector).FirstOrDefault();
-                if (selectedApi == null)
+                if (((JValue)oApi["value"][i]["name"]).Value.ToString().Equals(singleApiName))
                 {
-                    throw new Exception($"{singleApiName} API not found!");
+                    return true;
                 }
-                item2.Add(selectedApi);
-                value["value"] = item2;
-                oApi = value;
             }
-
+            return false;
+        }
+        
+        public async Task<JObject> GetAllAPIsFromAPIM(string apimname, string resourceGroup, string policyXMLBaseUrl)
+        {
+            // pull all apis from service
+            string apis = await GetAPIsAsync(apimname, resourceGroup);
+            JObject oApi = JObject.Parse(apis);
             return oApi;
         }
 
