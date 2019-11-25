@@ -27,7 +27,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apiVersionSets/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, APIVersionSetName, GlobalConstants.APIVersion);
             
-            Console.WriteLine(requestUrl);
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
