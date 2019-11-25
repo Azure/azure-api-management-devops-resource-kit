@@ -158,15 +158,35 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // write templates to output file location
             string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
             fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@dirName, apiFileName));
-            fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(@dirName, fileNames.apiVersionSets));
-            fileWriter.WriteJSONToFile(authorizationServerTemplate, String.Concat(@dirName, fileNames.authorizationServers));
-            fileWriter.WriteJSONToFile(backendTemplate, String.Concat(@dirName, fileNames.backends));
-            fileWriter.WriteJSONToFile(loggerTemplate, String.Concat(@dirName, fileNames.loggers));
-            fileWriter.WriteJSONToFile(namedValueTemplate, String.Concat(@dirName, fileNames.namedValues));
-            fileWriter.WriteJSONToFile(tagTemplate, String.Concat(@dirName, fileNames.tags));
-            fileWriter.WriteJSONToFile(productTemplate, String.Concat(@dirName, fileNames.products));
-            fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(@dirName, fileNames.globalServicePolicy));
-
+            // won't generate template when there is no resources
+            if (apiVersionSetTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(@dirName, fileNames.apiVersionSets));
+            }
+            if (backendTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(backendTemplate, String.Concat(@dirName, fileNames.backends));
+            }
+            if (authorizationServerTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(authorizationServerTemplate, String.Concat(@dirName, fileNames.authorizationServers));
+            }
+            if (productTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(productTemplate, String.Concat(@dirName, fileNames.products));
+            }
+            if (tagTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(tagTemplate, String.Concat(@dirName, fileNames.tags));
+            }
+            if (namedValueTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(namedValueTemplate, String.Concat(@dirName, fileNames.namedValues));
+            }
+            if (globalServicePolicyTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(@dirName, fileNames.globalServicePolicy));
+            }
             if (linkedBaseUrl != null)
             {
                 // create a master template that links to all other templates
