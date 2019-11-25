@@ -293,6 +293,7 @@ az account set --subscription <subscription_id>
 | linkedTemplatesUrlQueryString | No | String   | Query string appended to linked templates uris that enables retrieval from private storage. |
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 | splitAPIs     | No                    | If set to "true", then generate multiple api folders, each api will have a seperate folder, with a separate master template to deploy this api. If this single api has a version set, then a version set folder will generate instead, then all apis that belongs to this version set will be included in the version set folder, apis in this version set can be deployed separately using every api's master template, or they can be deployed together using the master template in "VersionSetMasterFolder" folder                        |
+| apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
 
 #### Note
 * You can not use "--splitAPIs" and "--apiName" at the same time, since using "--apiName" only extract one API
@@ -308,6 +309,10 @@ dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destina
 Extract **all APIs with seperated api folders**, use the following command: 
 ```
 dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location> --splitAPIs true
+```
+Extract **all APIs within an apiversionset**, use the following command: 
+```
+dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location> --apiVersionSetName "Echo API"
 ```
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
