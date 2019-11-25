@@ -33,6 +33,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | linked                | boolean               | No                    | Determines whether the utility should create a master template that links to all generated templates. |
 | linkedTemplatesBaseUrl| string                | No                    | Location that stores linked templates. Required if 'linked' is set to true. |
 | linkedTemplatesUrlQueryString| string                | No                    | Query string appended to linked templates uris that enables retrieval from private storage. |
+| tags                   | Array<[TagConfiguration](#tagConfiguration)>      | No                   | List of Tags configurations.                                |
 
 #### APIConfiguration
 
@@ -57,6 +58,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | products              | string                | No                    | Comma separated list of existing products to associate the API with.                   |
 | protocols             | string                | No                    | Comma separated list of protocols used between client and APIM service.                   |
 | diagnostic            | [APIDiagnosticConfiguration](#APIDiagnosticConfiguration) | No | Diagnostic configuration. |
+| tags                  | string                | No                    | Comma separated list of tags to associate the API with. Tags can be existing or nonexisting. For nonexisting tags, it will automatically generate new tags on the API instance        |
 
 #### APIOperationPolicyConfiguration
 
@@ -96,6 +98,13 @@ _Additional properties found in [ProductContractProperties](https://docs.microso
 
 _Additional properties found in [LoggerContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/loggers#LoggerContractProperties)_
 
+#### TagConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| displayName           | string                | Yes                   | DisplayName and name of the tag                  |
+
+_Additional properties found in [TagContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/tags)_
 ### Sample Config File
 
 The following is a full config.yml file with each property listed:
@@ -131,7 +140,9 @@ apis:
       apiVersionDescription: My first version
       apiVersionSetId: myAPIVersionSetID
       apiRevision: 1
-      apiRevisionDescription: My first revision
+      apiRevisionDescription: My first revision 
+      products: myProduct   
+      tags: Universe, myTag
       operations:
         addPet:
           policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
@@ -177,6 +188,8 @@ products:
       subscriptionsLimit: 1
       state: notPublished
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
+tags:
+    - displayName: Universe
 loggers:
     - name: myAppInsights
       loggerType: applicationInsights
@@ -279,10 +292,22 @@ az account set --subscription <subscription_id>
 | linkedTemplatesBaseUrl| No                    | Linked templates remote location. If provided, Extractor generates master template and requires linked templates pushed to remote location.                                   |
 | linkedTemplatesUrlQueryString | No | String   | Query string appended to linked templates uris that enables retrieval from private storage. |
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
+| splitAPIs     | No                    | If set to "true", then generate multiple api folders, each api will have a seperate folder, with a separate master template to deploy this api. If this single api has a version set, then a version set folder will generate instead, then all apis that belongs to this version set will be included in the version set folder, apis in this version set can be deployed separately using every api's master template, or they can be deployed together using the master template in "VersionSetMasterFolder" folder                        |
 
-To run the Extractor with all arguments (executing a single API extraction with linked templates and policy file generation), use the following command: 
+#### Note
+* You can not use "--splitAPIs" and "--apiName" at the same time, since using "--apiName" only extract one API
+### Extractor Command Example
+Executing **a single API extraction with linked templates and policy file** generation, use the following command: 
 ```
 dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --apiName <api_name> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location>
+```
+Extract **all APIs with linked templates linking all apis and policy file**, use the following command: 
+```
+dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location>
+```
+Extract **all APIs with seperated api folders**, use the following command: 
+```
+dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location> --splitAPIs true
 ```
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
