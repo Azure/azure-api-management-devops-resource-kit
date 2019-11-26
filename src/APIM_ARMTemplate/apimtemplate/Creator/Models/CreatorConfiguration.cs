@@ -55,6 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string apiRevisionDescription { get; set; }
         public Dictionary<string, OperationsConfig> operations { get; set; }
         public APITemplateAuthenticationSettings authenticationSettings { get; set; }
+        public APITemplateSubscriptionKeyParameterNames subscriptionKeyParameterNames { get; set; }
         public string products { get; set; }
         public string tags { get; set; }
         public string protocols { get; set; }
