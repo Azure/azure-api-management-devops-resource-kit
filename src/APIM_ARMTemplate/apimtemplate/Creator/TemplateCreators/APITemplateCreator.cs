@@ -118,7 +118,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             };
 
             // add properties depending on whether the template is the initial, subsequent, or unified 
-            if (!isSplit || isInitial)
+            if (!isSplit || !isInitial)
             {
                 // add metadata properties for initial and unified templates
                 apiTemplateResource.properties.apiVersion = api.apiVersion;
@@ -131,6 +131,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.apiRevisionDescription = api.apiRevisionDescription;
                 apiTemplateResource.properties.apiVersionDescription = api.apiVersionDescription;
                 apiTemplateResource.properties.authenticationSettings = api.authenticationSettings;
+                apiTemplateResource.properties.subscriptionKeyParameterNames = api.subscriptionKeyParameterNames;
                 apiTemplateResource.properties.path = api.suffix;
                 apiTemplateResource.properties.isCurrent = api.isCurrent;
                 apiTemplateResource.properties.displayName = api.name;
@@ -147,8 +148,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 {
                     apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = api.authenticationSettings.oAuth2.authorizationServerId;
                 }
+                // set the subscriptionKey Parameter Names
+                if (api.subscriptionKeyParameterNames != null) {
+                    if (api.subscriptionKeyParameterNames.header != null) {
+                        apiTemplateResource.properties.subscriptionKeyParameterNames.header = api.subscriptionKeyParameterNames.header;
+                    }
+                    if (api.subscriptionKeyParameterNames.query != null) {
+                        apiTemplateResource.properties.subscriptionKeyParameterNames.query = api.subscriptionKeyParameterNames.query;
+                    }
+                }
             }
-            if (!isSplit || !isInitial)
+            if (!isSplit || isInitial)
             {
                 // add open api spec properties for subsequent and unified templates
                 string format;
