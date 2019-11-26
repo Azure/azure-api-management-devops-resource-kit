@@ -34,6 +34,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | linkedTemplatesBaseUrl| string                | No                    | Location that stores linked templates. Required if 'linked' is set to true. |
 | linkedTemplatesUrlQueryString| string                | No                    | Query string appended to linked templates uris that enables retrieval from private storage. |
 | tags                   | Array<[TagConfiguration](#tagConfiguration)>      | No                   | List of Tags configurations.                                |
+| subscriptionKeyParameterNames | APITemplateSubscriptionKeyParameterNames      | No                   | subscription key parameter name.                    |
 
 #### APIConfiguration
 
@@ -105,6 +106,18 @@ _Additional properties found in [LoggerContractProperties](https://docs.microsof
 | displayName           | string                | Yes                   | DisplayName and name of the tag                  |
 
 _Additional properties found in [TagContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/tags)_
+
+#### APITemplateSubscriptionKeyParameterNames
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| header                | string                | Yes                   | header name of the subscription.                 |
+| query                 | string                | Yes                   | query parameter name of the subscription.        |
+
+_Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions)_
+
+
+
 ### Sample Config File
 
 The following is a full config.yml file with each property listed:
