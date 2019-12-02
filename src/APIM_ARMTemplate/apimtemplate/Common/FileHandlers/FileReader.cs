@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
@@ -56,6 +57,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                     CreatorConfig yamlObject = JsonConvert.DeserializeObject<CreatorConfig>(jsonText);
                     return yamlObject;
                 }
+            }
+        }
+
+        public ExtractorConfig ConvertConfigJsonToExtractorConfig()
+        {
+            string extractorJsonPath = "extractorparams.json";
+            using (StreamReader r = new StreamReader(extractorJsonPath))
+            {
+                string extractorJson = r.ReadToEnd();
+                ExtractorConfig extractorConfig = JsonConvert.DeserializeObject<ExtractorConfig>(extractorJson);
+                return extractorConfig;
             }
         }
 
