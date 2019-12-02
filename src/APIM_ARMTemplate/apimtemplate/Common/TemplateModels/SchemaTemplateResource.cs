@@ -15,6 +15,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     public class SchemaTemplateDocument
     {
         public string value { get; set; }
+
+        public dynamic components { get; set; }
     }
 
     public class RESTReturnedSchemaTemplate : APITemplateSubResource
