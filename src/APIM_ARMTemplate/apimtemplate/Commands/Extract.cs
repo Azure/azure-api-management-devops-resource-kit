@@ -15,33 +15,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.Name = GlobalConstants.ExtractName;
             this.Description = GlobalConstants.ExtractDescription;
 
-            var sourceApimName = this.Option("--sourceApimName <sourceApimName>", "Source API Management name", CommandOptionType.SingleValue);
-            var destinationAPIManagementName = this.Option("--destinationApimName <destinationApimName>", "Destination API Management name", CommandOptionType.SingleValue);
-            var resourceGroupName = this.Option("--resourceGroup <resourceGroup>", "Resource Group name", CommandOptionType.SingleValue);
-            var fileFolderName = this.Option("--fileFolder <filefolder>", "ARM Template files folder", CommandOptionType.SingleValue);
-            var apiName = this.Option("--apiName <apiName>", "API name", CommandOptionType.SingleValue);
-            var linkedTemplatesBaseUrlName = this.Option("--linkedTemplatesBaseUrl <linkedTemplatesBaseUrl>", "Creates a master template with links", CommandOptionType.SingleValue);
-            var linkedTemplatesUrlQueryString = this.Option("--linkedTemplatesUrlQueryString <linkedTemplatesUrlQueryString>", "Query string appended to linked templates uris that enables retrieval from private storage", CommandOptionType.SingleValue);
-            var policyXMLBaseUrlName = this.Option("--policyXMLBaseUrl <policyXMLBaseUrl>", "Writes policies to local XML files that require deployment to remote folder", CommandOptionType.SingleValue);
-            var splitAPITemplates = this.Option("--splitAPIs <splitAPIs>", "Split APIs into multiple templates", CommandOptionType.SingleValue);
-            var apiVersionSetNameId = this.Option("--apiVersionSetName <apiVersionSetName>", "Name of the apiVersionSet you want to extract", CommandOptionType.SingleValue);
-
             this.HelpOption();
 
             this.OnExecute(async () =>
             {
+                // convert config file to extractorConfig class
+                FileReader fileReader = new FileReader();
+                ExtractorConfig extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig();
+                Console.WriteLine(extractorConfig.sourceApimName);
+                //Console.WriteLine(extractorConfig.ToString());
                 try
                 {
-                    if (!sourceApimName.HasValue()) throw new Exception("Missing parameter <sourceApimName>.");
-                    if (!destinationAPIManagementName.HasValue()) throw new Exception("Missing parameter <destinationApimName>.");
-                    if (!resourceGroupName.HasValue()) throw new Exception("Missing parameter <resourceGroup>.");
-                    if (!fileFolderName.HasValue()) throw new Exception("Missing parameter <filefolder>.");
+                    if (extractorConfig.sourceApimName == null) throw new Exception("Missing parameter <sourceApimName>.");
+                    if (extractorConfig.destinationApimName == null) throw new Exception("Missing parameter <destinationApimName>.");
+                    if (extractorConfig.resourceGroup == null) throw new Exception("Missing parameter <resourceGroup>.");
+                    if (extractorConfig.fileFolder == null) throw new Exception("Missing parameter <filefolder>.");
 
-                    string splitAPIs = splitAPITemplates.HasValue() ? splitAPITemplates.Value().ToString() : null;
-                    string apiVersionSetName = apiVersionSetNameId.HasValue() ? apiVersionSetNameId.Value().ToString() : null;
+                    string splitAPIs = extractorConfig.splitAPIs;
+                    string apiVersionSetName = extractorConfig.apiVersionSetName;
+                    string singleApiName = extractorConfig.apiName;
 
                     // validaion check
-                    if (splitAPIs != null && splitAPIs.Equals("true") && apiName.Values.Count > 0)
+                    if (splitAPIs != null && splitAPIs.Equals("true") && singleApiName != null)
                     {
                         throw new Exception("Can't use --splitAPIs and --apiName at same time");
                     }
@@ -51,25 +46,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         throw new Exception("Can't use --splitAPIs and --apiVersionSetName at same time");
                     }
 
-                    if (apiName.Values.Count > 0 && apiVersionSetName != null)
+                    if (singleApiName != null && apiVersionSetName != null)
                     {
                         throw new Exception("Can't use --apiName and --apiVersionSetName at same time");
                     }
 
                     // isolate cli parameters
-                    string resourceGroup = resourceGroupName.Value().ToString();
-                    string sourceApim = sourceApimName.Value().ToString();
-                    string destinationApim = destinationAPIManagementName.Value().ToString();
-                    string dirName = fileFolderName.Value().ToString();
-                    string linkedBaseUrl = linkedTemplatesBaseUrlName.HasValue() ? linkedTemplatesBaseUrlName.Value().ToString() : null;
-                    string linkedUrlQueryString = linkedTemplatesUrlQueryString.HasValue() ? linkedTemplatesUrlQueryString.Value().ToString() : null;
-                    string policyXMLBaseUrl = policyXMLBaseUrlName.HasValue() ? policyXMLBaseUrlName.Value().ToString() : null;
-                    string singleApiName = null;
-
-                    if (apiName.Values.Count > 0)
-                    {
-                        singleApiName = apiName.Value().ToString();
-                    }
+                    string resourceGroup = extractorConfig.resourceGroup;
+                    string sourceApim = extractorConfig.sourceApimName;
+                    string destinationApim = extractorConfig.destinationApimName;
+                    string dirName = extractorConfig.fileFolder;
+                    string linkedBaseUrl = extractorConfig.linkedTemplatesBaseUrl;
+                    string linkedUrlQueryString = extractorConfig.linkedTemplatesUrlQueryString;
+                    string policyXMLBaseUrl = extractorConfig.policyXMLBaseUrl;
 
                     Console.WriteLine("API Management Template");
                     Console.WriteLine();
