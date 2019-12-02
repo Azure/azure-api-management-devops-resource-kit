@@ -22,8 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // convert config file to extractorConfig class
                 FileReader fileReader = new FileReader();
                 ExtractorConfig extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig();
-                Console.WriteLine(extractorConfig.sourceApimName);
-                //Console.WriteLine(extractorConfig.ToString());
+                
                 try
                 {
                     if (extractorConfig.sourceApimName == null) throw new Exception("Missing parameter <sourceApimName>.");
