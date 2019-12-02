@@ -494,6 +494,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         private string GetSchemaValueBasedOnContentType(RESTReturnedSchemaTemplateProperties schemaTemplateProperties)
         {
+            var contentType = schemaTemplateProperties.contentType.ToLowerInvariant();
+            if (contentType.Equals("application/vnd.oai.openapi.components+json"))
+            {
+                // for OpenAPI "value" is not used, but "components" which is resolved during json deserialization
+                return null;
+            }
+
             if (!(schemaTemplateProperties.document is JToken))
             {
                 return JsonConvert.SerializeObject(schemaTemplateProperties.document);
@@ -501,7 +508,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             var schemaJson = schemaTemplateProperties.document as JToken;
 
-            switch (schemaTemplateProperties.contentType.ToLowerInvariant())
+            switch (contentType)
             {
                 case "application/vnd.ms-azure-apim.swagger.definitions+json":
                     if (schemaJson["definitions"] != null && schemaJson.Count() == 1)
