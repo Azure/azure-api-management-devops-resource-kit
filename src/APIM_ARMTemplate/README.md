@@ -294,6 +294,7 @@ az account set --subscription <subscription_id>
 ```
 
 #### Extractor Arguments
+**Please go to "extractorparameters.json" to specify the parameters to pass in.**
 
 | Property              | Required              | Value                                             |
 |-----------------------|-----------------------|---------------------------------------------------|
@@ -309,23 +310,61 @@ az account set --subscription <subscription_id>
 | apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
 
 #### Note
-* You can not use "--splitAPIs" and "--apiName" at the same time, since using "--apiName" only extract one API
-### Extractor Command Example
-Executing **a single API extraction with linked templates and policy file** generation, use the following command: 
+* You can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
+### Extractor Parameter Example
+In **extractorparams.json** file (path: src/APIM_ARMTemplate/extractorparams.json) <br />
+Executing **a single API extraction with linked templates and policy file** generation, use the following parameters: 
 ```
-dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --apiName <api_name> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location>
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "apiName": "<api_name>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>"
+}
 ```
-Extract **all APIs with linked templates linking all apis and policy file**, use the following command: 
+Extract **all APIs with linked templates linking all apis and policy file**, use the following parameters: 
 ```
-dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location>
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>"
+}
 ```
-Extract **all APIs with seperated api folders**, use the following command: 
+Extract **all APIs with seperated api folders**, use the following parameters: 
 ```
-dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location> --splitAPIs true
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>",
+    "splitAPIs": "true"
+}
 ```
-Extract **all APIs within an apiversionset**, use the following command: 
+Extract **all APIs within an apiversionset**, use the following parameters: 
 ```
-dotnet run extract --sourceApimName <name_of_the_source_APIM_instance> --destinationApimName <name_of_the_destination_APIM_instance> --resourceGroup <name_of_resource_group> --fileFolder <path_to_folder> --linkedTemplatesBaseUrl <linked_templates_remote_location> --policyXMLBaseUrl <policies_remote_location> --apiVersionSetName "Echo API"
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>",
+    "apiVersionSetName": "<api-version-set-name>"
+}
 ```
+
+#### Run the extractor
+```
+dotnet run extract
+```
+
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
