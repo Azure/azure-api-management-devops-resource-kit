@@ -77,6 +77,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
+        public async Task<string> GetAPIChangeLogAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/releases?api-version={5}",
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
+
+        public async Task<string> GetAPIRevisionsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/revisions?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
+
         public async Task<string> GetAPIPolicyAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -383,26 +402,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             // initialize arm template
             Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
-            JObject oApi = await GetAllAPIsFromAPIM(apimname, resourceGroup, policyXMLBaseUrl);
             List<TemplateResource> templateResources = new List<TemplateResource>();
-
+            
             // when extract single API
             if (singleApiName != null)
             {
                 // check if this api exist
-                if (!CheckAPIExist(singleApiName, oApi))
+                try
                 {
-                    throw new Exception($"{singleApiName} API not found!");
+                    string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, singleApiName);
+                    Console.WriteLine("{0} API found ...", singleApiName);
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
                 }
-                Console.WriteLine("{0} API found ...", singleApiName);
-
-                templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
+                catch (Exception)
+                {
+                   throw new Exception($"{singleApiName} API not found!");
+                }
             }
             // when extract multiple APIs and generate one master template
             else if (multipleApiNames != null)
             {
                 Console.WriteLine("{0} APIs found ...", multipleApiNames.Count().ToString());
-                foreach(string apiName in multipleApiNames)
+                foreach (string apiName in multipleApiNames)
                 {
                     templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
                 }
@@ -410,6 +431,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // when extract all APIs and generate one master template
             else
             {
+                JObject oApi = await GetAllAPIsFromAPIM(apimname, resourceGroup, policyXMLBaseUrl);
                 Console.WriteLine("{0} APIs found ...", ((JContainer)oApi["value"]).Count.ToString());
 
                 for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
@@ -454,7 +476,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
             return false;
         }
-        
+
         public async Task<JObject> GetAllAPIsFromAPIM(string apimname, string resourceGroup, string policyXMLBaseUrl)
         {
             // pull all apis from service

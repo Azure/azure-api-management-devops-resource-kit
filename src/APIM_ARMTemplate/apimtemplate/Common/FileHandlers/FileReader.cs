@@ -109,7 +109,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 object deserializedFileContents = JsonConvert.DeserializeObject<object>(fileContents);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
