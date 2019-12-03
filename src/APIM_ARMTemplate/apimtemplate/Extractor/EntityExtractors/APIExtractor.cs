@@ -411,8 +411,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 try
                 {
                     string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, singleApiName);
-                    string revisions = await GetAPIRevisionsAsync(apimname, resourceGroup, singleApiName);
-                    Console.WriteLine(revisions);
                     Console.WriteLine("{0} API found ...", singleApiName);
                     templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
                 }
