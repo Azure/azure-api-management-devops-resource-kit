@@ -194,6 +194,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return parameters;
         }
 
+        // this function will create master / parameter templates for deploying API revisions
         public Template CreateSingleAPIRevisionsMasterTemplate(List<string> revList, string currentRev, string linkedTemplatesUrlQueryString, string policyXMLBaseUrl, FileNames fileNames)
         {
             // create empty template
@@ -206,19 +207,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> resources = new List<TemplateResource>();
 
             string curRevTemplate = String.Concat(currentRev, "MasterTemplate");
+            int masterCnt = 0;
 
             foreach (string apiName in revList)
             {
                 string revMasterPath = String.Concat("/", apiName, fileNames.linkedMaster);
                 string revUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, revMasterPath);
-                string templatename = String.Concat(apiName, "MasterTemplate");
+                string templatename = String.Concat("masterTemplate", masterCnt++);
                 if (!apiName.Equals(currentRev))
                 {
                     resources.Add(this.CreateLinkedMasterTemplateResource(templatename, revUri, GenerateAPIRevisionDependencies(curRevTemplate)));
                 }
                 else
                 {
-                    resources.Add(this.CreateLinkedMasterTemplateResource(templatename, revUri, new string[0]));
+                    resources.Add(this.CreateLinkedMasterTemplateResource(templatename, revUri, new string[]{}));
                 }
             }
 
