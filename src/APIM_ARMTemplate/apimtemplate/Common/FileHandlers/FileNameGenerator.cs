@@ -22,7 +22,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 linkedMaster = $@"/{apimServiceName}-master.template.json",
                 apis = "/Apis",
                 splitAPIs = "/SplitAPIs",
-                versionSetMasterFolder = "/VersionSetMasterFolder"
+                versionSetMasterFolder = "/VersionSetMasterFolder",
+                revisionMasterFolder = "/RevisionMasterFolder"
             };
         }
 
@@ -69,5 +70,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string apis { get; set; }
         public string splitAPIs { get; set; }
         public string versionSetMasterFolder { get; set; }
+        public string revisionMasterFolder { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Linq;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -32,95 +33,83 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // namedValue
             string namedValueDeploymentResourceName = "namedValuesTemplate";
             // all other deployment resources will depend on named values
-            string[] dependsOnNamedValues = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]" };
-            if (namedValuesTemplate != null)
+            string[] dependsOnNamedValues = new string[] {};
+
+            // api dependsOn
+            List<string> apiDependsOn = new List<string>();
+
+            if (namedValuesTemplate != null && namedValuesTemplate.resources.Count() != 0)
             {
+                dependsOnNamedValues = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]" };
+                apiDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]");
                 string namedValuesUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.namedValues);
                 resources.Add(this.CreateLinkedMasterTemplateResource(namedValueDeploymentResourceName, namedValuesUri, new string[] { }));
             }
 
             // globalServicePolicy
-            if (globalServicePolicyTemplate != null)
+            if (globalServicePolicyTemplate != null && globalServicePolicyTemplate.resources.Count() != 0)
             {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'globalServicePolicyTemplate')]");
                 string globalServicePolicyUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.globalServicePolicy);
                 resources.Add(this.CreateLinkedMasterTemplateResource("globalServicePolicyTemplate", globalServicePolicyUri, dependsOnNamedValues));
             }
 
             // apiVersionSet
-            if (apiVersionSetTemplate != null)
+            if (apiVersionSetTemplate != null && apiVersionSetTemplate.resources.Count() != 0)
             {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
                 string apiVersionSetUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.apiVersionSets);
                 resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, dependsOnNamedValues));
             }
 
             // product
-            if (productsTemplate != null)
+            if (productsTemplate != null && productsTemplate.resources.Count() != 0)
             {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
                 string productsUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.products);
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, dependsOnNamedValues));
             }
 
-            if (tagTemplate != null)
+            if (tagTemplate != null && tagTemplate.resources.Count() != 0)
             {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
                 string tagUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.tags);
                 resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, dependsOnNamedValues));
             }
 
             // logger
-            if (loggersTemplate != null)
+            if (loggersTemplate != null && loggersTemplate.resources.Count() != 0)
             {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
                 string loggersUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.loggers);
                 resources.Add(this.CreateLinkedMasterTemplateResource("loggersTemplate", loggersUri, dependsOnNamedValues));
             }
 
             // backend
-            if (backendsTemplate != null)
+            if (backendsTemplate != null && backendsTemplate.resources.Count() != 0)
             {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'backendsTemplate')]");
                 string backendsUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.backends);
                 resources.Add(this.CreateLinkedMasterTemplateResource("backendsTemplate", backendsUri, dependsOnNamedValues));
             }
 
             // authorizationServer
-            if (authorizationServersTemplate != null)
+            if (authorizationServersTemplate != null && authorizationServersTemplate.resources.Count() != 0)
             {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
                 string authorizationServersUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, fileNames.authorizationServers);
                 resources.Add(this.CreateLinkedMasterTemplateResource("authorizationServersTemplate", authorizationServersUri, dependsOnNamedValues));
             }
 
             // api
-            if (apiTemplate != null)
+            if (apiTemplate != null && apiTemplate.resources.Count() != 0)
             {
                 string apisUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, apiFileName);
-                resources.Add(this.CreateLinkedMasterTemplateResource("apisTemplate", apisUri, GenerateAPIResourceDependencies(apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, namedValueDeploymentResourceName)));
+                resources.Add(this.CreateLinkedMasterTemplateResource("apisTemplate", apisUri, apiDependsOn.ToArray()));
             }
 
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
-        }
-
-        public string[] GenerateAPIResourceDependencies(Template apiTemplate,
-            Template globalServicePolicyTemplate,
-            Template apiVersionSetTemplate,
-            Template productsTemplate,
-            Template loggersTemplate,
-            Template backendsTemplate,
-            Template authorizationServersTemplate,
-            string namedValueDeploymentResourceName)
-        {
-            List<string> apiDependsOn = new List<string>();
-            var apiResources = apiTemplate.resources.Where(resource => resource.type == ResourceTypeConstants.API);
-
-            // add dependency on all other template files by default for now
-            apiDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]");
-            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'globalServicePolicyTemplate')]");
-            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
-            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
-            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
-            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'backendsTemplate')]");
-            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
-            apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
-
-            return apiDependsOn.ToArray();
         }
 
         public MasterTemplateResource CreateLinkedMasterTemplateResource(string name, string uriLink, string[] dependsOn)
@@ -203,6 +192,47 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 parameters.Add("PolicyXMLBaseUrl", policyTemplateBaseUrlProperties);
             }
             return parameters;
+        }
+
+        // this function will create master / parameter templates for deploying API revisions
+        public Template CreateSingleAPIRevisionsMasterTemplate(List<string> revList, string currentRev, string linkedTemplatesUrlQueryString, string policyXMLBaseUrl, FileNames fileNames)
+        {
+            // create empty template
+            Template masterTemplate = GenerateEmptyTemplate();
+
+            // add parameters
+            masterTemplate.parameters = this.CreateMasterTemplateParameters(true, linkedTemplatesUrlQueryString, policyXMLBaseUrl);
+
+            // add deployment resources that links to all resource files
+            List<TemplateResource> resources = new List<TemplateResource>();
+
+            string curRevTemplate = String.Concat(currentRev, "MasterTemplate");
+            int masterCnt = 0;
+
+            foreach (string apiName in revList)
+            {
+                string revMasterPath = String.Concat("/", apiName, fileNames.linkedMaster);
+                string revUri = GenerateLinkedTemplateUri(linkedTemplatesUrlQueryString, revMasterPath);
+                string templatename = String.Concat("masterTemplate", masterCnt++);
+                if (!apiName.Equals(currentRev))
+                {
+                    resources.Add(this.CreateLinkedMasterTemplateResource(templatename, revUri, GenerateAPIRevisionDependencies(curRevTemplate)));
+                }
+                else
+                {
+                    resources.Add(this.CreateLinkedMasterTemplateResource(templatename, revUri, new string[]{}));
+                }
+            }
+
+            masterTemplate.resources = resources.ToArray();
+            return masterTemplate;
+        }
+
+        public string[] GenerateAPIRevisionDependencies(string curRevTemplate)
+        {
+            List<string> revDependsOn = new List<string>();
+            revDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{curRevTemplate}')]");
+            return revDependsOn.ToArray();
         }
 
         public Template CreateMasterTemplateParameterValues(string apimServiceName, string linkedTemplatesBaseUrl, string linkedTemplatesUrlQueryString, string policyXMLBaseUrl)
