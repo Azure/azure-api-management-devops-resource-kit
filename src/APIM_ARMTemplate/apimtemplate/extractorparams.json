@@ -1,6 +1,11 @@
 {
-    "sourceApimName": "<source-apim-name>",
-    "destinationApimName": "<destination-apim-name>",
-    "resourceGroup": "<resource-group>",
-    "fileFolder": "<destination-file-folder>"
+    "sourceApimName": "devportal-lrp",
+    "destinationApimName": "Devops-lrp",
+    "resourceGroup": "Api-Default-West-US",
+    "fileFolder": "/Users/rupliu/devOpsDev/GeneratedTemplatesExtractor",
+    "apiName": "blankapi",
+    "linkedTemplatesBaseUrl": "https://devportaldb.blob.core.windows.net/templates",
+    "linkedTemplatesUrlQueryString": "?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-04T06:54:15Z&st=2019-12-03T22:54:15Z&spr=https&sig=qfEhUbo60iOlzqv0DPcN6GJU0iO0n2s10JBnOaC92aw%3D",
+    "policyXMLBaseUrl": "https://devportaldb.blob.core.windows.net/templates",
+    "includeAllRevisions": "true"
 }

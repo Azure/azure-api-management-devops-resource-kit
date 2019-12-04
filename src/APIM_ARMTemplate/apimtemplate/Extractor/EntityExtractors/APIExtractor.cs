@@ -398,12 +398,39 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return templateResources;
         }
 
+        // this function generate apiTemplate for single api with all its revisions
+        public async Task<Template> GenerateAPIRevisionTemplateAsync(string currentRevision, List<string> revList, string apiName, Extractor exc)
+        {
+            // generate apiTemplate
+            Template armTemplate = GenerateEmptyTemplateWithParameters(exc.policyXMLBaseUrl);
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+            Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
+            
+            foreach (string curApi in revList)
+            {
+                List<TemplateResource> apiResources = await GenerateSingleAPIResourceAsync(curApi, exc.sourceApimName, exc.resourceGroup, exc.fileFolder, exc.policyXMLBaseUrl);
+                // should add current api to dependsOn to those revisions that are not "current"
+                if (!curApi.Equals(currentRevision))
+                {
+                    TemplateResource apiResource = apiResources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as TemplateResource;
+                    List<TemplateResource> newResourcesList = ExtractorUtils.removeResourceType(ResourceTypeConstants.API, apiResources);
+                    List<string> dependsOn = apiResource.dependsOn.ToList();
+                    dependsOn.Add($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]");
+                    apiResource.dependsOn = dependsOn.ToArray();
+                    newResourcesList.Add(apiResource);
+                }
+                templateResources.AddRange(apiResources);
+            }
+            armTemplate.resources = templateResources.ToArray();
+            return armTemplate;
+        }
+
         public async Task<Template> GenerateAPIsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<string> multipleApiNames, string policyXMLBaseUrl, string fileFolder)
         {
             // initialize arm template
             Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            
+
             // when extract single API
             if (singleApiName != null)
             {
@@ -416,7 +443,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 catch (Exception)
                 {
-                   throw new Exception($"{singleApiName} API not found!");
+                    throw new Exception($"{singleApiName} API not found!");
                 }
             }
             // when extract multiple APIs and generate one master template
