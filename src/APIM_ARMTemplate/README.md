@@ -308,9 +308,14 @@ az account set --subscription <subscription_id>
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 | splitAPIs     | No                    | If set to "true", then generate multiple api folders, each api will have a seperate folder, with a separate master template to deploy this api. If this single api has a version set, then a version set folder will generate instead, then all apis that belongs to this version set will be included in the version set folder, apis in this version set can be deployed separately using every api's master template, or they can be deployed together using the master template in "VersionSetMasterFolder" folder                        |
 | apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
+| mutipleAPIs  | No                    | Specify multiple APIs to extract. Generate templates for each API, also generate an aggregated templates folder to deploy these APIs together at a time      |
+| includeAllRevisions  | No                    |  Set to "true" will extract all revisions for the single API. Will work only with "apiName" paramter, where you specify which API's revisions to extract. Generate templates for each revision, also generate an aggregated master folder to deploy these revisions together at one time. Note: there are many complicated issues with deploying revisions, make sure your deployment won't overwrite or break the existing ones      |
+
 
 #### Note
-* You can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
+* Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
+* Can not use "apiName" and "mutipleAPIs" at the same time
+* Can only "includeAllRevisions" with "apiName"
 ### Extractor Parameter Example
 In **extractorparams.json** file (path: src/APIM_ARMTemplate/extractorparams.json) <br />
 Executing **a single API extraction with linked templates and policy file** generation, use the following parameters: 
@@ -358,6 +363,31 @@ Extract **all APIs within an apiversionset**, use the following parameters:
     "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
     "policyXMLBaseUrl": "<policies_remote_location>",
     "apiVersionSetName": "<api-version-set-name>"
+}
+```
+Extract **single API with all revisions**, use the following parameters: 
+```
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>",
+    "apiName": "<api_name>",
+    "includeAllRevisions": "true"
+}
+```
+Extract **multiple APIs**, use the following parameters: 
+```
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>",
+    "mutipleAPIs": "api1, api2, api3"
 }
 ```
 
