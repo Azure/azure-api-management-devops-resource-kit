@@ -29,6 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     bool hasVersionSetName = extractorConfig.apiVersionSetName != null;
                     bool hasSingleApi = singleApiName != null;
                     bool includeRevisions = extractorConfig.includeAllRevisions != null && extractorConfig.includeAllRevisions.Equals("true");
+                    bool hasMultipleAPIs = extractorConfig.mutipleAPIs != null;
 
                     // start running extractor
                     Console.WriteLine("API Management Template");
@@ -48,6 +49,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     {
                         // create split api templates and aggregated api templates for this apiversionset
                         await ExtractorUtils.GenerateAPIVersionSetTemplates(extractorConfig, fileNameGenerator, fileNames, fileWriter);
+                    }
+                    else if (hasMultipleAPIs)
+                    {
+                        // generate templates for multiple APIs
+                        await ExtractorUtils.GenerateMultipleAPIsTemplates(extractorConfig, fileNameGenerator, fileWriter, fileNames);
                     }
                     else if (hasSingleApi && includeRevisions)
                     {

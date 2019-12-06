@@ -140,6 +140,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
             else
             {
+                Console.WriteLine("Start extracting the API version set {0}", exc.apiVersionSetName);
+
                 foreach (string apiName in apiDictionary[exc.apiVersionSetName])
                 {
                     // generate seperate folder for each API
@@ -161,7 +163,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         // this function will generate templates for multiple specified APIs
         public static async Task GenerateMultipleAPIsTemplates(ExtractorConfig exc, FileNameGenerator fileNameGenerator, FileWriter fileWriter, FileNames fileNames)
         {
-            
+            if (exc.mutipleAPIs == null && exc.mutipleAPIs.Equals(""))
+            {
+                throw new Exception("mutipleAPIs parameter doesn't have any data");
+            }
+
+            string[] apis = exc.mutipleAPIs.Split(',');
+            for (int i = 0; i < apis.Length; i++)
+            {
+                apis[i] = apis[i].Trim();
+            }
+
+            Console.WriteLine("Start extracting these {0} APIs", apis.Length);
+
+            foreach (string apiName in apis)
+            {
+                // generate seperate folder for each API
+                string apiFileFolder = String.Concat(@exc.fileFolder, $@"/{apiName}");
+                System.IO.Directory.CreateDirectory(apiFileFolder);
+                await GenerateTemplates(new Extractor(exc, apiFileFolder), apiName, null, fileNameGenerator, fileNames, fileWriter, null);
+            }
+
+            // create master templates for these apis 
+            string groupApiFolder = String.Concat(@exc.fileFolder, fileNames.groupAPIsMasterFolder);
+            System.IO.Directory.CreateDirectory(groupApiFolder);
+            await GenerateTemplates(new Extractor(exc, groupApiFolder), null, apis.ToList(), fileNameGenerator, fileNames, fileWriter, null);
+
+            Console.WriteLine($@"Finish extracting mutiple APIs");
         }
 
         // this function will generate split api templates / folders for each api in this sourceApim
