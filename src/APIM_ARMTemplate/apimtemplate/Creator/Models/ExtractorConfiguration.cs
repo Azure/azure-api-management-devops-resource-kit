@@ -7,6 +7,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string resourceGroup { get; set; }
         public string fileFolder { get; set; }
         public string apiName { get; set; }
+        public string mutipleAPIs { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
         public string linkedTemplatesUrlQueryString { get; set; }
         public string policyXMLBaseUrl { get; set; }
