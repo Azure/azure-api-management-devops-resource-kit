@@ -317,7 +317,7 @@ az account set --subscription <subscription_id>
 * Can not use "apiName" and "mutipleAPIs" at the same time
 * Can only "includeAllRevisions" with "apiName"
 ### Extractor Parameter Example
-In **extractorparams.json** file (path: src/APIM_ARMTemplate/extractorparams.json) <br />
+In **extractorparams.json** file (path: src/APIM_ARMTemplate/apimtemplate/extractorparams.json) <br />
 Executing **a single API extraction with linked templates and policy file** generation, use the following parameters: 
 ```
 {
