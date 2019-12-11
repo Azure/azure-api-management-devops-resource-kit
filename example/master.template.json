@@ -113,8 +113,7 @@
                  "contentVersion":"1.0.0.0"
               },
               "parameters": {
-                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
-                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
                }
             },
             "dependsOn": [
@@ -189,8 +188,7 @@
                  "contentVersion":"1.0.0.0"
               },
               "parameters": {
-                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
-                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
                }
             },
             "dependsOn": [
@@ -209,8 +207,7 @@
                  "contentVersion":"1.0.0.0"
               },
               "parameters": {
-                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
-                 "repoBaseUrl": {"value": "[parameters('repoBaseUrl')]" }
+                 "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }
                }
             },
             "dependsOn": [
