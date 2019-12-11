@@ -58,7 +58,7 @@
                  "contentVersion":"1.0.0.0"
               },
               "parameters": {
-                "ApimServiceName": {"value": "[parameters('ApimServiceName')]" }, 
+                "ApimServiceName": {"value": "[parameters('ApimServiceName')]" },
                 "PublisherName": {"value": "[parameters('PublisherName')]" },
                 "PublisherEmail": {"value": "[parameters('PublisherEmail')]" },
                 "sku": {"value": "[parameters('sku')]" },
@@ -109,7 +109,7 @@
             "properties": {
               "mode": "Incremental",
               "templateLink": {
-                 "uri":"[concat(parameters('repoBaseUrl'), '/product-starter/product-starter.template.json')]",
+                 "uri":"[concat(parameters('repoBaseUrl'), '/products/product-starter.template.json')]",
                  "contentVersion":"1.0.0.0"
               },
               "parameters": {
