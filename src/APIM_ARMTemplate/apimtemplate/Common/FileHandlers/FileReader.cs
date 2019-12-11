@@ -60,9 +60,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             }
         }
 
-        public ExtractorConfig ConvertConfigJsonToExtractorConfig()
+        public ExtractorConfig ConvertConfigJsonToExtractorConfig(string extractorJsonPath)
         {
-            string extractorJsonPath = "extractorparams.json";
+            if (extractorJsonPath == null)
+            {
+                extractorJsonPath = "extractorparams.json";
+            }
             using (StreamReader r = new StreamReader(extractorJsonPath))
             {
                 string extractorJson = r.ReadToEnd();

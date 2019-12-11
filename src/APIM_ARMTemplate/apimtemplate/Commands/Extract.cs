@@ -10,14 +10,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             this.Name = GlobalConstants.ExtractName;
             this.Description = GlobalConstants.ExtractDescription;
-
+            var filePath = this.Option("--extractorConfig <extractorConfig>", "Config file of the extractor", CommandOptionType.SingleValue);
+           
             this.HelpOption();
 
             this.OnExecute(async () =>
             {
                 // convert config file to extractorConfig class
                 FileReader fileReader = new FileReader();
-                ExtractorConfig extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig();
+                string extractorConfigPath = filePath.HasValue() ? filePath.Value().ToString() : null;
+
+                ExtractorConfig extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig(extractorConfigPath);
 
                 try
                 {
