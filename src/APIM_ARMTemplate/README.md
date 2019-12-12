@@ -273,7 +273,7 @@ You can also run it directly from the [releases](https://github.com/Azure/azure-
 
 # Extractor
 
-This utility generates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) by extracing existing configurations of one or more APIs in an API Management instance. 
+This utility generates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) by extracting existing configurations of one or more APIs in an API Management instance. 
 
 <a name="prerequisite"></a>
 
