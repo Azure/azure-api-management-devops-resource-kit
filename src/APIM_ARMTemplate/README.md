@@ -294,7 +294,7 @@ az account set --subscription <subscription_id>
 ```
 
 #### Extractor Arguments
-**Please go to "extractorparameters.json" to specify the parameters to pass in.**
+**Please go to "extractorparameters.json" to specify the parameters to pass in or pass an argument --extractorConfig which points to a file as defined below.**
 
 | Property              | Required              | Value                                             |
 |-----------------------|-----------------------|---------------------------------------------------|
