@@ -94,6 +94,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 fileWriter.WriteJSONToFile(backendTemplate, String.Concat(@dirName, fileNames.backends));
             }
+            if (loggerTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(loggerTemplate, String.Concat(@dirName, fileNames.loggers));
+            }
             if (authorizationServerTemplate.resources.Count() != 0)
             {
                 fileWriter.WriteJSONToFile(authorizationServerTemplate, String.Concat(@dirName, fileNames.authorizationServers));
