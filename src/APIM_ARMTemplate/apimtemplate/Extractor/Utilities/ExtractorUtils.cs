@@ -283,23 +283,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             APIExtractor apiExtractor = new APIExtractor(fileWriter);
             // pull all apis from service
-            string apis = await apiExtractor.GetAPIsAsync(sourceApim, resourceGroup);
-            JObject oApi = JObject.Parse(apis);
+            JToken[] apis = await apiExtractor.GetAllAPIObjsAsync(sourceApim, resourceGroup);
 
             // Generate folders based on all apiversionset
             var apiDictionary = new Dictionary<string, List<string>>();
-            for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
+            foreach (JToken oApi in apis)
             {
-                string apiDisplayName = ((JValue)oApi["value"][i]["properties"]["displayName"]).Value.ToString();
+                string apiDisplayName = ((JValue)oApi["properties"]["displayName"]).Value.ToString();
                 if (!apiDictionary.ContainsKey(apiDisplayName))
                 {
                     List<string> apiVersionSet = new List<string>();
-                    apiVersionSet.Add(((JValue)oApi["value"][i]["name"]).Value.ToString());
+                    apiVersionSet.Add(((JValue)oApi["name"]).Value.ToString());
                     apiDictionary[apiDisplayName] = apiVersionSet;
                 }
                 else
                 {
-                    apiDictionary[apiDisplayName].Add(((JValue)oApi["value"][i]["name"]).Value.ToString());
+                    apiDictionary[apiDisplayName].Add(((JValue)oApi["name"]).Value.ToString());
                 }
             }
             return apiDictionary;

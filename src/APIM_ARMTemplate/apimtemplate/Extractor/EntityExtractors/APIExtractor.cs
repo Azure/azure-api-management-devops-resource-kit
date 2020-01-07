@@ -17,14 +17,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.fileWriter = fileWriter;
         }
 
-        public async Task<string> GetAPIOperationsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        private async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            JObject oOperations = new JObject();
+            int numOfOps = 0;
+            List<string> operationNames = new List<string>();
+            do
+            {
+                (string azToken, string azSubId) = await auth.GetAccessToken();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations?$skip={5}&api-version={6}",
+                   baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, numOfOps, GlobalConstants.APIVersion);
+                numOfOps += GlobalConstants.NumOfRecords;
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+                string operations = await CallApiManagementAsync(azToken, requestUrl);
+
+                oOperations = JObject.Parse(operations);
+
+                foreach (var item in oOperations["value"])
+                {
+                    operationNames.Add(((JValue)item["name"]).Value.ToString());
+                }
+            }
+            while (oOperations["nextLink"] != null);
+            return operationNames.ToArray();
         }
 
         public async Task<string> GetAPIOperationDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationName)
@@ -67,14 +83,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAPIsAsync(string ApiManagementName, string ResourceGroupName)
+        public async Task<JToken[]> GetAllAPIObjsAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            JObject oApi = new JObject();
+            int numOfApis = 0;
+            List<JToken> apiObjs = new List<JToken>();
+            do
+            {
+                (string azToken, string azSubId) = await auth.GetAccessToken();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?api-version={4}",
-                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?$skip={4}&api-version={5}",
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfApis, GlobalConstants.APIVersion);
+                numOfApis += GlobalConstants.NumOfRecords;
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+                string apis = await CallApiManagementAsync(azToken, requestUrl);
+
+                oApi = JObject.Parse(apis);
+
+                foreach (var item in oApi["value"])
+                {
+                    apiObjs.Add(item);
+                }
+            }
+            while (oApi["nextLink"] != null);
+            return apiObjs.ToArray();
         }
 
         public async Task<string> GetAPIChangeLogAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
@@ -199,12 +231,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             #region Operations
 
             // pull api operations for service
-            string operations = await GetAPIOperationsAsync(apimname, resourceGroup, apiName);
-            JObject oOperations = JObject.Parse(operations);
+            string[] operationNames = await GetAllOperationNames(apimname, resourceGroup, apiName);
 
-            foreach (var item in oOperations["value"])
+            foreach (string operationName in operationNames)
             {
-                string operationName = ((JValue)item["name"]).Value.ToString();
                 string operationDetails = await GetAPIOperationDetailsAsync(apimname, resourceGroup, apiName, operationName);
 
                 Console.WriteLine("'{0}' Operation found", operationName);
@@ -422,7 +452,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     // add other API revision resources to template
                     apiResources = await GenerateSingleAPIResourceAsync(curApi, exc.sourceApimName, exc.resourceGroup, exc.fileFolder, exc.policyXMLBaseUrl);
-                    
+
                     // make current API a dependency to other revisions, in case destination apim doesn't have the this API 
                     TemplateResource apiResource = apiResources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as TemplateResource;
                     List<TemplateResource> newResourcesList = ExtractorUtils.removeResourceType(ResourceTypeConstants.API, apiResources);
@@ -483,12 +513,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             #region Operations
 
             // pull api operations for service
-            string operations = await GetAPIOperationsAsync(apimname, resourceGroup, apiName);
-            JObject oOperations = JObject.Parse(operations);
+            string[] operationNames = await GetAllOperationNames(apimname, resourceGroup, apiName);
 
-            foreach (var item in oOperations["value"])
+            foreach (string operationName in operationNames)
             {
-                string operationName = ((JValue)item["name"]).Value.ToString();
                 string operationDetails = await GetAPIOperationDetailsAsync(apimname, resourceGroup, apiName, operationName);
 
                 Console.WriteLine("'{0}' Operation found", operationName);
@@ -715,12 +743,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // when extract all APIs and generate one master template
             else
             {
-                JObject oApi = await GetAllAPIsFromAPIM(apimname, resourceGroup, policyXMLBaseUrl);
-                Console.WriteLine("{0} APIs found ...", ((JContainer)oApi["value"]).Count.ToString());
+                JToken[] oApis = await GetAllAPIObjsAsync(apimname, resourceGroup);
+                Console.WriteLine("{0} APIs found ...", (oApis.Count().ToString()));
 
-                for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
+                foreach (JToken oApi in oApis)
                 {
-                    string apiName = ((JValue)oApi["value"][i]["name"]).Value.ToString();
+                    string apiName = ((JValue)oApi["name"]).Value.ToString();
                     templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl));
                 }
             }
@@ -759,14 +787,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
             }
             return false;
-        }
-
-        public async Task<JObject> GetAllAPIsFromAPIM(string apimname, string resourceGroup, string policyXMLBaseUrl)
-        {
-            // pull all apis from service
-            string apis = await GetAPIsAsync(apimname, resourceGroup);
-            JObject oApi = JObject.Parse(apis);
-            return oApi;
         }
 
         private async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
