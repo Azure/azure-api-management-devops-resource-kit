@@ -771,7 +771,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // when extract all APIs and generate one master template
             else
             {
-                JToken[] oApis = await GetAllAPIObjsAsync(apimname, resourceGroup, policyXMLBaseUrl);
+                JToken[] oApis = await GetAllAPIObjsAsync(apimname, resourceGroup);
                 Console.WriteLine("{0} APIs found ...", (oApis.Count().ToString()));
 
                 foreach (JToken oApi in oApis)
