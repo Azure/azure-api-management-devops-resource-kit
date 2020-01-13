@@ -20,11 +20,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateTagsTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateTagsTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources, string policyXMLBaseUrl, string policyXMLSasToken)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting tags from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
 
             // isolate tag and api operation associations in the case of a single api extraction
             var apiOperationTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIOperationTag);

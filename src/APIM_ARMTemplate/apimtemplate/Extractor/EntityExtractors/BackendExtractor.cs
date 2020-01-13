@@ -30,11 +30,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateBackendsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateBackendsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources, string policyXMLBaseUrl, string policyXMLSasToken)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting backends from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

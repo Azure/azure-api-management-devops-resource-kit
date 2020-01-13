@@ -30,11 +30,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAPIVersionSetsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateAPIVersionSetsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl, string policyXMLSasToken)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting API version sets from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
 
             // isolate apis in the case of a single api extraction
             var apiResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
