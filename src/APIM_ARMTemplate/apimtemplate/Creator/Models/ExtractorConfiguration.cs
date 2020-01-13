@@ -9,8 +9,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string apiName { get; set; }
         public string mutipleAPIs { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
+        public string linkedTemplatesSasToken { get; set; }
         public string linkedTemplatesUrlQueryString { get; set; }
         public string policyXMLBaseUrl { get; set; }
+        public string policyXMLSasToken { get; set; }
         public string splitAPIs { get; set; }
         public string apiVersionSetName { get; set; }
         public string includeAllRevisions { get; set; }
@@ -23,8 +25,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string resourceGroup { get; private set; }
         public string fileFolder { get; private set; }
         public string linkedTemplatesBaseUrl { get; private set; }
+        public string linkedTemplatesSasToken { get; private set; }
         public string linkedTemplatesUrlQueryString { get; private set; }
         public string policyXMLBaseUrl { get; private set; }
+        public string policyXMLSasToken { get; private set; }
         public string apiVersionSetName { get; private set; }
         public bool includeAllRevisions { get; private set; }
 
@@ -35,8 +39,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.resourceGroup = exc.resourceGroup;
             this.fileFolder = dirName;
             this.linkedTemplatesBaseUrl = exc.linkedTemplatesBaseUrl;
+            this.linkedTemplatesSasToken = exc.linkedTemplatesSasToken;
             this.linkedTemplatesUrlQueryString = exc.linkedTemplatesUrlQueryString;
             this.policyXMLBaseUrl = exc.policyXMLBaseUrl;
+            this.policyXMLSasToken = exc.policyXMLSasToken;
             this.apiVersionSetName = exc.apiVersionSetName;
             this.includeAllRevisions = checkIncludeRevision(exc.includeAllRevisions);
         }
@@ -48,8 +54,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.resourceGroup = exc.resourceGroup;
             this.fileFolder = exc.fileFolder;
             this.linkedTemplatesBaseUrl = exc.linkedTemplatesBaseUrl;
+            this.linkedTemplatesSasToken = exc.linkedTemplatesSasToken;
             this.linkedTemplatesUrlQueryString = exc.linkedTemplatesUrlQueryString;
             this.policyXMLBaseUrl = exc.policyXMLBaseUrl;
+            this.policyXMLSasToken = exc.policyXMLSasToken;
             this.apiVersionSetName = exc.apiVersionSetName;
             this.includeAllRevisions = checkIncludeRevision(exc.includeAllRevisions);
         }
