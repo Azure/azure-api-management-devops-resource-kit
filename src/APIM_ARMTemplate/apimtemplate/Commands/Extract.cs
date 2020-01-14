@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
@@ -10,17 +12,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             this.Name = GlobalConstants.ExtractName;
             this.Description = GlobalConstants.ExtractDescription;
-            var filePath = this.Option("--extractorConfig <extractorConfig>", "Config file of the extractor", CommandOptionType.SingleValue);
-           
+            var extractorConfigFilePathOption = this.Option("--extractorConfig <extractorConfig>", "Config file of the extractor", CommandOptionType.SingleValue);
+            AddExtractorConfigPropertiesToCommandLineOptions();
+
             this.HelpOption();
 
             this.OnExecute(async () =>
             {
-                // convert config file to extractorConfig class
-                FileReader fileReader = new FileReader();
-                string extractorConfigPath = filePath.HasValue() ? filePath.Value().ToString() : null;
+                ExtractorConfig extractorConfig = new ExtractorConfig();
 
-                ExtractorConfig extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig(extractorConfigPath);
+                if (extractorConfigFilePathOption.HasValue())
+                {
+                    var fileReader = new FileReader();
+                    extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig(extractorConfigFilePathOption.Value().ToString());
+                }
+
+                UpdateExtractorConfigFromAdditionalArguments(extractorConfig);
 
                 try
                 {
@@ -88,6 +95,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     throw;
                 }
             });
+        }
+
+        private void AddExtractorConfigPropertiesToCommandLineOptions()
+        {
+            foreach (var propertyInfo in typeof(ExtractorConfig).GetProperties())
+            {
+                var description = Attribute.IsDefined(propertyInfo, typeof(DescriptionAttribute)) ? (Attribute.GetCustomAttribute(propertyInfo, typeof(DescriptionAttribute)) as DescriptionAttribute).Description : string.Empty;
+
+                this.Option($"--{propertyInfo.Name} <{propertyInfo.Name}>", description, CommandOptionType.SingleValue);
+            }
+        }
+
+        private void UpdateExtractorConfigFromAdditionalArguments(ExtractorConfig extractorConfig)
+        {
+            var extractorConfigType = typeof(ExtractorConfig);
+            foreach (var option in this.Options.Where(o => o.HasValue()))
+            {
+                extractorConfigType.GetProperty(option.LongName)?.SetValue(extractorConfig, option.Value());
+            }
         }
     }
 }

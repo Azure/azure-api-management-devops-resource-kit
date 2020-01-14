@@ -309,10 +309,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         // validation check, some parameter can't be used at the same time, and check required parameters are passed in
         public static void validationCheck(ExtractorConfig exc)
         {
-            if (exc.sourceApimName == null) throw new Exception("Missing parameter <sourceApimName>.");
-            if (exc.destinationApimName == null) throw new Exception("Missing parameter <destinationApimName>.");
-            if (exc.resourceGroup == null) throw new Exception("Missing parameter <resourceGroup>.");
-            if (exc.fileFolder == null) throw new Exception("Missing parameter <filefolder>.");
+            if (string.IsNullOrEmpty(exc.sourceApimName)) throw new Exception("Missing parameter <sourceApimName>.");
+            if (string.IsNullOrEmpty(exc.destinationApimName)) throw new Exception("Missing parameter <destinationApimName>.");
+            if (string.IsNullOrEmpty(exc.resourceGroup)) throw new Exception("Missing parameter <resourceGroup>.");
+            if (string.IsNullOrEmpty(exc.fileFolder)) throw new Exception("Missing parameter <filefolder>.");
 
             bool splitAPIs = exc.splitAPIs != null && exc.splitAPIs.Equals("true");
             bool hasVersionSetName = exc.apiVersionSetName != null;

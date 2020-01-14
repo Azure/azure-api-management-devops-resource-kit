@@ -1,19 +1,31 @@
+using System.ComponentModel;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class ExtractorConfig
     {
+        [Description("Source API Management name")]
         public string sourceApimName { get; set; }
+        [Description("Destination API Management name")]
         public string destinationApimName { get; set; }
+        [Description("Resource Group name")]
         public string resourceGroup { get; set; }
+        [Description("ARM Template files folder")]
         public string fileFolder { get; set; }
+        [Description("API name")]
         public string apiName { get; set; }
         public string mutipleAPIs { get; set; }
+        [Description("Creates a master template with links")]
         public string linkedTemplatesBaseUrl { get; set; }
         public string linkedTemplatesSasToken { get; set; }
+        [Description("Query string appended to linked templates uris that enables retrieval from private storage")]
         public string linkedTemplatesUrlQueryString { get; set; }
+        [Description("Writes policies to local XML files that require deployment to remote folder")]
         public string policyXMLBaseUrl { get; set; }
         public string policyXMLSasToken { get; set; }
+        [Description("Split APIs into multiple templates")]
         public string splitAPIs { get; set; }
+        [Description("Name of the apiVersionSet you want to extract")]
         public string apiVersionSetName { get; set; }
         public string includeAllRevisions { get; set; }
     }

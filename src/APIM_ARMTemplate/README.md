@@ -294,7 +294,12 @@ az account set --subscription <subscription_id>
 ```
 
 #### Extractor Arguments
-**Please go to "extractorparameters.json" to specify the parameters to pass in or pass an argument --extractorConfig which points to a file as defined below.**
+
+You have two choices when specifying your settings:
+1. By using a json file with key-values where the keys matches the table below (see examples below). You can either
+    * use the "extractorparameters.json" to specify your settings
+    * or pass an argument --extractorConfig which points to a file of your choice
+2. Pass the arguments on the command line. For instance `extract --sourceApimName my-feature-apim --destinationApimName company-stable-apim --resourceGroup my-feature-rg --fileFolder c:\temp\apim-extract --apiName MyFeatureV1Api`.
 
 | Property              | Required              | Value                                             |
 |-----------------------|-----------------------|---------------------------------------------------|
@@ -316,7 +321,7 @@ az account set --subscription <subscription_id>
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
 * Can not use "apiName" and "mutipleAPIs" at the same time
 * Can only "includeAllRevisions" with "apiName"
-### Extractor Parameter Example
+### Extractor Parameter File Example
 In **extractorparams.json** file (path: src/APIM_ARMTemplate/apimtemplate/extractorparams.json) <br />
 Executing **a single API extraction with linked templates and policy file** generation, use the following parameters: 
 ```
