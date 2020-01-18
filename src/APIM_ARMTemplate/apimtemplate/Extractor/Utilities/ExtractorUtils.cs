@@ -305,45 +305,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
             return apiDictionary;
         }
-
-        // validation check, some parameter can't be used at the same time, and check required parameters are passed in
-        public static void validationCheck(ExtractorConfig exc)
-        {
-            if (string.IsNullOrEmpty(exc.sourceApimName)) throw new Exception("Missing parameter <sourceApimName>.");
-            if (string.IsNullOrEmpty(exc.destinationApimName)) throw new Exception("Missing parameter <destinationApimName>.");
-            if (string.IsNullOrEmpty(exc.resourceGroup)) throw new Exception("Missing parameter <resourceGroup>.");
-            if (string.IsNullOrEmpty(exc.fileFolder)) throw new Exception("Missing parameter <filefolder>.");
-
-            bool splitAPIs = exc.splitAPIs != null && exc.splitAPIs.Equals("true");
-            bool hasVersionSetName = exc.apiVersionSetName != null;
-            bool hasSingleApi = exc.apiName != null;
-            bool includeRevisions = exc.includeAllRevisions != null && exc.includeAllRevisions.Equals("true");
-            bool hasMultipleAPIs = exc.mutipleAPIs != null;
-
-            if (splitAPIs && hasSingleApi)
-            {
-                throw new Exception("Can't use splitAPIs and apiName at same time");
-            }
-
-            if (splitAPIs && hasVersionSetName)
-            {
-                throw new Exception("Can't use splitAPIs and apiVersionSetName at same time");
-            }
-
-            if ((hasVersionSetName || hasSingleApi) && hasMultipleAPIs)
-            {
-                throw new Exception("Can't use mutipleAPIs with apiName or apiVersionSetName at the same time");
-            }
-
-            if (hasSingleApi && hasVersionSetName)
-            {
-                throw new Exception("Can't use apiName and apiVersionSetName at same time");
-            }
-
-            if (!hasSingleApi && includeRevisions)
-            {
-                throw new Exception("\"includeAllRevisions\" can be used when you specify the API you want to extract with \"apiName\"");
-            }
-        }
     }
 }

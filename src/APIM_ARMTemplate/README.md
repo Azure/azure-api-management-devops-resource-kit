@@ -296,9 +296,8 @@ az account set --subscription <subscription_id>
 #### Extractor Arguments
 
 You have two choices when specifying your settings:
-1. By using a json file with key-values where the keys matches the table below (see examples below). You can either
-    * use the "extractorparameters.json" to specify your settings
-    * or pass an argument --extractorConfig which points to a file of your choice
+1. By using a json file with key-values where the keys matches the table below. Use the `extractorConfig` argument:
+`extract --extractorConfig c:/temp/extractSettings.json`. [See more examples.](#extractorParameterFileExamples)
 2. Pass the arguments on the command line. For instance `extract --sourceApimName my-feature-apim --destinationApimName company-stable-apim --resourceGroup my-feature-rg --fileFolder c:\temp\apim-extract --apiName MyFeatureV1Api`.
 
 | Property              | Required              | Value                                             |
@@ -309,7 +308,8 @@ You have two choices when specifying your settings:
 | fileFolder            | Yes                   | Path to output folder                             |
 | apiName               | No                    | Name of API. If provided, Extractor executes single API extraction. Otherwise, Extractor executes full extraction.  Note:  This is the "Name" value as seen in the API settings, not "Display Name" and is case sensitive.     |
 | linkedTemplatesBaseUrl| No                    | Linked templates remote location. If provided, Extractor generates master template and requires linked templates pushed to remote location.                                   |
-| linkedTemplatesUrlQueryString | No | String   | Query string appended to linked templates uris that enables retrieval from private storage. |
+| linkedTemplatesUrlQueryString | No            | Query string appended to linked templates uris that enables retrieval from private storage. |
+| linkedTemplatesSasToken | No                  | String appended to end of the linked templates uris that enables adding a SAS token or other query parameters. |
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 | splitAPIs     | No                    | If set to "true", then generate multiple api folders, each api will have a seperate folder, with a separate master template to deploy this api. If this single api has a version set, then a version set folder will generate instead, then all apis that belongs to this version set will be included in the version set folder, apis in this version set can be deployed separately using every api's master template, or they can be deployed together using the master template in "VersionSetMasterFolder" folder                        |
 | apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
@@ -321,8 +321,10 @@ You have two choices when specifying your settings:
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
 * Can not use "apiName" and "mutipleAPIs" at the same time
 * Can only "includeAllRevisions" with "apiName"
+
+<a name="extractorParameterFileExamples"></a>
 ### Extractor Parameter File Example
-In **extractorparams.json** file (path: src/APIM_ARMTemplate/apimtemplate/extractorparams.json) <br />
+ 
 Executing **a single API extraction with linked templates and policy file** generation, use the following parameters: 
 ```
 {

@@ -24,15 +24,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 if (extractorConfigFilePathOption.HasValue())
                 {
                     var fileReader = new FileReader();
-                    extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig(extractorConfigFilePathOption.Value().ToString());
+                    extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig(extractorConfigFilePathOption.Value());
                 }
 
                 UpdateExtractorConfigFromAdditionalArguments(extractorConfig);
 
                 try
                 {
-                    //validation check
-                    ExtractorUtils.validationCheck(extractorConfig);
+                    extractorConfig.Validate();
 
                     string singleApiName = extractorConfig.apiName;
                     bool splitAPIs = extractorConfig.splitAPIs != null && extractorConfig.splitAPIs.Equals("true");
