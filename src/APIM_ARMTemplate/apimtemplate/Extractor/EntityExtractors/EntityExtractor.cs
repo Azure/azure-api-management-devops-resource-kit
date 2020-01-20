@@ -1,9 +1,10 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -11,9 +12,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
     {
         public string baseUrl = "https://management.azure.com";
         internal Authentication auth = new Authentication();
+        private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
 
         public static async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
         {
+            if (_cache.TryGetValue(requestUrl, out string cachedResponseBody))
+            {
+                return cachedResponseBody;
+            }
+
             using (HttpClient httpClient = new HttpClient())
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
@@ -24,6 +31,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
+
+                _cache.Set(requestUrl, responseBody);
+
                 return responseBody;
             }
         }
