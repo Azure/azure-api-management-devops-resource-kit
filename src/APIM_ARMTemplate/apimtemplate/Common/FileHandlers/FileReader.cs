@@ -62,10 +62,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
         public ExtractorConfig ConvertConfigJsonToExtractorConfig(string extractorJsonPath)
         {
-            if (extractorJsonPath == null)
+            if (string.IsNullOrWhiteSpace(extractorJsonPath) || !File.Exists(extractorJsonPath))
             {
-                extractorJsonPath = "extractorparams.json";
+                throw new FileNotFoundException($"You have to specify an existing file, you specified: '{extractorJsonPath}'");
             }
+
             using (StreamReader r = new StreamReader(extractorJsonPath))
             {
                 string extractorJson = r.ReadToEnd();
