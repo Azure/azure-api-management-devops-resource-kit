@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Linq;
+using System.Threading.Tasks;
+using apimtemplate.Extractor.Utilities;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -786,7 +787,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         private static void ArmEscapeSampleValueIfNecessary(OperationTemplateRepresentation operationTemplateRepresentation)
         {
-            if (!string.IsNullOrWhiteSpace(operationTemplateRepresentation.sample) && operationTemplateRepresentation.contentType == "application/json" && JToken.Parse(operationTemplateRepresentation.sample).Type == JTokenType.Array)
+            if (!string.IsNullOrWhiteSpace(operationTemplateRepresentation.sample) && operationTemplateRepresentation.contentType == "application/json" && operationTemplateRepresentation.sample.TryParseJson(out JToken sampleAsJToken) && sampleAsJToken.Type == JTokenType.Array)
             {
                 operationTemplateRepresentation.sample = "[" + operationTemplateRepresentation.sample;
             }
