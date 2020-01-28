@@ -47,12 +47,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     // initialize file helper classes
                     FileWriter fileWriter = new FileWriter();
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
-                    FileNames fileNames = fileNameGenerator.GenerateFileNames(extractorConfig.sourceApimName);
+                    FileNames fileNames = extractorConfig.baseFileName == null ?  fileNameGenerator.GenerateFileNames(extractorConfig.sourceApimName) : fileNameGenerator.GenerateFileNames(extractorConfig.baseFileName);
 
                     if (splitAPIs)
                     {
                         // create split api templates for all apis in the sourceApim
                         await ExtractorUtils.GenerateSplitAPITemplates(extractorConfig, fileNameGenerator, fileWriter, fileNames);
+                        await ExtractorUtils.GenerateTemplates(new Extractor(extractorConfig), null, null, fileNameGenerator, fileNames, fileWriter, null);
                     }
                     else if (hasVersionSetName)
                     {

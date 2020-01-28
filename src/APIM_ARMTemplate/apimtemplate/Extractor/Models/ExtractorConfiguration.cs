@@ -32,7 +32,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string apiVersionSetName { get; set; }
         [Description("Includes all revisions for a single api - use with caution")]
         public string includeAllRevisions { get; set; }
-
+        [Description("Specify base name of the template file")]
+        public string baseFileName { get; set; }
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");

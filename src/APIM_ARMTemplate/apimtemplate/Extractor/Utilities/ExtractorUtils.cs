@@ -68,7 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template globalServicePolicyTemplate = await policyExtractor.GenerateGlobalServicePolicyTemplateAsync(sourceApim, resourceGroup, policyXMLBaseUrl, policyXMLSasToken, dirName);
             if (apiTemplate == null)
             {
-                apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, multipleApiNames, policyXMLBaseUrl, policyXMLSasToken, dirName);
+                apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(singleApiName, multipleApiNames, exc);
             }
             List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
             Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
