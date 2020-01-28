@@ -35,6 +35,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | linkedTemplatesUrlQueryString| string                | No                    | Query string appended to linked templates uris that enables retrieval from private storage. |
 | tags                   | Array<[TagConfiguration](#tagConfiguration)>      | No                   | List of Tags configurations.                                |
 | subscriptionKeyParameterNames | APITemplateSubscriptionKeyParameterNames      | No                   | subscription key parameter name.                    |
+| baseFileName | string      | No                   | base file name for the templates file               |
 
 #### APIConfiguration
 
@@ -257,6 +258,7 @@ outputLocation: C:\Users\myUsername\GeneratedTemplates
 linked: false
 linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
 linkedTemplatesUrlQueryString : ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-22T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFTldJEYPH888QVzKb7q7eLq0Xt%2Bu35UTqpFGUYo6uc%3D
+baseFileName: baseName
 ```
 
 <a name="creator2"></a>
@@ -315,6 +317,7 @@ You have two choices when specifying your settings:
 | apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
 | mutipleAPIs  | No                    | Specify multiple APIs to extract. Generate templates for each API, also generate an aggregated templates folder to deploy these APIs together at a time      |
 | includeAllRevisions  | No                    |  Set to "true" will extract all revisions for the single API. Will work only with "apiName" paramter, where you specify which API's revisions to extract. Generate templates for each revision, also generate an aggregated master folder to deploy these revisions together at one time. Note: there are many complicated issues with deploying revisions, make sure your deployment won't overwrite or break the existing ones      |
+| baseFileName  | No                    | Specify base file name of the templates file      |
 
 
 #### Note
@@ -395,6 +398,19 @@ Extract **multiple APIs**, use the following parameters:
     "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
     "policyXMLBaseUrl": "<policies_remote_location>",
     "mutipleAPIs": "api1, api2, api3"
+}
+```
+Extract **single API with baseFileName**, use the following parameters: 
+```
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>",
+    "apiName": "<api_name>",
+    "baseFileName": "<base_file_name>"
 }
 ```
 
