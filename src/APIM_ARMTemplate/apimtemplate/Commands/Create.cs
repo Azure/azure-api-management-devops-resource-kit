@@ -34,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // initialize file helper classes
                     FileWriter fileWriter = new FileWriter();
                     FileNameGenerator fileNameGenerator = new FileNameGenerator();
-                    FileNames fileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
+                    FileNames fileNames = creatorConfig.baseFileName == null ? fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName) : fileNameGenerator.GenerateFileNames(creatorConfig.baseFileName);
 
                     // initialize template creator classes
                     APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();

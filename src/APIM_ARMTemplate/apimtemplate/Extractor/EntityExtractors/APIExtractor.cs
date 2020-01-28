@@ -188,9 +188,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<List<TemplateResource>> GenerateSingleAPIResourceAsync(string apiName, string apimname, string resourceGroup, string fileFolder, string policyXMLBaseUrl, string policyXMLSasToken)
+        public async Task<List<TemplateResource>> GenerateSingleAPIResourceAsync(string apiName, Extractor exc)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
+            string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken; 
             string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, apiName);
 
             Console.WriteLine("------------------------------------------");
@@ -283,7 +284,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     {
                         string policyXMLContent = operationPolicyResource.properties.value;
                         string policyFolder = String.Concat(fileFolder, $@"/policies");
-                        string operationPolicyFileName = $@"/{operationName}-operationPolicy.xml";
+                        string operationPolicyFileName = $@"/{apiName}-{operationName}-operationPolicy.xml";
                         this.fileWriter.CreateFolderIfNotExists(policyFolder);
                         this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, operationPolicyFileName));
                         operationPolicyResource.properties.format = "rawxml-link";
@@ -451,7 +452,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
-            List<TemplateResource> apiResources = await GenerateSingleAPIResourceAsync(apiName, exc.sourceApimName, exc.resourceGroup, exc.fileFolder, exc.policyXMLBaseUrl, exc.policyXMLSasToken);
+            List<TemplateResource> apiResources = await GenerateSingleAPIResourceAsync(apiName, exc);
             templateResources.AddRange(apiResources);
 
             foreach (string curApi in revList)
@@ -460,13 +461,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 if (curApi.Equals(currentRevision))
                 {
                     // add current API revision resource to template
-                    apiResources = await GenerateCurrentRevisionAPIResourceAsync(curApi, exc.sourceApimName, exc.resourceGroup, exc.fileFolder, exc.policyXMLBaseUrl, exc.policyXMLSasToken);
+                    apiResources = await GenerateCurrentRevisionAPIResourceAsync(curApi, exc);
                     templateResources.AddRange(apiResources);
                 }
                 else
                 {
                     // add other API revision resources to template
-                    apiResources = await GenerateSingleAPIResourceAsync(curApi, exc.sourceApimName, exc.resourceGroup, exc.fileFolder, exc.policyXMLBaseUrl, exc.policyXMLSasToken);
+                    apiResources = await GenerateSingleAPIResourceAsync(curApi, exc);
                     
                     // make current API a dependency to other revisions, in case destination apim doesn't have the this API 
                     TemplateResource apiResource = apiResources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as TemplateResource;
@@ -485,9 +486,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         }
 
         // this function will get the current revision of this api and will remove "isCurrent" paramter
-        public async Task<List<TemplateResource>> GenerateCurrentRevisionAPIResourceAsync(string apiName, string apimname, string resourceGroup, string fileFolder, string policyXMLBaseUrl, string policyXMLSasToken)
+        public async Task<List<TemplateResource>> GenerateCurrentRevisionAPIResourceAsync(string apiName, Extractor exc)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
+            string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken;
             string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, apiName);
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting resources from {0} API:", apiName);
@@ -579,7 +581,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     {
                         string policyXMLContent = operationPolicyResource.properties.value;
                         string policyFolder = String.Concat(fileFolder, $@"/policies");
-                        string operationPolicyFileName = $@"/{operationName}-operationPolicy.xml";
+                        string operationPolicyFileName = $@"/{apiName}-{operationName}-operationPolicy.xml";
                         this.fileWriter.CreateFolderIfNotExists(policyFolder);
                         this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, operationPolicyFileName));
                         operationPolicyResource.properties.format = "rawxml-link";
@@ -739,10 +741,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return templateResources;
         }
 
-        public async Task<Template> GenerateAPIsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<string> multipleApiNames, string policyXMLBaseUrl, string policyXMLSasToken, string fileFolder)
+        public async Task<Template> GenerateAPIsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, Extractor exc)
         {
             // initialize arm template
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
+            Template armTemplate = GenerateEmptyTemplateWithParameters(exc.policyXMLBaseUrl, exc.policyXMLSasToken);
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // when extract single API
@@ -751,9 +753,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // check if this api exist
                 try
                 {
-                    string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, singleApiName);
+                    string apiDetails = await GetAPIDetailsAsync(exc.sourceApimName, exc.resourceGroup, singleApiName);
                     Console.WriteLine("{0} API found ...", singleApiName);
-                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl, policyXMLSasToken));
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, exc));
                 }
                 catch (Exception)
                 {
@@ -766,19 +768,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Console.WriteLine("{0} APIs found ...", multipleApiNames.Count().ToString());
                 foreach (string apiName in multipleApiNames)
                 {
-                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl, policyXMLSasToken));
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, exc));
                 }
             }
             // when extract all APIs and generate one master template
             else
             {
-                JToken[] oApis = await GetAllAPIObjsAsync(apimname, resourceGroup);
+                JToken[] oApis = await GetAllAPIObjsAsync(exc.sourceApimName, exc.resourceGroup);
                 Console.WriteLine("{0} APIs found ...", (oApis.Count().ToString()));
 
                 foreach (JToken oApi in oApis)
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, apimname, resourceGroup, fileFolder, policyXMLBaseUrl, policyXMLSasToken));
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, exc));
                 }
             }
             armTemplate.resources = templateResources.ToArray();
