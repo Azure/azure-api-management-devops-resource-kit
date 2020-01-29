@@ -34,6 +34,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string includeAllRevisions { get; set; }
         [Description("Specify base name of the template file")]
         public string baseFileName { get; set; }
+        [Description("ServiceUrl parameters")]
+        public serviceUrlProperty[] serviceUrlParameters { get; set; }
+        [Description("Parameterize serviceUrl")]
+        public string paramServiceUrl { get; set; }
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -87,6 +91,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string policyXMLSasToken { get; private set; }
         public string apiVersionSetName { get; private set; }
         public bool includeAllRevisions { get; private set; }
+        public serviceUrlProperty[] serviceUrlParameters { get; set; }
+        public bool paramServiceUrl { get; private set; }
 
         public Extractor(ExtractorConfig exc, string dirName)
         {
@@ -101,10 +107,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.policyXMLSasToken = exc.policyXMLSasToken;
             this.apiVersionSetName = exc.apiVersionSetName;
             this.includeAllRevisions = exc.includeAllRevisions != null && exc.includeAllRevisions.Equals("true");
+            this.serviceUrlParameters = exc.serviceUrlParameters;
+            this.paramServiceUrl = (exc.paramServiceUrl != null && exc.paramServiceUrl.Equals("true")) || exc.serviceUrlParameters != null;
         }
 
-        public Extractor(ExtractorConfig exc): this(exc, exc.fileFolder)
+        public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)
         {
+        }
+    }
+
+    public class serviceUrlProperty
+    {
+        public string apiName { get; private set; }
+        public string serviceUrl { get; private set; }
+        public serviceUrlProperty (string apiName, string serviceUrl) {
+            this.apiName = apiName;
+            this.serviceUrl = serviceUrl;
         }
     }
 }
