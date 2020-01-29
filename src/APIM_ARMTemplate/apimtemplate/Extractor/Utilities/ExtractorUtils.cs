@@ -77,7 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
             Template productTemplate = await productExtractor.GenerateProductsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken, dirName);
             List<TemplateResource> productTemplateResources = productTemplate.resources.ToList();
-            Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
+            Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc);
             Template tagTemplate = await tagExtractor.GenerateTagsTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, productTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
             List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
             Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl, policyXMLSasToken);
@@ -248,6 +248,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (Char.IsDigit(validApiName.First()))
             {
                 return "Api" + validApiName;
+            }
+            else
+            {
+                return validApiName;
+            }
+        }
+
+        public static string GenValidPropertyParamName(string propertyName)
+        {
+            string validApiName = Regex.Replace(propertyName, "[^a-zA-Z0-9]", "");
+            if (Char.IsDigit(validApiName.First()))
+            {
+                return "Property" + validApiName;
             }
             else
             {
