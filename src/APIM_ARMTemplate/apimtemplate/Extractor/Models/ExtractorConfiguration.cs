@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
             if (string.IsNullOrEmpty(destinationApimName)) throw new ArgumentException("Missing parameter <destinationApimName>.");
             if (string.IsNullOrEmpty(resourceGroup)) throw new ArgumentException("Missing parameter <resourceGroup>.");
-            if (string.IsNullOrEmpty(fileFolder)) throw new ArgumentException("Missing parameter <filefolder>.");
+            if (string.IsNullOrEmpty(fileFolder)) throw new ArgumentException("Missing parameter <fileFolder>.");
 
             bool shouldSplitAPIs = splitAPIs != null && splitAPIs.Equals("true");
             bool hasVersionSetName = apiVersionSetName != null;
