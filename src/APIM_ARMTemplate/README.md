@@ -317,7 +317,11 @@ You have two choices when specifying your settings:
 | apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
 | mutipleAPIs  | No                    | Specify multiple APIs to extract. Generate templates for each API, also generate an aggregated templates folder to deploy these APIs together at a time      |
 | includeAllRevisions  | No                    |  Set to "true" will extract all revisions for the single API. Will work only with "apiName" paramter, where you specify which API's revisions to extract. Generate templates for each revision, also generate an aggregated master folder to deploy these revisions together at one time. Note: there are many complicated issues with deploying revisions, make sure your deployment won't overwrite or break the existing ones      |
-| baseFileName  | No                    | Specify base file name of the templates file      |
+| baseFileName  | No                    | Specify base file name of the template files      |
+|  policyXMLSasToken | No                    | Specify sasToken for fetching policy files    |
+|  linkedTemplatesSasToken | No                    | Specify sasToken for fetching linkedTemplate files    |
+| serviceUrlParameters  | No                    | Parameterize service url in advance (you can replace serviceUrl afterwards as well, you can refer example for more information).  |
+|  paramServiceUrl | No                    |  Set to "true" will parameterize all serviceUrl for each api and generate serviceUrl parameter in apiTemplate/parameter/masterTemplate files |
 
 
 #### Note
@@ -411,6 +415,39 @@ Extract **single API with baseFileName**, use the following parameters:
     "policyXMLBaseUrl": "<policies_remote_location>",
     "apiName": "<api_name>",
     "baseFileName": "<base_file_name>"
+}
+```
+Extract **all APIs with serviceUrlParameters**, use the following parameters: 
+```
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>",
+    "serviceUrlParameters": [
+      {
+         "apiName": "test",
+         "serviceUrl": "http://url.com"
+      },
+      {  
+         "apiName": "api2",
+         "serviceUrl": "http://url2.com"
+      }
+    ]
+}
+```
+Extract **all APIs within parameterServiceUrl**, use the following parameters: 
+```
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "policyXMLBaseUrl": "<policies_remote_location>",
+    "paramServiceUrl": "true"
 }
 ```
 
