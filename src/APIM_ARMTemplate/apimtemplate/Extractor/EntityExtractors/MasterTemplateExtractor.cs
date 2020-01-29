@@ -2,6 +2,7 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Linq;
 using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 dependsOnNamedValues = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]" };
                 apiDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]");
                 string namedValuesUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.namedValues);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken(namedValueDeploymentResourceName, namedValuesUri, new string[] { }, exc));
+                resources.Add(this.CreateLinkedMasterTemplateResourceForPropertyTemplate(namedValueDeploymentResourceName, namedValuesUri, new string[] { }, exc));
             }
 
             // globalServicePolicy
@@ -123,6 +124,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (exc.paramServiceUrl)
             {
                 masterResourceTemplate.properties.parameters.Add("serviceUrl", new TemplateParameterProperties() { value = "[parameters('serviceUrl')]" });
+            }
+            return masterResourceTemplate;
+        }
+
+        public MasterTemplateResource CreateLinkedMasterTemplateResourceForPropertyTemplate(string name, string uriLink, string[] dependsOn, Extractor exc)
+        {
+            MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
+            if (exc.policyXMLSasToken != null)
+            {
+                masterResourceTemplate.properties.parameters.Add("PolicyXMLSasToken", new TemplateParameterProperties() { value = "[parameters('PolicyXMLSasToken')]" });
+            }
+            if (exc.paramNamedValue)
+            {
+                masterResourceTemplate.properties.parameters.Add("NamedValues", new TemplateParameterProperties() { value = "[parameters('NamedValues')]" });
             }
             return masterResourceTemplate;
         }
@@ -255,6 +270,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     type = "object"
                 };
                 parameters.Add("serviceUrl", paramServiceUrlProperties);
+            }
+            if (exc.paramNamedValue)
+            {
+                TemplateParameterProperties namedValueProperties = new TemplateParameterProperties()
+                {
+                    metadata = new TemplateParameterMetadata()
+                    {
+                        description = "Named values"
+                    },
+                    type = "object"
+                };
+                parameters.Add("NamedValues", namedValueProperties);
             }
             return parameters;
         }
@@ -403,6 +430,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     value = serviceUrls
                 };
                 parameters.Add("serviceUrl", serviceUrlProperties);
+            }
+            if (exc.paramNamedValue)
+            {
+                Dictionary<string, string> namedValues = new Dictionary<string, string>();
+                PropertyExtractor pExc = new PropertyExtractor();
+                string properties = await pExc.GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
+                JObject oProperties = JObject.Parse(properties);
+
+                foreach (var extractedProperty in oProperties["value"])
+                {
+                    string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
+                    string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
+                    PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+                    string propertyValue = propertyTemplateResource.properties.value;
+                    string validPName = ExtractorUtils.GenValidPropertyParamName(propertyName);
+                    namedValues.Add(validPName, propertyValue);
+                }
+                TemplateServiceUrlProperties namedValueProperties = new TemplateServiceUrlProperties()
+                {
+                    value = namedValues
+                };
+                parameters.Add("NamedValues", namedValueProperties);
             }
             masterTemplate.parameters = parameters;
             return masterTemplate;

@@ -38,6 +38,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public serviceUrlProperty[] serviceUrlParameters { get; set; }
         [Description("Parameterize serviceUrl")]
         public string paramServiceUrl { get; set; }
+        [Description("Parameterize named values")]
+        public string paramNamedValue { get; set; }
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -93,6 +95,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public bool includeAllRevisions { get; private set; }
         public serviceUrlProperty[] serviceUrlParameters { get; set; }
         public bool paramServiceUrl { get; private set; }
+        public bool paramNamedValue { get; private set; }
 
         public Extractor(ExtractorConfig exc, string dirName)
         {
@@ -109,6 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.includeAllRevisions = exc.includeAllRevisions != null && exc.includeAllRevisions.Equals("true");
             this.serviceUrlParameters = exc.serviceUrlParameters;
             this.paramServiceUrl = (exc.paramServiceUrl != null && exc.paramServiceUrl.Equals("true")) || exc.serviceUrlParameters != null;
+            this.paramNamedValue = exc.paramNamedValue != null && exc.paramNamedValue.Equals("true");
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)

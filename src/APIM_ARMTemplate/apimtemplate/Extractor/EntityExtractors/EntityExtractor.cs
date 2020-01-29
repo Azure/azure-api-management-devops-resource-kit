@@ -45,6 +45,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return armTemplate;
         }
 
+        public Template GenerateEmptyPropertyTemplateWithParameters(Extractor exc)
+        {
+            Template armTemplate = GenerateEmptyTemplate();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
+            {
+                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add("PolicyXMLSasToken", policyTemplateSasTokenParameterProperties);
+            }
+            if (exc.policyXMLBaseUrl != null)
+            {
+                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add("PolicyXMLBaseUrl", policyTemplateBaseUrlParameterProperties);
+            }
+            if (exc.paramNamedValue)
+            {
+                TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add("NamedValues", namedValueParameterProperties);
+            }
+            return armTemplate;
+        }
+
         public Template GenerateEmptyTemplateWithParameters(string policyXMLBaseUrl, string policyXMLSasToken)
         {
             Template armTemplate = GenerateEmptyTemplate();
