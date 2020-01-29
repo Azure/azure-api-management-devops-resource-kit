@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -82,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl, policyXMLSasToken);
 
             // create parameters file
-            Template templateParameters = masterTemplateExtractor.CreateMasterTemplateParameterValues(destinationApim, linkedBaseUrl, linkedSasToken, linkedUrlQueryString, policyXMLBaseUrl, policyXMLSasToken);
+            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(singleApiName, multipleApiNames, exc);
 
             // write templates to output file location
             string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
@@ -126,7 +127,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(
                     apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate,
                     loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
-                    tagTemplate, fileNames, apiFileName, linkedUrlQueryString, linkedSasToken, policyXMLBaseUrl, policyXMLSasToken);
+                    tagTemplate, fileNames, apiFileName, exc);
 
                 fileWriter.WriteJSONToFile(masterTemplate, String.Concat(@dirName, fileNames.linkedMaster));
             }
@@ -238,6 +239,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                     Console.WriteLine($@"Finish extracting API {apiName}");
                 }
+            }
+        }
+
+        public static string GenValidApiParamName(string apiName)
+        {
+            string validApiName = Regex.Replace(apiName, "[^a-zA-Z0-9]", "");
+            if (Char.IsDigit(validApiName.First()))
+            {
+                return "Api" + validApiName;
+            }
+            else
+            {
+                return validApiName;
             }
         }
 

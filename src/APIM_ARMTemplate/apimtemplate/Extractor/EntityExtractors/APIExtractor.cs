@@ -74,6 +74,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
+        public async Task<string> GetAPIServiceUrl(string ApiManagementName, string ResourceGroupName, string ApiName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+
+            string apiDetails = await CallApiManagementAsync(azToken, requestUrl);
+            JObject oApiDetails = JObject.Parse(apiDetails);
+            APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
+            return apiResource.properties.serviceUrl;    
+        }
+
         public async Task<string> GetAPIDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
@@ -191,7 +204,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<List<TemplateResource>> GenerateSingleAPIResourceAsync(string apiName, Extractor exc)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken; 
+            string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken;
             string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, apiName);
 
             Console.WriteLine("------------------------------------------");
@@ -206,6 +219,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             apiResource.name = $"[concat(parameters('ApimServiceName'), '/{oApiName}')]";
             apiResource.apiVersion = GlobalConstants.APIVersion;
             apiResource.scale = null;
+
+            if (exc.paramServiceUrl)
+            {
+                apiResource.properties.serviceUrl = $"[parameters('serviceUrl').{ExtractorUtils.GenValidApiParamName(apiName)}]";
+            }
 
             if (apiResource.properties.apiVersionSetId != null)
             {
@@ -468,7 +486,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     // add other API revision resources to template
                     apiResources = await GenerateSingleAPIResourceAsync(curApi, exc);
-                    
+
                     // make current API a dependency to other revisions, in case destination apim doesn't have the this API 
                     TemplateResource apiResource = apiResources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as TemplateResource;
                     List<TemplateResource> newResourcesList = ExtractorUtils.removeResourceType(ResourceTypeConstants.API, apiResources);
@@ -503,6 +521,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             apiResource.apiVersion = GlobalConstants.APIVersion;
             apiResource.scale = null;
             apiResource.properties.isCurrent = null;
+
+            if (exc.paramServiceUrl)
+            {
+                apiResource.properties.serviceUrl = $"[parameters('serviceUrl').{ExtractorUtils.GenValidApiParamName(apiName)}]";
+            }
 
             if (apiResource.properties.apiVersionSetId != null)
             {
@@ -744,9 +767,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateAPIsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, Extractor exc)
         {
             // initialize arm template
-            Template armTemplate = GenerateEmptyTemplateWithParameters(exc.policyXMLBaseUrl, exc.policyXMLSasToken);
+            Template armTemplate = GenerateEmptyApiTemplateWithParameters(exc);
             List<TemplateResource> templateResources = new List<TemplateResource>();
-
             // when extract single API
             if (singleApiName != null)
             {
