@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
                 string apiVersionSetUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.apiVersionSets);
-                resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, dependsOnNamedValues));
+                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("versionSetTemplate", apiVersionSetUri, dependsOnNamedValues, exc));
             }
 
             // product
@@ -71,14 +71,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
                 string productsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.products);
-                resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, dependsOnNamedValues));
+                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("productsTemplate", productsUri, dependsOnNamedValues, exc));
             }
 
             if (tagTemplate != null && tagTemplate.resources.Count() != 0)
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
                 string tagUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.tags);
-                resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, dependsOnNamedValues));
+                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("tagTemplate", tagUri, dependsOnNamedValues, exc));
             }
 
             // logger
@@ -86,7 +86,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'loggersTemplate')]");
                 string loggersUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.loggers);
-                resources.Add(this.CreateLinkedMasterTemplateResource("loggersTemplate", loggersUri, dependsOnNamedValues));
+                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("loggersTemplate", loggersUri, dependsOnNamedValues, exc));
             }
 
             // backend
@@ -94,7 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'backendsTemplate')]");
                 string backendsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.backends);
-                resources.Add(this.CreateLinkedMasterTemplateResource("backendsTemplate", backendsUri, dependsOnNamedValues));
+                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("backendsTemplate", backendsUri, dependsOnNamedValues, exc));
             }
 
             // authorizationServer
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
                 string authorizationServersUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.authorizationServers);
-                resources.Add(this.CreateLinkedMasterTemplateResource("authorizationServersTemplate", authorizationServersUri, dependsOnNamedValues));
+                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("authorizationServersTemplate", authorizationServersUri, dependsOnNamedValues, exc));
             }
 
             // api
