@@ -40,6 +40,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string paramServiceUrl { get; set; }
         [Description("Parameterize named values")]
         public string paramNamedValue { get; set; }
+        [Description("Specify the loggerId for this api")]
+        public string paramApiLoggerId { get; set; }
+        [Description("Specify the resourceId for this logger")]
+        public string paramLogResourceId { get; set; }
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -96,6 +100,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public serviceUrlProperty[] serviceUrlParameters { get; set; }
         public bool paramServiceUrl { get; private set; }
         public bool paramNamedValue { get; private set; }
+        public bool paramApiLoggerId { get; private set; }
+        public bool paramLogResourceId { get; private set; }
 
         public Extractor(ExtractorConfig exc, string dirName)
         {
@@ -113,6 +119,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.serviceUrlParameters = exc.serviceUrlParameters;
             this.paramServiceUrl = (exc.paramServiceUrl != null && exc.paramServiceUrl.Equals("true")) || exc.serviceUrlParameters != null;
             this.paramNamedValue = exc.paramNamedValue != null && exc.paramNamedValue.Equals("true");
+            this.paramApiLoggerId = exc.paramApiLoggerId != null && exc.paramApiLoggerId.Equals("true");
+            this.paramLogResourceId = exc.paramLogResourceId != null && exc.paramLogResourceId.Equals("true");
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)

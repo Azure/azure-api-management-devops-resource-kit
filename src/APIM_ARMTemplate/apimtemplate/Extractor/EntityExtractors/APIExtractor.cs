@@ -84,7 +84,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             string apiDetails = await CallApiManagementAsync(azToken, requestUrl);
             JObject oApiDetails = JObject.Parse(apiDetails);
             APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
-            return apiResource.properties.serviceUrl;    
+            return apiResource.properties.serviceUrl;
         }
 
         public async Task<string> GetAPIDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
@@ -121,6 +121,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
             while (oApi["nextLink"] != null);
             return apiObjs.ToArray();
+        }
+
+        public async Task<List<string>> GetAllAPINamesAsync(string ApiManagementName, string ResourceGroupName)
+        {
+            JToken[] oApis = await GetAllAPIObjsAsync(ApiManagementName, ResourceGroupName);
+            List<string> apiNames = new List<string>();
+
+            foreach (JToken curApi in oApis)
+            {
+                string apiName = ((JValue)curApi["name"]).Value.ToString();
+                apiNames.Add(apiName);
+            }
+            return apiNames;
         }
 
         public async Task<string> GetAPIChangeLogAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
@@ -222,7 +235,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             if (exc.paramServiceUrl)
             {
-                apiResource.properties.serviceUrl = $"[parameters('serviceUrl').{ExtractorUtils.GenValidApiParamName(apiName)}]";
+                apiResource.properties.serviceUrl = $"[parameters('serviceUrl').{ExtractorUtils.GenValidParamName(apiName, "Api")}]";
             }
 
             if (apiResource.properties.apiVersionSetId != null)
@@ -449,6 +462,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 diagnosticResource.scale = null;
                 diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{oApiName}')]" };
 
+                if (exc.paramApiLoggerId) {
+                    diagnosticResource.properties.loggerId = $"[parameters('ApiLoggerId').{ExtractorUtils.GenValidParamName(apiName, "Api")}.{ExtractorUtils.GenValidParamName(diagnosticName, "Diagnostic")}]";
+                }
+
                 if (!diagnosticName.Contains("applicationinsights"))
                 {
                     // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
@@ -524,7 +541,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             if (exc.paramServiceUrl)
             {
-                apiResource.properties.serviceUrl = $"[parameters('serviceUrl').{ExtractorUtils.GenValidApiParamName(apiName)}]";
+                apiResource.properties.serviceUrl = $"[parameters('serviceUrl').{ExtractorUtils.GenValidParamName(apiName, "Api")}]";
             }
 
             if (apiResource.properties.apiVersionSetId != null)
@@ -750,6 +767,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 diagnosticResource.apiVersion = GlobalConstants.APIVersion;
                 diagnosticResource.scale = null;
                 diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{apiName}')]" };
+
+                if (exc.paramApiLoggerId) {
+                    diagnosticResource.properties.loggerId = $"[parameters('ApiLoggerId').{ExtractorUtils.GenValidParamName(apiName, "Api")}.{ExtractorUtils.GenValidParamName(diagnosticName, "Diagnostic")}]";
+                }
 
                 if (!diagnosticName.Contains("applicationinsights"))
                 {

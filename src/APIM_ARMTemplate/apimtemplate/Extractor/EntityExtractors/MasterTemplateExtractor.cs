@@ -23,6 +23,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             string apiFileName,
             Extractor exc)
         {
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Generating master template");
             // create empty template
             Template masterTemplate = GenerateEmptyTemplate();
 
@@ -109,7 +111,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string apisUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, apiFileName);
                 resources.Add(this.CreateLinkedMasterTemplateResourceForApiTemplate("apisTemplate", apisUri, apiDependsOn.ToArray(), exc));
             }
-
+            Console.WriteLine("Master template generated");
             masterTemplate.resources = resources.ToArray();
             return masterTemplate;
         }
@@ -124,6 +126,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (exc.paramServiceUrl)
             {
                 masterResourceTemplate.properties.parameters.Add("serviceUrl", new TemplateParameterProperties() { value = "[parameters('serviceUrl')]" });
+            }
+            if (exc.paramApiLoggerId)
+            {
+                masterResourceTemplate.properties.parameters.Add("ApiLoggerId", new TemplateParameterProperties() { value = "[parameters('ApiLoggerId')]" });
             }
             return masterResourceTemplate;
         }
@@ -283,6 +289,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 };
                 parameters.Add("NamedValues", namedValueProperties);
             }
+            if (exc.paramApiLoggerId)
+            {
+                TemplateParameterProperties loggerIdProperties = new TemplateParameterProperties()
+                {
+                    metadata = new TemplateParameterMetadata()
+                    {
+                        description = "LoggerId for this api"
+                    },
+                    type = "object"
+                };
+                parameters.Add("ApiLoggerId", loggerIdProperties);
+            }
             return parameters;
         }
 
@@ -327,7 +345,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return revDependsOn.ToArray();
         }
 
-        public async Task<Template> CreateMasterTemplateParameterValues(string singleApiName, List<string> multipleApiNames, Extractor exc)
+        public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, Extractor exc)
         {
             // used to create the parameter values for use in parameters file
             // create empty template
@@ -387,43 +405,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 Dictionary<string, string> serviceUrls = new Dictionary<string, string>();
                 APIExtractor apiExc = new APIExtractor(new FileWriter());
-                if (singleApiName != null)
+                foreach (string apiName in apisToExtract)
                 {
-                    string validApiName = ExtractorUtils.GenValidApiParamName(singleApiName);
-                    string serviceUrl = GetApiServiceUrlFromParameters(singleApiName, exc.serviceUrlParameters);
+                    string validApiName = ExtractorUtils.GenValidParamName(apiName, "Api");
+                    string serviceUrl = GetApiServiceUrlFromParameters(apiName, exc.serviceUrlParameters);
                     if (serviceUrl == null)
                     {
-                        serviceUrl = await apiExc.GetAPIServiceUrl(exc.sourceApimName, exc.resourceGroup, singleApiName);
+                        serviceUrl = await apiExc.GetAPIServiceUrl(exc.sourceApimName, exc.resourceGroup, apiName);
                     }
                     serviceUrls.Add(validApiName, serviceUrl);
-                }
-                else if (multipleApiNames != null)
-                {
-                    foreach (string apiName in multipleApiNames)
-                    {
-                        string validApiName = ExtractorUtils.GenValidApiParamName(apiName);
-                        string serviceUrl = GetApiServiceUrlFromParameters(apiName, exc.serviceUrlParameters);
-                        if (serviceUrl == null)
-                        {
-                            serviceUrl = await apiExc.GetAPIServiceUrl(exc.sourceApimName, exc.resourceGroup, apiName);
-                        }
-                        serviceUrls.Add(validApiName, serviceUrl);
-                    }
-                }
-                else
-                {
-                    JToken[] oApis = await apiExc.GetAllAPIObjsAsync(exc.sourceApimName, exc.resourceGroup);
-                    foreach (JToken oApi in oApis)
-                    {
-                        string apiName = ((JValue)oApi["name"]).Value.ToString();
-                        string validApiName = ExtractorUtils.GenValidApiParamName(apiName);
-                        string serviceUrl = GetApiServiceUrlFromParameters(apiName, exc.serviceUrlParameters);
-                        if (serviceUrl == null)
-                        {
-                            serviceUrl = await apiExc.GetAPIServiceUrl(exc.sourceApimName, exc.resourceGroup, apiName);
-                        }
-                        serviceUrls.Add(validApiName, serviceUrl);
-                    }
                 }
                 TemplateServiceUrlProperties serviceUrlProperties = new TemplateServiceUrlProperties()
                 {
@@ -444,7 +434,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
                     PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
                     string propertyValue = propertyTemplateResource.properties.value;
-                    string validPName = ExtractorUtils.GenValidPropertyParamName(propertyName);
+                    string validPName = ExtractorUtils.GenValidParamName(propertyName, "Property");
                     namedValues.Add(validPName, propertyValue);
                 }
                 TemplateServiceUrlProperties namedValueProperties = new TemplateServiceUrlProperties()
@@ -452,6 +442,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     value = namedValues
                 };
                 parameters.Add("NamedValues", namedValueProperties);
+            }
+            if (exc.paramApiLoggerId)
+            {
+                Dictionary<string, Dictionary<string, string>> ApiLoggerId = new Dictionary<string, Dictionary<string, string>>();
+                APIExtractor apiExc = new APIExtractor(new FileWriter());
+                foreach (string curApiName in apisToExtract)
+                {
+                    Dictionary<string, string> loggerIds = new Dictionary<string, string>();
+                    string diagnostics = await apiExc.GetAPIDiagnosticsAsync(exc.sourceApimName, exc.resourceGroup, curApiName);
+                    JObject oDiagnostics = JObject.Parse(diagnostics);
+                    foreach (var diagnostic in oDiagnostics["value"])
+                    {
+                        string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
+                        string loggerId = ((JValue)diagnostic["properties"]["loggerId"]).Value.ToString();
+                        loggerIds.Add(ExtractorUtils.GenValidParamName(diagnosticName, "Diagnostic"), loggerId);
+                    }
+                    if (loggerIds.Count != 0) {
+                        ApiLoggerId.Add(ExtractorUtils.GenValidParamName(curApiName, "Api"), loggerIds);
+                    }
+                }
+                TemplateServiceUrlProperties loggerIdProperties = new TemplateServiceUrlProperties()
+                {
+                    value = ApiLoggerId
+                };
+                parameters.Add("ApiLoggerId", loggerIdProperties);
             }
             masterTemplate.parameters = parameters;
             return masterTemplate;

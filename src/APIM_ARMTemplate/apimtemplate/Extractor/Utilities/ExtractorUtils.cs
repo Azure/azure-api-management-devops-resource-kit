@@ -65,6 +65,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<string> multipleApiNames = multipleAPINames;
             string linkedUrlQueryString = exc.linkedTemplatesUrlQueryString;
 
+            // Get all Apis that will be extracted
+            List<string> apisToExtract = new List<string>();
+            if (singleApiName != null) {
+                apisToExtract.Add(singleApiName);
+            } else if (multipleApiNames != null) {
+                apisToExtract.AddRange(multipleApiNames);
+            } else {
+                List<string> allApis = await apiExtractor.GetAllAPINamesAsync(exc.sourceApimName, exc.resourceGroup);
+                apisToExtract.AddRange(allApis);
+            }
+
             // extract templates from apim service
             Template globalServicePolicyTemplate = await policyExtractor.GenerateGlobalServicePolicyTemplateAsync(sourceApim, resourceGroup, policyXMLBaseUrl, policyXMLSasToken, dirName);
             if (apiTemplate == null)
@@ -83,7 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl, policyXMLSasToken);
 
             // create parameters file
-            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(singleApiName, multipleApiNames, exc);
+            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc);
 
             // write templates to output file location
             string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
@@ -242,25 +253,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
         }
 
-        public static string GenValidApiParamName(string apiName)
+        public static string GenValidParamName(string apiName, string prefix)
         {
             string validApiName = Regex.Replace(apiName, "[^a-zA-Z0-9]", "");
             if (Char.IsDigit(validApiName.First()))
             {
-                return "Api" + validApiName;
-            }
-            else
-            {
-                return validApiName;
-            }
-        }
-
-        public static string GenValidPropertyParamName(string propertyName)
-        {
-            string validApiName = Regex.Replace(propertyName, "[^a-zA-Z0-9]", "");
-            if (Char.IsDigit(validApiName.First()))
-            {
-                return "Property" + validApiName;
+                return prefix + validApiName;
             }
             else
             {
