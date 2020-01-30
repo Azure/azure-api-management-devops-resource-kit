@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 if (exc.paramNamedValue)
                 {
-                    propertyTemplateResource.properties.value = $"[parameters('NamedValues').{ExtractorUtils.GenValidPropertyParamName(propertyName)}]";
+                    propertyTemplateResource.properties.value = $"[parameters('NamedValues').{ExtractorUtils.GenValidParamName(propertyName, "Property")}]";
                 }
 
                 if (singleApiName == null)
