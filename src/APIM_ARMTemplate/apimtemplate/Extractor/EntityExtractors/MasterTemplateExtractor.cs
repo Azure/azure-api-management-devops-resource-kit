@@ -408,11 +408,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 foreach (string apiName in apisToExtract)
                 {
                     string validApiName = ExtractorUtils.GenValidParamName(apiName, "Api");
-                    string serviceUrl = GetApiServiceUrlFromParameters(apiName, exc.serviceUrlParameters);
-                    if (serviceUrl == null)
-                    {
-                        serviceUrl = await apiExc.GetAPIServiceUrl(exc.sourceApimName, exc.resourceGroup, apiName);
-                    }
+                    string serviceUrl = exc.serviceUrlParameters != null ? GetApiServiceUrlFromParameters(apiName, exc.serviceUrlParameters) :
+                      await apiExc.GetAPIServiceUrl(exc.sourceApimName, exc.resourceGroup, apiName);
                     serviceUrls.Add(validApiName, serviceUrl);
                 }
                 TemplateServiceUrlProperties serviceUrlProperties = new TemplateServiceUrlProperties()
