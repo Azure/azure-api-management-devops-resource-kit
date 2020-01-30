@@ -345,7 +345,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return revDependsOn.ToArray();
         }
 
-        public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, Extractor exc)
+        public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, Extractor exc, Dictionary<string, Dictionary<string, string>> apiLoggerId)
         {
             // used to create the parameter values for use in parameters file
             // create empty template
@@ -445,26 +445,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
             if (exc.paramApiLoggerId)
             {
-                Dictionary<string, Dictionary<string, string>> ApiLoggerId = new Dictionary<string, Dictionary<string, string>>();
-                APIExtractor apiExc = new APIExtractor(new FileWriter());
-                foreach (string curApiName in apisToExtract)
-                {
-                    Dictionary<string, string> loggerIds = new Dictionary<string, string>();
-                    string diagnostics = await apiExc.GetAPIDiagnosticsAsync(exc.sourceApimName, exc.resourceGroup, curApiName);
-                    JObject oDiagnostics = JObject.Parse(diagnostics);
-                    foreach (var diagnostic in oDiagnostics["value"])
-                    {
-                        string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
-                        string loggerId = ((JValue)diagnostic["properties"]["loggerId"]).Value.ToString();
-                        loggerIds.Add(ExtractorUtils.GenValidParamName(diagnosticName, "Diagnostic"), loggerId);
-                    }
-                    if (loggerIds.Count != 0) {
-                        ApiLoggerId.Add(ExtractorUtils.GenValidParamName(curApiName, "Api"), loggerIds);
-                    }
-                }
                 TemplateServiceUrlProperties loggerIdProperties = new TemplateServiceUrlProperties()
                 {
-                    value = ApiLoggerId
+                    value = apiLoggerId
                 };
                 parameters.Add("ApiLoggerId", loggerIdProperties);
             }
