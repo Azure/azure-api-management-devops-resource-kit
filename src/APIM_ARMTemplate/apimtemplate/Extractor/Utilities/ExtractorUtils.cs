@@ -107,7 +107,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc, apiLoggerId);
 
             // write templates to output file location
-            string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, sourceApim);
+            string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, fileNames.baseFileName);
+
             fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@dirName, apiFileName));
             // won't generate template when there is no resources
             if (apiVersionSetTemplate.resources.Count() != 0)

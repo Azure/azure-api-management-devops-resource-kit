@@ -24,7 +24,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 splitAPIs = "/SplitAPIs",
                 versionSetMasterFolder = "/VersionSetMasterFolder",
                 revisionMasterFolder = "/RevisionMasterFolder",
-                groupAPIsMasterFolder = "/MultipleApisMasterFolder"
+                groupAPIsMasterFolder = "/MultipleApisMasterFolder",
+                baseFileName = baseFileName
             };
         }
 
@@ -73,5 +74,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string versionSetMasterFolder { get; set; }
         public string revisionMasterFolder { get; set; }
         public string groupAPIsMasterFolder{ get; set; }
+        public string baseFileName { get; set; }
     }
 }
