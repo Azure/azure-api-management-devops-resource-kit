@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             loggerTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // create logger resource with properties
                 LoggerTemplateResource loggerTemplateResource = new LoggerTemplateResource()
                 {
-                    name = $"[concat(parameters('ApimServiceName'), '/{logger.name}')]",
+                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.name}')]",
                     type = ResourceTypeConstants.Logger,
                     apiVersion = GlobalConstants.APIVersion,
                     properties = new LoggerTemplateProperties()

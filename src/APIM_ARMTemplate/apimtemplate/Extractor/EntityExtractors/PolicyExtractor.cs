@@ -41,7 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 Console.WriteLine($" - Global policy found for {apimname} API Management service");
                 PolicyTemplateResource globalServicePolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(globalServicePolicy);
                 // REST API will return format property as rawxml and value property as the xml by default
-                globalServicePolicyResource.name = $"[concat(parameters('ApimServiceName'), '/policy')]";
+                globalServicePolicyResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/policy')]";
                 globalServicePolicyResource.apiVersion = GlobalConstants.APIVersion;
                 globalServicePolicyResource.scale = null;
 
@@ -56,11 +56,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     globalServicePolicyResource.properties.format = "rawxml-link";
                     if (policyXMLSasToken != null)
                     {
-                        globalServicePolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{globalServicePolicyFileName}', parameters('PolicyXMLSasToken'))]";
+                        globalServicePolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{globalServicePolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                     }
                     else
                     {
-                        globalServicePolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{globalServicePolicyFileName}')]";
+                        globalServicePolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{globalServicePolicyFileName}')]";
                     }
                 }
 

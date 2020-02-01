@@ -48,14 +48,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public Template GenerateEmptyPropertyTemplateWithParameters(Extractor exc)
         {
             Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
             if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
                     type = "string"
                 };
-                armTemplate.parameters.Add("PolicyXMLSasToken", policyTemplateSasTokenParameterProperties);
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
             }
             if (exc.policyXMLBaseUrl != null)
             {
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     type = "string"
                 };
-                armTemplate.parameters.Add("PolicyXMLBaseUrl", policyTemplateBaseUrlParameterProperties);
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
             }
             if (exc.paramNamedValue)
             {
@@ -71,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     type = "object"
                 };
-                armTemplate.parameters.Add("NamedValues", namedValueParameterProperties);
+                armTemplate.parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
             }
             return armTemplate;
         }
@@ -79,14 +79,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public Template GenerateEmptyTemplateWithParameters(string policyXMLBaseUrl, string policyXMLSasToken)
         {
             Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
             if (policyXMLBaseUrl != null && policyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
                     type = "string"
                 };
-                armTemplate.parameters.Add("PolicyXMLSasToken", policyTemplateSasTokenParameterProperties);
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
             }
             if (policyXMLBaseUrl != null)
             {
@@ -94,22 +94,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     type = "string"
                 };
-                armTemplate.parameters.Add("PolicyXMLBaseUrl", policyTemplateBaseUrlParameterProperties);
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
             }
             return armTemplate;
         }
 
-        public Template GenerateEmptyApiTemplateWithParameters(Extractor exc)
+        public Template GenerateEmptyLoggerTemplateWithParameters(Extractor exc)
         {
             Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { "ApimServiceName", new TemplateParameterProperties() { type = "string" } } };
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
             if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
                     type = "string"
                 };
-                armTemplate.parameters.Add("PolicyXMLSasToken", policyTemplateSasTokenParameterProperties);
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
             }
             if (exc.policyXMLBaseUrl != null)
             {
@@ -117,7 +117,38 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     type = "string"
                 };
-                armTemplate.parameters.Add("PolicyXMLBaseUrl", policyTemplateBaseUrlParameterProperties);
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
+            }
+            if (exc.paramLogResourceId)
+            {
+                TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
+            }
+            return armTemplate;
+        }
+
+        public Template GenerateEmptyApiTemplateWithParameters(Extractor exc)
+        {
+            Template armTemplate = GenerateEmptyTemplate();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
+            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
+            {
+                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
+            }
+            if (exc.policyXMLBaseUrl != null)
+            {
+                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
             }
             if (exc.paramServiceUrl || (exc.serviceUrlParameters != null && exc.serviceUrlParameters.Length > 0))
             {
@@ -125,7 +156,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     type = "object"
                 };
-                armTemplate.parameters.Add("serviceUrl", serviceUrlParamProperty);
+                armTemplate.parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
             }
             if (exc.paramApiLoggerId)
             {
@@ -133,7 +164,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     type = "object"
                 };
-                armTemplate.parameters.Add("ApiLoggerId", apiLoggerProperty);
+                armTemplate.parameters.Add(ParameterNames.ApiLoggerId, apiLoggerProperty);
             }
             return armTemplate;
         }

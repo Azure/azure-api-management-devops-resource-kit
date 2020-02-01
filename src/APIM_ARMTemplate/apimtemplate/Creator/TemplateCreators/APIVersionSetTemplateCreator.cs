@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             apiVersionSetTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 string versionSetId = (apiVersionSet != null && apiVersionSet.id != null) ? apiVersionSet.id : "versionset";
                 APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
                 {
-                    name = $"[concat(parameters('ApimServiceName'), '/{versionSetId}')]",
+                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{versionSetId}')]",
                     type = ResourceTypeConstants.APIVersionSet,
                     apiVersion = GlobalConstants.APIVersion,
                     properties = new APIVersionSetProperties()

@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 
                 // convert returned named value to template resource class
                 TagTemplateResource TagTemplateResource = JsonConvert.DeserializeObject<TagTemplateResource>(extractedTag.ToString());
-                TagTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{TagName}')]";
+                TagTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{TagName}')]";
                 TagTemplateResource.type = ResourceTypeConstants.Tag;
                 TagTemplateResource.apiVersion = GlobalConstants.APIVersion;
                 TagTemplateResource.scale = null;

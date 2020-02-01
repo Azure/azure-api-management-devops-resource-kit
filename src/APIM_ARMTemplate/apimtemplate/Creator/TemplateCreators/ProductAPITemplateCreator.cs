@@ -10,7 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create products/apis resource with properties
             ProductAPITemplateResource productAPITemplateResource = new ProductAPITemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{productID}/{apiName}')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productID}/{apiName}')]",
                 type = ResourceTypeConstants.ProductAPI,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new ProductAPITemplateProperties(),

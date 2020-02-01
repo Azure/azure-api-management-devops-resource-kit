@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string value { get; set; }
     }
 
-    public class TemplateServiceUrlProperties: TemplateParameterProperties {
+    public class TemplateObjectParameterProperties: TemplateParameterProperties {
         public new object value { get; set; }
     }
 

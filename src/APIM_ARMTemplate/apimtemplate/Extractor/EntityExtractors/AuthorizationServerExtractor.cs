@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 // convert returned authorization server to template resource class
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);
-                authorizationServerTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{authorizationServerName}')]";
+                authorizationServerTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServerName}')]";
                 authorizationServerTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 // only extract the authorization server if this is a full extraction, or in the case of a single api, if it is referenced by one of the api's authentication settings
