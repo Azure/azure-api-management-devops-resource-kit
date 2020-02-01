@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // create tags/apis resource with properties
             TagAPITemplateResource tagAPITemplateResource = new TagAPITemplateResource(){
-                name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{tagName}')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{tagName}')]",
                 type = ResourceTypeConstants.APITag,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new TagAPITemplateProperties(){

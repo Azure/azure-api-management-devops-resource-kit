@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 // convert returned product to template resource class
                 APIVersionSetTemplateResource versionSetTemplateResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSetDetails);
-                versionSetTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetName}')]";
+                versionSetTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{versionSetName}')]";
                 versionSetTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api

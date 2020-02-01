@@ -103,8 +103,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
             Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl, policyXMLSasToken);
 
+            Dictionary<string, string> loggerResourceIds = null;
+            if (exc.paramLogResourceId)
+            {
+                List<TemplateResource> loggerResources = loggerTemplate.resources.ToList();
+                loggerResourceIds = loggerExtractor.GetAllLoggerResourceIds(loggerResources);
+                loggerTemplate = loggerExtractor.SetLoggerResourceId(loggerTemplate);
+            }
+
             // create parameters file
-            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc, apiLoggerId);
+            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc, apiLoggerId, loggerResourceIds);
 
             // write templates to output file location
             string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, fileNames.baseFileName);
@@ -356,11 +364,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
                     string loggerId = ((JValue)diagnostic["properties"]["loggerId"]).Value.ToString();
-                    loggerIds.Add(ExtractorUtils.GenValidParamName(diagnosticName, "Diagnostic"), loggerId);
+                    loggerIds.Add(ExtractorUtils.GenValidParamName(diagnosticName, ParameterPrefix.Diagnostic), loggerId);
                 }
                 if (loggerIds.Count != 0)
                 {
-                    ApiLoggerId.Add(ExtractorUtils.GenValidParamName(curApiName, "Api"), loggerIds);
+                    ApiLoggerId.Add(ExtractorUtils.GenValidParamName(curApiName, ParameterPrefix.Api), loggerIds);
                 }
             }
             return ApiLoggerId;

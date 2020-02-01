@@ -171,7 +171,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     },
                     parameters = new Dictionary<string, TemplateParameterProperties>
                     {
-                        { "ApimServiceName", new TemplateParameterProperties(){ value = "[parameters('ApimServiceName')]" } }
+                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
                     }
                 },
                 dependsOn = dependsOn
@@ -192,7 +192,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 },
                 type = "string"
             };
-            parameters.Add("ApimServiceName", apimServiceNameProperties);
+            parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
             // add remote location of template files for linked option
             if (creatorConfig.linked == true)
             {
@@ -204,7 +204,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     },
                     type = "string"
                 };
-                parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
+                parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
                 if (creatorConfig.linkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
@@ -215,7 +215,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         },
                         type = "string"
                     };
-                    parameters.Add("LinkedTemplatesUrlQueryString", linkedTemplatesUrlQueryStringProperties);
+                    parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
             }
             return parameters;
@@ -233,21 +233,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 value = creatorConfig.apimServiceName
             };
-            parameters.Add("ApimServiceName", apimServiceNameProperties);
+            parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
             if (creatorConfig.linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
                     value = creatorConfig.linkedTemplatesBaseUrl
                 };
-                parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
+                parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
                 if (creatorConfig.linkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
                     {
                         value = creatorConfig.linkedTemplatesUrlQueryString
                     };
-                    parameters.Add("LinkedTemplatesUrlQueryString", linkedTemplatesUrlQueryStringProperties);
+                    parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
             }
             masterTemplate.parameters = parameters;
@@ -307,7 +307,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public string GenerateLinkedTemplateUri(CreatorConfig creatorConfig, string fileName)
         {
-            return creatorConfig.linkedTemplatesUrlQueryString != null ? $"[concat(parameters('LinkedTemplatesBaseUrl'), '{fileName}', parameters('LinkedTemplatesUrlQueryString'))]" : $"[concat(parameters('LinkedTemplatesBaseUrl'), '{fileName}')]";
+            return creatorConfig.linkedTemplatesUrlQueryString != null ?
+             $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}', parameters('{ParameterNames.LinkedTemplatesUrlQueryString}'))]" 
+             : $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}')]";
         }
     }
 

@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             tagTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                {"ApimServiceName", new TemplateParameterProperties(){ type = "string" }}
+                {ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" }}
             };
 
             // aggregate all tags from apis
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // create tag resource with properties
                 TagTemplateResource tagTemplateResource = new TagTemplateResource()
                 {
-                    name = $"[concat(parameters('ApimServiceName'), '/{tag}')]",
+                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag}')]",
                     type = ResourceTypeConstants.Tag,
                     apiVersion = GlobalConstants.APIVersion,
                     properties = new TagTemplateProperties()

@@ -53,7 +53,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 // convert returned backend to template resource class
                 BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
-                backendTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{backendName}')]";
+                backendTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendName}')]";
                 backendTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 ////only extract the backend if this is a full extraction, or in the case of a single api, if it is referenced by one of the policies

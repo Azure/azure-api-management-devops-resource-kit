@@ -94,7 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 };
                 ProductsTemplateResource productsTemplateResource = JsonConvert.DeserializeObject<ProductsTemplateResource>(productDetails, settings);
-                productsTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}')]";
+                productsTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}')]";
                 productsTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 string productGroupDetails = await GetProductGroupsAsync(apimname, resourceGroup, productName);
@@ -109,10 +109,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     // add product policy resource to template
                     try
                     {
-                        var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+                        var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productName}')]" };
                         foreach (ProductGroupsValue ProductGroup in productGroupsDetails.value)
                         {
-                            ProductGroup.name = $"[concat(parameters('ApimServiceName'), '/{productName}/{ProductGroup.name}')]";
+                            ProductGroup.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{ProductGroup.name}')]";
                             ProductGroup.apiVersion = GlobalConstants.APIVersion;
                             ProductGroup.dependsOn = productResourceId;
                             templateResources.Add(ProductGroup);
@@ -120,7 +120,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         string productPolicy = await GetProductPolicyAsync(apimname, resourceGroup, productName);
                         Console.WriteLine($" - Product policy found for {productName} product");
                         PolicyTemplateResource productPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(productPolicy);
-                        productPolicyResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}/policy')]";
+                        productPolicyResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/policy')]";
                         productPolicyResource.apiVersion = GlobalConstants.APIVersion;
                         productPolicyResource.scale = null;
                         productPolicyResource.dependsOn = productResourceId;
@@ -136,11 +136,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             productPolicyResource.properties.format = "rawxml-link";
                             if (policyXMLSasToken != null)
                             {
-                                productPolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{productPolicyFileName}', parameters('PolicyXMLSasToken'))]";
+                                productPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{productPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                             }
                             else
                             {
-                                productPolicyResource.properties.value = $"[concat(parameters('PolicyXMLBaseUrl'), '{productPolicyFileName}')]";
+                                productPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{productPolicyFileName}')]";
                             }
                         }
 
@@ -162,10 +162,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                             // convert associations between product and tags to template resource class
                             TagTemplateResource productTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
-                            productTagResource.name = $"[concat(parameters('ApimServiceName'), '/{productName}/{productTagName}')]";
+                            productTagResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{productTagName}')]";
                             productTagResource.apiVersion = GlobalConstants.APIVersion;
                             productTagResource.scale = null;
-                            productTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{productName}')]" };
+                            productTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productName}')]" };
                             templateResources.Add(productTagResource);
                         }
                     }

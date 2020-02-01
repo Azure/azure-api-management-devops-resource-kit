@@ -48,14 +48,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 // convert returned named value to template resource class
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
+                propertyTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
                 propertyTemplateResource.type = ResourceTypeConstants.Property;
                 propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
                 propertyTemplateResource.scale = null;
 
                 if (exc.paramNamedValue)
                 {
-                    propertyTemplateResource.properties.value = $"[parameters('NamedValues').{ExtractorUtils.GenValidParamName(propertyName, "Property")}]";
+                    propertyTemplateResource.properties.value = $"[parameters('{ParameterNames.NamedValues}').{ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property)}]";
                 }
 
                 if (singleApiName == null)

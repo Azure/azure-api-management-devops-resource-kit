@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             List<TemplateResource> resources = new List<TemplateResource>();
             // all child resources will depend on the api
-            string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{api.name}')]" };
+            string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{api.name}')]" };
 
             PolicyTemplateResource apiPolicyResource = api.policy != null ? this.policyTemplateCreator.CreateAPIPolicyTemplateResource(api, dependsOn) : null;
             List<PolicyTemplateResource> operationPolicyResources = api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(api, dependsOn) : null;
@@ -110,7 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create api resource
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{api.name}')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]",
                 type = ResourceTypeConstants.API,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new APITemplateProperties(),
@@ -140,7 +140,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if (api.apiVersionSetId != null)
                 {
                     // point to the supplied version set if the apiVersionSetId is provided
-                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]";
+                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
                 }
                 // set the authorization server id
                 if (api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null
