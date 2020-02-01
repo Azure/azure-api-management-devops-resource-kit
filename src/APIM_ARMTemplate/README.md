@@ -323,6 +323,8 @@ You have two choices when specifying your settings:
 | serviceUrlParameters  | No                    | Parameterize service url in advance (you can replace serviceUrl afterwards as well, you can refer example for more information).  |
 |  paramServiceUrl | No                    |  Set to "true" will parameterize all serviceUrl for each api and generate serviceUrl parameter to api template/parameter template/master template files |
 |  paramNamedValue | No                    |  Set to "true" will parameterize all named values and add named values parameter to property template/parameter template/mastert emplate files |
+|  paramApiLoggerId | No                    |  Set to "true" will parameterize all logger ids in all apis (within api templates) |
+|  paramLogResourceId | No                    |  Set to "true" will parameterize all loggers' resource ids (within logger template)|
 
 
 #### Note
