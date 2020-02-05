@@ -325,7 +325,7 @@ You have two choices when specifying your settings:
 |  paramNamedValue | No                    |  Set to "true" will parameterize all named values and add named values parameter to property template/parameter template/mastert emplate files |
 |  paramApiLoggerId | No                    |  Set to "true" will parameterize all logger ids in all apis (within api templates) |
 |  paramLogResourceId | No                    |  Set to "true" will parameterize all loggers' resource ids (within logger template)|
-
+| serviceBaseUrl | No                    | Specify the base url where you want to run your extractor |
 
 #### Note
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
