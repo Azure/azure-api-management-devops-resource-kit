@@ -39,6 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     bool hasSingleApi = singleApiName != null;
                     bool includeRevisions = extractorConfig.includeAllRevisions != null && extractorConfig.includeAllRevisions.Equals("true");
                     bool hasMultipleAPIs = extractorConfig.mutipleAPIs != null;
+                    EntityExtractor.baseUrl = (extractorConfig.serviceBaseUrl == null) ? EntityExtractor.baseUrl : extractorConfig.serviceBaseUrl;
 
                     // start running extractor
                     Console.WriteLine("API Management Template");

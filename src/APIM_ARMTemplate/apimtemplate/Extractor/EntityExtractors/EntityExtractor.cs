@@ -10,7 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class EntityExtractor
     {
-        public string baseUrl = "https://management.azure.com";
+        public static string baseUrl = "https://management.azure.com";
         internal Authentication auth = new Authentication();
         private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
 
