@@ -44,6 +44,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string paramApiLoggerId { get; set; }
         [Description("Specify the resourceId for this logger")]
         public string paramLogResourceId { get; set; }
+        [Description("Specify the the base url for calling api management")]
+        public string serviceBaseUrl { get; set; }
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -132,7 +134,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
     {
         public string apiName { get; private set; }
         public string serviceUrl { get; private set; }
-        public serviceUrlProperty (string apiName, string serviceUrl) {
+        public serviceUrlProperty(string apiName, string serviceUrl)
+        {
             this.apiName = apiName;
             this.serviceUrl = serviceUrl;
         }
