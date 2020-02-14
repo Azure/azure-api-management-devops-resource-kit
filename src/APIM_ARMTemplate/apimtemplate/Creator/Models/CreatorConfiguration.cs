@@ -84,6 +84,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         // policy file location (local or url)
         public string policy { get; set; }
+        // coma separated names
+        public string groups { get; set; }
     }
     
 }
