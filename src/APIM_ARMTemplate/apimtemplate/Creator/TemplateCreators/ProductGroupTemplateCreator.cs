@@ -15,7 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiVersion = GlobalConstants.APIVersion,
                 dependsOn = dependsOn
             };
-            return productGroupTemplateResource;
+            return productAPITemplateResource;
         }
 
         public List<ProductGroupsValue> CreateProductGroupTemplateResources(ProductConfig product, string[] dependsOn)
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] groupNames = product.groups.Split(", ");
             foreach (string groupName in groupNames)
             {
-                ProductGroupsValue productAPITemplate = this.CreateProductGroupTemplateResource(groupName, api.name, dependsOn);
+                ProductGroupsValue productAPITemplate = this.CreateProductGroupTemplateResource(groupName, product.displayName, dependsOn);
                 productGroupTemplates.Add(productAPITemplate);
             }
             return productGroupTemplates;

@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if(product.groups != null)
                 {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.displayName}')]" };
-                    List<ProductGroupsValue> productGroups = this.groupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
+                    List<ProductGroupsValue> productGroups = this.productGroupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
                     resources.AddRange(productGroups);
                 }
             }

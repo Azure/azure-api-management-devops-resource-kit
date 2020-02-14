@@ -8,7 +8,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public static ProductTemplateCreator GenerateProductTemplateCreator()
         {
             PolicyTemplateCreator policyTemplateCreator = PolicyTemplateCreatorFactory.GeneratePolicyTemplateCreator();
-            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator);
+            ProductGroupTemplateCreator productGroupTemplateCreator = new ProductGroupTemplateCreator();
+            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator);
             return productTemplateCreator;
         }
     }
