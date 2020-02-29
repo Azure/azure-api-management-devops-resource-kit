@@ -13,7 +13,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{groupName}')]",
                 type = ResourceTypeConstants.ProductGroup,
                 apiVersion = GlobalConstants.APIVersion,
-                dependsOn = dependsOn
+                dependsOn = dependsOn,
+                properties=new ProductGroupTemplateProperties()
             };
             return productAPITemplateResource;
         }
