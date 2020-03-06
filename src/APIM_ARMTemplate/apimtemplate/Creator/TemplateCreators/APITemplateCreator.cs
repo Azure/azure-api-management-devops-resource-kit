@@ -200,6 +200,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         format = "openapi";
                     }
                 }
+				// set the version set id
+                if (api.apiVersionSetId != null)
+                {
+                    // point to the supplied version set if the apiVersionSetId is provided
+                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
+                }
                 apiTemplateResource.properties.format = format;
                 apiTemplateResource.properties.value = value;
                 apiTemplateResource.properties.path = api.suffix;
