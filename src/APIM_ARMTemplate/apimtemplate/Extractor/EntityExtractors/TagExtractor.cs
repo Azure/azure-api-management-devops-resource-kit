@@ -8,14 +8,14 @@ using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class TagExtractor: EntityExtractor
+    public class TagExtractor : EntityExtractor
     {
-        public async Task<string> GetTagsAsync(string ApiManagementName, string ResourceGroupName)
+        public async Task<string> GetTagsAsync(string ApiManagementName, string ResourceGroupName, int skipNumOfRecords )
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/Tags?api-version={4}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/Tags?$skip={4}&api-version={5}",
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, skipNumOfRecords, GlobalConstants.APIVersion);
 
             return await CallApiManagementAsync(azToken, requestUrl);
         }
@@ -28,7 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // isolate tag and api operation associations in the case of a single api extraction
             var apiOperationTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIOperationTag);
-           
+
             // isolate tag and api associations in the case of a single api extraction
             var apiTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APITag);
 
@@ -41,34 +41,44 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (Tags) for service
-            string Tags = await GetTagsAsync(apimname, resourceGroup);
-            JObject oTags = JObject.Parse(Tags);
+            JObject oTags = new JObject();
+            int skipNumOfTags = 0;
 
-            foreach (var extractedTag in oTags["value"])
+            do
             {
-                string TagName = ((JValue)extractedTag["name"]).Value.ToString();
-                
-                // convert returned named value to template resource class
-                TagTemplateResource TagTemplateResource = JsonConvert.DeserializeObject<TagTemplateResource>(extractedTag.ToString());
-                TagTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{TagName}')]";
-                TagTemplateResource.type = ResourceTypeConstants.Tag;
-                TagTemplateResource.apiVersion = GlobalConstants.APIVersion;
-                TagTemplateResource.scale = null;
+                string Tags = await GetTagsAsync(apimname, resourceGroup, skipNumOfTags);
+                oTags = JObject.Parse(Tags);
 
-                // only extract the tag if this is a full extraction, 
-                // or in the case of a single api, if it is found in tags associated with the api operations
-                // or if it is found in tags associated with the api
-                // or if it is found in tags associated with the products associated with the api
-                if (singleApiName == null 
-                        || apiOperationTagResources.Any(t => t.name.Contains($"/{TagName}'"))
-                        || apiTagResources.Any(t => t.name.Contains($"/{TagName}'"))
-                        || (productAPIResources.Any(t => t.name.Contains($"/{singleApiName}"))
-                            && productTagResources.Any(t => t.name.Contains($"/{TagName}'"))))
+                foreach (var extractedTag in oTags["value"])
                 {
-                    Console.WriteLine("'{0}' Tag found", TagName);
-                    templateResources.Add(TagTemplateResource);
+                    string TagName = ((JValue)extractedTag["name"]).Value.ToString();
+
+                    // convert returned named value to template resource class
+                    TagTemplateResource TagTemplateResource = JsonConvert.DeserializeObject<TagTemplateResource>(extractedTag.ToString());
+                    TagTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{TagName}')]";
+                    TagTemplateResource.type = ResourceTypeConstants.Tag;
+                    TagTemplateResource.apiVersion = GlobalConstants.APIVersion;
+                    TagTemplateResource.scale = null;
+
+                    // only extract the tag if this is a full extraction, 
+                    // or in the case of a single api, if it is found in tags associated with the api operations
+                    // or if it is found in tags associated with the api
+                    // or if it is found in tags associated with the products associated with the api
+                    if (singleApiName == null
+                            || apiOperationTagResources.Any(t => t.name.Contains($"/{TagName}'"))
+                            || apiTagResources.Any(t => t.name.Contains($"/{TagName}'"))
+                            || (productAPIResources.Any(t => t.name.Contains($"/{singleApiName}"))
+                                && productTagResources.Any(t => t.name.Contains($"/{TagName}'"))))
+                    {
+                        Console.WriteLine("'{0}' Tag found", TagName);
+                        templateResources.Add(TagTemplateResource);
+                    }
                 }
+
+                skipNumOfTags += GlobalConstants.NumOfRecords;
             }
+            while (oTags["nextLink"] != null);
+
 
             armTemplate.resources = templateResources.ToArray();
             return armTemplate;

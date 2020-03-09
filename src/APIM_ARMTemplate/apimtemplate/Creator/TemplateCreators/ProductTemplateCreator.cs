@@ -6,10 +6,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     public class ProductTemplateCreator : TemplateCreator
     {
         private PolicyTemplateCreator policyTemplateCreator;
+        private ProductGroupTemplateCreator productGroupTemplateCreator;
 
-        public ProductTemplateCreator(PolicyTemplateCreator policyTemplateCreator)
+        public ProductTemplateCreator(PolicyTemplateCreator policyTemplateCreator,ProductGroupTemplateCreator productGroupTemplateCreator)
         {
             this.policyTemplateCreator = policyTemplateCreator;
+            this.productGroupTemplateCreator = productGroupTemplateCreator;
         }
 
         public Template CreateProductTemplate(CreatorConfig creatorConfig)
@@ -52,6 +54,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.displayName}')]" };
                     PolicyTemplateResource productPolicy = this.policyTemplateCreator.CreateProductPolicyTemplateResource(product, dependsOn);
                     resources.Add(productPolicy);
+                }
+
+                // create product group resources if provided
+                if(product.groups != null)
+                {
+                    string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.displayName}')]" };
+                    List<ProductGroupsValue> productGroups = this.productGroupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
+                    resources.AddRange(productGroups);
                 }
             }
 
