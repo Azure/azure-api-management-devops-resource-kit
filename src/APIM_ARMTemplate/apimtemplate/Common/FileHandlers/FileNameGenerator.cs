@@ -7,19 +7,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
         public FileNames GenerateFileNames(string baseFileName)
         {
+            if (baseFileName.Length > 0)
+                baseFileName += "-";
+
             // generate useable object with file names for consistency throughout project
             return new FileNames()
             {
-                apiVersionSets = $@"/{baseFileName}-apiVersionSets.template.json",
-                authorizationServers = $@"/{baseFileName}-authorizationServers.template.json",
-                backends = $@"/{baseFileName}-backends.template.json",
-                globalServicePolicy = $@"/{baseFileName}-globalServicePolicy.template.json",
-                loggers = $@"/{baseFileName}-loggers.template.json",
-                namedValues = $@"/{baseFileName}-namedValues.template.json",
-                tags = $@"/{baseFileName}-tags.template.json",
-                products = $@"/{baseFileName}-products.template.json",
-                parameters = $@"/{baseFileName}-parameters.json",
-                linkedMaster = $@"/{baseFileName}-master.template.json",
+                apiVersionSets = $@"/{baseFileName}apiVersionSets.template.json",
+                authorizationServers = $@"/{baseFileName}authorizationServers.template.json",
+                backends = $@"/{baseFileName}backends.template.json",
+                globalServicePolicy = $@"/{baseFileName}globalServicePolicy.template.json",
+                loggers = $@"/{baseFileName}loggers.template.json",
+                namedValues = $@"/{baseFileName}namedValues.template.json",
+                tags = $@"/{baseFileName}tags.template.json",
+                products = $@"/{baseFileName}products.template.json",
+                parameters = $@"/{baseFileName}parameters.json",
+                linkedMaster = $@"/{baseFileName}master.template.json",
                 apis = "/Apis",
                 splitAPIs = "/SplitAPIs",
                 versionSetMasterFolder = "/VersionSetMasterFolder",
@@ -29,23 +32,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             };
         }
 
-        public string GenerateCreatorAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI, string apimServiceName)
+        public string GenerateCreatorAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI)
         {
             // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
             string sanitizedAPIName = GenerateOriginalAPIName(apiName);
+
             if (isSplitAPI == true)
             {
-                return isInitialAPI == true ? $@"/{apimServiceName}-{sanitizedAPIName}-initial.api.template.json" : $@"/{apimServiceName}-{sanitizedAPIName}-subsequent.api.template.json";
+                return isInitialAPI == true ? $@"/{sanitizedAPIName}-initial.api.template.json" : $@"/{sanitizedAPIName}-subsequent.api.template.json";
             }
             else
             {
-                return $@"/{apimServiceName}-{sanitizedAPIName}.api.template.json";
+                return $@"/{sanitizedAPIName}.api.template.json";
             }
         }
 
         public string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
-            return singleAPIName == null ? $@"/{baseFileName}-apis.template.json" : $@"/{baseFileName}-{singleAPIName}-api.template.json";
+            if (baseFileName.Length > 0)
+                baseFileName += "-";
+
+            return singleAPIName == null ? $@"/{baseFileName}apis.template.json" : $@"/{baseFileName}{singleAPIName}-api.template.json";
         }
 
         public string GenerateOriginalAPIName(string apiName)
