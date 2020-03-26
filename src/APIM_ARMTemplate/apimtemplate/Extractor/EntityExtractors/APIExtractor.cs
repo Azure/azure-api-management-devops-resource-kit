@@ -804,6 +804,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 catch (Exception ex)
                 {
+                    string message = string.Format("Exception: {0} \n resourceGroup: {1} \n\t APIM instance: {2} \n\t API Name: {3}",
+                        ex.Message, exc.resourceGroup, exc.sourceApimName, singleApiName );
                     Console.WriteLine(ex.Message);
                     throw new Exception($"{singleApiName} API not found!");
                 }
