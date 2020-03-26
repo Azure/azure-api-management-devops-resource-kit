@@ -800,9 +800,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     Console.WriteLine("{0} API found ...", singleApiName);
                     templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, exc));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine(ex.Message);
                     throw new Exception($"{singleApiName} API not found!");
                 }
             }

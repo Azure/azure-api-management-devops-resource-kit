@@ -85,8 +85,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         await ExtractorUtils.GenerateTemplates(new Extractor(extractorConfig), singleApiName, null, fileNameGenerator, fileNames, fileWriter, null);
                     }
                     Console.WriteLine("Templates written to output location");
-#if DEBUG
                     Console.WriteLine("Press any key to exit process:");
+#if DEBUG
                     Console.ReadKey();
 #endif
                 }
