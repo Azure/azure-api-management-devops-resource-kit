@@ -17,6 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public List<APIVersionSetConfig> apiVersionSets { get; set; }
         public List<APIConfig> apis { get; set; }
         public List<ProductConfig> products { get; set; }
+        public List<PropertyConfig> namedValues {get;set;}
         public List<LoggerConfig> loggers { get; set; }
         public List<AuthorizationServerTemplateProperties> authorizationServers { get; set; }
         public List<BackendTemplateProperties> backends { get; set; }
@@ -86,6 +87,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string policy { get; set; }
         // coma separated names
         public string groups { get; set; }
+    }
+
+    public class PropertyConfig : PropertyResourceProperties
+    {
+
     }
     
 }

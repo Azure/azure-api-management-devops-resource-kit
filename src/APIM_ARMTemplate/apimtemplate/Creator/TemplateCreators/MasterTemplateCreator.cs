@@ -10,6 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
+            Template propertyTemplate,
             Template loggersTemplate,
             Template backendsTemplate,
             Template authorizationServersTemplate,
@@ -47,6 +48,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 string productsUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.products);
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }));
+            }
+
+            // property
+            if (propertyTemplate != null)
+            {
+                string propertyUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.namedValues);
+                resources.Add(this.CreateLinkedMasterTemplateResource("propertyTemplate", propertyUri, new string[] { }));
             }
 
             // logger
