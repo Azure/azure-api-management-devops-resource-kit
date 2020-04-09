@@ -97,6 +97,8 @@ _Additional properties found in [ProductContractProperties](https://docs.microso
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| tags                | array                | No                    | Optional tags that when provided can be used to filter the property list. - string
+| secret                | boolean                | No                    | Determines whether the value is a secret and should be encrypted or not. Default value is false.
 | displayName                | string                | Yes                    | Unique name of Property. It may contain only letters, digits, period, dash, and underscore characters.                          |
 | value                | string                | Yes                    | Value of the property. Can contain policy expressions. It may not be empty or consist only of whitespace.                          |
 
