@@ -28,7 +28,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     properties = new PropertyResourceProperties()
                     {
                         displayName = namedValue.displayName,
-                        value = namedValue.value
+                        value = namedValue.value,
+                        secret = namedValue.secret,
+                        tags = namedValue.tags
                     },
                     dependsOn = new string[] {}
                 };
