@@ -26,6 +26,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | apiVersionSets         | Array<[APIVersionSetConfiguration](#APIVersionSetConfiguration)> | No               | List of API Version Set configurations.                        |
 | apis                   | Array<[APIConfiguration](#APIConfiguration)>      | Yes                   | List of API configurations.                                |
 | products                   | Array<[ProductConfiguration](#ProductConfiguration)>      | No                   | List of Product configurations.                                |
+| namedValues               | Array<[PropertyConfiguration](#PropertyConfiguration)>     | No                   | List of Named Values
 | loggers                   | Array<[LoggerConfiguration](#LoggerConfiguration)>      | No                   | List of Logger configurations.                                |
 | authorizationServers                   | Array<[AuthorizationServerContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/authorizationservers#AuthorizationServerContractProperties)>      | No                   | List of Authorization Server configurations.                                |
 | backends                   | Array<[BackendContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/backends#BackendContractProperties)>      | No                   | List of Backend configurations.                                |
@@ -91,6 +92,17 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          |
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+
+#### PropertyConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| tags                | array                | No                    | Optional tags that when provided can be used to filter the property list. - string
+| secret                | boolean                | No                    | Determines whether the value is a secret and should be encrypted or not. Default value is false.
+| displayName                | string                | Yes                    | Unique name of Property. It may contain only letters, digits, period, dash, and underscore characters.                          |
+| value                | string                | Yes                    | Value of the property. Can contain policy expressions. It may not be empty or consist only of whitespace.                          |
+
+_Additional properties found in [PropertyContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/properties#propertycontractproperties-object)_
 
 #### LoggerConfiguration
 
