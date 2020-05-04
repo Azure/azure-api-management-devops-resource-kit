@@ -9,7 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\apimtemplate\Creator\ExampleFiles\OpenAPISpecs\swaggerPetstorev3.json" Link="Resources\swaggerPetstorev3.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +29,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\apimtemplate\apimtemplate.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\apimtemplate\Creator\ExampleFiles\OpenAPISpecs\swaggerPetstore.yml" Link="Resources\swaggerPetstore.yml" />
   </ItemGroup>
 
 </Project>

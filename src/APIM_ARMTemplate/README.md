@@ -43,6 +43,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                  | string                | Yes                   | API identifier. Must be unique in the current API Management service instance.                                 |
+| displayName           | string                | No                    | User-friendly name for the API.           |
 | description           | string                | No                    | Description of the API.                          |
 | serviceUrl            | string                | No                    | Absolute URL of the backend service implementing this API.                                 |
 | type                  | enum                  | No                    | Type of API. - http or soap                      |
@@ -156,6 +157,7 @@ apiVersionSets:
 apis:
     - name: myAPI
       type: http
+      displayName: My API
       description: myFirstAPI
       serviceUrl: http://myApiBackendUrl.com
       openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json

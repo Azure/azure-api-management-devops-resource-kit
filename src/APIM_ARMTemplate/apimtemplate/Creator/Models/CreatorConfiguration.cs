@@ -38,6 +38,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         // used to build displayName and resource name from APITemplateResource schema
         public string name { get; set; }
+        // optional : overrides title from OpenAPI definition
+        public string displayName { get; set; }
         public string description { get; set; }
         public string serviceUrl { get; set; }
         // used to build type and apiType from APITemplateResource schema
