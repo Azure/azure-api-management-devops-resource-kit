@@ -89,6 +89,7 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                | string                | No                    | Name of the product resource. If omitted, the display name is used.                          |
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          |
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
@@ -206,7 +207,8 @@ apis:
               bytes: 512
         enableHttpCorrelationHeaders: true
 products:
-    - displayName: platinum
+    - name: platinum
+      displayName: Platinum
       description: a test product
       terms: some terms
       subscriptionRequired: true
