@@ -90,6 +90,7 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                | string                | No                    | Name of the product resource. If omitted, the display name is used.                          |
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          |
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
@@ -208,7 +209,8 @@ apis:
               bytes: 512
         enableHttpCorrelationHeaders: true
 products:
-    - displayName: platinum
+    - name: platinum
+      displayName: Platinum
       description: a test product
       terms: some terms
       subscriptionRequired: true
@@ -286,6 +288,17 @@ Below are the steps to run the Creator from the source code:
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
+
+Additionaly, the Creator can also be made available as a global [dotnet CLI tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) in your Azure DevOps artifacts or private NuGet repository. Build the Creator, and run the following commands to package the Creator as a dotnet tool:
+
+```
+dotnet pack -c Release
+dotnet tool install -g --add-source .\bin\Release apimtemplate
+```
+
+The Creator tool is now available anywhere on the command-line:
+
+```apim-templates create --configFile CONFIG_YAML_FILE_LOCATION ```
 
 # Extractor
 
@@ -487,3 +500,9 @@ dotnet run extract
 
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
+
+Likewise, if you [package the Extractor as a dotnet CLI tool](#creator2), you can run it from anywhere on the command-line:
+
+```
+apim-templates extract
+```

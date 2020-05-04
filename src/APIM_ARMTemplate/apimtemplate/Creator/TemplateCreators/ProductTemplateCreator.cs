@@ -8,7 +8,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         private PolicyTemplateCreator policyTemplateCreator;
         private ProductGroupTemplateCreator productGroupTemplateCreator;
 
-        public ProductTemplateCreator(PolicyTemplateCreator policyTemplateCreator,ProductGroupTemplateCreator productGroupTemplateCreator)
+        public ProductTemplateCreator(PolicyTemplateCreator policyTemplateCreator, ProductGroupTemplateCreator productGroupTemplateCreator)
         {
             this.policyTemplateCreator = policyTemplateCreator;
             this.productGroupTemplateCreator = productGroupTemplateCreator;
@@ -28,10 +28,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<TemplateResource> resources = new List<TemplateResource>();
             foreach (ProductConfig product in creatorConfig.products)
             {
+                if (string.IsNullOrEmpty(product.name))
+                    product.name = product.displayName;
+
                 // create product resource with properties
                 ProductsTemplateResource productsTemplateResource = new ProductsTemplateResource()
                 {
-                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.displayName}')]",
+                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.name}')]",
                     type = ResourceTypeConstants.Product,
                     apiVersion = GlobalConstants.APIVersion,
                     properties = new ProductsTemplateProperties()
@@ -57,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 }
 
                 // create product group resources if provided
-                if(product.groups != null)
+                if (product.groups != null)
                 {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.displayName}')]" };
                     List<ProductGroupsValue> productGroups = this.productGroupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
