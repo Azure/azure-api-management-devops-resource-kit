@@ -287,6 +287,17 @@ Below are the steps to run the Creator from the source code:
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
 
+Additionaly, the Creator can also be made available as a global [dotnet CLI tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) in your Azure DevOps artifacts or private NuGet repository. Build the Creator, and run the following commands to package the Creator as a dotnet tool:
+
+```
+dotnet pack -c Release
+dotnet tool install -g --add-source .\bin\Release apimtemplate
+```
+
+The Creator tool is now available anywhere on the command-line:
+
+```apim-templates create --configFile CONFIG_YAML_FILE_LOCATION ```
+
 # Extractor
 
 This utility generates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) by extracting existing configurations of one or more APIs in an API Management instance. 
@@ -487,3 +498,9 @@ dotnet run extract
 
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
+
+Likewise, if you [package the Extractor as a dotnet CLI tool](#creator2), you can run it from anywhere on the command-line:
+
+```
+apim-templates extract
+```
