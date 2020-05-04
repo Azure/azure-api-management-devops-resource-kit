@@ -110,7 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create api resource
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]",
+                name = MakeResourceName(api),
                 type = ResourceTypeConstants.API,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new APITemplateProperties(),
@@ -149,11 +149,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = api.authenticationSettings.oAuth2.authorizationServerId;
                 }
                 // set the subscriptionKey Parameter Names
-                if (api.subscriptionKeyParameterNames != null) {
-                    if (api.subscriptionKeyParameterNames.header != null) {
+                if (api.subscriptionKeyParameterNames != null)
+                {
+                    if (api.subscriptionKeyParameterNames.header != null)
+                    {
                         apiTemplateResource.properties.subscriptionKeyParameterNames.header = api.subscriptionKeyParameterNames.header;
                     }
-                    if (api.subscriptionKeyParameterNames.query != null) {
+                    if (api.subscriptionKeyParameterNames.query != null)
+                    {
                         apiTemplateResource.properties.subscriptionKeyParameterNames.query = api.subscriptionKeyParameterNames.query;
                     }
                 }
@@ -211,6 +214,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.path = api.suffix;
             }
             return apiTemplateResource;
+        }
+
+        public static string MakeResourceName(APIConfig api)
+        {
+            return $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]";
         }
 
         public string[] CreateProtocols(APIConfig api)
