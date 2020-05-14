@@ -27,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] groupNames = product.groups.Split(", ");
             foreach (string groupName in groupNames)
             {
-                ProductGroupsValue productAPITemplate = this.CreateProductGroupTemplateResource(groupName, product.displayName, dependsOn);
+                ProductGroupsValue productAPITemplate = this.CreateProductGroupTemplateResource(groupName, product.name, dependsOn);
                 productGroupTemplates.Add(productAPITemplate);
             }
             return productGroupTemplates;
