@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         [Description("API name")]
         public string apiName { get; set; }
         [Description("Comma-separated list of API names")]
-        public string mutipleAPIs { get; set; }
+        public string multipleAPIs { get; set; }
         [Description("Creates a master template with links")]
         public string linkedTemplatesBaseUrl { get; set; }
         public string linkedTemplatesSasToken { get; set; }
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             bool hasVersionSetName = apiVersionSetName != null;
             bool hasSingleApi = apiName != null;
             bool includeRevisions = includeAllRevisions != null && includeAllRevisions.Equals("true");
-            bool hasMultipleAPIs = mutipleAPIs != null;
+            bool hasMultipleAPIs = multipleAPIs != null;
 
             if (shouldSplitAPIs && hasSingleApi)
             {
@@ -71,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             if ((hasVersionSetName || hasSingleApi) && hasMultipleAPIs)
             {
-                throw new NotSupportedException("Can't use mutipleAPIs with apiName or apiVersionSetName at the same time");
+                throw new NotSupportedException("Can't use multipleAPIs with apiName or apiVersionSetName at the same time");
             }
 
             if (hasSingleApi && hasVersionSetName)

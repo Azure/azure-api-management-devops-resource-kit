@@ -200,12 +200,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         // this function will generate templates for multiple specified APIs
         public static async Task GenerateMultipleAPIsTemplates(ExtractorConfig exc, FileNameGenerator fileNameGenerator, FileWriter fileWriter, FileNames fileNames)
         {
-            if (exc.mutipleAPIs == null && exc.mutipleAPIs.Equals(""))
+            if (exc.multipleAPIs == null && exc.multipleAPIs.Equals(""))
             {
-                throw new Exception("mutipleAPIs parameter doesn't have any data");
+                throw new Exception("multipleAPIs parameter doesn't have any data");
             }
 
-            string[] apis = exc.mutipleAPIs.Split(',');
+            string[] apis = exc.multipleAPIs.Split(',');
             for (int i = 0; i < apis.Length; i++)
             {
                 apis[i] = apis[i].Trim();
