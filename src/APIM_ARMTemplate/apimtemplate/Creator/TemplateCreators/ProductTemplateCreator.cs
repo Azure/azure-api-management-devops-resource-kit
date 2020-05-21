@@ -28,6 +28,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<TemplateResource> resources = new List<TemplateResource>();
             foreach (ProductConfig product in creatorConfig.products)
             {
+                if (string.IsNullOrEmpty(product.name)) {
+                    product.name = product.displayName;
+                }
                 // create product resource with properties
                 ProductsTemplateResource productsTemplateResource = new ProductsTemplateResource()
                 {
