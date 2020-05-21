@@ -5,7 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class PolicyTemplateCreator: TemplateCreator
+    public class PolicyTemplateCreator : TemplateCreator
     {
         private FileReader fileReader;
 
@@ -75,7 +75,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public PolicyTemplateResource CreateProductPolicyTemplateResource(ProductConfig product, string[] dependsOn)
         {
             if (string.IsNullOrEmpty(product.name))
+            {
                 product.name = product.displayName;
+            }
 
             Uri uriResult;
             bool isUrl = Uri.TryCreate(product.policy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
