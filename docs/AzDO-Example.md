@@ -8,7 +8,7 @@ To run this solution you will need:
 
 - Azure DevOps Account
 - An Azure DevOps Repo configured (how to configura an Azure DevOps Repo)
-- An API Management deployed 
+- For this solution, we will use 3 API Management deployed (Dev, QA and Production) 
 - Some API(s) on your API Management 
 
 ## Architecture
