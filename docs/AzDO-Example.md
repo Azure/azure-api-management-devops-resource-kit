@@ -15,7 +15,7 @@ To run this solution you will need:
 
 We'll follow the same scenario presented on [README.md] file. 
 
-![alt](.//images/architecture.png)
+![alt](.//images/architecture.png){:height="50%" width="50%"}
 
 ## The proccess
 
@@ -23,7 +23,7 @@ This is one example how to use Azure DevOps Repo and Azure DevOps Pipelines to e
 
 This is our Development API management. In general, developers will create their API's on one instance of APIM to test it. 
 
-![alt](./images/apim-dev-apis.png)
+![alt](./images/apim-dev-apis.png){:height="50%" width="50%"}
 
 Once a Developer create and test the API on API Management, it's time to extract these API's using this DevOps Resource Kit. 
 
@@ -61,11 +61,11 @@ Where:
 
 After execute the command above, you will see something similar to this:
 
-![alt](./images/extractedapis.png)
+![alt](./images/extractedapis.png){:height="50%" width="50%"}
 
 Then you see the json files extracted: 
 
-![alt](./images/extractedfiles.png)
+![alt](./images/extractedfiles.png){:height="50%" width="50%"}
 
 Now, push your to your Azure DevOps Repo 
 
@@ -79,13 +79,13 @@ Add these tasks to your build:
 - Get Sources
 - Copy Publish Artifacts 
   
-![alt](./images/buildpipelinetasks.png)
+![alt](./images/buildpipelinetasks.png){:height="50%" width="50%"}
 
 Configure the fields as show bellow:
 
-![alt](./images/copypublishartifact.png)
+![alt](./images/copypublishartifact.png){:height="50%" width="50%"}
 
 Now you have a Build Pipeline which will pull your APIM JSON files and publish it to the Artifact folder on your Azure DevOps. 
 
-![alt](./images/releasepipeline.png)
+![alt](./images/releasepipeline.png){:height="50%" width="50%"}
 
