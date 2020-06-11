@@ -49,9 +49,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
         public string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
-            if (baseFileName.Length > 0)
-                baseFileName += "-";
-
             return singleAPIName == null ? $@"/{baseFileName}apis.template.json" : $@"/{baseFileName}{singleAPIName}-api.template.json";
         }
 
