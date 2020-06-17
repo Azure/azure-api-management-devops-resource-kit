@@ -1,8 +1,8 @@
-#Continuos Integration and Continuos Deployment using Azure DevOps - AzDO
+# Continuos Integration and Continuos Deployment using Azure DevOps - AzDO
 
 The following instructions demonstrate how to deploy the contents of this example repository using Azure DevOps Repos and Azure DevOps Pipelines.
 
-##Pre-reqs
+## Pre-reqs
 
 To execute this solution you will need:
 
