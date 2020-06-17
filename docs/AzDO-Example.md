@@ -11,7 +11,7 @@ To execute this solution you will need:
 - Three API Management deployed (DEV, QA and PROD) ([how to deploy a Create a new Azure API Management service instance](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance))
 - Some API(s) on your API Management ([Add an API manually](https://docs.microsoft.com/en-us/azure/api-management/add-api-manually))
 
-###Architecture
+## Architecture
 
 ![](images/architecture.png)
 
@@ -22,6 +22,8 @@ This is our Development API management. In general, developers will create their
 Create your API's on API Management Development environment. ([How to create API's on API Management](https://docs.microsoft.com/en-us/azure/api-management/import-and-publish))
 
 ![](images/apim-dev.png)
+
+## APIM DevOps Toolkit
 
 **Running the Extractor**
 
