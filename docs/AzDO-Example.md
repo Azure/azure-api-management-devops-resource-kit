@@ -6,10 +6,10 @@ The following instructions demonstrate how to deploy the contents of this exampl
 
 To execute this solution you will need:
 
-\- Azure DevOps Account
-\- An Azure DevOps Repo configured ([how to configure an Azure DevOps Repo](https://docs.microsoft.com/en-us/azure/devops/repos/get-started/sign-up-invite-teammates?view=azure-devops))
-\- Three API Management deployed (DEV, QA and PROD) ([how to deploy a Create a new Azure API Management service instance](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance))
-\- Some API(s) on your API Management ([Add an API manually](https://docs.microsoft.com/en-us/azure/api-management/add-api-manually))
+- Azure DevOps Account
+- An Azure DevOps Repo configured ([how to configure an Azure DevOps Repo](https://docs.microsoft.com/en-us/azure/devops/repos/get-started/sign-up-invite-teammates?view=azure-devops))
+- Three API Management deployed (DEV, QA and PROD) ([how to deploy a Create a new Azure API Management service instance](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance))
+- Some API(s) on your API Management ([Add an API manually](https://docs.microsoft.com/en-us/azure/api-management/add-api-manually))
 
 ###Architecture
 
@@ -29,14 +29,14 @@ After a developer creates and tests APIs in API management, it is time to extrac
 
 Below are the steps to run the extractor from source code:
 
-\- Clone this repository and navigate to {path\_to\_folder}/src/APIM\_ARMTemplate/apimtemplate
-\- Restore its packages using
+- Clone this repository and navigate to {path\_to\_folder}/src/APIM\_ARMTemplate/apimtemplate
+- Restore its packages using
 
 ``` 
 dotnet restore 
 ```
 
-\- Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted.
+- Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted.
 
 ```
 
