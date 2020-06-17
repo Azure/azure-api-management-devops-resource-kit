@@ -1,91 +1,145 @@
-# Continuos Integration and Continuos Deployment using Azure DevOps - AzDO
+#Continuos Integration and Continuos Deployment using Azure DevOps - AzDO
 
 The following instructions demonstrate how to deploy the contents of this example repository using Azure DevOps Repos and Azure DevOps Pipelines.
 
-## Pre-reqs
+##Pre-reqs
 
-To run this solution you will need:
+To execute this solution you will need:
 
-- Azure DevOps Account
-- An Azure DevOps Repo configured (how to configura an Azure DevOps Repo)
-- For this solution, we will use 3 API Management deployed (Dev, QA and Production) 
-- Some API(s) on your API Management 
+\- Azure DevOps Account
+\- An Azure DevOps Repo configured ([how to configure an Azure DevOps Repo](https://docs.microsoft.com/en-us/azure/devops/repos/get-started/sign-up-invite-teammates?view=azure-devops))
+\- Three API Management deployed (DEV, QA and PROD) ([how to deploy a Create a new Azure API Management service instance](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance))
+\- Some API(s) on your API Management ([Add an API manually](https://docs.microsoft.com/en-us/azure/api-management/add-api-manually))
 
-## Architecture
+###Architecture
 
-We'll follow the same scenario presented on [README.md] file. 
+![](images/architecture.png)
 
-![alt](.//images/architecture.png){:height="50%" width="50%"}
+This is one example of how to use Azure DevOps Repo and Azure DevOps Pipelines to enable a Continuous Integration and Continuous Deployment (CI/CD) for API\'s on an Azure API Management Service. There're other ways to do this, but this is a \"Keep it Simple\" to help you start.(Planning to have another version using Github and Github Actions soon).
 
-## The proccess
+This is our Development API management. In general, developers will create their API\'s in one instance of APIM to test it.
 
-This is one example how to use Azure DevOps Repo and Azure DevOps Pipelines to enable a Continuos Integration and Continuos Deploiment (CI/CD) for API's on a Azure API Management Service. There's other ways to do this, but this is a "Keep it Simple" to help you start. (Planning to have another version using Github and Github Actions soon).
+Create your API's on API Management Development environment. ([How to create API's on API Management](https://docs.microsoft.com/en-us/azure/api-management/import-and-publish))
 
-This is our Development API management. In general, developers will create their API's on one instance of APIM to test it. 
+![](images/apim-dev.png)
 
-![alt](./images/apim-dev-apis.png){:height="50%" width="50%"}
+**Running the Extractor**
 
-Once a Developer create and test the API on API Management, it's time to extract these API's using this DevOps Resource Kit. 
+After a developer creates and tests APIs in API management, it is time to extract those APIs using this DevOps Resource Kit.
 
-To runn it:
+Below are the steps to run the extractor from source code:
 
-<a name="extractor1"></a>
+\- Clone this repository and navigate to {path\_to\_folder}/src/APIM\_ARMTemplate/apimtemplate
+\- Restore its packages using
 
-## Running the Extractor
-Below are the steps to run the Extractor from the source code:
-- Clone this repository and navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate 
-- Restore its packages using ```dotnet restore```
-- Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted. 
+``` 
+dotnet restore 
 ```
+
+\- Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted.
+
+```
+
 az login
-az account set --subscription <subscription_id>
+
+az account set \--subscription \<subscription\_id\>
+
 ```
-#### Extractor Arguments
+
+**Extractor Arguments**
 
 You have two choices when specifying your settings:
-1. By using a json file with key-values where the keys matches the table below. Use the `extractorConfig` argument:
-`extract --extractorConfig c:/temp/extractSettings.json`. [See more examples.](#extractorParameterFileExamples)
-2. Pass the arguments on the command line. For instance `extract --sourceApimName my-feature-apim --destinationApimName company-stable-apim --resourceGroup my-feature-rg --fileFolder c:\temp\apim-extract --apiName MyFeatureV1Api`.
 
-For this example we will only use the option #2
+1\. By using a json file with key-values where the keys matches the table below. Use the \`extractorConfig\` argument:
 
-So, run the aplication with: 
-```
-dotnet run extract --sourceApimName <DEV-APIM-NAME> --destinationApimName <DESTINATION-APIM-NAME> --resourceGroup <RESOURCE-GROUP-NAME>  --fileFolder c:\temp\apim-extract.
-```
-Where: 
+\`extract \--extractorConfig c:/temp/extractSettings.json\`. [See more examples.](#extractorParameterFileExamples)
 
-> **DEV-APIM-NAME:** API Management where you created your API
-> **DESTINATION-APIM-NAME:** It's just a convention to set the DESTINATION-API-NAME in front of the generated files.
-> **RESOURCE-GROUP-NAME:** Resource group where the DEV-APIM-NAME is hosted.
+2\. Pass the arguments on the command line. For instance \`extract \--sourceApimName my-feature-apim \--destinationApimName company-stable-apim \--resourceGroup my-feature-rg \--fileFolder c:\\temp\\apim-extract \--apiName MyFeatureV1Api\`.
 
-After execute the command above, you will see something similar to this:
+For this example, we will only use the option \#2
 
-![alt](./images/extractedapis.png){:height="50%" width="50%"}
-
-Then you see the json files extracted: 
-
-![alt](./images/extractedfiles.png){:height="50%" width="50%"}
-
-Now, push your to your Azure DevOps Repo 
+So, run the application with:
 
 ```
-git push 
+
+dotnet run extract \--sourceApimName \<DEV-APIM-NAME\>
+\--destinationApimName \<DESTINATION-APIM-NAME\> \--resourceGroup
+\<RESOURCE-GROUP-NAME\> \--fileFolder c:\\temp\\apim-extract.
+
 ```
 
-Now lets create our Build Pipeline: 
+Where:
 
-Add these tasks to your build: 
+**DEV-APIM-NAME:** API Management where you created your API
+
+**DESTINATION-APIM-NAME:** It\'s just a convention to set the DESTINATION-API-NAME in front of the generated files.
+
+**RESOURCE-GROUP-NAME:** Resource group where the DEV-APIM-NAME is hosted.
+
+***For more information on how to run the application and parameters, [go to this page](https://github.com/Azure/azure-api-management-devops-resource-kit/blob/master/src/APIM_ARMTemplate/README.md#extractor).***
+
+After executing the command above, you will see something similar to this:
+
+![A screenshot of text Description automatically
+generated](images/extractor.png)
+
+Then you see the json files extracted:
+
+![A close up of text on a white background Description automatically
+generated](images/extracted-files.png)
+
+Now, push them to your Azure DevOps Repo
+
+```
+git push
+```
+
+# Build Pipeline
+
+We will use a **Build Pipeline** to pull the extracted files from a repo and put it on Azure DevOps Artefacts Folder. 
+ 
+1 - Add these tasks to your build:
 - Get Sources
-- Copy Publish Artifacts 
-  
-![alt](./images/buildpipelinetasks.png){:height="50%" width="50%"}
+- Copy Publish Artifacts
 
-Configure the fields as show bellow:
+2 - Configure the fields as show bellow:
 
-![alt](./images/copypublishartifact.png){:height="50%" width="50%"}
+![A screenshot of a cell phone Description automatically
+generated](images/build-pipeline1.png)
 
-Now you have a Build Pipeline which will pull your APIM JSON files and publish it to the Artifact folder on your Azure DevOps. 
+![A screenshot of a cell phone Description automatically
+generated](images/build-pipeline2.png)
 
-![alt](./images/releasepipeline.png){:height="50%" width="50%"}
+# Release Pipeline
 
+You can use [this](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/?view=azure-devops) document as a reference on how to create a release pipeline.
+
+1 - Add an [**Azure Deployment tasks**](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-resource-group-deployment?view=azure-devops) for each file generated by extractor, following the order:
+
+```
+- Products.template.json
+- Tags.template.json
+- namedValues.template.json
+- apis.template.json
+- globalServicePolice.template.json
+```
+
+2 - Set "Override template parameters" field with "-ApimServiceName \<QA-APIM-NAME>\"
+
+3 - Set set [Deployment mode to Incremental](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-tutorial-pipeline#create-a-devops-project)
+
+![](images/release-qa-parameters.png)
+
+When you finish the steps above, you will see something like this:
+
+![](images/deploy-qa.png)
+
+Clone your QA environment and update the **Resource Group** and **ApimServiceName** value on "Override template parameters" field to reflect your "production" APIM.
+
+![](images/release-prod.png)
+
+Now you will see your Release Pipeline like this:
+
+![](images/release-pipeline.png)
+
+By using a combination of manual deployment approvals, gates, and manual intervention within a release pipeline in Azure Pipelines, you can quickly and easily configure a release pipeline with all the control and auditing capabilities you require for your DevOps CI/CD processes. You will find more information on this [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/deploy-using-approvals?view=azure-devops). 
