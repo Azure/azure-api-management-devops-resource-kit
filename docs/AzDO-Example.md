@@ -13,7 +13,7 @@ To execute this solution you will need:
 
 ## Architecture
 
-![](images/architecture.png)
+![](images/Architecture.png)
 
 This is one example of how to use Azure DevOps Repo and Azure DevOps Pipelines to enable a Continuous Integration and Continuous Deployment (CI/CD) for API\'s on an Azure API Management Service. There're other ways to do this, but this is a \"Keep it Simple\" to help you start.(Planning to have another version using Github and Github Actions soon).
 
@@ -64,9 +64,7 @@ So, run the application with:
 
 ```
 
-dotnet run extract \--sourceApimName \<DEV-APIM-NAME\>
-\--destinationApimName \<DESTINATION-APIM-NAME\> \--resourceGroup
-\<RESOURCE-GROUP-NAME\> \--fileFolder c:\\temp\\apim-extract.
+dotnet run extract --sourceApimName <DEV-APIM-NAME> --destinationApimName <DESTINATION-APIM-NAME> --resourceGroup <RESOURCE-GROUP-NAME> --fileFolder c:\\temp\\apim-extract.
 
 ```
 
