@@ -26,6 +26,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | apiVersionSets         | Array<[APIVersionSetConfiguration](#APIVersionSetConfiguration)> | No               | List of API Version Set configurations.                        |
 | apis                   | Array<[APIConfiguration](#APIConfiguration)>      | Yes                   | List of API configurations.                                |
 | products                   | Array<[ProductConfiguration](#ProductConfiguration)>      | No                   | List of Product configurations.                                |
+| namedValues               | Array<[PropertyConfiguration](#PropertyConfiguration)>     | No                   | List of Named Values
 | loggers                   | Array<[LoggerConfiguration](#LoggerConfiguration)>      | No                   | List of Logger configurations.                                |
 | authorizationServers                   | Array<[AuthorizationServerContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/authorizationservers#AuthorizationServerContractProperties)>      | No                   | List of Authorization Server configurations.                                |
 | backends                   | Array<[BackendContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/backends#BackendContractProperties)>      | No                   | List of Backend configurations.                                |
@@ -42,6 +43,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                  | string                | Yes                   | API identifier. Must be unique in the current API Management service instance.                                 |
+| displayName           | string                | No                    | User-friendly name for the API.           |
 | description           | string                | No                    | Description of the API.                          |
 | serviceUrl            | string                | No                    | Absolute URL of the backend service implementing this API.                                 |
 | type                  | enum                  | No                    | Type of API. - http or soap                      |
@@ -88,9 +90,21 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                | string                | No                    | Name of the product resource. If omitted, the display name is used.                          |
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          |
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+
+#### PropertyConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| tags                | array                | No                    | Optional tags that when provided can be used to filter the property list. - string
+| secret                | boolean                | No                    | Determines whether the value is a secret and should be encrypted or not. Default value is false.
+| displayName                | string                | Yes                    | Unique name of Property. It may contain only letters, digits, period, dash, and underscore characters.                          |
+| value                | string                | Yes                    | Value of the property. Can contain policy expressions. It may not be empty or consist only of whitespace.                          |
+
+_Additional properties found in [PropertyContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/properties#propertycontractproperties-object)_
 
 #### LoggerConfiguration
 
@@ -143,6 +157,7 @@ apiVersionSets:
 apis:
     - name: myAPI
       type: http
+      displayName: My API
       description: myFirstAPI
       serviceUrl: http://myApiBackendUrl.com
       openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
@@ -194,7 +209,8 @@ apis:
               bytes: 512
         enableHttpCorrelationHeaders: true
 products:
-    - displayName: platinum
+    - name: platinum
+      displayName: Platinum
       description: a test product
       terms: some terms
       subscriptionRequired: true
@@ -273,6 +289,17 @@ Below are the steps to run the Creator from the source code:
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
 
+Additionaly, the Creator can also be made available as a global [dotnet CLI tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) in your Azure DevOps artifacts or private NuGet repository. Build the Creator, and run the following commands to package the Creator as a dotnet tool:
+
+```
+dotnet pack -c Release
+dotnet tool install -g --add-source .\bin\Release apimtemplate
+```
+
+The Creator tool is now available anywhere on the command-line:
+
+```apim-templates create --configFile CONFIG_YAML_FILE_LOCATION ```
+
 # Extractor
 
 This utility generates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) by extracting existing configurations of one or more APIs in an API Management instance. 
@@ -315,7 +342,7 @@ You have two choices when specifying your settings:
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 | splitAPIs     | No                    | If set to "true", then generate multiple api folders, each api will have a seperate folder, with a separate master template to deploy this api. If this single api has a version set, then a version set folder will generate instead, then all apis that belongs to this version set will be included in the version set folder, apis in this version set can be deployed separately using every api's master template, or they can be deployed together using the master template in "VersionSetMasterFolder" folder                        |
 | apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
-| mutipleAPIs  | No                    | Specify multiple APIs to extract. Generate templates for each API, also generate an aggregated templates folder to deploy these APIs together at a time      |
+| multipleAPIs  | No                    | Specify multiple APIs to extract. Generate templates for each API, also generate an aggregated templates folder to deploy these APIs together at a time      |
 | includeAllRevisions  | No                    |  Set to "true" will extract all revisions for the single API. Will work only with "apiName" paramter, where you specify which API's revisions to extract. Generate templates for each revision, also generate an aggregated master folder to deploy these revisions together at one time. Note: there are many complicated issues with deploying revisions, make sure your deployment won't overwrite or break the existing ones      |
 | baseFileName  | No                    | Specify base file name of the template files      |
 |  policyXMLSasToken | No                    | Specify sasToken for fetching policy files    |
@@ -329,7 +356,7 @@ You have two choices when specifying your settings:
 
 #### Note
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
-* Can not use "apiName" and "mutipleAPIs" at the same time
+* Can not use "apiName" and "multipleAPIs" at the same time
 * Can only "includeAllRevisions" with "apiName"
 
 <a name="extractorParameterFileExamples"></a>
@@ -404,7 +431,7 @@ Extract **multiple APIs**, use the following parameters:
     "fileFolder": "<destination-file-folder>",
     "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
     "policyXMLBaseUrl": "<policies_remote_location>",
-    "mutipleAPIs": "api1, api2, api3"
+    "multipleAPIs": "api1, api2, api3"
 }
 ```
 Extract **single API with baseFileName**, use the following parameters: 
@@ -473,3 +500,9 @@ dotnet run extract
 
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
+
+Likewise, if you [package the Extractor as a dotnet CLI tool](#creator2), you can run it from anywhere on the command-line:
+
+```
+apim-templates extract
+```

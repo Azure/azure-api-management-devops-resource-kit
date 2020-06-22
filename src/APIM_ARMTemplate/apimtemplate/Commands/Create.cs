@@ -48,6 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
                     ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
                     ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator);
+                    PropertyTemplateCreator propertyTemplateCreator = new PropertyTemplateCreator();
                     TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
@@ -62,6 +63,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Console.WriteLine("Creating product template");
                     Console.WriteLine("------------------------------------------");
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating named values template");
+                    Console.WriteLine("------------------------------------------");
+                    Template propertyTemplate = creatorConfig.namedValues != null ? propertyTemplateCreator.CreatePropertyTemplate(creatorConfig) : null;
                     Console.WriteLine("Creating logger template");
                     Console.WriteLine("------------------------------------------");
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
@@ -108,13 +112,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, propertyTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
                     }
                     foreach (Template apiTemplate in apiTemplates)
                     {
                         APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
-                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name, StringComparison.Ordinal));
+                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.name, APITemplateCreator.MakeResourceName(api), true) == 0);
                         // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
                         string apiFileName = fileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
                         fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
@@ -130,6 +134,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (productsTemplate != null)
                     {
                         fileWriter.WriteJSONToFile(productsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.products));
+                    }
+                    if (propertyTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(propertyTemplate, String.Concat(creatorConfig.outputLocation, fileNames.namedValues));
                     }
                     if (loggersTemplate != null)
                     {

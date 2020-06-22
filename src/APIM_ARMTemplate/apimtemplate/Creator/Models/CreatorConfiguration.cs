@@ -17,6 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public List<APIVersionSetConfig> apiVersionSets { get; set; }
         public List<APIConfig> apis { get; set; }
         public List<ProductConfig> products { get; set; }
+        public List<PropertyConfig> namedValues {get;set;}
         public List<LoggerConfig> loggers { get; set; }
         public List<AuthorizationServerTemplateProperties> authorizationServers { get; set; }
         public List<BackendTemplateProperties> backends { get; set; }
@@ -37,6 +38,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         // used to build displayName and resource name from APITemplateResource schema
         public string name { get; set; }
+        // optional : overrides title from OpenAPI definition
+        public string displayName { get; set; }
         public string description { get; set; }
         public string serviceUrl { get; set; }
         // used to build type and apiType from APITemplateResource schema
@@ -86,6 +89,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string policy { get; set; }
         // coma separated names
         public string groups { get; set; }
+    }
+
+    public class PropertyConfig : PropertyResourceProperties
+    {
+
     }
     
 }

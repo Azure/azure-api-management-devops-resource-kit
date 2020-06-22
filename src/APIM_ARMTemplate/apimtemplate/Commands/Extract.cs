@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     bool hasVersionSetName = extractorConfig.apiVersionSetName != null;
                     bool hasSingleApi = singleApiName != null;
                     bool includeRevisions = extractorConfig.includeAllRevisions != null && extractorConfig.includeAllRevisions.Equals("true");
-                    bool hasMultipleAPIs = extractorConfig.mutipleAPIs != null;
+                    bool hasMultipleAPIs = extractorConfig.multipleAPIs != null;
                     EntityExtractor.baseUrl = (extractorConfig.serviceBaseUrl == null) ? EntityExtractor.baseUrl : extractorConfig.serviceBaseUrl;
 
                     // start running extractor

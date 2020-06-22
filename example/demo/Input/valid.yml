@@ -1,6 +1,6 @@
 version: 0.0.1   # Required
 apimServiceName: contosoapim-dev   # Required, must match name of an apim service deployed in the specified resource group
-apiVersionSet:   # Optional
+apiVersionSets:   # Optional
   - id: myVersionSetID
     displayName: myAPIVersionSet
     description: a description
@@ -14,7 +14,7 @@ apis:
     policy: ./Input/apiPolicyHeaders.xml   # Optional, can be url or local file
     suffix: myAPIPet   # Required
     apiVersion: v1   # Optional
-    apiVersionDescription: My first version   # Optional 
+    apiVersionDescription: My first version   # Optional
     apiVersionSetId: myVersionSetID
     revision: 1   # Optional
     revisionDescription: My first revision   # Optional

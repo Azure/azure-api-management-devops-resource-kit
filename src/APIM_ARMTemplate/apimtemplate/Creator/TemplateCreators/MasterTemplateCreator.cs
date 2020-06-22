@@ -10,6 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
+            Template propertyTemplate,
             Template loggersTemplate,
             Template backendsTemplate,
             Template authorizationServersTemplate,
@@ -47,6 +48,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 string productsUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.products);
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }));
+            }
+
+            // property
+            if (propertyTemplate != null)
+            {
+                string propertyUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.namedValues);
+                resources.Add(this.CreateLinkedMasterTemplateResource("propertyTemplate", propertyUri, new string[] { }));
             }
 
             // logger
@@ -182,7 +190,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(CreatorConfig creatorConfig)
         {
             // used to create the parameter metatadata, etc (not value) for use in file with resources
-            // add parameters with metatdata properties
+            // add parameters with metadata properties
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
@@ -225,7 +233,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = CreateEmptyTemplate();
+            Template masterTemplate = CreateEmptyParameters();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();

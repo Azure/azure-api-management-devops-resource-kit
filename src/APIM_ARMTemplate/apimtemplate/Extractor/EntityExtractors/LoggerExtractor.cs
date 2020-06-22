@@ -56,10 +56,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             foreach (LoggerTemplateResource resource in loggerResources)
             {
                 string validLoggerName = GetValidLoggerParamName(resource.name);
-                if (resource.properties.resourceId != null)
-                {
-                    resource.properties.resourceId = $"[parameters('{ParameterNames.LoggerResourceId}').{validLoggerName}]";
-                }
+                resource.properties.resourceId = $"[parameters('{ParameterNames.LoggerResourceId}').{validLoggerName}]";
                 nLoggerResource.Add(resource);
             }
             loggerTemplate.resources = nLoggerResource.ToArray();

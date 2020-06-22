@@ -18,5 +18,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             };
             return template;
         }
+
+        public Template CreateEmptyParameters()
+        {
+            // creates empty parameters file for use in all other template creators
+            Template template = new Template()
+            {
+                schema = "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+                contentVersion = "1.0.0.0",
+                parameters = { },
+            };
+            return template;
+        }
     }
 }
