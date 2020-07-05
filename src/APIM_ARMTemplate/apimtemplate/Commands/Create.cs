@@ -3,6 +3,7 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -16,6 +17,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // list command options
             CommandOption configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
 
+            // list command options
+            CommandOption backendUrlFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue).IsRequired();
+
             this.HelpOption();
 
             this.OnExecute(async () =>
@@ -23,6 +27,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
+
+                string backendurlConfigContent = fileReader.RetrieveLocalFileContents(backendUrlFile.Value());
+
+                if(fileReader.isJSON(backendurlConfigContent))
+                {                    
+                    List<BackendUrlsConfig> backendUrls = JsonConvert.DeserializeObject<List<BackendUrlsConfig>>(backendurlConfigContent);
+                    
+                    foreach(APIConfig aPIConfig in creatorConfig.apis)
+                    {
+                        BackendUrlsConfig backendUrlsConfig = backendUrls.Find(f => f.apiName == aPIConfig.name);
+
+                        if(backendUrlsConfig != null && !string.IsNullOrEmpty(backendUrlsConfig.apiUrl))
+                        {
+                            aPIConfig.serviceUrl = backendUrlsConfig.apiUrl;
+                        }
+                    }
+                }
 
                 // validate creator config
                 CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
