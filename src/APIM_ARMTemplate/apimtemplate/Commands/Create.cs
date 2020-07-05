@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             CommandOption configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
 
             // list command options
-            CommandOption backendUrlFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue).IsRequired();
+            CommandOption backendUrlFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
 
             this.HelpOption();
 
@@ -28,19 +28,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
 
-                string backendurlConfigContent = fileReader.RetrieveLocalFileContents(backendUrlFile.Value());
+                //if backendurlfile passed as parameter
+                if (backendUrlFile != null && !string.IsNullOrEmpty(backendUrlFile.Value()))
+                {
+                    string backendurlConfigContent = fileReader.RetrieveLocalFileContents(backendUrlFile.Value());
 
-                if(fileReader.isJSON(backendurlConfigContent))
-                {                    
-                    List<BackendUrlsConfig> backendUrls = JsonConvert.DeserializeObject<List<BackendUrlsConfig>>(backendurlConfigContent);
-                    
-                    foreach(APIConfig aPIConfig in creatorConfig.apis)
+                    //if the file is json file
+                    if (fileReader.isJSON(backendurlConfigContent))
                     {
-                        BackendUrlsConfig backendUrlsConfig = backendUrls.Find(f => f.apiName == aPIConfig.name);
+                        List<BackendUrlsConfig> backendUrls = JsonConvert.DeserializeObject<List<BackendUrlsConfig>>(backendurlConfigContent);
 
-                        if(backendUrlsConfig != null && !string.IsNullOrEmpty(backendUrlsConfig.apiUrl))
+                        foreach (APIConfig aPIConfig in creatorConfig.apis)
                         {
-                            aPIConfig.serviceUrl = backendUrlsConfig.apiUrl;
+                            //if the apiname matches with the one in valid yaml file
+                            BackendUrlsConfig backendUrlsConfig = backendUrls.Find(f => f.apiName == aPIConfig.name);
+
+                            //update the backendurl as per the input json file
+                            if (backendUrlsConfig != null && !string.IsNullOrEmpty(backendUrlsConfig.apiUrl))
+                            {
+                                aPIConfig.serviceUrl = backendUrlsConfig.apiUrl;
+                            }
                         }
                     }
                 }
