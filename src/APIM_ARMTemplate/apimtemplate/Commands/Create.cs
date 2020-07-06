@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             CommandOption configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
 
             // list command options
-            CommandOption backendUrlFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
+            CommandOption backendurlconfigFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
 
             this.HelpOption();
 
@@ -29,9 +29,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
 
                 //if backendurlfile passed as parameter
-                if (backendUrlFile != null && !string.IsNullOrEmpty(backendUrlFile.Value()))
+                if (backendurlconfigFile != null && !string.IsNullOrEmpty(backendurlconfigFile.Value()))
                 {
-                    string backendurlConfigContent = fileReader.RetrieveLocalFileContents(backendUrlFile.Value());
+                    string backendurlConfigContent = fileReader.RetrieveLocalFileContents(backendurlconfigFile.Value());
 
                     //if the file is json file
                     if (fileReader.isJSON(backendurlConfigContent))
