@@ -4,6 +4,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using apimtemplate.Creator.Utilities;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -28,32 +29,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
 
+                // validate creator config
+                CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
+
                 //if backendurlfile passed as parameter
                 if (backendurlconfigFile != null && !string.IsNullOrEmpty(backendurlconfigFile.Value()))
                 {
-                    string backendurlConfigContent = fileReader.RetrieveLocalFileContents(backendurlconfigFile.Value());
-
-                    //if the file is json file
-                    if (fileReader.isJSON(backendurlConfigContent))
-                    {
-                        List<BackendUrlsConfig> backendUrls = JsonConvert.DeserializeObject<List<BackendUrlsConfig>>(backendurlConfigContent);
-
-                        foreach (APIConfig aPIConfig in creatorConfig.apis)
-                        {
-                            //if the apiname matches with the one in valid yaml file
-                            BackendUrlsConfig backendUrlsConfig = backendUrls.Find(f => f.apiName == aPIConfig.name);
-
-                            //update the backendurl as per the input json file
-                            if (backendUrlsConfig != null && !string.IsNullOrEmpty(backendUrlsConfig.apiUrl))
-                            {
-                                aPIConfig.serviceUrl = backendUrlsConfig.apiUrl;
-                            }
-                        }
-                    }
+                    CreatorApiBackendUrlUpdater creatorApiBackendUrlUpdater = new CreatorApiBackendUrlUpdater();
+                    creatorConfig = creatorApiBackendUrlUpdater.UpdateBackendServiceUrl(backendurlconfigFile.Value(), creatorConfig);
                 }
 
-                // validate creator config
-                CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
                 bool isValidCreatorConfig = creatorConfigurationValidator.ValidateCreatorConfig(creatorConfig);
                 if (isValidCreatorConfig == true)
                 {
