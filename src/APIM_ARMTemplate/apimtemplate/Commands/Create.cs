@@ -3,6 +3,7 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using System.Linq;
+using apimtemplate.Creator.Utilities;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -16,6 +17,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // list command options
             CommandOption configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
 
+            CommandOption appInsightsInstrumentationKey = this.Option("--appInsightsInstrumentationKey <appInsightsInstrumentationKey>", "AppInsights intrumentationkey", CommandOptionType.SingleValue);
+
+            CommandOption appInsightsName = this.Option("--appInsightsName <appInsightsName>", "AppInsights Name", CommandOptionType.SingleValue);
+
             this.HelpOption();
 
             this.OnExecute(async () =>
@@ -23,6 +28,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
+
+                AppInsightsUpdater appInsightsUpdater = new AppInsightsUpdater();
+                appInsightsUpdater.UpdateAppInsightNameAndInstrumentationKey(creatorConfig, appInsightsInstrumentationKey, appInsightsName);
 
                 // validate creator config
                 CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
