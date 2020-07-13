@@ -3,6 +3,7 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using apimtemplate.Creator.Utilities;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
@@ -21,6 +22,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             CommandOption appInsightsName = this.Option("--appInsightsName <appInsightsName>", "AppInsights Name", CommandOptionType.SingleValue);
 
+            // list command options
+            CommandOption backendurlconfigFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
+
+
             this.HelpOption();
 
             this.OnExecute(async () =>
@@ -34,6 +39,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                 // validate creator config
                 CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
+
+                //if backendurlfile passed as parameter
+                if (backendurlconfigFile != null && !string.IsNullOrEmpty(backendurlconfigFile.Value()))
+                {
+                    CreatorApiBackendUrlUpdater creatorApiBackendUrlUpdater = new CreatorApiBackendUrlUpdater();
+                    creatorConfig = creatorApiBackendUrlUpdater.UpdateBackendServiceUrl(backendurlconfigFile.Value(), creatorConfig);
+                }
+
                 bool isValidCreatorConfig = creatorConfigurationValidator.ValidateCreatorConfig(creatorConfig);
                 if (isValidCreatorConfig == true)
                 {
