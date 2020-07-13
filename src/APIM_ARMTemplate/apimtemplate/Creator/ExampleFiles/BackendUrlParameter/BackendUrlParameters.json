@@ -1,0 +1,9 @@
+[{
+        "apiName": "myAPI",
+        "apiUrl": "http://myApiBackendUrl.com"
+    },
+    {
+        "apiName": "myAPI2",
+        "apiUrl": "http://myApiBackendUrl.com"
+    }
+]

@@ -6,6 +6,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     public class CLICreatorArguments
     {
         public string configFile { get; set; }
+
+        public string backendurlconfigFile { get; set; }
     }
 
     public class CreatorConfig
