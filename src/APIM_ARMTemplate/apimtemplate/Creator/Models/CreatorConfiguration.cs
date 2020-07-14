@@ -5,6 +5,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
     public class CLICreatorArguments
     {
+        public string appInsightsInstrumentationKey { get; set; }
+        public string appInsightsName { get; set; }
         public string configFile { get; set; }
 
         public string backendurlconfigFile { get; set; }
@@ -97,5 +99,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
 
     }
-    
+
 }

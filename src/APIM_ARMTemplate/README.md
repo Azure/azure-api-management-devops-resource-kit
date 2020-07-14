@@ -286,9 +286,10 @@ Below are the steps to run the Creator from the source code:
 - Navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate directory
 - Run the following command:
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
+- Run the following command to pass AppinsightsName and Appinsights InstrumentationKey as an parameter:
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --appInsightsInstrumentationKey 45d4v88-fdfs-4b35-9232-731d82d4d1c6 --appInsightsName  myAppInsights ```
 - Run the following command to pass BackendUrls as an json input file into the parameter(sample file available in the same path as below in this repository):
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --backendurlconfigFile .\apimtemplate\Creator\ExampleFiles\BackendUrlParameter\BackendUrlParameters.json```
-
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
 
