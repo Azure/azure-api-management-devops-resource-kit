@@ -224,6 +224,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.format = format;
                 apiTemplateResource.properties.value = value;
                 apiTemplateResource.properties.path = api.suffix;
+                apiTemplateResource.properties.serviceUrl = api.serviceUrl;
+               
             }
             return apiTemplateResource;
         }
