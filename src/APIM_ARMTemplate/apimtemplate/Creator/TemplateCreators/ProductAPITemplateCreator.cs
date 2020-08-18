@@ -3,8 +3,32 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class ProductAPITemplateCreator
+    public class ProductAPITemplateCreator : TemplateCreator
     {
+        public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
+        {
+            // create empty template
+            Template productTemplate = CreateEmptyTemplate();
+
+            // add parameters
+            productTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
+            };
+
+            List<TemplateResource> resources = new List<TemplateResource>();
+            string[] dependsOn = new string[] {};
+            foreach (APIConfig api in creatorConfig.apis)
+            {
+                List<ProductAPITemplateResource> apiResources = CreateProductAPITemplateResources(api, dependsOn);
+                resources.AddRange(apiResources);                
+                // Add previous product/API resource as a dependency for next product/API resource(s)
+                dependsOn = new string[] { apiResources[apiResources.Count-1].name };
+            }
+
+            productTemplate.resources = resources.ToArray();
+            return productTemplate;
+        }
         public ProductAPITemplateResource CreateProductAPITemplateResource(string productID, string apiName, string[] dependsOn)
         {
             // create products/apis resource with properties
@@ -25,9 +49,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<ProductAPITemplateResource> productAPITemplates = new List<ProductAPITemplateResource>();
             // products is comma separated list of productIds
             string[] productIDs = api.products.Split(", ");
+            string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
-                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, dependsOn);
+                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
+                // Add previous product/API resource as a dependency for next product/API resource
+                allDependsOn = new string[dependsOn.Length + 1];
+                dependsOn.CopyTo(allDependsOn, 1);
+                allDependsOn[0] = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]";
                 productAPITemplates.Add(productAPITemplate);
             }
             return productAPITemplates;

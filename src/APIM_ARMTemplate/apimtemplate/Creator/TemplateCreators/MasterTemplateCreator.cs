@@ -10,6 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
+            Template productAPIsTemplate,
             Template propertyTemplate,
             Template loggersTemplate,
             Template backendsTemplate,
@@ -48,6 +49,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 string productsUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.products);
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }));
+            }
+
+            // productApi
+            if (productAPIsTemplate != null)
+            {
+                // depends on all products and APIs
+                string[] dependsOn = CreateProductAPIResourceDependencies(productsTemplate, apiInformation, fileNameGenerator);
+                string productAPIsUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.productAPIs);
+                resources.Add(this.CreateLinkedMasterTemplateResource("productAPIsTemplate", productAPIsUri, dependsOn));
             }
 
             // property
@@ -159,6 +169,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
             }
             return apiDependsOn.ToArray();
+        }
+
+        public string[] CreateProductAPIResourceDependencies(Template productsTemplate,
+            List<LinkedMasterTemplateAPIInformation> apiInformation,
+            FileNameGenerator fileNameGenerator)
+        {
+            List<string> apiProductDependsOn = new List<string>();
+            if (productsTemplate != null)
+            {
+                apiProductDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
+            }
+            foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
+            {
+                string originalAPIName = fileNameGenerator.GenerateOriginalAPIName(apiInfo.name);
+                string apiDeploymentResourceName = apiInfo.isSplit ? $"{originalAPIName}-SubsequentAPITemplate" : $"{originalAPIName}-APITemplate";
+                apiProductDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{apiDeploymentResourceName}')]");
+            }
+            return apiProductDependsOn.ToArray();
         }
 
         public MasterTemplateResource CreateLinkedMasterTemplateResource(string name, string uriLink, string[] dependsOn)
