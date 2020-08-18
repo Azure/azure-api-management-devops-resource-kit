@@ -22,8 +22,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 List<ProductAPITemplateResource> apiResources = CreateProductAPITemplateResources(api, dependsOn);
                 resources.AddRange(apiResources);                
+
                 // Add previous product/API resource as a dependency for next product/API resource(s)
-                dependsOn = new string[] { apiResources[apiResources.Count-1].name };
+                string productID = apiResources[apiResources.Count-1].name.Split('/', 3)[1];
+                dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]" };
             }
 
             productTemplate.resources = resources.ToArray();
