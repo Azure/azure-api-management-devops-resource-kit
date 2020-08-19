@@ -94,6 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, new string[] { }));
             }
 
+            string previousAPIName = null;
             // each api has an associated api info class that determines whether the api is split and its dependencies on other resources
             foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
             {
@@ -106,13 +107,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                     string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string initialAPIUri = GenerateLinkedTemplateUri(creatorConfig, initialAPIFileName);
-                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo);
+                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName);
                     resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn));
 
                     string subsequentAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, false);
                     string subsequentAPIUri = GenerateLinkedTemplateUri(creatorConfig, subsequentAPIFileName);
                     string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
                     resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
+
+                    // Set previous API name for dependency chain
+                    previousAPIName = subsequentAPIDeploymentResourceName;
                 }
                 else
                 {
@@ -121,8 +125,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string unifiedAPIDeploymentResourceName = $"{originalAPIName}-APITemplate";
                     string unifiedAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string unifiedAPIUri = GenerateLinkedTemplateUri(creatorConfig, unifiedAPIFileName);
-                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo);
+                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName);
                     resources.Add(this.CreateLinkedMasterTemplateResource(unifiedAPIDeploymentResourceName, unifiedAPIUri, unifiedAPIDependsOn));
+
+                    // Set previous API name for dependency chain
+                    previousAPIName = unifiedAPIDeploymentResourceName;
                 }
             }
 
@@ -137,7 +144,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Template backendsTemplate,
             Template authorizationServersTemplate,
             Template tagTemplate,
-            LinkedMasterTemplateAPIInformation apiInfo)
+            LinkedMasterTemplateAPIInformation apiInfo,
+            string previousAPI)
         {
             List<string> apiDependsOn = new List<string>();
             if (globalServicePolicyTemplate != null && apiInfo.dependsOnGlobalServicePolicies == true)
@@ -167,6 +175,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (tagTemplate != null && apiInfo.dependsOnTags == true) 
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
+            }
+            if (previousAPI != null && apiInfo.dependsOnTags == true) 
+            {
+                apiDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{previousAPI}')]");
             }
             return apiDependsOn.ToArray();
         }

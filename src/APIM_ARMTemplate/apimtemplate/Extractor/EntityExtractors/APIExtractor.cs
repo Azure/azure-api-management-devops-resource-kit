@@ -417,33 +417,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
             catch (Exception) { }
 
-            // add product api associations to template
-            #region API Products
-            try
-            {
-                // pull product api associations
-                string apiProducts = await GetAPIProductsAsync(apimname, resourceGroup, apiName);
-                JObject oApiProducts = JObject.Parse(apiProducts);
-
-                foreach (var item in oApiProducts["value"])
-                {
-                    string apiProductName = ((JValue)item["name"]).Value.ToString();
-                    Console.WriteLine("'{0}' Product association found", apiProductName);
-
-                    // convert returned api product associations to template resource class
-                    ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(item.ToString());
-                    productAPIResource.type = ResourceTypeConstants.ProductAPI;
-                    productAPIResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiProductName}/{oApiName}')]";
-                    productAPIResource.apiVersion = GlobalConstants.APIVersion;
-                    productAPIResource.scale = null;
-                    productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{oApiName}')]" };
-
-                    templateResources.Add(productAPIResource);
-                }
-            }
-            catch (Exception) { }
-            #endregion
-
             #region Diagnostics
             // add diagnostics to template
             // pull diagnostics for api
