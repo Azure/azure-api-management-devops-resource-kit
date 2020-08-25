@@ -483,7 +483,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateAPIRevisionTemplateAsync(string currentRevision, List<string> revList, string apiName, Extractor exc)
         {
             // generate apiTemplate
-            Template armTemplate = GenerateEmptyTemplateWithParameters(exc.policyXMLBaseUrl, exc.policyXMLSasToken);
+            Template armTemplate = GenerateEmptyApiTemplateWithParameters(exc);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
