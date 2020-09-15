@@ -76,7 +76,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/{api.diagnostic.name}')]", diagnosticTemplateResource.name);
             Assert.Equal(dependsOn, diagnosticTemplateResource.dependsOn);
             Assert.Equal(api.diagnostic.alwaysLog, diagnosticTemplateResource.properties.alwaysLog);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), '{api.diagnostic.loggerId}')]", diagnosticTemplateResource.properties.loggerId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), parameters('LoggerName'))]", diagnosticTemplateResource.properties.loggerId);
             Assert.Equal(api.diagnostic.enableHttpCorrelationHeaders, diagnosticTemplateResource.properties.enableHttpCorrelationHeaders);
             Assert.Equal(api.diagnostic.sampling.samplingType, diagnosticTemplateResource.properties.sampling.samplingType);
             Assert.Equal(api.diagnostic.sampling.percentage, diagnosticTemplateResource.properties.sampling.percentage);

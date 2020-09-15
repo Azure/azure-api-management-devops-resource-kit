@@ -3,7 +3,6 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using apimtemplate.Creator.Utilities;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
@@ -12,23 +11,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         public CreateCommand()
         {
-            this.Name = GlobalConstants.CreateName;
-            this.Description = GlobalConstants.CreateDescription;
+            Name = GlobalConstants.CreateName;
+            Description = GlobalConstants.CreateDescription;
 
             // list command options
-            CommandOption configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
+            CommandOption configFile = Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
 
-            CommandOption appInsightsInstrumentationKey = this.Option("--appInsightsInstrumentationKey <appInsightsInstrumentationKey>", "AppInsights intrumentationkey", CommandOptionType.SingleValue);
+            CommandOption appInsightsInstrumentationKey = Option("--appInsightsInstrumentationKey <appInsightsInstrumentationKey>", "AppInsights intrumentationkey", CommandOptionType.SingleValue);
 
-            CommandOption appInsightsName = this.Option("--appInsightsName <appInsightsName>", "AppInsights Name", CommandOptionType.SingleValue);
+            CommandOption appInsightsName = Option("--appInsightsName <appInsightsName>", "AppInsights Name", CommandOptionType.SingleValue);
 
             // list command options
-            CommandOption backendurlconfigFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
-
+            CommandOption backendurlconfigFile = Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
 
             this.HelpOption();
 
-            this.OnExecute(async () =>
+            OnExecute(async () =>
             {
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
@@ -48,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 }
 
                 bool isValidCreatorConfig = creatorConfigurationValidator.ValidateCreatorConfig(creatorConfig);
-                if (isValidCreatorConfig == true)
+                if (isValidCreatorConfig)
                 {
                     // required parameters have been supplied
 
@@ -130,7 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Template templateParameters = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
                     // write templates to outputLocation
-                    if (creatorConfig.linked == true)
+                    if (creatorConfig.linked)
                     {
                         // create linked master template
                         Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, propertyTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
@@ -172,14 +170,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, fileNames.authorizationServers));
                     }
-                    if (tagTemplate != null) {
+                    if (tagTemplate != null)
+                    {
                         fileWriter.WriteJSONToFile(tagTemplate, String.Concat(creatorConfig.outputLocation, fileNames.tags));
                     }
 
                     // write parameters to outputLocation
                     fileWriter.WriteJSONToFile(templateParameters, String.Concat(creatorConfig.outputLocation, fileNames.parameters));
                     Console.WriteLine("Templates written to output location");
-
                 }
                 return 0;
             });

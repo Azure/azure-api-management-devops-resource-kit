@@ -1,4 +1,3 @@
-
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     internal static class GlobalConstants
@@ -30,6 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string LinkedTemplatesUrlQueryString = "LinkedTemplatesUrlQueryString";
         public const string LinkedTemplatesSasToken = "LinkedTemplatesSasToken";
         public const string ApimServiceName = "ApimServiceName";
+        public const string LoggerName = "LoggerName";
         public const string LinkedTemplatesBaseUrl = "LinkedTemplatesBaseUrl";
     }
 

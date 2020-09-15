@@ -1,10 +1,7 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
-
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     public class FileNameGenerator
     {
-
         public FileNames GenerateFileNames(string baseFileName)
         {
             if (baseFileName.Length > 0)
@@ -37,9 +34,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
             string sanitizedAPIName = GenerateOriginalAPIName(apiName);
 
-            if (isSplitAPI == true)
+            if (isSplitAPI)
             {
-                return isInitialAPI == true ? $@"/{sanitizedAPIName}-initial.api.template.json" : $@"/{sanitizedAPIName}-subsequent.api.template.json";
+                return isInitialAPI ? $@"/{sanitizedAPIName}-operations.api.template.json" : $@"/{sanitizedAPIName}-properties.api.template.json";
             }
             else
             {
@@ -71,13 +68,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string tags { get; set; }
         public string products { get; set; }
         public string parameters { get; set; }
+
         // linked property outputs 1 master template
         public string linkedMaster { get; set; }
+
         public string apis { get; set; }
         public string splitAPIs { get; set; }
         public string versionSetMasterFolder { get; set; }
         public string revisionMasterFolder { get; set; }
-        public string groupAPIsMasterFolder{ get; set; }
+        public string groupAPIsMasterFolder { get; set; }
         public string baseFileName { get; set; }
     }
 }
