@@ -9,59 +9,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class ProductAPIExtractor : EntityExtractor
+    public class ProductAPIExtractor : APIExtractor
     {
         private FileWriter fileWriter;
 
-        public ProductAPIExtractor(FileWriter fileWriter)
+        public ProductAPIExtractor(FileWriter fileWriter) : base (fileWriter)
         {
             this.fileWriter = fileWriter;
-        }
-
-        public async Task<string> GetAPIDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
-        {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
-
-            return await CallApiManagementAsync(azToken, requestUrl);
-        }
-
-        public async Task<JToken[]> GetAllAPIObjsAsync(string ApiManagementName, string ResourceGroupName)
-        {
-            JObject oApi = new JObject();
-            int numOfApis = 0;
-            List<JToken> apiObjs = new List<JToken>();
-            do
-            {
-                (string azToken, string azSubId) = await auth.GetAccessToken();
-
-                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?$skip={4}&api-version={5}",
-                baseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfApis, GlobalConstants.APIVersion);
-                numOfApis += GlobalConstants.NumOfRecords;
-
-                string apis = await CallApiManagementAsync(azToken, requestUrl);
-
-                oApi = JObject.Parse(apis);
-
-                foreach (var item in oApi["value"])
-                {
-                    apiObjs.Add(item);
-                }
-            }
-            while (oApi["nextLink"] != null);
-            return apiObjs.ToArray();
-        }
-
-        public async Task<string> GetAPIProductsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
-        {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/products?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
-
-            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<List<TemplateResource>> GenerateSingleProductAPIResourceAsync(string apiName, Extractor exc, string[] dependsOn)

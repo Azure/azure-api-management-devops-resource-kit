@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.fileWriter = fileWriter;
         }
 
-        private async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             JObject oOperations = new JObject();
             int numOfOps = 0;
