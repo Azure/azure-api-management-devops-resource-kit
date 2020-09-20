@@ -22,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet build src/APIM_ARMTemplate/apimtemplate/apimtemplate.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test *.test.dll --no-restore --verbosity normal
+      run: dotnet test src/APIM_ARMTemplate/apimtemplate.test/apimtemplate.test.csproj --no-restore --verbosity normal
