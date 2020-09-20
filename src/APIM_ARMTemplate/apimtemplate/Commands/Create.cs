@@ -24,6 +24,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // list command options
             CommandOption backendurlconfigFile = Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
 
+            var mergeApiTemplatesOption = Option("--mergeApiTemplates <mergeApiTemplates>", "Merge templates", CommandOptionType.SingleValue);
+
             this.HelpOption();
 
             OnExecute(async () =>
@@ -31,6 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
+                var mergeApiTemplates = Convert.ToBoolean(mergeApiTemplatesOption.Value());
 
                 AppInsightsUpdater appInsightsUpdater = new AppInsightsUpdater();
                 appInsightsUpdater.UpdateAppInsightNameAndInstrumentationKey(creatorConfig, appInsightsInstrumentationKey, appInsightsName);
@@ -98,25 +101,60 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // store name and whether the api will depend on the version set template each api necessary to build linked templates
                     List<LinkedMasterTemplateAPIInformation> apiInformation = new List<LinkedMasterTemplateAPIInformation>();
                     List<Template> apiTemplates = new List<Template>();
+                    if (mergeApiTemplates)
+                    {
+                        var operations = apiTemplateCreator.CreateEmptyTemplate();
+                        operations.resources = apiVersionSetsTemplate.resources;
+                        apiTemplates.Add(operations);   // api operations template
+
+                        apiTemplates.Add(apiTemplateCreator.CreateEmptyTemplate());   // api properties template
+                    }
+
                     Console.WriteLine("Creating API templates");
                     Console.WriteLine("------------------------------------------");
                     foreach (APIConfig api in creatorConfig.apis)
                     {
                         // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
-                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
-                        apiTemplates.AddRange(apiTemplateSet);
+                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api, mergeApiTemplates);
+
+                        if (!mergeApiTemplates)
+                        {
+                            apiTemplates.AddRange(apiTemplateSet);
+
+                            // create the relevant info that will be needed to properly link to the api template(s) from the master template
+                            apiInformation.Add(new LinkedMasterTemplateAPIInformation()
+                            {
+                                name = api.name,
+                                isSplit = apiTemplateCreator.isSplitAPI(api),
+                                dependsOnGlobalServicePolicies = creatorConfig.policy != null,
+                                dependsOnVersionSets = api.apiVersionSetId != null,
+                                dependsOnProducts = api.products != null,
+                                dependsOnTags = api.tags != null,
+                                dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
+                                dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
+                                dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader)
+                            });
+                        }
+                        else
+                        {
+                            await apiTemplateCreator.MergeApiTemplates(apiTemplateSet, apiTemplates);
+                        }
+                    }
+
+                    if (!mergeApiTemplates)
+                    {
                         // create the relevant info that will be needed to properly link to the api template(s) from the master template
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
                         {
-                            name = api.name,
-                            isSplit = apiTemplateCreator.isSplitAPI(api),
+                            name = creatorConfig.baseFileName,
+                            isSplit = true,
                             dependsOnGlobalServicePolicies = creatorConfig.policy != null,
-                            dependsOnVersionSets = api.apiVersionSetId != null,
-                            dependsOnProducts = api.products != null,
-                            dependsOnTags = api.tags != null,
-                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
-                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
-                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader)
+                            dependsOnVersionSets = false,
+                            dependsOnProducts = creatorConfig.products != null,
+                            dependsOnTags = creatorConfig.tags != null,
+                            dependsOnLoggers = creatorConfig.loggers != null,
+                            dependsOnAuthorizationServers = creatorConfig.authorizationServers != null && creatorConfig.authorizationServers.Count > 0,
+                            dependsOnBackends = creatorConfig.backends != null
                         });
                     }
 
@@ -134,19 +172,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, propertyTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
                     }
+
                     foreach (Template apiTemplate in apiTemplates)
                     {
                         APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
                         APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.name, APITemplateCreator.MakeResourceName(api), true) == 0);
+
                         // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
-                        string apiFileName = fileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
+                        string apiFileName = fileNameGenerator.GenerateCreatorAPIFileName(mergeApiTemplates ? creatorConfig.baseFileName : providedAPIConfiguration.name,
+                                                apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
                         fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
                     }
+
                     if (globalServicePolicyTemplate != null)
                     {
                         fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(creatorConfig.outputLocation, fileNames.globalServicePolicy));
                     }
-                    if (apiVersionSetsTemplate != null)
+                    if (apiVersionSetsTemplate != null && !mergeApiTemplates)
                     {
                         fileWriter.WriteJSONToFile(apiVersionSetsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.apiVersionSets));
                     }

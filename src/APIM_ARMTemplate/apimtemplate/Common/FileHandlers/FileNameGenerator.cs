@@ -10,16 +10,16 @@
             // generate useable object with file names for consistency throughout project
             return new FileNames()
             {
-                apiVersionSets = $@"/{baseFileName}apiVersionSets.template.json",
-                authorizationServers = $@"/{baseFileName}authorizationServers.template.json",
-                backends = $@"/{baseFileName}backends.template.json",
-                globalServicePolicy = $@"/{baseFileName}globalServicePolicy.template.json",
-                loggers = $@"/{baseFileName}loggers.template.json",
-                namedValues = $@"/{baseFileName}namedValues.template.json",
-                tags = $@"/{baseFileName}tags.template.json",
-                products = $@"/{baseFileName}products.template.json",
+                apiVersionSets = $@"/{baseFileName}apiVersionSets.json",
+                authorizationServers = $@"/{baseFileName}authorizationServers.json",
+                backends = $@"/{baseFileName}backends.json",
+                globalServicePolicy = $@"/{baseFileName}globalServicePolicy.json",
+                loggers = $@"/{baseFileName}loggers.json",
+                namedValues = $@"/{baseFileName}namedValues.json",
+                tags = $@"/{baseFileName}tags.json",
+                products = $@"/{baseFileName}products.json",
                 parameters = $@"/{baseFileName}parameters.json",
-                linkedMaster = $@"/{baseFileName}master.template.json",
+                linkedMaster = $@"/{baseFileName}master.json",
                 apis = "/Apis",
                 splitAPIs = "/SplitAPIs",
                 versionSetMasterFolder = "/VersionSetMasterFolder",
@@ -36,7 +36,7 @@
 
             if (isSplitAPI)
             {
-                return isInitialAPI ? $@"/{sanitizedAPIName}-operations.api.template.json" : $@"/{sanitizedAPIName}-properties.api.template.json";
+                return isInitialAPI ? $@"/{sanitizedAPIName}-operations.json" : $@"/{sanitizedAPIName}-properties.json";
             }
             else
             {
@@ -46,7 +46,7 @@
 
         public string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
-            return singleAPIName == null ? $@"/{baseFileName}apis.template.json" : $@"/{baseFileName}{singleAPIName}-api.template.json";
+            return singleAPIName == null ? $@"/{baseFileName}apis.json" : $@"/{baseFileName}{singleAPIName}-api.json";
         }
 
         public string GenerateOriginalAPIName(string apiName)
