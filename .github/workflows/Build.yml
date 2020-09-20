@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Install dependencies
-      run: dotnet restore src/**/*.csproj
+      run: dotnet restore src/APIM_ARMTemplate/apimtemplate/apimtemplate.sln
     - name: Build
-      run: dotnet build src/**/*.csproj --configuration Release --no-restore
+      run: dotnet build src/APIM_ARMTemplate/apimtemplate/apimtemplate.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test src/**/*.test.dll --no-restore --verbosity normal
+      run: dotnet test *.test.dll --no-restore --verbosity normal
