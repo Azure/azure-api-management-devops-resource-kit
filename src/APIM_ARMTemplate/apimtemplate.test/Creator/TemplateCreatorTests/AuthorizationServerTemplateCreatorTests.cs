@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             AuthorizationServerTemplateResource authorizationServerTemplateResource = (AuthorizationServerTemplateResource)authorizationServerTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{authorizationServer.displayName}')]", authorizationServerTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{authorizationServer.displayName}')]", authorizationServerTemplateResource.name);
             Assert.Equal(authorizationServer.description, authorizationServerTemplateResource.properties.description);
             Assert.Equal(authorizationServer.displayName, authorizationServerTemplateResource.properties.displayName);
             Assert.Equal(authorizationServer.authorizationEndpoint, authorizationServerTemplateResource.properties.authorizationEndpoint);

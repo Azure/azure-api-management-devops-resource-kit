@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             TagTemplateResource tagTemplateResource = (TagTemplateResource)tagTemplate.resources[0];
 
             //assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{tag.displayName}')]", tagTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{tag.displayName}')]", tagTemplateResource.name);
         }
     }
 }

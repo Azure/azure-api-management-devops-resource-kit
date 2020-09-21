@@ -26,7 +26,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                     instrumentationKey = "iKey",
                     name = "credName"
                 }
-
             };
             creatorConfig.loggers.Add(logger);
 
@@ -35,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             LoggerTemplateResource loggerTemplateResource = (LoggerTemplateResource)loggerTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{logger.name}')]", loggerTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{logger.name}')]", loggerTemplateResource.name);
             Assert.Equal(logger.loggerType, loggerTemplateResource.properties.loggerType);
             Assert.Equal(logger.description, loggerTemplateResource.properties.description);
             Assert.Equal(logger.isBuffered, loggerTemplateResource.properties.isBuffered);

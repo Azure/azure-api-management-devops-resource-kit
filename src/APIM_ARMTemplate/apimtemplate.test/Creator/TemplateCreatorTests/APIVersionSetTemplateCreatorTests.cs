@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APIVersionSetTemplateResource apiVersionSetTemplateResource = (APIVersionSetTemplateResource)versionSetTemplate.resources[0];
 
             // assert
-            Assert.Equal("[concat(parameters('ApimServiceName'), '/versionset')]", apiVersionSetTemplateResource.name);
+            Assert.Equal("[concat(parameters('apimServiceName'), '/versionset')]", apiVersionSetTemplateResource.name);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APIVersionSetTemplateResource apiVersionSetTemplateResource = (APIVersionSetTemplateResource)versionSetTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{apiVersionSet.id}')]", apiVersionSetTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{apiVersionSet.id}')]", apiVersionSetTemplateResource.name);
         }
     }
 }

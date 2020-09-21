@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         {
             // arrange
             ProductGroupTemplateCreator productgroupTemplateCreator = new ProductGroupTemplateCreator();
-            string groupName  = "groupName";
+            string groupName = "groupName";
             string productName = "productName";
             string[] dependsOn = new string[] { "dependsOn" };
 
@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             ProductGroupsValue productGroupTemplateResource = productgroupTemplateCreator.CreateProductGroupTemplateResource(groupName, productName, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{productName}/{groupName}')]", productGroupTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{productName}/{groupName}')]", productGroupTemplateResource.name);
             Assert.Equal(dependsOn, productGroupTemplateResource.dependsOn);
         }
 
@@ -41,7 +41,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // assert
             Assert.Equal(count, productAPITemplateResources.Count);
-            
         }
     }
 }

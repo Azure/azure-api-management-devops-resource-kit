@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.type, apiTemplateResource.properties.apiType);
             Assert.Equal(api.isCurrent, apiTemplateResource.properties.isCurrent);
             Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
             Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
             Assert.Equal(api.apiRevisionDescription, apiTemplateResource.properties.apiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.properties.path);
@@ -87,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
             Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
         }
@@ -110,7 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal("swagger-json", apiTemplateResource.properties.format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
@@ -118,7 +118,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             var yaml = apiTemplateResource.properties.value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
-            var info = (Dictionary<object, object>) definition["info"];
+            var info = (Dictionary<object, object>)definition["info"];
 
             Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
         }
@@ -151,7 +151,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal("openapi+json", apiTemplateResource.properties.format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
@@ -159,7 +159,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             var yaml = apiTemplateResource.properties.value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
-            var info = (Dictionary<object, object>) definition["info"];
+            var info = (Dictionary<object, object>)definition["info"];
 
             Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
         }
@@ -192,7 +192,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal("openapi", apiTemplateResource.properties.format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
@@ -200,7 +200,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             var yaml = apiTemplateResource.properties.value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
-            var info = (Dictionary<object, object>) definition["info"];
+            var info = (Dictionary<object, object>)definition["info"];
 
             Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
         }
@@ -246,7 +246,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, false, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.type, apiTemplateResource.properties.type);
@@ -254,7 +254,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Equal(api.isCurrent, apiTemplateResource.properties.isCurrent);
             Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
             Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
             Assert.Equal(api.apiRevisionDescription, apiTemplateResource.properties.apiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.properties.path);
@@ -294,5 +294,4 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Assert.Contains(";rev", apiTemplateResource.name);
         }
     }
-
 }

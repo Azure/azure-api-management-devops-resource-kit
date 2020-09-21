@@ -100,7 +100,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             string linkedResourceUri = masterTemplateCreator.GenerateLinkedTemplateUri(creatorConfig, apiVersionSetFileName);
 
             // assert
-            Assert.Equal($"[concat(parameters('LinkedTemplatesBaseUrl'), '{apiVersionSetFileName}', parameters('LinkedTemplatesUrlQueryString'))]", linkedResourceUri);
+            Assert.Equal($"[concat(parameters('linkedTemplatesBaseUrl'), '{apiVersionSetFileName}', parameters('linkedTemplatesUrlQueryString'))]", linkedResourceUri);
         }
     }
 }

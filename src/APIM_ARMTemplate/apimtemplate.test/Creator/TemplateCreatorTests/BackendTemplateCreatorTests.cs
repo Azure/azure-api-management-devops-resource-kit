@@ -57,7 +57,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                         } }
                     }
                 }
-
             };
             creatorConfig.backends.Add(backend);
 
@@ -66,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             BackendTemplateResource backendTemplateResource = (BackendTemplateResource)backendTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{backend.title}')]", backendTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{backend.title}')]", backendTemplateResource.name);
             Assert.Equal(backend.title, backendTemplateResource.properties.title);
             Assert.Equal(backend.description, backendTemplateResource.properties.description);
             Assert.Equal(backend.resourceId, backendTemplateResource.properties.resourceId);

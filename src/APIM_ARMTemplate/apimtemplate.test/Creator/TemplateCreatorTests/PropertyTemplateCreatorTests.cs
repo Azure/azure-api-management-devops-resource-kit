@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             PropertyTemplateResource propertyTemplateResource = (PropertyTemplateResource)propertyTemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{property.displayName}')]", propertyTemplateResource.name);
+            Assert.Equal($"[concat(parameters('apimServiceName'), '/{property.displayName}')]", propertyTemplateResource.name);
             Assert.Equal(property.displayName, propertyTemplateResource.properties.displayName);
             Assert.Equal(property.value, propertyTemplateResource.properties.value);
         }
