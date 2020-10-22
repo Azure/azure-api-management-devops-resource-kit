@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
                 propertyTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
                 propertyTemplateResource.type = ResourceTypeConstants.Property;
-                propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
+                propertyTemplateResource.apiVersion = GlobalConstants.ServicePropertyAPIVersion;
                 propertyTemplateResource.scale = null;
 
                 if (exc.paramNamedValue)
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     // TODO - if the user is executing a single api, extract all the named values used in the template resources
                     Console.WriteLine("'{0}' Named value found", propertyName);
                     templateResources.Add(propertyTemplateResource);
-                };
+                }
             }
 
             armTemplate.resources = templateResources.ToArray();
