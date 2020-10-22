@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 {
                     name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{namedValue.displayName}')]",
                     type = ResourceTypeConstants.Property,
-                    apiVersion = GlobalConstants.APIVersion,
+                    apiVersion = GlobalConstants.ServicePropertyAPIVersion,
                     properties = new PropertyResourceProperties()
                     {
                         displayName = namedValue.displayName,
@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         secret = namedValue.secret,
                         tags = namedValue.tags
                     },
-                    dependsOn = new string[] {}
+                    dependsOn = new string[] { }
                 };
                 resources.Add(propertyTemplateResource);
             }
