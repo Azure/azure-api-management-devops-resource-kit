@@ -5,19 +5,87 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using Newtonsoft.Json;
 using System;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class BackendExtractor : EntityExtractor
     {
-        public async Task<string> GetBackendsAsync(string ApiManagementName, string ResourceGroupName)
+        public async Task<string> GetBackendsAsync(string ApiManagementName, string ResourceGroupName, string singleApiName)
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/backends?api-version={4}",
+            if (string.IsNullOrEmpty(singleApiName))
+            {
+                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/backends?api-version={4}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+                return await CallApiManagementAsync(azToken, requestUrl);
+            }
+            else
+            {
+                JArray policies = new JArray();
+
+                // Get API Extractor for reading policies
+                FileWriter fw = new FileWriter();
+                var apiExtractor = new APIExtractor(fw);
+
+                // Add API policy
+                policies.Add(await apiExtractor.GetAPIPolicyAsync(ApiManagementName, ResourceGroupName, singleApiName));
+
+                // Get all operations of a specific API
+                var operations = await apiExtractor.GetAllOperationNames(ApiManagementName, ResourceGroupName, singleApiName);
+
+                // Add Operation policies
+                foreach (var operation in operations)
+                {
+                    policies.Add(await apiExtractor.GetOperationPolicyAsync(ApiManagementName, ResourceGroupName, singleApiName, operation));
+                }
+
+                // Extract DisplayNames
+                JArray backendIds = new JArray();
+                var propertyRegex = new Regex("backend-id=\"({{(.*?)}}|.*?)\"");
+                foreach (var policy in policies)
+                {
+                    var policyO = JObject.Parse(policy?.ToString());
+                    var policyString = policyO["properties"]["value"]?.ToString();
+                    var matches = propertyRegex.Matches(policyString);
+
+                    foreach (Match match in matches)
+                    {
+                        string value = match.Groups[1].Value;
+
+                        // Handle Named Value
+                        if (value.StartsWith("{{"))
+                        {
+                            var nvExtractor = new PropertyExtractor();
+
+                            // Get NamedValue without braces
+                            value = match.Groups[2].Value;
+                            var property = await nvExtractor.GetPropertyByDisplayName(ApiManagementName, ResourceGroupName, value);
+                            var propertyO = JObject.Parse(property);
+                            var backendId = propertyO["value"][0]["properties"]["value"]?.ToString();
+                            backendIds.Add(backendId);
+                        }
+                        else
+                        {
+                            backendIds.Add(value);
+                        }
+                    }
+                }
+
+                var backends = new JObject();
+                backends["value"] = new JArray();
+                foreach (var backendId in backendIds)
+                {
+                    var backend = await GetBackendDetailsAsync(ApiManagementName, ResourceGroupName, backendId?.ToString());
+                    var backendO = JObject.Parse(backend);
+                    ((JArray)backends["value"]).Add(backendO);
+                }
+
+                backends["count"] = ((JArray)backends["value"]).Count;
+
+                return backends.ToString();
+            }
         }
 
         public async Task<string> GetBackendDetailsAsync(string ApiManagementName, string ResourceGroupName, string backendName)
@@ -43,7 +111,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             var namedValueResources = propertyResources.Where(resource => (resource.type == ResourceTypeConstants.Property));
 
             // pull all backends for service
-            string backends = await GetBackendsAsync(apimname, resourceGroup);
+            string backends = await GetBackendsAsync(apimname, resourceGroup, singleApiName);
             JObject oBackends = JObject.Parse(backends);
 
             foreach (var item in oBackends["value"])
