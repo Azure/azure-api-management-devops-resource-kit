@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             backendTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // create backend resource with properties
                 BackendTemplateResource backendTemplateResource = new BackendTemplateResource()
                 {
-                    name = $"[concat(parameters('ApimServiceName'), '/{backendTemplatePropeties.title}')]",
+                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendTemplatePropeties.title}')]",
                     type = ResourceTypeConstants.Backend,
                     apiVersion = GlobalConstants.APIVersion,
                     properties = backendTemplatePropeties,

@@ -5,7 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class PolicyTemplateCreator: TemplateCreator
+    public class PolicyTemplateCreator : TemplateCreator
     {
         private FileReader fileReader;
 
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -34,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/policy')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/policy')]",
                 type = ResourceTypeConstants.GlobalServicePolicy,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{api.name}/policy')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/policy')]",
                 type = ResourceTypeConstants.APIPolicy,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
@@ -74,12 +74,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public PolicyTemplateResource CreateProductPolicyTemplateResource(ProductConfig product, string[] dependsOn)
         {
+            if (string.IsNullOrEmpty(product.name))
+            {
+                product.name = product.displayName;
+            }
+
             Uri uriResult;
             bool isUrl = Uri.TryCreate(product.policy, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{product.displayName}/policy')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.name}/policy')]",
                 type = ResourceTypeConstants.ProductPolicy,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
@@ -100,7 +105,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{apiName}/{policyPair.Key}/policy')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{policyPair.Key}/policy')]",
                 type = ResourceTypeConstants.APIOperationPolicy,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()

@@ -26,15 +26,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apiVersionSets/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, APIVersionSetName, GlobalConstants.APIVersion);
-
+            
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateAPIVersionSetsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateAPIVersionSetsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl, string policyXMLSasToken)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting API version sets from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
+            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
 
             // isolate apis in the case of a single api extraction
             var apiResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 // convert returned product to template resource class
                 APIVersionSetTemplateResource versionSetTemplateResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSetDetails);
-                versionSetTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{versionSetName}')]";
+                versionSetTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{versionSetName}')]";
                 versionSetTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api

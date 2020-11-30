@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class LoggerExtractor: EntityExtractor
+    public class LoggerExtractor : EntityExtractor
     {
         public async Task<string> GetLoggersAsync(string ApiManagementName, string ResourceGroupName)
         {
@@ -30,29 +30,61 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateLoggerTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public Dictionary<string, string> GetAllLoggerResourceIds(List<TemplateResource> resources)
+        {
+            Dictionary<string, string> logResIds = new Dictionary<string, string>();
+            foreach (LoggerTemplateResource resource in resources)
+            {
+                string validLoggerName = GetValidLoggerParamName(resource.name);
+                string resourceId = resource.properties.resourceId;
+                logResIds.Add(validLoggerName, resourceId);
+            }
+            return logResIds;
+        }
+
+        private string GetValidLoggerParamName(string resourceName)
+        {
+            string[] loggerNameStrs = resourceName.Split(new char[] { ',' });
+            string validLoggerName = ExtractorUtils.GenValidParamName(loggerNameStrs[loggerNameStrs.Length - 1], ParameterPrefix.LogResourceId);
+            return validLoggerName;
+        }
+
+        public Template SetLoggerResourceId(Template loggerTemplate)
+        {
+            TemplateResource[] loggerResources = loggerTemplate.resources.ToArray();
+            List<TemplateResource> nLoggerResource = new List<TemplateResource>();
+            foreach (LoggerTemplateResource resource in loggerResources)
+            {
+                string validLoggerName = GetValidLoggerParamName(resource.name);
+                resource.properties.resourceId = $"[parameters('{ParameterNames.LoggerResourceId}').{validLoggerName}]";
+                nLoggerResource.Add(resource);
+            }
+            loggerTemplate.resources = nLoggerResource.ToArray();
+            return loggerTemplate;
+        }
+
+        public async Task<Template> GenerateLoggerTemplateAsync(Extractor exc, string singleApiName, List<TemplateResource> apiTemplateResources, Dictionary<string, Dictionary<string, string>> apiLoggerId)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
+            Template armTemplate = GenerateEmptyLoggerTemplateWithParameters(exc);
 
             // isolate product api associations in the case of a single api extraction
-            var diagnosticResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIDiagnostic);
             var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all loggers for service
-            string loggers = await GetLoggersAsync(apimname, resourceGroup);
+            string loggers = await GetLoggersAsync(exc.sourceApimName, exc.resourceGroup);
             JObject oLoggers = JObject.Parse(loggers);
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-                string fullLoggerResource = await GetLoggerDetailsAsync(apimname, resourceGroup, loggerName);
+                string fullLoggerResource = await GetLoggerDetailsAsync(exc.sourceApimName, exc.resourceGroup, loggerName);
 
                 // convert returned logger to template resource class
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
-                loggerResource.name = $"[concat(parameters('ApimServiceName'), '/{loggerName}')]";
+                loggerResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{loggerName}')]";
                 loggerResource.type = ResourceTypeConstants.Logger;
                 loggerResource.apiVersion = GlobalConstants.APIVersion;
                 loggerResource.scale = null;
@@ -75,9 +107,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             isReferencedInPolicy = true;
                         }
                     }
-                    foreach (DiagnosticTemplateResource diagnosticTemplateResource in diagnosticResources)
+                    string validApiName = ExtractorUtils.GenValidParamName(singleApiName, ParameterPrefix.Api);
+                    if (exc.paramApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {
-                        if (diagnosticTemplateResource.properties.loggerId.Contains(loggerName))
+                        Dictionary<string, string> curDiagnostic = apiLoggerId[validApiName];
+                        string validDName = ExtractorUtils.GenValidParamName(loggerResource.properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
+                        if (curDiagnostic.ContainsKey(validDName) && curDiagnostic[validDName].Contains(loggerName))
                         {
                             isReferencedInDiagnostic = true;
                         }

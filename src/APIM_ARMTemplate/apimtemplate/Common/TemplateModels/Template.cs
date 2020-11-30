@@ -22,6 +22,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string value { get; set; }
     }
 
+    public class TemplateObjectParameterProperties: TemplateParameterProperties {
+        public new object value { get; set; }
+    }
+
     public class TemplateParameterMetadata {
         public string description { get; set; }
     }

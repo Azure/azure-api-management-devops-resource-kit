@@ -33,6 +33,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 return false;
             }
+            if (ValidateNamedValues(creatorConfig) != true)
+            {
+                return false;
+            }
             if (ValidateLoggers(creatorConfig) != true)
             {
                 return false;
@@ -48,6 +52,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return true;
         }
 
+        public bool ValidateNamedValues(CreatorConfig creatorConfig)
+        {
+            bool isValid = true;
+            if (creatorConfig.namedValues != null)
+            {
+                foreach (PropertyResourceProperties property in creatorConfig.namedValues)
+                {
+                    if (property.displayName == null)
+                    {
+                        isValid = false;
+                        throw new CommandParsingException(commandLineApplication, "Display name is required is a Named Value is provided");
+                    }
+                }
+            }
+            return isValid;
+        }
         public bool ValidateProducts(CreatorConfig creatorConfig)
         {
             bool isValid = true;

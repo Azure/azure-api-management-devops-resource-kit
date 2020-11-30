@@ -3,6 +3,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 {
@@ -46,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             creatorConfig.apis.Add(api);
 
             // act
-            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
@@ -83,12 +84,125 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             creatorConfig.apis.Add(api);
 
             // act
-            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
             Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
             Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
+        }
+
+        [Fact]
+        public async void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithAlternateTitle()
+        {
+            // arrange
+            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
+            APIConfig api = new APIConfig()
+            {
+                name = "name",
+                displayName = "Swagger Petstore (alternate title)",
+                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+            };
+            creatorConfig.apis.Add(api);
+
+            // act
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
+
+            // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal("swagger-json", apiTemplateResource.properties.format);
+
+            // check alternate title has been specified in the embedded YAML or JSON definition
+
+            var yaml = apiTemplateResource.properties.value;
+            var deserializer = new YamlDotNet.Serialization.Deserializer();
+            var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
+            var info = (Dictionary<object, object>) definition["info"];
+
+            Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
+        }
+
+        [Fact]
+        public async void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithAlternateTitleInSwagger()
+        {
+            // arrange
+            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
+
+            // extract swagger as a local file
+
+            var swaggerPath = Path.GetTempFileName();
+            using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("apimtemplate.test.Resources.swaggerPetstorev3.json"))
+            using (var reader = new StreamReader(stream))
+                File.WriteAllText(swaggerPath, reader.ReadToEnd());
+
+            // create API config with local swagger definition
+
+            APIConfig api = new APIConfig()
+            {
+                name = "name",
+                displayName = "Swagger Petstore (alternate title)",
+                openApiSpec = swaggerPath,
+            };
+            creatorConfig.apis.Add(api);
+
+            // act
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
+
+            // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal("openapi+json", apiTemplateResource.properties.format);
+
+            // check alternate title has been specified in the embedded YAML or JSON definition
+
+            var yaml = apiTemplateResource.properties.value;
+            var deserializer = new YamlDotNet.Serialization.Deserializer();
+            var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
+            var info = (Dictionary<object, object>) definition["info"];
+
+            Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
+        }
+
+        [Fact]
+        public async void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithAlternateTitleInOpenApi()
+        {
+            // arrange
+            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
+
+            // extract swagger as a local file
+
+            var openapiPath = Path.GetTempFileName();
+            using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("apimtemplate.test.Resources.swaggerPetstore.yml"))
+            using (var reader = new StreamReader(stream))
+                File.WriteAllText(openapiPath, reader.ReadToEnd());
+
+            // create API config with local swagger definition
+
+            APIConfig api = new APIConfig()
+            {
+                name = "name",
+                displayName = "Swagger Petstore (alternate title)",
+                openApiSpec = openapiPath,
+            };
+            creatorConfig.apis.Add(api);
+
+            // act
+            APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
+
+            // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal("openapi", apiTemplateResource.properties.format);
+
+            // check alternate title has been specified in the embedded YAML or JSON definition
+
+            var yaml = apiTemplateResource.properties.value;
+            var deserializer = new YamlDotNet.Serialization.Deserializer();
+            var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
+            var info = (Dictionary<object, object>) definition["info"];
+
+            Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
         }
 
         [Fact]

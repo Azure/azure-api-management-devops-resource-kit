@@ -73,6 +73,11 @@ products:
       subscriptionsLimit: 1
       state: notPublished
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
+namedValues:
+    - displayName: Test
+      value: Item 1
+    - displayname: Test2
+      value: Item 2
 loggers:
     - name: myAppInsights
       loggerType: applicationInsights

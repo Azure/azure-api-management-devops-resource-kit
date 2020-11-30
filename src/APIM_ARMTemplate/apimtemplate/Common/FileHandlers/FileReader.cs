@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
@@ -59,6 +60,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             }
         }
 
+        public ExtractorConfig ConvertConfigJsonToExtractorConfig(string extractorJsonPath)
+        {
+            if (string.IsNullOrWhiteSpace(extractorJsonPath) || !File.Exists(extractorJsonPath))
+            {
+                throw new FileNotFoundException($"You have to specify an existing file, you specified: '{extractorJsonPath}'");
+            }
+
+            using (StreamReader r = new StreamReader(extractorJsonPath))
+            {
+                string extractorJson = r.ReadToEnd();
+                ExtractorConfig extractorConfig = JsonConvert.DeserializeObject<ExtractorConfig>(extractorJson);
+                return extractorConfig;
+            }
+        }
+
         public string RetrieveLocalFileContents(string fileLocation)
         {
             return File.ReadAllText(fileLocation);
@@ -97,7 +113,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 object deserializedFileContents = JsonConvert.DeserializeObject<object>(fileContents);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

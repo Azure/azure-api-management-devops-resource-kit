@@ -10,9 +10,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
+            Template propertyTemplate,
             Template loggersTemplate,
             Template backendsTemplate,
             Template authorizationServersTemplate,
+            Template tagTemplate,
             List<LinkedMasterTemplateAPIInformation> apiInformation,
             FileNames fileNames,
             string apimServiceName,
@@ -48,6 +50,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }));
             }
 
+            // property
+            if (propertyTemplate != null)
+            {
+                string propertyUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.namedValues);
+                resources.Add(this.CreateLinkedMasterTemplateResource("propertyTemplate", propertyUri, new string[] { }));
+            }
+
             // logger
             if (loggersTemplate != null)
             {
@@ -69,6 +78,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 resources.Add(this.CreateLinkedMasterTemplateResource("authorizationServersTemplate", authorizationServersUri, new string[] { }));
             }
 
+            // tag
+            if (tagTemplate != null) {
+                string tagUri = GenerateLinkedTemplateUri(creatorConfig, fileNames.tags);
+                resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, new string[] { }));
+            }
+
             // each api has an associated api info class that determines whether the api is split and its dependencies on other resources
             foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
             {
@@ -79,12 +94,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string initialAPIDeploymentResourceName = $"{originalAPIName}-InitialAPITemplate";
                     string subsequentAPIDeploymentResourceName = $"{originalAPIName}-SubsequentAPITemplate";
 
-                    string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true, apimServiceName);
+                    string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string initialAPIUri = GenerateLinkedTemplateUri(creatorConfig, initialAPIFileName);
-                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInfo);
+                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo);
                     resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn));
 
-                    string subsequentAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, false, apimServiceName);
+                    string subsequentAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, false);
                     string subsequentAPIUri = GenerateLinkedTemplateUri(creatorConfig, subsequentAPIFileName);
                     string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
                     resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
@@ -94,9 +109,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // add a deployment resource for the unified api template file
                     string originalAPIName = fileNameGenerator.GenerateOriginalAPIName(apiInfo.name);
                     string unifiedAPIDeploymentResourceName = $"{originalAPIName}-APITemplate";
-                    string unifiedAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true, apimServiceName);
+                    string unifiedAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string unifiedAPIUri = GenerateLinkedTemplateUri(creatorConfig, unifiedAPIFileName);
-                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, apiInfo);
+                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo);
                     resources.Add(this.CreateLinkedMasterTemplateResource(unifiedAPIDeploymentResourceName, unifiedAPIUri, unifiedAPIDependsOn));
                 }
             }
@@ -111,6 +126,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             Template loggersTemplate,
             Template backendsTemplate,
             Template authorizationServersTemplate,
+            Template tagTemplate,
             LinkedMasterTemplateAPIInformation apiInfo)
         {
             List<string> apiDependsOn = new List<string>();
@@ -138,6 +154,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
             }
+            if (tagTemplate != null && apiInfo.dependsOnTags == true) 
+            {
+                apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
+            }
             return apiDependsOn.ToArray();
         }
 
@@ -159,7 +179,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     },
                     parameters = new Dictionary<string, TemplateParameterProperties>
                     {
-                        { "ApimServiceName", new TemplateParameterProperties(){ value = "[parameters('ApimServiceName')]" } }
+                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
                     }
                 },
                 dependsOn = dependsOn
@@ -170,7 +190,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(CreatorConfig creatorConfig)
         {
             // used to create the parameter metatadata, etc (not value) for use in file with resources
-            // add parameters with metatdata properties
+            // add parameters with metadata properties
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
@@ -180,7 +200,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 },
                 type = "string"
             };
-            parameters.Add("ApimServiceName", apimServiceNameProperties);
+            parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
             // add remote location of template files for linked option
             if (creatorConfig.linked == true)
             {
@@ -192,7 +212,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     },
                     type = "string"
                 };
-                parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
+                parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
                 if (creatorConfig.linkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
@@ -203,7 +223,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         },
                         type = "string"
                     };
-                    parameters.Add("LinkedTemplatesUrlQueryString", linkedTemplatesUrlQueryStringProperties);
+                    parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
             }
             return parameters;
@@ -213,7 +233,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = CreateEmptyTemplate();
+            Template masterTemplate = CreateEmptyParameters();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
@@ -221,21 +241,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 value = creatorConfig.apimServiceName
             };
-            parameters.Add("ApimServiceName", apimServiceNameProperties);
+            parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
             if (creatorConfig.linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
                     value = creatorConfig.linkedTemplatesBaseUrl
                 };
-                parameters.Add("LinkedTemplatesBaseUrl", linkedTemplatesBaseUrlProperties);
+                parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
                 if (creatorConfig.linkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
                     {
                         value = creatorConfig.linkedTemplatesUrlQueryString
                     };
-                    parameters.Add("LinkedTemplatesUrlQueryString", linkedTemplatesUrlQueryStringProperties);
+                    parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
             }
             masterTemplate.parameters = parameters;
@@ -295,7 +315,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public string GenerateLinkedTemplateUri(CreatorConfig creatorConfig, string fileName)
         {
-            return creatorConfig.linkedTemplatesUrlQueryString != null ? $"[concat(parameters('LinkedTemplatesBaseUrl'), '{fileName}', parameters('LinkedTemplatesUrlQueryString'))]" : $"[concat(parameters('LinkedTemplatesBaseUrl'), '{fileName}')]";
+            return creatorConfig.linkedTemplatesUrlQueryString != null ?
+             $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}', parameters('{ParameterNames.LinkedTemplatesUrlQueryString}'))]" 
+             : $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}')]";
         }
     }
 
@@ -309,6 +331,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool dependsOnLoggers { get; set; }
         public bool dependsOnBackends { get; set; }
         public bool dependsOnAuthorizationServers { get; set; }
+        public bool dependsOnTags { get; set; }
     }
 
 }

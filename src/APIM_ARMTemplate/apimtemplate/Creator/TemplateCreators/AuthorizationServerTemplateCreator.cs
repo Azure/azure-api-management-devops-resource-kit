@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             authorizationTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { "ApimServiceName", new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 // create authorization server resource with properties
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = new AuthorizationServerTemplateResource()
                 {
-                    name = $"[concat(parameters('ApimServiceName'), '/{authorizationServerTemplateProperties.displayName}')]",
+                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServerTemplateProperties.displayName}')]",
                     type = ResourceTypeConstants.AuthorizationServer,
                     apiVersion = GlobalConstants.APIVersion,
                     properties = authorizationServerTemplateProperties,

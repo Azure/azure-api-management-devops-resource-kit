@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
-    public class PropertyExtractor: EntityExtractor
+    public class PropertyExtractor : EntityExtractor
     {
         public async Task<string> GetPropertiesAsync(string ApiManagementName, string ResourceGroupName)
         {
@@ -29,29 +29,34 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateNamedValuesTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl)
+        public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting named values from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl);
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters(exc);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (properties) for service
-            string properties = await GetPropertiesAsync(apimname, resourceGroup);
+            string properties = await GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
             JObject oProperties = JObject.Parse(properties);
 
             foreach (var extractedProperty in oProperties["value"])
             {
                 string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
-                string fullPropertyResource = await GetPropertyDetailsAsync(apimname, resourceGroup, propertyName);
+                string fullPropertyResource = await GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
 
                 // convert returned named value to template resource class
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                propertyTemplateResource.name = $"[concat(parameters('ApimServiceName'), '/{propertyName}')]";
+                propertyTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
                 propertyTemplateResource.type = ResourceTypeConstants.Property;
                 propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
                 propertyTemplateResource.scale = null;
+
+                if (exc.paramNamedValue)
+                {
+                    propertyTemplateResource.properties.value = $"[parameters('{ParameterNames.NamedValues}').{ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property)}]";
+                }
 
                 if (singleApiName == null)
                 {
