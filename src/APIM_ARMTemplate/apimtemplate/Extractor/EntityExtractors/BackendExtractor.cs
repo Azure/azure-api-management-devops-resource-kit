@@ -132,12 +132,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     var matches = propertyRegex.Matches(item?.ToString());
                     foreach (Match match in matches)
                     {
-                        var propertyId = match.Groups[1].Value;
+                        var propertyName = match.Groups[1].Value;
                         var propertyExtractor = new PropertyExtractor();
-                        var property = await propertyExtractor.GetPropertyDetailsAsync(apimname, resourceGroup, propertyId);
-                        var propertyResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(property);
-                        propertyResource.apiVersion = GlobalConstants.APIVersion;
-                        propertyResources.Add(propertyResource);
+                        var fullPropertyResource = await propertyExtractor.GetPropertyDetailsAsync(apimname, resourceGroup, propertyName);
+                        PropertyTemplateResource propertyTemplateResource = propertyExtractor.GetPropertyTemplateResource(propertyName, fullPropertyResource);
+                        propertyResources.Add(propertyTemplateResource);
                     }
                 }
 

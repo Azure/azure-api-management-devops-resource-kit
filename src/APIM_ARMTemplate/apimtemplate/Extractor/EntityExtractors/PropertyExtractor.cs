@@ -108,11 +108,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string fullPropertyResource = await GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
 
                 // convert returned named value to template resource class
-                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                propertyTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
-                propertyTemplateResource.type = ResourceTypeConstants.Property;
-                propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
-                propertyTemplateResource.scale = null;
+                PropertyTemplateResource propertyTemplateResource = GetPropertyTemplateResource(propertyName, fullPropertyResource);
 
                 if (exc.paramNamedValue)
                 {
@@ -135,6 +131,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             armTemplate.resources = templateResources.ToArray();
             return armTemplate;
+        }
+
+        public PropertyTemplateResource GetPropertyTemplateResource(string propertyName, string fullPropertyResource)
+        {
+            PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+            propertyTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
+            propertyTemplateResource.type = ResourceTypeConstants.Property;
+            propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
+            propertyTemplateResource.scale = null;
+            return propertyTemplateResource;
         }
     }
 }
