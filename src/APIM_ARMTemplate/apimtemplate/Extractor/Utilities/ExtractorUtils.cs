@@ -103,6 +103,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
             Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl, policyXMLSasToken);
 
+            // Add Named Values from Backend
+            if (namedValueResources.Count > namedValueTemplate.resources.Length)
+            {
+                namedValueTemplate.resources = namedValueResources.ToArray();
+            }
+
             Dictionary<string, string> loggerResourceIds = null;
             if (exc.paramLogResourceId)
             {

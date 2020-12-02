@@ -124,6 +124,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 backendTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendName}')]";
                 backendTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
+                if (singleApiName != null)
+                {
+                    // Extract Properties
+                    JArray namedValues = new JArray();
+                    var propertyRegex = new Regex("{{(.*?)}}");
+                    var matches = propertyRegex.Matches(item?.ToString());
+                    foreach (Match match in matches)
+                    {
+                        var propertyId = match.Groups[1].Value;
+                        var propertyExtractor = new PropertyExtractor();
+                        var property = await propertyExtractor.GetPropertyDetailsAsync(apimname, resourceGroup, propertyId);
+                        var propertyResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(property);
+                        propertyResource.apiVersion = GlobalConstants.APIVersion;
+                        propertyResources.Add(propertyResource);
+                    }
+                }
+
                 ////only extract the backend if this is a full extraction, or in the case of a single api, if it is referenced by one of the policies
                 //if (singleApiName == null)
                 //{
