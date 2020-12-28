@@ -65,7 +65,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add parameters
             apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } },
+                { ParameterNames.ServiceUrl, new TemplateParameterProperties(){ type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -124,7 +125,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 // add metadata properties for initial and unified templates
                 apiTemplateResource.properties.apiVersion = api.apiVersion;
-                apiTemplateResource.properties.serviceUrl = api.serviceUrl;
+                apiTemplateResource.properties.serviceUrl = api.serviceUrl ?? $"[parameters('{ParameterNames.ServiceUrl}')]";
                 apiTemplateResource.properties.type = api.type;
                 apiTemplateResource.properties.apiType = api.type;
                 apiTemplateResource.properties.description = api.description;
@@ -224,8 +225,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.format = format;
                 apiTemplateResource.properties.value = value;
                 apiTemplateResource.properties.path = api.suffix;
-                apiTemplateResource.properties.serviceUrl = api.serviceUrl;
-               
+                apiTemplateResource.properties.serviceUrl = api.serviceUrl ?? $"[parameters('{ParameterNames.ServiceUrl}')]";
+
             }
             return apiTemplateResource;
         }
