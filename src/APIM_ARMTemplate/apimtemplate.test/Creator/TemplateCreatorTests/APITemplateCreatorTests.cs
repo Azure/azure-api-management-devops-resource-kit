@@ -72,7 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         }
 
         [Fact]
-        public async void ShouldCreateAPITemplateResourceFromCreatorConfigWithServiceUrl()
+        public async void ShouldCreateAPITemplateResourceFromCreatorConfigWithoutServiceUrlParameter()
         {
             // arrange
             APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
@@ -91,6 +91,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = apiTemplates.FirstOrDefault().resources[0] as APITemplateResource;
 
             // assert
+            Assert.Single(apiTemplates.First().parameters);
+            Assert.False(apiTemplates.First().parameters.ContainsKey(ParameterNames.ServiceUrl));
             Assert.Equal("https://petstore.swagger.io", apiTemplateResource.properties.serviceUrl);
         }
 
