@@ -35,6 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string linkedTemplatesUrlQueryString { get; set; }
         public string baseFileName { get; set; }
         public List<ServiceUrlProperty> serviceUrlParameters { get; set; }
+        public bool paramNamedValue { get; set; }
     }
 
     public class APIVersionSetConfig : APIVersionSetProperties
