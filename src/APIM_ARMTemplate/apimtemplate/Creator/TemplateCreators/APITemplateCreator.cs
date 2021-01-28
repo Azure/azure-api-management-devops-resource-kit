@@ -4,6 +4,7 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using apimtemplate.Creator.Utilities;
 using System.Net;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -70,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             if (String.IsNullOrEmpty(api.serviceUrl))
             {
-                apiTemplate.parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { type = "string" });
+                apiTemplate.parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { type = "object" });
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -129,7 +130,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 // add metadata properties for initial and unified templates
                 apiTemplateResource.properties.apiVersion = api.apiVersion;
-                apiTemplateResource.properties.serviceUrl = api.serviceUrl ?? $"[parameters('{ParameterNames.ServiceUrl}')]";
+                apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
                 apiTemplateResource.properties.type = api.type;
                 apiTemplateResource.properties.apiType = api.type;
                 apiTemplateResource.properties.description = api.description;
@@ -229,7 +230,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.format = format;
                 apiTemplateResource.properties.value = value;
                 apiTemplateResource.properties.path = api.suffix;
-                apiTemplateResource.properties.serviceUrl = api.serviceUrl ?? $"[parameters('{ParameterNames.ServiceUrl}')]";
+                apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
 
             }
             return apiTemplateResource;
@@ -258,6 +259,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             // the api needs to be split into multiple templates if the user has supplied a version or version set - deploying swagger related properties at the same time as api version related properties fails, so they must be written and deployed separately
             return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null || (apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.oAuth2 != null && apiConfig.authenticationSettings.oAuth2.authorizationServerId != null);
+        }
+
+        private string MakeServiceUrl(APIConfig api)
+        {
+            return api.serviceUrl ?? $"[parameters('{ParameterNames.ServiceUrl}').{ExtractorUtils.GenValidParamName(api.name, ParameterPrefix.Api)}]";
         }
     }
 }
