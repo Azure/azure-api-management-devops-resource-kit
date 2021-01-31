@@ -94,6 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string policy { get; set; }
         // coma separated names
         public string groups { get; set; }
+        public List<SubscriptionConfig> subscriptions { get; set; }
     }
 
     public class PropertyConfig : PropertyResourceProperties
@@ -103,6 +104,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
     public class SubscriptionConfig : SubscriptionsTemplateProperties
     {
-
+        public string name { get; set; }
     }
 }
