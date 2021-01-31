@@ -21,11 +21,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public List<APIVersionSetConfig> apiVersionSets { get; set; }
         public List<APIConfig> apis { get; set; }
         public List<ProductConfig> products { get; set; }
-        public List<PropertyConfig> namedValues {get;set;}
+        public List<PropertyConfig> namedValues { get; set; }
         public List<LoggerConfig> loggers { get; set; }
         public List<AuthorizationServerTemplateProperties> authorizationServers { get; set; }
         public List<BackendTemplateProperties> backends { get; set; }
         public List<TagTemplateProperties> tags { get; set; }
+        public List<SubscriptionConfig> subscriptions { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
         public string linkedTemplatesBaseUrl { get; set; }
@@ -33,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string baseFileName { get; set; }
     }
 
-    public class APIVersionSetConfig: APIVersionSetProperties
+    public class APIVersionSetConfig : APIVersionSetProperties
     {
         public string id { get; set; }
     }
@@ -100,4 +101,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
     }
 
+    public class SubscriptionConfig : SubscriptionsTemplateProperties
+    {
+
+    }
 }
