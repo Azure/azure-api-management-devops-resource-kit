@@ -9,7 +9,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         {
             PolicyTemplateCreator policyTemplateCreator = PolicyTemplateCreatorFactory.GeneratePolicyTemplateCreator();
             ProductGroupTemplateCreator productGroupTemplateCreator = new ProductGroupTemplateCreator();
-            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator);
+            SubscriptionTemplateCreator productSubscriptionsTemplateCreator = new SubscriptionTemplateCreator();
+            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator, productSubscriptionsTemplateCreator);
             return productTemplateCreator;
         }
     }
