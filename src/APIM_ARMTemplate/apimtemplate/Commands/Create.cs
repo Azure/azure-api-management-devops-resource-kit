@@ -72,7 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator, productSubscriptionsTemplateCreator);
                     PropertyTemplateCreator propertyTemplateCreator = new PropertyTemplateCreator();
                     TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration
@@ -85,6 +85,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Console.WriteLine("Creating product template");
                     Console.WriteLine("------------------------------------------");
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating product/APIs template");
+                    Console.WriteLine("------------------------------------------");
+                    Template productAPIsTemplate = (creatorConfig.products != null && creatorConfig.apis != null) ? productAPITemplateCreator.CreateProductAPITemplate(creatorConfig) : null;
                     Console.WriteLine("Creating named values template");
                     Console.WriteLine("------------------------------------------");
                     Template propertyTemplate = creatorConfig.namedValues != null ? propertyTemplateCreator.CreatePropertyTemplate(creatorConfig) : null;
@@ -134,7 +137,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, propertyTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, productAPIsTemplate, propertyTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
                     }
                     foreach (Template apiTemplate in apiTemplates)
@@ -156,6 +159,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (productsTemplate != null)
                     {
                         fileWriter.WriteJSONToFile(productsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.products));
+                    }
+                    if (productAPIsTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(productAPIsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.productAPIs));
                     }
                     if (propertyTemplate != null)
                     {
