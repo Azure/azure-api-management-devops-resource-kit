@@ -92,8 +92,17 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                | string                | No                    | Name of the product resource. If omitted, the display name is used.                          |
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          |
+| subscriptions                | Array<[SubscriptionConfiguration](#SubscriptionConfiguration)>                | No                    | List of Subscriptions
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+
+#### SubscriptionConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                | string                | No                    | Name of the subscription resource. If omitted, the display name is used.                          |
+
+_Additional properties found in [SubscriptionCreateParameterProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions#subscriptioncreateparameterproperties-object)_
 
 #### PropertyConfiguration
 
@@ -218,6 +227,12 @@ products:
       subscriptionsLimit: 1
       state: notPublished
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
+      subscriptions:
+          - name: platinum
+            primaryKey: a240691f-03fd-4557-a5cb-6e0f65cd976a
+            secondaryKey: 032338aa-0076-4379-910c-32ddd42f38a1
+            state: active
+            allowTracing: true 
 tags:
     - displayName: Universe
 loggers:
