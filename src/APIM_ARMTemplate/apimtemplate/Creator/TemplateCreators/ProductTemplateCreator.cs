@@ -7,11 +7,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         private PolicyTemplateCreator policyTemplateCreator;
         private ProductGroupTemplateCreator productGroupTemplateCreator;
+        private SubscriptionTemplateCreator subscriptionTemplateCreator;
 
-        public ProductTemplateCreator(PolicyTemplateCreator policyTemplateCreator, ProductGroupTemplateCreator productGroupTemplateCreator)
+        public ProductTemplateCreator(
+            PolicyTemplateCreator policyTemplateCreator,
+            ProductGroupTemplateCreator productGroupTemplateCreator,
+            SubscriptionTemplateCreator subscriptionTemplateCreator
+            )
         {
             this.policyTemplateCreator = policyTemplateCreator;
             this.productGroupTemplateCreator = productGroupTemplateCreator;
+            this.subscriptionTemplateCreator = subscriptionTemplateCreator;
         }
 
         public Template CreateProductTemplate(CreatorConfig creatorConfig)
@@ -65,6 +71,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.name}')]" };
                     List<ProductGroupsValue> productGroups = this.productGroupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
                     resources.AddRange(productGroups);
+                }
+
+                // create product subscriptions if provided
+                if (product.subscriptions != null)
+                { 
+                    string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.name}')]" };
+                    List<SubscriptionsTemplateResource> subscriptions = this.subscriptionTemplateCreator.CreateSubscriptionsTemplateResources(product, dependsOn);
+                    resources.AddRange(subscriptions);
                 }
             }
 

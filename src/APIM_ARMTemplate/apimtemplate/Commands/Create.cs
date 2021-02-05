@@ -66,9 +66,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     TagAPITemplateCreator tagAPITemplateCreator = new TagAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     ProductGroupTemplateCreator productGroupTemplateCreator = new ProductGroupTemplateCreator();
+                    SubscriptionTemplateCreator productSubscriptionsTemplateCreator = new SubscriptionTemplateCreator();
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
                     ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
-                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator);
+                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator, productSubscriptionsTemplateCreator);
                     PropertyTemplateCreator propertyTemplateCreator = new PropertyTemplateCreator();
                     TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
