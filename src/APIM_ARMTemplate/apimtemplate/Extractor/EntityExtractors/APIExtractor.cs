@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.fileWriter = fileWriter;
         }
 
-        private async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             JObject oOperations = new JObject();
             int numOfOps = 0;
@@ -332,30 +332,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     templateResources.Add(operationPolicyResource);
                 }
                 catch (Exception) { }
-
-
-                // add tags associated with the operation to template 
-                try
-                {
-                    // pull tags associated with the operation
-                    string apiOperationTags = await GetOperationTagsAsync(apimname, resourceGroup, oApiName, operationName);
-                    JObject oApiOperationTags = JObject.Parse(apiOperationTags);
-
-                    foreach (var tag in oApiOperationTags["value"])
-                    {
-                        string apiOperationTagName = ((JValue)tag["name"]).Value.ToString();
-                        Console.WriteLine(" - '{0}' Tag association found for {1} operation", apiOperationTagName, operationResourceName);
-
-                        // convert operation tag association to template resource class
-                        TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
-                        operationTagResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{oApiName}/{operationResourceName}/{apiOperationTagName}')]";
-                        operationTagResource.apiVersion = GlobalConstants.APIVersion;
-                        operationTagResource.scale = null;
-                        operationTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{oApiName}', '{operationResourceName}')]" };
-                        templateResources.Add(operationTagResource);
-                    }
-                }
-                catch (Exception) { }
             }
             #endregion
 
@@ -390,56 +366,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     }
                 }
                 templateResources.Add(apiPoliciesResource);
-            }
-            catch (Exception) { }
-            #endregion
-
-            // add tags associated with the api to template 
-            try
-            {
-                // pull tags associated with the api
-                string apiTags = await GetAPITagsAsync(apimname, resourceGroup, apiName);
-                JObject oApiTags = JObject.Parse(apiTags);
-
-                foreach (var tag in oApiTags["value"])
-                {
-                    string apiTagName = ((JValue)tag["name"]).Value.ToString();
-                    Console.WriteLine("'{0}' Tag association found", apiTagName);
-
-                    // convert associations between api and tags to template resource class
-                    TagTemplateResource apiTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
-                    apiTagResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{oApiName}/{apiTagName}')]";
-                    apiTagResource.apiVersion = GlobalConstants.APIVersion;
-                    apiTagResource.scale = null;
-                    apiTagResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{oApiName}')]" };
-                    templateResources.Add(apiTagResource);
-                }
-            }
-            catch (Exception) { }
-
-            // add product api associations to template
-            #region API Products
-            try
-            {
-                // pull product api associations
-                string apiProducts = await GetAPIProductsAsync(apimname, resourceGroup, apiName);
-                JObject oApiProducts = JObject.Parse(apiProducts);
-
-                foreach (var item in oApiProducts["value"])
-                {
-                    string apiProductName = ((JValue)item["name"]).Value.ToString();
-                    Console.WriteLine("'{0}' Product association found", apiProductName);
-
-                    // convert returned api product associations to template resource class
-                    ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(item.ToString());
-                    productAPIResource.type = ResourceTypeConstants.ProductAPI;
-                    productAPIResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiProductName}/{oApiName}')]";
-                    productAPIResource.apiVersion = GlobalConstants.APIVersion;
-                    productAPIResource.scale = null;
-                    productAPIResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{oApiName}')]" };
-
-                    templateResources.Add(productAPIResource);
-                }
             }
             catch (Exception) { }
             #endregion
@@ -483,7 +409,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateAPIRevisionTemplateAsync(string currentRevision, List<string> revList, string apiName, Extractor exc)
         {
             // generate apiTemplate
-            Template armTemplate = GenerateEmptyTemplateWithParameters(exc.policyXMLBaseUrl, exc.policyXMLSasToken);
+            Template armTemplate = GenerateEmptyApiTemplateWithParameters(exc);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
