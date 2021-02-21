@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Threading.Tasks;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -154,7 +155,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
             }
-            if (tagTemplate != null && apiInfo.dependsOnTags == true) 
+            if (tagTemplate != null && apiInfo.dependsOnTags == true)
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
             }
@@ -316,7 +317,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string GenerateLinkedTemplateUri(CreatorConfig creatorConfig, string fileName)
         {
             return creatorConfig.linkedTemplatesUrlQueryString != null ?
-             $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}', parameters('{ParameterNames.LinkedTemplatesUrlQueryString}'))]" 
+             $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}', parameters('{ParameterNames.LinkedTemplatesUrlQueryString}'))]"
              : $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}')]";
         }
     }
