@@ -8,9 +8,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
     public class ProductAPITemplateCreatorTests
     {
         [Fact]
-        public void ShouldCreateProductAPITemplateResourceFromValues()
-        {
-            [Fact]
         public void ShouldCreateProductAPIFromCreatorConfig()
         {
             // arrange
@@ -67,6 +64,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name}')]", productAPITemplateResource.name);
         }
+
+        [Fact]
+        public void ShouldCreateProductAPITemplateResourceFromValues()
+        {
 
             // arrange
             ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
