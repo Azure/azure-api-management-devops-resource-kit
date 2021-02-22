@@ -104,4 +104,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
     }
 
+    public class SubscriptionConfig : SubscriptionsTemplateProperties
+    {
+        public string name { get; set; }
+    }
+
 }

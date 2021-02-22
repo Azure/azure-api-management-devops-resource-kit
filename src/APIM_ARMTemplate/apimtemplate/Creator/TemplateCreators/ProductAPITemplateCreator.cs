@@ -3,7 +3,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
-    public class ProductAPITemplateCreator
     public class ProductAPITemplateCreator : TemplateCreator
     {
         public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
@@ -18,14 +17,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            string[] dependsOn = new string[] {};
+            string[] dependsOn = new string[] { };
             foreach (APIConfig api in creatorConfig.apis)
             {
                 List<ProductAPITemplateResource> apiResources = CreateProductAPITemplateResources(api, dependsOn);
-                resources.AddRange(apiResources);                
+                resources.AddRange(apiResources);
 
                 // Add previous product/API resource as a dependency for next product/API resource(s)
-                string productID = apiResources[apiResources.Count-1].name.Split('/', 3)[1];
+                string productID = apiResources[apiResources.Count - 1].name.Split('/', 3)[1];
                 dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]" };
             }
 
@@ -54,7 +53,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
-                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, dependsOn);
                 ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
                 // Add previous product/API resource as a dependency for next product/API resource
                 allDependsOn = new string[dependsOn.Length + 1];
