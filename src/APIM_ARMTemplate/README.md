@@ -92,17 +92,8 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                | string                | No                    | Name of the product resource. If omitted, the display name is used.                          |
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          |
-| subscriptions                | Array<[SubscriptionConfiguration](#SubscriptionConfiguration)>                | No                    | List of Subscriptions
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
-
-#### SubscriptionConfiguration
-
-| Property              | Type                  | Required              | Value                                            |
-|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
-| name                | string                | No                    | Name of the subscription resource. If omitted, the display name is used.                          |
-
-_Additional properties found in [SubscriptionCreateParameterProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions#subscriptioncreateparameterproperties-object)_
 
 #### PropertyConfiguration
 
@@ -227,12 +218,6 @@ products:
       subscriptionsLimit: 1
       state: notPublished
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
-      subscriptions:
-          - name: platinum
-            primaryKey: a240691f-03fd-4557-a5cb-6e0f65cd976a
-            secondaryKey: 032338aa-0076-4379-910c-32ddd42f38a1
-            state: active
-            allowTracing: true 
 tags:
     - displayName: Universe
 loggers:
@@ -301,10 +286,20 @@ Below are the steps to run the Creator from the source code:
 - Navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate directory
 - Run the following command:
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
-- Run the following command to pass AppinsightsName and Appinsights InstrumentationKey as an parameter:
-```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --appInsightsInstrumentationKey 45d4v88-fdfs-4b35-9232-731d82d4d1c6 --appInsightsName  myAppInsights ```
+- Run the following command to pass apim Name as a parameter:
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --apimNameValue apimname1```
+- Run the following command to pass api name to generate ARM templates only for this specified APIs semicolon separated where the api1 (api name) will be same as name used in valid.yml file for that api(here it is myBackend):
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --preferredAPIsForDeployment myBackend;api2;api3;```
 - Run the following command to pass BackendUrls as an json input file into the parameter(sample file available in the same path as below in this repository):
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --backendurlconfigFile .\apimtemplate\Creator\ExampleFiles\BackendUrlParameter\BackendUrlParameters.json```
+- Run the following command to pass AppinsightsName and Appinsights InstrumentationKey as an parameter:
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --appInsightsInstrumentationKey 45d4v88-fdfs-4b35-9232-731d82d4d1c6 --appInsightsName  myAppInsights ```
+- Run the following command to pass namedValueKeys as an parameter to provide environment specific named values with key name and value like following:
+- Add new key to namedValues section in valid yaml file then use the same key name here in this cli parameter
+    **Here namedvalue displayname can not have | or ; in their name.**
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --namedValues namedvalue1|namevaluevalue1;namedvalue2|namevaluevalue2 ```
+Add new key to namedValues section in valid yaml file then use the same key name here in this cli parameter
+    **Here displayName can not have | or ; in their name.**
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
 

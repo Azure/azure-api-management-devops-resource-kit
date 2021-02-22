@@ -10,6 +10,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string configFile { get; set; }
 
         public string backendurlconfigFile { get; set; }
+
+        public string preferredAPIsForDeployment { get; set; }
     }
 
     public class CreatorConfig
@@ -106,4 +108,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         public string name { get; set; }
     }
+
 }
