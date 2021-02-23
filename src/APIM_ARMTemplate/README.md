@@ -227,6 +227,12 @@ products:
       subscriptionsLimit: 1
       state: notPublished
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
+      subscriptions:
+          - name: platinum
+            primaryKey: a240691f-03fd-4557-a5cb-6e0f65cd976a
+            secondaryKey: 032338aa-0076-4379-910c-32ddd42f38a1
+            state: active
+            allowTracing: true 
 tags:
     - displayName: Universe
 loggers:
