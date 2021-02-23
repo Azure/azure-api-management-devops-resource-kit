@@ -94,6 +94,13 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          
 | subscriptions                | Array<[SubscriptionConfiguration](#SubscriptionConfiguration)>                | No                    | List of Subscriptions
 
+_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+
+#### SubscriptionConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                | string                | No                    | Name of the subscription resource. If omitted, the display name is used.                          |
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
 
