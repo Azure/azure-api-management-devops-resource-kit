@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string paramLogResourceId { get; set; }
         [Description("Specify the the base url for calling api management")]
         public string serviceBaseUrl { get; set; }
-        [Description("Should include named values template")]
+        [Description("Should not include named values template")]
         public string notIncludeNamedValue { get; set; }
 
         public void Validate()
