@@ -48,6 +48,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | serviceUrl            | string                | No                    | Absolute URL of the backend service implementing this API.                                 |
 | type                  | enum                  | No                    | Type of API. - http or soap                      |
 | openApiSpec           | string                | Yes                   | Location of the Open API Spec file. Can be url or local file.                          |
+| openApiSpecFormat           | string                | No                   | Format of the API definition. When the `openApiSpec` property refers to a local file, the program will infer the format if this property is omitted. If the `openApiSpec` property refers to a url, you can prevent downloading the API definition by specifying this property. Valid values are `Swagger` (JSON), `Swagger_Json`, `OpenApi20` (YAML), `OpenApi20_Yaml`, `OpenApi20_Json`, `OpenApi30` (YAML), `OpenApi30_Yaml`, or `OpenApi30_Json`.
 | policy                | string                | No                    | Location of the API policy XML file. Can be url or local file.                          |
 | suffix                | string                | Yes                    | Relative URL uniquely identifying this API and all of its resource paths within the API Management service instance. It is appended to the API endpoint base URL specified during the service instance creation to form a public URL for this API.                       |
 | subscriptionRequired  | boolean               | No                    | Specifies whether an API or Product subscription is required for accessing the API.                         |
@@ -170,6 +171,7 @@ apis:
       description: myFirstAPI
       serviceUrl: http://myApiBackendUrl.com
       openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
+      openApiSpecFormat: swagger
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
       suffix: conf
       subscriptionRequired: true
