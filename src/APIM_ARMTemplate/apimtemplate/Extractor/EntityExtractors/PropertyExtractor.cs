@@ -27,7 +27,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string properties = await CallApiManagementAsync(azToken, requestUrl);
 
                 oProperty = JObject.Parse(properties);
-                Console.WriteLine($"Processing {oProperty["value"].Count()} properties.");
 
                 foreach (var item in oProperty["value"])
                 {
