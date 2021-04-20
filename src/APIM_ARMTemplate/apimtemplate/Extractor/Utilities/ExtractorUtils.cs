@@ -50,6 +50,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             PolicyExtractor policyExtractor = new PolicyExtractor(fileWriter);
             PropertyExtractor propertyExtractor = new PropertyExtractor();
             TagExtractor tagExtractor = new TagExtractor();
+            ProductAPIExtractor productAPIExtractor = new ProductAPIExtractor(fileWriter);
+            APITagExtractor apiTagExtractor = new APITagExtractor(fileWriter);
             ProductExtractor productExtractor = new ProductExtractor(fileWriter);
             MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
@@ -97,6 +99,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
             Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplateAsync(exc, singleApiName, apiTemplateResources, apiLoggerId);
             Template productTemplate = await productExtractor.GenerateProductsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken, dirName);
+            Template productAPITemplate = await productAPIExtractor.GenerateAPIProductsARMTemplateAsync(singleApiName, multipleApiNames, exc);
+            Template apiTagTemplate = await apiTagExtractor.GenerateAPITagsARMTemplateAsync(singleApiName, multipleApiNames, exc);
             List<TemplateResource> productTemplateResources = productTemplate.resources.ToList();
             Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc);
             Template tagTemplate = await tagExtractor.GenerateTagsTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, productTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
@@ -139,6 +143,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 fileWriter.WriteJSONToFile(productTemplate, String.Concat(@dirName, fileNames.products));
             }
+            if (productAPITemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(productAPITemplate, String.Concat(@dirName, fileNames.productAPIs));
+            }
+            if (apiTagTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(apiTagTemplate, String.Concat(@dirName, fileNames.apiTags));
+            }
             if (tagTemplate.resources.Count() != 0)
             {
                 fileWriter.WriteJSONToFile(tagTemplate, String.Concat(@dirName, fileNames.tags));
@@ -155,8 +167,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 // create a master template that links to all other templates
                 Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(
-                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate,
-                    loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
+                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productAPITemplate,
+                    apiTagTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
                     tagTemplate, fileNames, apiFileName, exc);
 
                 fileWriter.WriteJSONToFile(masterTemplate, String.Concat(@dirName, fileNames.linkedMaster));

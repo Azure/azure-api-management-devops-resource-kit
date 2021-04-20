@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.fileWriter = fileWriter;
         }
 
-        private async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
         {
             JObject oOperations = new JObject();
             int numOfOps = 0;
@@ -261,10 +261,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // convert returned api to template resource class
             JObject oApiDetails = JObject.Parse(apiDetails);
             APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
-            string oApiName = ((JValue)oApiDetails["name"]).Value.ToString();
 
             apiResource.type = ((JValue)oApiDetails["type"]).Value.ToString();
-            apiResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{oApiName}')]";
+            apiResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}')]";
             apiResource.apiVersion = GlobalConstants.APIVersion;
             apiResource.scale = null;
 
@@ -272,7 +271,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ExtractorUtils.GenValidParamName(apiName, ParameterPrefix.Api)}]";
             }
-
+            
             if (apiResource.properties.apiVersionSetId != null)
             {
                 apiResource.dependsOn = new string[] { };
@@ -290,6 +289,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             templateResources.Add(apiResource);
 
+<<<<<<< Updated upstream
+            templateResources.AddRange(await GetRelatedTemplateResourcesAsync(apiName, exc));
+
+=======
             #region Schemas
             // add schema resources to api template
             List<TemplateResource> schemaResources = await GenerateSchemasARMTemplate(apimname, apiName, resourceGroup, fileFolder);
@@ -551,6 +554,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             }
             #endregion
+>>>>>>> Stashed changes
             return templateResources;
         }
 
@@ -601,6 +605,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
             string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken;
             string apiDetails = await GetAPIDetailsAsync(apimname, resourceGroup, apiName);
+
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting resources from {0} API:", apiName);
 
@@ -618,7 +623,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ExtractorUtils.GenValidParamName(apiName, ParameterPrefix.Api)}]";
             }
-
+            
             if (apiResource.properties.apiVersionSetId != null)
             {
                 apiResource.dependsOn = new string[] { };
@@ -635,15 +640,172 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
 
             templateResources.Add(apiResource);
+            templateResources.AddRange(await GetRelatedTemplateResourcesAsync(apiName, exc));
 
-            #region Schemas
+            return templateResources;
+        }
+
+        public async Task<Template> GenerateAPIsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, Extractor exc)
+        {
+            // initialize arm template
+            Template armTemplate = GenerateEmptyApiTemplateWithParameters(exc);
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+            // when extract single API
+            if (singleApiName != null)
+            {
+                // check if this api exist
+                try
+                {
+                    string apiDetails = await GetAPIDetailsAsync(exc.sourceApimName, exc.resourceGroup, singleApiName);
+                    Console.WriteLine("{0} API found ...", singleApiName);
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, exc));
+                }
+                catch (Exception)
+                {
+                    throw new Exception($"{singleApiName} API not found!");
+                }
+            }
+            // when extract multiple APIs and generate one master template
+            else if (multipleApiNames != null)
+            {
+                Console.WriteLine("{0} APIs found ...", multipleApiNames.Count().ToString());
+                foreach (string apiName in multipleApiNames)
+                {
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, exc));
+                }
+            }
+            // when extract all APIs and generate one master template
+            else
+            {
+                JToken[] oApis = await GetAllAPIObjsAsync(exc.sourceApimName, exc.resourceGroup);
+                Console.WriteLine("{0} APIs found ...", (oApis.Count().ToString()));
+
+                foreach (JToken oApi in oApis)
+                {
+                    string apiName = ((JValue)oApi["name"]).Value.ToString();
+                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, exc));
+                }
+            }
+
+            armTemplate.resources = templateResources.ToArray();
+            return armTemplate;
+        }
+
+        private static void ArmEscapeSampleValueIfNecessary(OperationTemplateRepresentation operationTemplateRepresentation)
+        {
+            if (!string.IsNullOrWhiteSpace(operationTemplateRepresentation.sample) && operationTemplateRepresentation.contentType?.Contains("application/json", StringComparison.OrdinalIgnoreCase) == true && operationTemplateRepresentation.sample.TryParseJson(out JToken sampleAsJToken) && sampleAsJToken.Type == JTokenType.Array)
+            {
+                operationTemplateRepresentation.sample = "[" + operationTemplateRepresentation.sample;
+            }
+        }
+
+        private static void AddSchemaDependencyToOperationIfNecessary(string apiName, List<string> operationDependsOn, OperationTemplateRepresentation operationTemplateRepresentation)
+        {
+            if (operationTemplateRepresentation.schemaId != null)
+            {
+                string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{operationTemplateRepresentation.schemaId}')]";
+                // add value to list if schema has not already been added
+                if (!operationDependsOn.Exists(o => o == dependsOn))
+                {
+                    operationDependsOn.Add(dependsOn);
+                }
+            }
+        }
+
+        private static bool CheckAPIExist(string singleApiName, JObject oApi)
+        {
+            for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
+            {
+                if (((JValue)oApi["value"][i]["name"]).Value.ToString().Equals(singleApiName))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
+        {
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+
+            // pull all schemas from service
+            string schemas = await GetAPISchemasAsync(apimServiceName, resourceGroup, apiName);
+            JObject oSchemas = JObject.Parse(schemas);
+
+            foreach (var item in oSchemas["value"])
+            {
+                string schemaName = ((JValue)item["name"]).Value.ToString();
+                Console.WriteLine("'{0}' Operation schema found", schemaName);
+
+                string schemaDetails = await GetAPISchemaDetailsAsync(apimServiceName, resourceGroup, apiName, schemaName);
+
+                // pull returned schema and convert to template resource
+                RESTReturnedSchemaTemplate restReturnedSchemaTemplate = JsonConvert.DeserializeObject<RESTReturnedSchemaTemplate>(schemaDetails);
+                SchemaTemplateResource schemaDetailsResource = JsonConvert.DeserializeObject<SchemaTemplateResource>(schemaDetails);
+                schemaDetailsResource.properties.document.value = GetSchemaValueBasedOnContentType(restReturnedSchemaTemplate.properties);
+                schemaDetailsResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{schemaName}')]";
+                schemaDetailsResource.apiVersion = GlobalConstants.APIVersion;
+                schemaDetailsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
+
+                templateResources.Add(schemaDetailsResource);
+
+            }
+            return templateResources;
+        }
+
+        private string GetSchemaValueBasedOnContentType(RESTReturnedSchemaTemplateProperties schemaTemplateProperties)
+        {
+            var contentType = schemaTemplateProperties.contentType.ToLowerInvariant();
+            if (contentType.Equals("application/vnd.oai.openapi.components+json"))
+            {
+                // for OpenAPI "value" is not used, but "components" which is resolved during json deserialization
+                return null;
+            }
+
+            if (!(schemaTemplateProperties.document is JToken))
+            {
+                return JsonConvert.SerializeObject(schemaTemplateProperties.document);
+            }
+
+            var schemaJson = schemaTemplateProperties.document as JToken;
+
+            switch (contentType)
+            {
+                case "application/vnd.ms-azure-apim.swagger.definitions+json":
+                    if (schemaJson["definitions"] != null && schemaJson.Count() == 1)
+                    {
+                        schemaJson = schemaJson["definitions"];
+                    }
+                    break;
+                case "application/vnd.ms-azure-apim.xsd+xml":
+                    if (schemaJson["value"] != null && schemaJson.Count() == 1)
+                    {
+                        return schemaJson["value"].ToString();
+                    }
+                    break;
+            }
+
+            return JsonConvert.SerializeObject(schemaJson);
+        }
+
+        /// <summary>
+        /// Adds related API Template resources like schemas, operations, products, tags etc.
+        /// </summary>
+        /// <param name="apiName">The name of the API.</param>
+        /// <param name="exc">The extractor.</param>
+        /// <returns></returns>
+        private async Task<IEnumerable<TemplateResource>> GetRelatedTemplateResourcesAsync(string apiName, Extractor exc)
+        {
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+            string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken;
+
+            #region Schemas            
             // add schema resources to api template
             List<TemplateResource> schemaResources = await GenerateSchemasARMTemplate(apimname, apiName, resourceGroup, fileFolder);
             templateResources.AddRange(schemaResources);
             #endregion
 
             #region Operations
-
             // pull api operations for service
             string[] operationNames = await GetAllOperationNames(apimname, resourceGroup, apiName);
 
@@ -775,7 +937,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             catch (Exception) { }
             #endregion
 
-            // add tags associated with the api to template 
+            #region API Tags
+            // add tags associated with the api to template
             try
             {
                 // pull tags associated with the api
@@ -797,9 +960,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
             }
             catch (Exception) { }
+            #endregion
 
-            // add product api associations to template
             #region API Products
+            // add product api associations to template
             try
             {
                 // pull product api associations
@@ -843,7 +1007,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 diagnosticResource.scale = null;
                 diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
 
-                if (exc.paramApiLoggerId) {
+                if (exc.paramApiLoggerId)
+                {
                     diagnosticResource.properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ExtractorUtils.GenValidParamName(apiName, ParameterPrefix.Api)}.{ExtractorUtils.GenValidParamName(diagnosticName, ParameterPrefix.Diagnostic)}]";
                 }
 
@@ -854,152 +1019,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
 
                 templateResources.Add(diagnosticResource);
-
             }
             #endregion
+
             return templateResources;
-        }
-
-        public async Task<Template> GenerateAPIsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, Extractor exc)
-        {
-            // initialize arm template
-            Template armTemplate = GenerateEmptyApiTemplateWithParameters(exc);
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-            // when extract single API
-            if (singleApiName != null)
-            {
-                // check if this api exist
-                try
-                {
-                    string apiDetails = await GetAPIDetailsAsync(exc.sourceApimName, exc.resourceGroup, singleApiName);
-                    Console.WriteLine("{0} API found ...", singleApiName);
-                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(singleApiName, exc));
-                }
-                catch (Exception)
-                {
-                    throw new Exception($"{singleApiName} API not found!");
-                }
-            }
-            // when extract multiple APIs and generate one master template
-            else if (multipleApiNames != null)
-            {
-                Console.WriteLine("{0} APIs found ...", multipleApiNames.Count().ToString());
-                foreach (string apiName in multipleApiNames)
-                {
-                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, exc));
-                }
-            }
-            // when extract all APIs and generate one master template
-            else
-            {
-                JToken[] oApis = await GetAllAPIObjsAsync(exc.sourceApimName, exc.resourceGroup);
-                Console.WriteLine("{0} APIs found ...", (oApis.Count().ToString()));
-
-                foreach (JToken oApi in oApis)
-                {
-                    string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, exc));
-                }
-            }
-            armTemplate.resources = templateResources.ToArray();
-            return armTemplate;
-        }
-
-        private static void ArmEscapeSampleValueIfNecessary(OperationTemplateRepresentation operationTemplateRepresentation)
-        {
-            if (!string.IsNullOrWhiteSpace(operationTemplateRepresentation.sample) && operationTemplateRepresentation.contentType?.Contains("application/json", StringComparison.OrdinalIgnoreCase) == true && operationTemplateRepresentation.sample.TryParseJson(out JToken sampleAsJToken) && sampleAsJToken.Type == JTokenType.Array)
-            {
-                operationTemplateRepresentation.sample = "[" + operationTemplateRepresentation.sample;
-            }
-        }
-
-        private static void AddSchemaDependencyToOperationIfNecessary(string oApiName, List<string> operationDependsOn, OperationTemplateRepresentation operationTemplateRepresentation)
-        {
-            if (operationTemplateRepresentation.schemaId != null)
-            {
-                string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('{ParameterNames.ApimServiceName}'), '{oApiName}', '{operationTemplateRepresentation.schemaId}')]";
-                // add value to list if schema has not already been added
-                if (!operationDependsOn.Exists(o => o == dependsOn))
-                {
-                    operationDependsOn.Add(dependsOn);
-                }
-            }
-        }
-
-        private static bool CheckAPIExist(string singleApiName, JObject oApi)
-        {
-            for (int i = 0; i < ((JContainer)oApi["value"]).Count; i++)
-            {
-                if (((JValue)oApi["value"][i]["name"]).Value.ToString().Equals(singleApiName))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
-        {
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // pull all schemas from service
-            string schemas = await GetAPISchemasAsync(apimServiceName, resourceGroup, apiName);
-            JObject oSchemas = JObject.Parse(schemas);
-
-            foreach (var item in oSchemas["value"])
-            {
-                string schemaName = ((JValue)item["name"]).Value.ToString();
-                Console.WriteLine("'{0}' Operation schema found", schemaName);
-
-                string schemaDetails = await GetAPISchemaDetailsAsync(apimServiceName, resourceGroup, apiName, schemaName);
-
-                // pull returned schema and convert to template resource
-                RESTReturnedSchemaTemplate restReturnedSchemaTemplate = JsonConvert.DeserializeObject<RESTReturnedSchemaTemplate>(schemaDetails);
-                SchemaTemplateResource schemaDetailsResource = JsonConvert.DeserializeObject<SchemaTemplateResource>(schemaDetails);
-                schemaDetailsResource.properties.document.value = GetSchemaValueBasedOnContentType(restReturnedSchemaTemplate.properties);
-                schemaDetailsResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{schemaName}')]";
-                schemaDetailsResource.apiVersion = GlobalConstants.APIVersion;
-                schemaDetailsResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
-
-                templateResources.Add(schemaDetailsResource);
-
-            }
-            return templateResources;
-        }
-
-        private string GetSchemaValueBasedOnContentType(RESTReturnedSchemaTemplateProperties schemaTemplateProperties)
-        {
-            var contentType = schemaTemplateProperties.contentType.ToLowerInvariant();
-            if (contentType.Equals("application/vnd.oai.openapi.components+json"))
-            {
-                // for OpenAPI "value" is not used, but "components" which is resolved during json deserialization
-                return null;
-            }
-
-            if (!(schemaTemplateProperties.document is JToken))
-            {
-                return JsonConvert.SerializeObject(schemaTemplateProperties.document);
-            }
-
-            var schemaJson = schemaTemplateProperties.document as JToken;
-
-            switch (contentType)
-            {
-                case "application/vnd.ms-azure-apim.swagger.definitions+json":
-                    if (schemaJson["definitions"] != null && schemaJson.Count() == 1)
-                    {
-                        schemaJson = schemaJson["definitions"];
-                    }
-                    break;
-                case "application/vnd.ms-azure-apim.xsd+xml":
-                    if (schemaJson["value"] != null && schemaJson.Count() == 1)
-                    {
-                        return schemaJson["value"].ToString();
-                    }
-                    break;
-            }
-
-            return JsonConvert.SerializeObject(schemaJson);
         }
     }
 }
