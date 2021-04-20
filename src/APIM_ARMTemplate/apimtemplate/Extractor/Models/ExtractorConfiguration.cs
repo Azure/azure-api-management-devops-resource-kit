@@ -46,14 +46,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string paramLogResourceId { get; set; }
         [Description("Specify the the base url for calling api management")]
         public string serviceBaseUrl { get; set; }
-<<<<<<< Updated upstream
         [Description("Should not include named values template")]
         public string notIncludeNamedValue { get; set; }
 
-=======
         [Description("Group the operations into batches of x?")]
         public int operationBatchSize {get;set;}
->>>>>>> Stashed changes
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -134,11 +131,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.paramNamedValue = exc.paramNamedValue != null && exc.paramNamedValue.Equals("true");
             this.paramApiLoggerId = exc.paramApiLoggerId != null && exc.paramApiLoggerId.Equals("true");
             this.paramLogResourceId = exc.paramLogResourceId != null && exc.paramLogResourceId.Equals("true");
-<<<<<<< Updated upstream
             this.notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
-=======
             this.operationBatchSize  = exc.operationBatchSize;
->>>>>>> Stashed changes
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)
