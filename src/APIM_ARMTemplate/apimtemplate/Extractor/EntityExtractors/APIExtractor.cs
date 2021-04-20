@@ -507,7 +507,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             #endregion
 
             #region Operations
-
             // pull api operations for service
             string[] operationNames = await GetAllOperationNames(apimname, resourceGroup, apiName);
             int numBatches = 0;
@@ -678,7 +677,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             catch (Exception) { }
             #endregion
 
-			#region API Tags				
+	    #region API Tags				
             // add tags associated with the api to template 
             try
             {
