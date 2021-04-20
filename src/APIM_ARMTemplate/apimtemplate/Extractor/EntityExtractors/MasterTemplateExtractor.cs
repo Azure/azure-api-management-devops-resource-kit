@@ -14,8 +14,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
-            Template productAPIsTemplate,
-            Template apiTagsTemplate,
             Template loggersTemplate,
             Template backendsTemplate,
             Template authorizationServersTemplate,
@@ -43,8 +41,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // api dependsOn
             List<string> apiDependsOn = new List<string>();
-            List<string> productAPIDependsOn = new List<string>();
-            List<string> apiTagDependsOn = new List<string>();
 
             if (namedValuesTemplate != null && namedValuesTemplate.resources.Count() != 0)
             {
@@ -74,14 +70,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (productsTemplate != null && productsTemplate.resources.Count() != 0)
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
-                productAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
                 string productsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.products);
                 resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("productsTemplate", productsUri, dependsOnNamedValues, exc));
             }
 
             if (tagTemplate != null && tagTemplate.resources.Count() != 0)
             {
-                apiTagDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
                 string tagUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.tags);
                 resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("tagTemplate", tagUri, dependsOnNamedValues, exc));
@@ -114,24 +108,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // api
             if (apiTemplate != null && apiTemplate.resources.Count() != 0)
             {
-                apiTagDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
-                productAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
                 string apisUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, apiFileName);
                 resources.Add(this.CreateLinkedMasterTemplateResourceForApiTemplate("apisTemplate", apisUri, apiDependsOn.ToArray(), exc));
-            }
-
-            // productAPIs
-            if (productAPIsTemplate != null && productAPIsTemplate.resources.Count() != 0)
-            {
-                string productAPIsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.productAPIs);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("productAPIsTemplate", productAPIsUri, productAPIDependsOn.ToArray(), exc));
-            }
-
-            // apiTags
-            if (apiTagsTemplate != null && apiTagsTemplate.resources.Count() != 0)
-            {
-                string apiTagsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.apiTags);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("apiTagsTemplate", apiTagsUri, apiTagDependsOn.ToArray(), exc));
             }
             Console.WriteLine("Master template generated");
             masterTemplate.resources = resources.ToArray();

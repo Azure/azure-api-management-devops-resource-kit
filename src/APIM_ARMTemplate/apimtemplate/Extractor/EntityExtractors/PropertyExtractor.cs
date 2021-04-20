@@ -31,13 +31,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc)
         {
-            if (exc.notIncludeNamedValue == true)
-            {
-                Console.WriteLine("------------------------------------------");
-                Console.WriteLine("Skipping extracting named values from service");
-                return GenerateEmptyPropertyTemplateWithParameters(exc);
-            }
-
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting named values from service");
             Template armTemplate = GenerateEmptyPropertyTemplateWithParameters(exc);
