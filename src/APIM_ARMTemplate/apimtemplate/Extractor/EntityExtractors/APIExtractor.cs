@@ -123,41 +123,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return apiObjs.ToArray();
         }
 
-        public async Task<List<JToken[]>> GetAllAPIObjsChunkedAsync(string ApiManagementName, string ResourceGroupName, int chunkSize) {
-            JObject oApi = new JObject();
-            int numOfApis = 0;
-            List<JToken> apiObjs = new List<JToken>();
-            do
-            {
-                (string azToken, string azSubId) = await auth.GetAccessToken();
-
-                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?$skip={4}&api-version={5}",
-                baseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfApis, GlobalConstants.APIVersion);
-                numOfApis += GlobalConstants.NumOfRecords;
-
-                string apis = await CallApiManagementAsync(azToken, requestUrl);
-
-                oApi = JObject.Parse(apis);
-
-                foreach (var item in oApi["value"])
-                {
-                    apiObjs.Add(item);
-                }
-            }
-            while (oApi["nextLink"] != null);
-
-            int total = 0;
-            var chunkedList = new List<JToken[]>();
-
-            while(total < apiObjs.Count){
-                var chunk = apiObjs.Skip(total).Take(chunkSize);
-                chunkedList.Add(chunk.ToArray());
-                total += chunkSize;
-            }
-
-            return chunkedList;
-        }
-
         public async Task<List<string>> GetAllAPINamesAsync(string ApiManagementName, string ResourceGroupName)
         {
             JToken[] oApis = await GetAllAPIObjsAsync(ApiManagementName, ResourceGroupName);
