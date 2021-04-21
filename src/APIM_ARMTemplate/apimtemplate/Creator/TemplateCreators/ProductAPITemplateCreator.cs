@@ -39,7 +39,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productID}/{apiName}')]",
                 type = ResourceTypeConstants.ProductAPI,
                 apiVersion = GlobalConstants.APIVersion,
-                properties = new ProductAPITemplateProperties(),
                 dependsOn = dependsOn
             };
             return productAPITemplateResource;
