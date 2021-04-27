@@ -104,8 +104,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
                     templateResources.AddRange(await GenerateSingleProductAPIResourceAsync(apiName, exc, dependsOn));
-                    string apiProductName = templateResources.Last().name.Split('/', 3)[1];
-                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+
+                    if (templateResources.Count > 0)
+                    {
+                        string apiProductName = templateResources.Last().name.Split('/', 3)[1];
+                        dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+                    }
                 }
             }
             armTemplate.resources = templateResources.ToArray();
