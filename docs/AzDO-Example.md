@@ -121,7 +121,7 @@ You can use [this](https://docs.microsoft.com/en-us/azure/devops/pipelines/relea
 - Tags.template.json
 - namedValues.template.json
 - apis.template.json
-- globalServicePolice.template.json
+- globalServicePolicy.template.json
 ```
 
 2 - Set "Override template parameters" field with "-ApimServiceName \<QA-APIM-NAME>\"
