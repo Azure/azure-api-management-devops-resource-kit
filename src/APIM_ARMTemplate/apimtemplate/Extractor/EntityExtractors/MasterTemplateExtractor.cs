@@ -471,12 +471,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 Dictionary<string, string> namedValues = new Dictionary<string, string>();
                 PropertyExtractor pExc = new PropertyExtractor();
-                string properties = await pExc.GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
-                JObject oProperties = JObject.Parse(properties);
+                string[] properties = await pExc.GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
 
-                foreach (var extractedProperty in oProperties["value"])
+                foreach (var extractedProperty in properties)
                 {
-                    string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
+                    JToken oProperty = JObject.Parse(extractedProperty);
+                    string propertyName = ((JValue)oProperty["name"]).Value.ToString();
                     string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
                     PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
                     string propertyValue = propertyTemplateResource.properties.value;

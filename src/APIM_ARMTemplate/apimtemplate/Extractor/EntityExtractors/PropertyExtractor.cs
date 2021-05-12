@@ -4,19 +4,38 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     public class PropertyExtractor : EntityExtractor
     {
-        public async Task<string> GetPropertiesAsync(string ApiManagementName, string ResourceGroupName)
+        public async Task<string[]> GetPropertiesAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            JObject oProperty = new JObject();
+            int numOfProperties = 0;
+            List<string> propertyObjs = new List<string>();
+            do
+            {
+                (string azToken, string azSubId) = await auth.GetAccessToken();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/properties?api-version={4}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/properties?$skip={4}&api-version={5}",
+                   baseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfProperties, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+                numOfProperties += GlobalConstants.NumOfRecords;
+
+                string properties = await CallApiManagementAsync(azToken, requestUrl);
+
+                oProperty = JObject.Parse(properties);
+
+                foreach (var item in oProperty["value"])
+                {
+                    propertyObjs.Add(item.ToString());
+                }
+            }
+            while (oProperty["nextLink"] != null);
+
+            return propertyObjs.ToArray();
         }
 
         public async Task<string> GetPropertyDetailsAsync(string ApiManagementName, string ResourceGroupName, string propertyName)
@@ -45,12 +64,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (properties) for service
-            string properties = await GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
-            JObject oProperties = JObject.Parse(properties);
+            string[] properties = await GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
 
-            foreach (var extractedProperty in oProperties["value"])
+            foreach (var extractedProperty in properties)
             {
-                string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
+                JToken oProperty = JObject.Parse(extractedProperty);
+                string propertyName = ((JValue)oProperty["name"]).Value.ToString();
                 string fullPropertyResource = await GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
 
                 // convert returned named value to template resource class
