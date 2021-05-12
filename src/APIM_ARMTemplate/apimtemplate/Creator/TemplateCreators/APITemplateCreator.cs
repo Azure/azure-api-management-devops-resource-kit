@@ -67,9 +67,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
-            if (String.IsNullOrEmpty(api.serviceUrl))
+            if (!String.IsNullOrEmpty(api.serviceUrl))
             {
-                apiTemplate.parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { type = "object" });
+                apiTemplate.parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { type = "string" });
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();

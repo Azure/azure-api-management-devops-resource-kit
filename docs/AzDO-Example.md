@@ -1,4 +1,4 @@
-# Continuos Integration and Continuos Deployment using Azure DevOps
+# Continuous Integration and Continuous Deployment using Azure DevOps
 
 The following instructions demonstrate how to deploy the contents of this example repository using Azure DevOps Repos and Azure DevOps Pipelines.
 
@@ -96,7 +96,7 @@ git push
 
 # Build Pipeline
 
-We will use a **Build Pipeline** to pull the extracted files from a repo and put it on Azure DevOps Artefacts Folder. 
+We will use a **Build Pipeline** to pull the extracted files from a repo and put it on Azure DevOps Artifacts Folder. 
  
 1 - Add these tasks to your build:
 - Get Sources
@@ -121,7 +121,7 @@ You can use [this](https://docs.microsoft.com/en-us/azure/devops/pipelines/relea
 - Tags.template.json
 - namedValues.template.json
 - apis.template.json
-- globalServicePolice.template.json
+- globalServicePolicy.template.json
 ```
 
 2 - Set "Override template parameters" field with "-ApimServiceName \<QA-APIM-NAME>\"
