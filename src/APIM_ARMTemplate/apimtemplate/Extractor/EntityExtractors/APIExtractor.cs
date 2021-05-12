@@ -500,7 +500,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
             string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken;
 
-            #region Schemas            
+            #region Schemas
             // add schema resources to api template
             List<TemplateResource> schemaResources = await GenerateSchemasARMTemplate(apimname, apiName, resourceGroup, fileFolder);
             templateResources.AddRange(schemaResources);
@@ -509,9 +509,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             #region Operations
             // pull api operations for service
             string[] operationNames = await GetAllOperationNames(apimname, resourceGroup, apiName);
+            int numBatches = 0;
+
+            // create empty array for the batch operation owners
+            List<string> batchOwners = new List<string>();   
+
+            // if a batch size is specified            
+            if(exc.operationBatchSize > 0) {
+                // store the number of batches required based on exc.operationBatchSize
+                numBatches = (int)Math.Ceiling((double)operationNames.Length/ (double)exc.operationBatchSize);
+                //Console.WriteLine ("Number of batches: {0}", numBatches);
+            }
+            
 
             foreach (string operationName in operationNames)
             {
+                int opIndex = Array.IndexOf(operationNames, operationName);
+
+                //add batch owners into array
+                // ensure each owner is linked to the one before
+                if(exc.operationBatchSize > 0 && opIndex < numBatches) {
+                    batchOwners.Add(operationName);
+                    //Console.WriteLine("Adding operation {0} to owner list", operationName);
+                }
+
                 string operationDetails = await GetAPIOperationDetailsAsync(apimname, resourceGroup, apiName, operationName);
 
                 Console.WriteLine("'{0}' Operation found", operationName);
@@ -538,6 +559,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         AddSchemaDependencyToOperationIfNecessary(apiName, operationDependsOn, operationTemplateRepresentation);
                         ArmEscapeSampleValueIfNecessary(operationTemplateRepresentation);
                     }
+                }
+
+                // add to batch if flagged
+                string batchdependsOn;
+
+                if(exc.operationBatchSize > 0 && opIndex > 0) {
+                    if(opIndex >= 1 && opIndex <= numBatches - 1) {
+                        // chain the owners to each other
+                        batchdependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{batchOwners[opIndex - 1]}')]";
+                        //Console.WriteLine("Owner chaining: this request {0} to previous {1}", operationName, batchOwners[opIndex-1]);
+                    } else {
+                        // chain the operation to respective owner
+                        int ownerIndex = (int)Math.Floor((opIndex - numBatches)/((double)exc.operationBatchSize-1));
+                        batchdependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{batchOwners[ownerIndex]}')]";
+                        //Console.WriteLine("Operation {0} chained to owner {1}", operationName, batchOwners[ownerIndex]);
+                    }
+                    
+                    operationDependsOn.Add(batchdependsOn);
                 }
 
                 operationResource.dependsOn = operationDependsOn.ToArray();
@@ -638,8 +677,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             catch (Exception) { }
             #endregion
 
-            #region API Tags
-            // add tags associated with the api to template
+	    #region API Tags				
+            // add tags associated with the api to template 
             try
             {
                 // pull tags associated with the api
@@ -661,10 +700,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
             }
             catch (Exception) { }
-            #endregion
+			#endregion
 
-            #region API Products
+								
             // add product api associations to template
+            #region API Products
             try
             {
                 // pull product api associations
@@ -708,8 +748,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 diagnosticResource.scale = null;
                 diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
 
-                if (exc.paramApiLoggerId)
-                {
+                if (exc.paramApiLoggerId) {
+				 
                     diagnosticResource.properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ExtractorUtils.GenValidParamName(apiName, ParameterPrefix.Api)}.{ExtractorUtils.GenValidParamName(diagnosticName, ParameterPrefix.Diagnostic)}]";
                 }
 
@@ -720,6 +760,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
 
                 templateResources.Add(diagnosticResource);
+
             }
             #endregion
 
