@@ -126,7 +126,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 // add metadata properties for initial and unified templates
                 apiTemplateResource.properties.apiVersion = api.apiVersion;
-                apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
+                if (!String.IsNullOrEmpty(api.serviceUrl))
+                {
+                    apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
+                }
                 apiTemplateResource.properties.type = api.type;
                 apiTemplateResource.properties.apiType = api.type;
                 apiTemplateResource.properties.description = api.description;
@@ -226,8 +229,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 apiTemplateResource.properties.format = format;
                 apiTemplateResource.properties.value = value;
                 apiTemplateResource.properties.path = api.suffix;
-                apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
-
+                if (!String.IsNullOrEmpty(api.serviceUrl))
+                {
+                    apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
+                }
             }
             return apiTemplateResource;
         }
