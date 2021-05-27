@@ -20,12 +20,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] dependsOn = new string[] { };
             foreach (APIConfig api in creatorConfig.apis)
             {
-                List<ProductAPITemplateResource> apiResources = CreateProductAPITemplateResources(api, dependsOn);
-                resources.AddRange(apiResources);
+                if (api.products != null)
+                {
+                    List<ProductAPITemplateResource> apiResources = CreateProductAPITemplateResources(api, dependsOn);
+                    resources.AddRange(apiResources);
 
-                // Add previous product/API resource as a dependency for next product/API resource(s)
-                string productID = apiResources[apiResources.Count - 1].name.Split('/', 3)[1];
-                dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]" };
+                    // Add previous product/API resource as a dependency for next product/API resource(s)
+                    string productID = apiResources[apiResources.Count - 1].name.Split('/', 3)[1];
+                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]" };
+                }
             }
 
             productTemplate.resources = resources.ToArray();
@@ -48,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create a products/apis association resource for each product provided in the config file
             List<ProductAPITemplateResource> productAPITemplates = new List<ProductAPITemplateResource>();
             // products is comma separated list of productIds
-            string[] productIDs = api.products.Split(", ");
+            string[] productIDs = (api.products ?? "").Split(", ", System.StringSplitOptions.RemoveEmptyEntries);
             string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
