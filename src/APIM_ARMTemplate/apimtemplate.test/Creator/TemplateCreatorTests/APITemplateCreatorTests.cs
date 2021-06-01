@@ -72,31 +72,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         }
 
         [Fact]
-        public async void ShouldCreateAPITemplateResourceFromCreatorConfigWithoutServiceUrlParameter()
-        {
-            // arrange
-            APITemplateCreator apiTemplateCreator = APITemplateCreatorFactory.GenerateAPITemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
-            APIConfig api = new APIConfig()
-            {
-                name = "name",
-                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
-                serviceUrl = "https://petstore.swagger.io"
-            };
-            creatorConfig.apis.Add(api);
-
-            // act
-            // the above api config will create a unified api template with a single resource
-            List<Template> apiTemplates = await apiTemplateCreator.CreateAPITemplatesAsync(api);
-            APITemplateResource apiTemplateResource = apiTemplates.FirstOrDefault().resources[0] as APITemplateResource;
-
-            // assert
-            Assert.Single(apiTemplates.First().parameters);
-            Assert.False(apiTemplates.First().parameters.ContainsKey(ParameterNames.ServiceUrl));
-            Assert.Equal("https://petstore.swagger.io", apiTemplateResource.properties.serviceUrl);
-        }
-
-        [Fact]
         public async void ShouldCreateSubsequentlAPITemplateResourceFromCreatorConfigWithCorrectContent()
         {
             // arrange
