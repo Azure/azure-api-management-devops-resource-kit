@@ -53,6 +53,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string type { get; set; }
         // openApiSpec file location (local or url), used to build protocols, value, and format from APITemplateResource schema
         public string openApiSpec { get; set; }
+        // format of the API definition.
+        public OpenApiSpecFormat openApiSpecFormat { get; set;  }
         // policy file location (local or url)
         public string policy { get; set; }
         // used to buld path from APITemplateResource schema
@@ -72,6 +74,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public string protocols { get; set; }
         public DiagnosticConfig diagnostic { get; set; }
         // does not currently include subscriptionKeyParameterNames, sourceApiId, and wsdlSelector from APITemplateResource schema
+    }
+
+    public enum OpenApiSpecFormat
+    {
+        Unspecified,
+
+        Swagger,
+        Swagger_Json = Swagger,
+
+        OpenApi20,
+        OpenApi20_Yaml = OpenApi20,
+        OpenApi20_Json,
+
+        OpenApi30,
+        OpenApi30_Yaml = OpenApi30,
+        OpenApi30_Json,
     }
 
     public class OperationsConfig
