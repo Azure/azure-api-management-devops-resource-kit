@@ -172,10 +172,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 string value;
 
                 // determine if the open api spec is remote or local, yaml or json
-                Uri uriResult;
-                string fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
-                bool isJSON = this.fileReader.isJSON(fileContents);
-                bool isUrl = Uri.TryCreate(api.openApiSpec, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                bool isJSON = false;
+                bool isUrl = IsUri(api, out var _);
+
+                string fileContents = null;
+                if (!isUrl || api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
+                    fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
 
                 value = isUrl
                     ? api.openApiSpec
@@ -183,24 +185,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     ;
 
                 bool isVersionThree = false;
-                if (isJSON == true)
+                if (api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
                 {
-                    // open api spec is remote json file, use swagger-link-json for v2 and openapi-link for v3
-                    OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
-                    isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
+                    isJSON = this.fileReader.isJSON(fileContents);
+
+                    if (isJSON == true)
+                    {
+                        var openAPISpecReader = new OpenAPISpecReader();
+                        isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
+                    }
+                    format = GetOpenApiSpecFormat(isUrl, isJSON, isVersionThree);
                 }
 
-                format = isUrl
-                    ? (isJSON ? (isVersionThree ? "openapi-link" : "swagger-link-json") : "openapi-link")
-                    : (isJSON ? (isVersionThree ? "openapi+json" : "swagger-json") : "openapi")
-                    ;
+                else
+                {
+                    isJSON = IsOpenApiSpecJson(api.openApiSpecFormat);
+                    format = GetOpenApiSpecFormat(isUrl, api.openApiSpecFormat);
+                }
 
                 // if the title needs to be modified
                 // we need to embed the OpenAPI definition
 
                 if (!string.IsNullOrEmpty(api.displayName))
                 {
-                    format = (isJSON ? (isVersionThree ? "openapi+json" : "swagger-json") : "openapi");
+                    format = GetOpenApiSpecFormat(false, isJSON, isVersionThree);
 
                     // download definition
 
@@ -217,6 +225,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         .GetDefinition()
                         ;
                 }
+
                 // set the version set id
                 if (api.apiVersionSetId != null)
                 {
@@ -232,6 +241,62 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 }
             }
             return apiTemplateResource;
+        }
+
+        private static string GetOpenApiSpecFormat(bool isUrl, bool isJSON, bool isVersionThree)
+        {
+            return isUrl
+                ? (isJSON ? (isVersionThree ? "openapi-link" : "swagger-link-json") : "openapi-link")
+                : (isJSON ? (isVersionThree ? "openapi+json" : "swagger-json") : "openapi");
+        }
+
+        private static string GetOpenApiSpecFormat(bool isUrl, OpenApiSpecFormat openApiSpecFormat)
+        {
+            switch (openApiSpecFormat)
+            {
+                case OpenApiSpecFormat.Swagger_Json:
+                    return isUrl ? "swagger-link-json" : "swagger-json";
+
+                case OpenApiSpecFormat.OpenApi20_Yaml:
+                    return isUrl ? "openapi-link" : "openapi";
+
+                case OpenApiSpecFormat.OpenApi20_Json:
+                    return isUrl ? "openapi-link" : "swagger-json";
+
+                case OpenApiSpecFormat.OpenApi30_Yaml:
+                    return isUrl ? "openapi-link" : "openapi";
+
+                case OpenApiSpecFormat.OpenApi30_Json:
+                    return isUrl ? "openapi-link" : "openapi+json";
+
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+        private static bool IsOpenApiSpecJson(OpenApiSpecFormat openApiSpecFormat)
+        {
+            switch (openApiSpecFormat)
+            {
+                case OpenApiSpecFormat.Swagger_Json:
+                case OpenApiSpecFormat.OpenApi20_Json:
+                case OpenApiSpecFormat.OpenApi30_Json:
+                    return true;
+
+                case OpenApiSpecFormat.OpenApi20_Yaml:
+                case OpenApiSpecFormat.OpenApi30_Yaml:
+                    return false;
+
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        private static bool IsUri(APIConfig api, out Uri uriResult)
+        {
+            return
+                Uri.TryCreate(api.openApiSpec, UriKind.Absolute, out uriResult) &&
+                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)
+                ;
         }
 
         public static string MakeResourceName(APIConfig api)
