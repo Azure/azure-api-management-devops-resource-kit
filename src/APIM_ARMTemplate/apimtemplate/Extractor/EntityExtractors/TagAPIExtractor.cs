@@ -128,17 +128,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, exc, dependsOn));
 
-                    // Extract the tag name from the last resource
-                    string[] lastTagName = templateResources.Last().name.Replace("')]", "").Split('/');
-                    if (lastTagName.Length > 3)
+                    if (templateResources.Count > 0)
                     {
-                        // Operations tag
-                        dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{lastTagName[2]}', '{lastTagName[3]}')]" };
-                    }
-                    else
-                    {
-                        // API tag
-                        dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{lastTagName[2]}')]" };
+
+                        // Extract the tag name from the last resource
+                        string[] lastTagName = templateResources.Last().name.Replace("')]", "").Split('/');
+                        if (lastTagName.Length > 3)
+                        {
+                            // Operations tag
+                            dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{lastTagName[2]}', '{lastTagName[3]}')]" };
+                        }
+                        else
+                        {
+                            // API tag
+                            dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{lastTagName[2]}')]" };
+                        }
                     }
                 }
             }
