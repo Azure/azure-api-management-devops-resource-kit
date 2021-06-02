@@ -18,8 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             do
             {
                 (string azToken, string azSubId) = await auth.GetAccessToken();
-
-                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/properties?$skip={4}&api-version={5}",
+                string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues?$skip={4}&api-version={5}",
                    baseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfProperties, GlobalConstants.APIVersion);
 
                 numOfProperties += GlobalConstants.NumOfRecords;
@@ -42,7 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             (string azToken, string azSubId) = await auth.GetAccessToken();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/properties/{4}?api-version={5}",
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, propertyName, GlobalConstants.APIVersion);
 
             return await CallApiManagementAsync(azToken, requestUrl);
