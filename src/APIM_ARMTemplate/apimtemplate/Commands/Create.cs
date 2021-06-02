@@ -101,7 +101,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator, productSubscriptionsTemplateCreator);
                     PropertyTemplateCreator propertyTemplateCreator = new PropertyTemplateCreator();
                     TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
-                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
+                    APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
 
                     // create templates from provided configuration

@@ -12,14 +12,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     {
         private FileReader fileReader;
         private PolicyTemplateCreator policyTemplateCreator;
+        private ProductAPITemplateCreator productAPITemplateCreator;
         private TagAPITemplateCreator tagAPITemplateCreator;
         private DiagnosticTemplateCreator diagnosticTemplateCreator;
         private ReleaseTemplateCreator releaseTemplateCreator;
 
-        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, TagAPITemplateCreator tagAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator, ReleaseTemplateCreator releaseTemplateCreator)
+        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, TagAPITemplateCreator tagAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator, ReleaseTemplateCreator releaseTemplateCreator)
         {
             this.fileReader = fileReader;
-            this.policyTemplateCreator = policyTemplateCreator;
+            this.policyTemplateCreator = policyTemplateCreator;            
+            this.productAPITemplateCreator = productAPITemplateCreator;
             this.tagAPITemplateCreator = tagAPITemplateCreator;
             this.diagnosticTemplateCreator = diagnosticTemplateCreator;
             this.releaseTemplateCreator = releaseTemplateCreator;
@@ -95,6 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             PolicyTemplateResource apiPolicyResource = api.policy != null ? this.policyTemplateCreator.CreateAPIPolicyTemplateResource(api, dependsOn) : null;
             List<PolicyTemplateResource> operationPolicyResources = api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(api, dependsOn) : null;
             List<TagAPITemplateResource> tagAPIResources = api.tags != null ? this.tagAPITemplateCreator.CreateTagAPITemplateResources(api, dependsOn) : null;
+            List<ProductAPITemplateResource> productAPIResources = api.products != null ? this.productAPITemplateCreator.CreateProductAPITemplateResources(api, dependsOn) : null;
             DiagnosticTemplateResource diagnosticTemplateResource = api.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn) : null;
             // add release resource if the name has been appended with ;rev{revisionNumber}
             ReleaseTemplateResource releaseTemplateResource = api.name.Contains(";rev") == true ? this.releaseTemplateCreator.CreateAPIReleaseTemplateResource(api, dependsOn) : null;
@@ -103,6 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (apiPolicyResource != null) resources.Add(apiPolicyResource);
             if (operationPolicyResources != null) resources.AddRange(operationPolicyResources);
             if (tagAPIResources != null) resources.AddRange(tagAPIResources);
+            if (productAPIResources != null) resources.AddRange(productAPIResources);
             if (diagnosticTemplateResource != null) resources.Add(diagnosticTemplateResource);
             if (releaseTemplateResource != null) resources.Add(releaseTemplateResource);
 
