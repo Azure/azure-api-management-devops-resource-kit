@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> GenerateAPIProductsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, Extractor exc)
         {
             // initialize arm template
-            Template armTemplate = GenerateEmptyApiTemplateWithParameters(exc);
+            Template armTemplate = GenerateEmptyProductApiTemplateWithParameters(exc);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             // when extract single API
             if (singleApiName != null)

@@ -124,7 +124,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (productAPIsTemplate != null && productAPIsTemplate.resources.Count() != 0)
             {
                 string productAPIsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.productAPIs);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("productAPIsTemplate", productAPIsUri, productAPIDependsOn.ToArray(), exc));
+                resources.Add(this.CreateLinkedMasterTemplateResourceForProductAPITemplate("productAPIsTemplate", productAPIsUri, productAPIDependsOn.ToArray(), exc));
             }
 
             // apiTags
@@ -182,6 +182,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 masterResourceTemplate.properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
                 return masterResourceTemplate;
             }
+        }
+
+        public MasterTemplateResource CreateLinkedMasterTemplateResourceForProductAPITemplate(string name, string uriLink, string[] dependsOn, Extractor exc)
+        {
+            MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
+            //Product API does not need the PolicyXMLBaseUrl parameter so remove it
+            //(this needs to be addressed at a higher level because this parameter isn't needed for some resources
+            masterResourceTemplate.properties.parameters.Remove(ParameterNames.PolicyXMLBaseUrl);
+            return masterResourceTemplate;
         }
 
         public MasterTemplateResource CreateLinkedMasterTemplateResourceForLoggerTemplate(string name, string uriLink, string[] dependsOn, Extractor exc)
