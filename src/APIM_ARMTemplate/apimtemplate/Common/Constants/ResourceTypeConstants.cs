@@ -6,6 +6,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string API = "Microsoft.ApiManagement/service/apis";
         public const string APIVersionSet = "Microsoft.ApiManagement/service/apiVersionSets";
         public const string APIDiagnostic = "Microsoft.ApiManagement/service/apis/diagnostics";
+        public const string APIServiceDiagnostic = "Microsoft.ApiManagement/service/diagnostics";
         public const string APIOperation = "Microsoft.ApiManagement/service/apis/operations";
         public const string APIOperationPolicy = "Microsoft.ApiManagement/service/apis/operations/policies";
         public const string APIOperationTag = "Microsoft.ApiManagement/service/apis/operations/tags";
