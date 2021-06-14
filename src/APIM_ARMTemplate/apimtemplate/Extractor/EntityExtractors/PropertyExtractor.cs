@@ -83,6 +83,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     propertyTemplateResource.properties.value = $"[parameters('{ParameterNames.NamedValues}').{ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property)}]";
                 }
 
+                if (propertyTemplateResource.properties.keyVault != null && exc.paramNamedValuesKeyVaultSecrets )
+                {
+                    propertyTemplateResource.properties.value = null;
+                    propertyTemplateResource.properties.keyVault.secretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property)}]";
+                }
+
                 if (singleApiName == null)
                 {
                     // if the user is executing a full extraction, extract all the loggers
