@@ -28,6 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string NamedValues = "NamedValues";
         public const string LoggerResourceId = "LoggerResourceId";
         public const string ServiceUrl = "serviceUrl";
+        public const string ServiceUrlParameters = "ServiceUrlParameters";
         public const string PolicyXMLSasToken = "PolicyXMLSasToken";
         public const string PolicyXMLBaseUrl = "PolicyXMLBaseUrl";
         public const string LinkedTemplatesUrlQueryString = "LinkedTemplatesUrlQueryString";

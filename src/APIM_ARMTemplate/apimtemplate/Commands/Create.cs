@@ -139,6 +139,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         if (considerAllApiForDeployments || preferredApis.Contains(api.name))
                         {
+                            if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0) {
+                                api.serviceUrl = creatorConfig.serviceUrlParameters.Any(s => s.apiName.Equals(api.name)) ? 
+                                    creatorConfig.serviceUrlParameters.Where(s => s.apiName.Equals(api.name)).FirstOrDefault().serviceUrl : null;
+                            }
                             // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
                             List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
                             apiTemplates.AddRange(apiTemplateSet);
