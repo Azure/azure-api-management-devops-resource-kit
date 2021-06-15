@@ -11,6 +11,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     {
         public string alwaysLog { get; set; }
         public string loggerId { get; set; }
+        public string httpCorrelationProtocol { get; set; }
+        public string verbosity { get; set; }
+        public Nullable<bool> logClientIp { get; set; }
+
         public DiagnosticTemplateSampling sampling { get; set; }
         public DiagnosticTemplateFrontendBackend frontend { get; set; }
         public DiagnosticTemplateFrontendBackend backend { get; set; }
