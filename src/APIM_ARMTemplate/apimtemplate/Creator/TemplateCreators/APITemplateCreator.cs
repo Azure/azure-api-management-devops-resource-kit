@@ -71,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             if (!String.IsNullOrEmpty(api.serviceUrl))
             {
-                apiTemplate.parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { type = "string" });
+                apiTemplate.parameters.Add(api.name + "-ServiceUrl", new TemplateParameterProperties() { type = "string" });
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -330,7 +330,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         private string MakeServiceUrl(APIConfig api)
         {
-            return api.serviceUrl ?? $"[parameters('{ParameterNames.ServiceUrl}').{ExtractorUtils.GenValidParamName(api.name, ParameterPrefix.Api)}]";
+            return !String.IsNullOrEmpty(api.serviceUrl) ? $"[parameters('{api.name + "-ServiceUrl"}')]" : null;
         }
     }
 }

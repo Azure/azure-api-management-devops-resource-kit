@@ -304,11 +304,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
             {
-                TemplateParameterProperties serviceUrlParamProperty = new TemplateObjectParameterProperties()
+                foreach (ServiceUrlProperty serviceUrlProperty in creatorConfig.serviceUrlParameters)
                 {
-                    value = creatorConfig.serviceUrlParameters
-                };
-                parameters.Add(ParameterNames.ServiceUrlParameters, serviceUrlParamProperty);
+                    TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
+                    {
+                        value = serviceUrlProperty.serviceUrl
+                    };
+                    parameters.Add(serviceUrlProperty.apiName + "-ServiceUrl", serviceUrlParamProperty);
+                }
             }
 
             masterTemplate.parameters = parameters;
