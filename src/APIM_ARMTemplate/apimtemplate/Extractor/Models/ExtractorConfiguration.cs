@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string notIncludeNamedValue { get; set; }
 
         [Description("Parameterize named values where value is retrieved from a Key Vault secret")]
-        public bool paramNamedValuesKeyVaultSecrets { get; set; }
+        public string paramNamedValuesKeyVaultSecrets { get; set; }
 
         [Description("Group the operations into batches of x?")]
         public int operationBatchSize {get;set;}
@@ -137,7 +137,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.paramLogResourceId = exc.paramLogResourceId != null && exc.paramLogResourceId.Equals("true");
             this.notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
             this.operationBatchSize  = exc.operationBatchSize;
-            this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets;
+            this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets != null && exc.paramNamedValuesKeyVaultSecrets.Equals("true");
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)
