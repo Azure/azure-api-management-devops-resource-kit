@@ -301,6 +301,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
             }
+
+            if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
+            {
+                foreach (ServiceUrlProperty serviceUrlProperty in creatorConfig.serviceUrlParameters)
+                {
+                    TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
+                    {
+                        value = serviceUrlProperty.serviceUrl
+                    };
+                    parameters.Add(serviceUrlProperty.apiName + "-ServiceUrl", serviceUrlParamProperty);
+                }
+            }
+
             masterTemplate.parameters = parameters;
             return masterTemplate;
         }
