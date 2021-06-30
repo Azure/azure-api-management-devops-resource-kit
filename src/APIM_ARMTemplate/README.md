@@ -37,6 +37,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | tags                   | Array<[TagConfiguration](#tagConfiguration)>      | No                   | List of Tags configurations.                                |
 | subscriptionKeyParameterNames | APITemplateSubscriptionKeyParameterNames      | No                   | subscription key parameter name.                    |
 | baseFileName | string      | No                   | base file name for the templates file               |
+| serviceUrlParameters | Array<[ServiceUrlProperty](#ServiceUrlProperty)> | No                   | List of parameterized ServiceUrl.                    |
 
 #### APIConfiguration
 
@@ -140,6 +141,13 @@ _Additional properties found in [TagContractProperties](https://docs.microsoft.c
 | query                 | string                | Yes                   | query parameter name of the subscription.        |
 
 _Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions)_
+
+#### ServiceUrlProperty
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| apiName               | string                | Yes                   | Name of API.                 |
+| serviceUrl            | string                | Yes                   | API ServiceUrl parameter.        |
 
 
 
@@ -292,6 +300,9 @@ linked: false
 linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
 linkedTemplatesUrlQueryString : ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-22T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFTldJEYPH888QVzKb7q7eLq0Xt%2Bu35UTqpFGUYo6uc%3D
 baseFileName: baseName
+serviceUrlParameters: 
+  - apiName: myAPI
+    serviceUrl: httpbin.com/myAPI
 ```
 
 <a name="creator2"></a>
