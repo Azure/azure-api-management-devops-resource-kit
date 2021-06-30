@@ -83,6 +83,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     propertyTemplateResource.properties.value = $"[parameters('{ParameterNames.NamedValues}').{ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property)}]";
                 }
 
+                //Hide the value field if it is a keyvault named value
+                if (propertyTemplateResource.properties.keyVault != null)
+                {
+                    propertyTemplateResource.properties.value = null;
+                }
+
+                if (propertyTemplateResource.properties.keyVault != null && exc.paramNamedValuesKeyVaultSecrets )
+                {
+                    propertyTemplateResource.properties.keyVault.secretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property)}]";
+                }
+
                 if (singleApiName == null)
                 {
                     // if the user is executing a full extraction, extract all the loggers

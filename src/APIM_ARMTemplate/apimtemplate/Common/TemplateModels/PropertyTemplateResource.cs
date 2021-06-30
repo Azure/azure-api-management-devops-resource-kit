@@ -13,5 +13,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public bool secret { get; set; }
         public string displayName { get; set; }
         public string value { get; set; }
+        public PropertyResourceKeyVaultProperties keyVault { get; set; }
+    }
+
+    public class PropertyResourceKeyVaultProperties
+    {
+        public string secretIdentifier { get; set; }
     }
 }
