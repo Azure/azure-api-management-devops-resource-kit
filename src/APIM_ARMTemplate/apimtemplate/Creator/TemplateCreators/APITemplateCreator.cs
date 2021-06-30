@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             int revisionNumber = 0;
             if (Int32.TryParse(api.apiRevision, out revisionNumber))
             {
-                if (revisionNumber > 1 && api.isCurrent == true)
+                if (revisionNumber > 1 && api.isCurrent == false)
                 {
                     string currentAPIName = api.name;
                     api.name += $";rev={revisionNumber}";
