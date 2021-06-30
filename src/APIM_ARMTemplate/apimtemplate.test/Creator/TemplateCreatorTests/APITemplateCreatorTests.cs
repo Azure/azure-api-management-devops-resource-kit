@@ -23,6 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
                 apiVersionSetId = "apiVersionSetId",
                 apiRevision = "revision",
                 apiRevisionDescription = "revisionDescription",
+                serviceUrl = "http://serviceUrl",
                 suffix = "suffix",
                 subscriptionRequired = true,
                 authenticationSettings = new APITemplateAuthenticationSettings()
@@ -51,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal($"[parameters('{ParameterNames.ServiceUrl}').{api.name}]", apiTemplateResource.properties.serviceUrl);
+            Assert.Equal($"[parameters('{api.name}-ServiceUrl')]", apiTemplateResource.properties.serviceUrl);
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);

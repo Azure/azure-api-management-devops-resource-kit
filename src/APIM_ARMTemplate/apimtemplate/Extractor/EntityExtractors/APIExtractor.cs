@@ -214,6 +214,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
+        public async Task<string> GetServiceDiagnosticsAsync(string ApiManagementName, string ResourceGroupName)
+        {
+            (string azToken, string azSubId) = await auth.GetAccessToken();
+
+            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/diagnostics?api-version={4}",
+                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+
+            return await CallApiManagementAsync(azToken, requestUrl);
+        }
+
         public async Task<List<TemplateResource>> GenerateSingleAPIResourceAsync(string apiName, Extractor exc)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
@@ -387,6 +397,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     templateResources.AddRange(await GenerateSingleAPIResourceAsync(apiName, exc));
                 }
             }
+
+
+            //Add the All API Diagnostics settings
+
+            templateResources.AddRange(await GetServiceDiagnosticsTemplateResourcesAsync(exc));
+
 
             armTemplate.resources = templateResources.ToArray();
             return armTemplate;
@@ -765,6 +781,51 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             #endregion
 
             return templateResources;
+        }
+
+        /// <summary>
+        /// Gets the "All API" level diagnostic resources, these are common to all APIs.
+        /// </summary>
+        /// <param name="exc">The extractor.</param>
+        /// <returns>a list of DiagnosticTemplateResources</returns>
+        private async Task<IEnumerable<TemplateResource>> GetServiceDiagnosticsTemplateResourcesAsync(Extractor exc)
+        {
+            List<TemplateResource> templateResources = new List<TemplateResource>();
+            string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup;
+
+            string serviceDiagnostics = await GetServiceDiagnosticsAsync(apimname, resourceGroup);
+            JObject oServiceDiagnostics = JObject.Parse(serviceDiagnostics);
+
+            foreach (var serviceDiagnostic in oServiceDiagnostics["value"])
+            {
+                string serviceDiagnosticName = ((JValue)serviceDiagnostic["name"]).Value.ToString();
+                Console.WriteLine("'{0}' Diagnostic found", serviceDiagnosticName);
+
+                // convert returned diagnostic to template resource class
+                DiagnosticTemplateResource serviceDiagnosticResource = serviceDiagnostic.ToObject<DiagnosticTemplateResource>();
+                serviceDiagnosticResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{serviceDiagnosticName}')]";
+                serviceDiagnosticResource.type = ResourceTypeConstants.APIServiceDiagnostic;
+                serviceDiagnosticResource.apiVersion = GlobalConstants.APIVersion;
+                serviceDiagnosticResource.scale = null;
+                serviceDiagnosticResource.dependsOn = new string[] { };
+
+                if (exc.paramApiLoggerId)
+                {
+
+                    serviceDiagnosticResource.properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ExtractorUtils.GenValidParamName(serviceDiagnosticName, ParameterPrefix.Diagnostic)}]";
+                }
+
+                if (!serviceDiagnosticName.Contains("applicationinsights"))
+                {
+                    // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
+                    //TODO: Check this settings still valid?
+                    serviceDiagnosticResource.properties.enableHttpCorrelationHeaders = null;
+                }
+
+                templateResources.Add(serviceDiagnosticResource);
+            }
+
+            return templateResources.ToArray();
         }
     }
 }

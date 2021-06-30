@@ -74,6 +74,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 };
                 armTemplate.parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
             }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
+            }
             return armTemplate;
         }
 
@@ -167,6 +175,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 };
                 armTemplate.parameters.Add(ParameterNames.ApiLoggerId, apiLoggerProperty);
             }
+            return armTemplate;
+        }
+
+        public Template GenerateEmptyProductApiTemplateWithParameters(Extractor exc)
+        {
+            Template armTemplate = GenerateEmptyTemplate();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
             return armTemplate;
         }
     }
