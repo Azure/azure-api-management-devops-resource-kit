@@ -67,7 +67,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
-            Template armTemplate = GenerateEmptyLoggerTemplateWithParameters(exc);
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
+
+            if (exc.paramLogResourceId)
+            {
+                TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
+            }
 
             // isolate product api associations in the case of a single api extraction
             var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
