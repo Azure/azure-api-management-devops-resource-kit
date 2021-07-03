@@ -438,7 +438,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         }
 
         public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, Extractor exc, 
-            Dictionary<string, Dictionary<string, string>> apiLoggerId, 
+            Dictionary<string, object> apiLoggerId, 
             Dictionary<string, string> loggerResourceIds,
             Dictionary<string, BackendApiParameters> backendParams)
         {

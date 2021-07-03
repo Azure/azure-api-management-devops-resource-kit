@@ -83,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 List<string> allApis = await apiExtractor.GetAllAPINamesAsync(exc.sourceApimName, exc.resourceGroup);
                 apisToExtract.AddRange(allApis);
             }
-            Dictionary<string, Dictionary<string, string>> apiLoggerId = null;
+            Dictionary<string, object> apiLoggerId = null;
             if (exc.paramApiLoggerId)
             {
                 apiLoggerId = await GetAllReferencedLoggers(apisToExtract, exc);
@@ -365,10 +365,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         }
 
         // this function generate all reference loggers in all extracted apis
-        public static async Task<Dictionary<string, Dictionary<string, string>>> GetAllReferencedLoggers(List<string> apisToExtract, Extractor exc)
+        public static async Task<Dictionary<string, object>> GetAllReferencedLoggers(List<string> apisToExtract, Extractor exc)
         {
-            Dictionary<string, Dictionary<string, string>> ApiLoggerId = new Dictionary<string, Dictionary<string, string>>();
+            Dictionary<string, object> ApiLoggerId = new Dictionary<string, object>();
+
             APIExtractor apiExc = new APIExtractor(new FileWriter());
+            string serviceDiagnostics = await apiExc.GetServiceDiagnosticsAsync(exc.sourceApimName, exc.resourceGroup);
+            JObject oServiceDiagnostics = JObject.Parse(serviceDiagnostics);
+
+            Dictionary<string, string> serviceloggerIds = new Dictionary<string, string>();
+            foreach (var serviceDiagnostic in oServiceDiagnostics["value"])
+            {
+                string diagnosticName = ((JValue)serviceDiagnostic["name"]).Value.ToString();
+                string loggerId = ((JValue)serviceDiagnostic["properties"]["loggerId"]).Value.ToString();
+                ApiLoggerId.Add(ExtractorUtils.GenValidParamName(diagnosticName, ParameterPrefix.Diagnostic), loggerId);
+            }
+
+
             foreach (string curApiName in apisToExtract)
             {
                 Dictionary<string, string> loggerIds = new Dictionary<string, string>();
@@ -385,6 +398,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     ApiLoggerId.Add(ExtractorUtils.GenValidParamName(curApiName, ParameterPrefix.Api), loggerIds);
                 }
             }
+
             return ApiLoggerId;
         }
     }

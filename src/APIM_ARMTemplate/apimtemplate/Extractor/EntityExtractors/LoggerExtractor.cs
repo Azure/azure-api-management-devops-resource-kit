@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return loggerTemplate;
         }
 
-        public async Task<Template> GenerateLoggerTemplateAsync(Extractor exc, string singleApiName, List<TemplateResource> apiTemplateResources, Dictionary<string, Dictionary<string, string>> apiLoggerId)
+        public async Task<Template> GenerateLoggerTemplateAsync(Extractor exc, string singleApiName, List<TemplateResource> apiTemplateResources, Dictionary<string, object> apiLoggerId)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
@@ -119,11 +119,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     string validApiName = ExtractorUtils.GenValidParamName(singleApiName, ParameterPrefix.Api);
                     if (exc.paramApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {
-                        Dictionary<string, string> curDiagnostic = apiLoggerId[validApiName];
-                        string validDName = ExtractorUtils.GenValidParamName(loggerResource.properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
-                        if (curDiagnostic.ContainsKey(validDName) && curDiagnostic[validDName].Contains(loggerName))
+                        object diagnosticObj = apiLoggerId[validApiName];
+                        if (diagnosticObj is Dictionary<string, string>)
                         {
-                            isReferencedInDiagnostic = true;
+                            Dictionary<string, string> curDiagnostic = (Dictionary<string, string>)diagnosticObj;
+                            string validDName = ExtractorUtils.GenValidParamName(loggerResource.properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
+                            if (curDiagnostic.ContainsKey(validDName) && curDiagnostic[validDName].Contains(loggerName))
+                            {
+                                isReferencedInDiagnostic = true;
+                            }
                         }
                     }
                     if (isReferencedInPolicy == true || isReferencedInDiagnostic == true)
