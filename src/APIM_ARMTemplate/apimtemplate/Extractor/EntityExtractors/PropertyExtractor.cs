@@ -49,16 +49,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc)
         {
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
+
+            if (exc.paramNamedValue)
+            {
+                TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
+            }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
+            }
             if (exc.notIncludeNamedValue == true)
             {
                 Console.WriteLine("------------------------------------------");
                 Console.WriteLine("Skipping extracting named values from service");
-                return GenerateEmptyPropertyTemplateWithParameters(exc);
+                return armTemplate;
             }
 
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting named values from service");
-            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters(exc);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

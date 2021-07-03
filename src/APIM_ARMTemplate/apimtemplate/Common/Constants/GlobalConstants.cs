@@ -35,6 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string ApimServiceName = "ApimServiceName";
         public const string LinkedTemplatesBaseUrl = "LinkedTemplatesBaseUrl";
         public const string NamedValueKeyVaultSecrets = "NamedValueKeyVaultSecrets";
+        public const string BackendSettings = "BackendSettings";
     }
 
     public static class ParameterPrefix
@@ -43,5 +44,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string Diagnostic = "Diagnostic";
         public const string Property = "Property";
         public const string LogResourceId = "LogResourceId";
+        public const string Backend = "Backend";
     }
 }

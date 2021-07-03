@@ -30,7 +30,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // extract global service policy in both full and single api extraction cases
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting global service policy from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
+            if (policyXMLBaseUrl != null && policyXMLSasToken != null)
+            {
+                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
+            }
+            if (policyXMLBaseUrl != null)
+            {
+                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
+            }
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

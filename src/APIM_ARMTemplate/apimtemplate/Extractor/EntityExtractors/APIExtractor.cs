@@ -827,5 +827,44 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             return templateResources.ToArray();
         }
+
+        public Template GenerateEmptyApiTemplateWithParameters(Extractor exc)
+        {
+            Template armTemplate = GenerateEmptyTemplate();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
+            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
+            {
+                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
+            }
+            if (exc.policyXMLBaseUrl != null)
+            {
+                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
+            }
+            if (exc.paramServiceUrl || (exc.serviceUrlParameters != null && exc.serviceUrlParameters.Length > 0))
+            {
+                TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
+            }
+            if (exc.paramApiLoggerId)
+            {
+                TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.ApiLoggerId, apiLoggerProperty);
+            }
+            return armTemplate;
+        }
     }
 }

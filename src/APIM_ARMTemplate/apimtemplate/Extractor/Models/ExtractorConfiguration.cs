@@ -54,6 +54,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         [Description("Group the operations into batches of x?")]
         public int operationBatchSize {get;set;}
+
+        [Description("Parameterize environment specific values from backend")]
+        public string paramBackend { get; set; }
+
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -115,7 +119,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public bool notIncludeNamedValue { get; private set; }
         public bool paramNamedValuesKeyVaultSecrets { get; private set; }
 
-        public int operationBatchSize { get; private set;} 
+        public int operationBatchSize { get; private set;}
+
+        public bool paramBackend { get; set; }
 
         public Extractor(ExtractorConfig exc, string dirName)
         {
@@ -138,6 +144,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
             this.operationBatchSize  = exc.operationBatchSize;
             this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets != null && exc.paramNamedValuesKeyVaultSecrets.Equals("true");
+            this.paramBackend = exc.paramBackend != null && exc.paramBackend.Equals("true");
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)

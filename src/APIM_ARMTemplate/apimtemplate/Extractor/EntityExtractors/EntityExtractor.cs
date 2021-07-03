@@ -46,143 +46,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return armTemplate;
         }
 
-        public Template GenerateEmptyPropertyTemplateWithParameters(Extractor exc)
+        public Template GenerateEmptyPropertyTemplateWithParameters()
         {
             Template armTemplate = GenerateEmptyTemplate();
             armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
-            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
-            {
-                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
-            }
-            if (exc.policyXMLBaseUrl != null)
-            {
-                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
-            }
-            if (exc.paramNamedValue)
-            {
-                TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
-            }
-            if (exc.paramNamedValuesKeyVaultSecrets)
-            {
-                TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
-            }
             return armTemplate;
         }
 
-        public Template GenerateEmptyTemplateWithParameters(string policyXMLBaseUrl, string policyXMLSasToken)
-        {
-            Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
-            if (policyXMLBaseUrl != null && policyXMLSasToken != null)
-            {
-                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
-            }
-            if (policyXMLBaseUrl != null)
-            {
-                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
-            }
-            return armTemplate;
-        }
 
-        public Template GenerateEmptyLoggerTemplateWithParameters(Extractor exc)
-        {
-            Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
-            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
-            {
-                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
-            }
-            if (exc.policyXMLBaseUrl != null)
-            {
-                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
-            }
-            if (exc.paramLogResourceId)
-            {
-                TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
-            }
-            return armTemplate;
-        }
+        
 
-        public Template GenerateEmptyApiTemplateWithParameters(Extractor exc)
-        {
-            Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
-            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
-            {
-                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
-            }
-            if (exc.policyXMLBaseUrl != null)
-            {
-                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
-            }
-            if (exc.paramServiceUrl || (exc.serviceUrlParameters != null && exc.serviceUrlParameters.Length > 0))
-            {
-                TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
-            }
-            if (exc.paramApiLoggerId)
-            {
-                TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.parameters.Add(ParameterNames.ApiLoggerId, apiLoggerProperty);
-            }
-            return armTemplate;
-        }
-
-        public Template GenerateEmptyProductApiTemplateWithParameters(Extractor exc)
-        {
-            Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
-            return armTemplate;
-        }
     }
 }
