@@ -30,7 +30,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         displayName = namedValue.displayName,
                         value = namedValue.value,
                         secret = namedValue.secret,
-                        tags = namedValue.tags
+                        tags = namedValue.tags,
+                        keyVault = namedValue.keyVault
+
                     },
                     dependsOn = new string[] {}
                 };
