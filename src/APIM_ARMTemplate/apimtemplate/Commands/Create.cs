@@ -139,6 +139,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         if (considerAllApiForDeployments || preferredApis.Contains(api.name))
                         {
+                            bool isServiceUrlParameterizeInYml = false;
+                            if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
+                            {
+                                isServiceUrlParameterizeInYml = creatorConfig.serviceUrlParameters.Any(s => s.apiName.Equals(api.name));
+                                api.serviceUrl = isServiceUrlParameterizeInYml ?
+                                    creatorConfig.serviceUrlParameters.Where(s => s.apiName.Equals(api.name)).FirstOrDefault().serviceUrl : api.serviceUrl;
+                            }
                             // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
                             List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
                             apiTemplates.AddRange(apiTemplateSet);
@@ -153,7 +160,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                                 dependsOnTags = api.tags != null,
                                 dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
                                 dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
-                                dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader)
+                                dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader),
+                                isServiceUrlParameterize = isServiceUrlParameterizeInYml
                             });
                         }
                     }
