@@ -52,7 +52,8 @@ namespace apimtemplate.Creator.Utilities
             }
             else
             {
-                return JsonConvert.SerializeObject(definition_);
+                // include StringEscaping to ensure single quotes are escaped
+                return JsonConvert.SerializeObject(definition_, settings: new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml});
             }
         }
 
