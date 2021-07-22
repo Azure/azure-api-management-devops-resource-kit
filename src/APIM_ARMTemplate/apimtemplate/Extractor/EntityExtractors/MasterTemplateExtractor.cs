@@ -131,7 +131,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (apiTagsTemplate != null && apiTagsTemplate.resources.Count() != 0)
             {
                 string apiTagsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.apiTags);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("apiTagsTemplate", apiTagsUri, apiTagDependsOn.ToArray(), exc));
+                resources.Add(this.CreateLinkedMasterTemplateResourceForApiTemplate("apiTagsTemplate", apiTagsUri, apiTagDependsOn.ToArray(), exc));
             }
             Console.WriteLine("Master template generated");
             masterTemplate.resources = resources.ToArray();
@@ -166,6 +166,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (exc.paramNamedValue)
             {
                 masterResourceTemplate.properties.parameters.Add(ParameterNames.NamedValues, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.NamedValues}')]" });
+            }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                masterResourceTemplate.properties.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}')]" });
             }
             return masterResourceTemplate;
         }
@@ -359,6 +363,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 };
                 parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdProperties);
             }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                TemplateParameterProperties namedValueKeyVaultSecretsProperties = new TemplateParameterProperties()
+                {
+                    metadata = new TemplateParameterMetadata()
+                    {
+                        description = "Key Vault Secrets for Named Values"
+                    },
+                    type = "object"
+                };
+                parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, namedValueKeyVaultSecretsProperties);
+            }
             return parameters;
         }
 
@@ -488,15 +504,44 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     string propertyName = ((JValue)oProperty["name"]).Value.ToString();
                     string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
                     PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                    string propertyValue = propertyTemplateResource.properties.value;
-                    string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
-                    namedValues.Add(validPName, propertyValue);
+                    //Only add the property if it is not controlled by keyvault
+                    if (propertyTemplateResource?.properties.keyVault == null)
+                    {
+                        string propertyValue = propertyTemplateResource.properties.value;
+                        string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
+                        namedValues.Add(validPName, propertyValue);
+                    }
                 }
                 TemplateObjectParameterProperties namedValueProperties = new TemplateObjectParameterProperties()
                 {
                     value = namedValues
                 };
                 parameters.Add(ParameterNames.NamedValues, namedValueProperties);
+            }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                Dictionary<string, string> keyVaultNamedValues = new Dictionary<string, string>();
+                PropertyExtractor pExc = new PropertyExtractor();
+                string[] properties = await pExc.GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
+
+                foreach (var extractedProperty in properties)
+                {
+                    JToken oProperty = JObject.Parse(extractedProperty);
+                    string propertyName = ((JValue)oProperty["name"]).Value.ToString();
+                    string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
+                    PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+                    if (propertyTemplateResource?.properties.keyVault != null)
+                    {
+                        string propertyValue = propertyTemplateResource.properties.keyVault.secretIdentifier;
+                        string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
+                        keyVaultNamedValues.Add(validPName, propertyValue);
+                    }
+                }
+                TemplateObjectParameterProperties keyVaultNamedValueProperties = new TemplateObjectParameterProperties()
+                {
+                    value = keyVaultNamedValues
+                };
+                parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueProperties);
             }
             if (exc.paramApiLoggerId)
             {

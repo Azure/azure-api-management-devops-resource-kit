@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             int revisionNumber = 0;
             if (Int32.TryParse(api.apiRevision, out revisionNumber))
             {
-                if (revisionNumber > 1 && api.isCurrent == true)
+                if (revisionNumber > 1 && api.isCurrent == false)
                 {
                     string currentAPIName = api.name;
                     api.name += $";rev={revisionNumber}";
@@ -71,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
             if (!String.IsNullOrEmpty(api.serviceUrl))
             {
-                apiTemplate.parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { type = "string" });
+                apiTemplate.parameters.Add(api.name + "-ServiceUrl", new TemplateParameterProperties() { type = "string" });
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -330,7 +330,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         private string MakeServiceUrl(APIConfig api)
         {
-            return api.serviceUrl ?? $"[parameters('{ParameterNames.ServiceUrl}').{ExtractorUtils.GenValidParamName(api.name, ParameterPrefix.Api)}]";
+            return !String.IsNullOrEmpty(api.serviceUrl) ? $"[parameters('{api.name + "-ServiceUrl"}')]" : null;
         }
     }
 }
