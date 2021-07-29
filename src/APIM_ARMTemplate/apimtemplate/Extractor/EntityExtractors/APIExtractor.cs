@@ -246,7 +246,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ExtractorUtils.GenValidParamName(apiName, ParameterPrefix.Api)}]";
             }
-            
+
             if (apiResource.properties.apiVersionSetId != null)
             {
                 apiResource.dependsOn = new string[] { };
@@ -334,7 +334,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ExtractorUtils.GenValidParamName(apiName, ParameterPrefix.Api)}]";
             }
-            
+
             if (apiResource.properties.apiVersionSetId != null)
             {
                 apiResource.dependsOn = new string[] { };
@@ -410,10 +410,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         private static void ArmEscapeSampleValueIfNecessary(OperationTemplateRepresentation operationTemplateRepresentation)
         {
-            if (!string.IsNullOrWhiteSpace(operationTemplateRepresentation.sample) && operationTemplateRepresentation.contentType?.Contains("application/json", StringComparison.OrdinalIgnoreCase) == true && operationTemplateRepresentation.sample.TryParseJson(out JToken sampleAsJToken) && sampleAsJToken.Type == JTokenType.Array)
+
+            if (!string.IsNullOrWhiteSpace(operationTemplateRepresentation.sample) &&
+                ContentTypes().Contains(operationTemplateRepresentation.contentType?.ToLower()) &&
+                operationTemplateRepresentation.sample.TryParseJson(out JToken sampleAsJToken) &&
+                sampleAsJToken.Type == JTokenType.Array)
             {
                 operationTemplateRepresentation.sample = "[" + operationTemplateRepresentation.sample;
             }
+        }
+
+        private static string[] ContentTypes()
+        {
+            return new string[] { "application/json", "text/json", "application/*+json" };
         }
 
         private static void AddSchemaDependencyToOperationIfNecessary(string apiName, List<string> operationDependsOn, OperationTemplateRepresentation operationTemplateRepresentation)
@@ -528,15 +537,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             int numBatches = 0;
 
             // create empty array for the batch operation owners
-            List<string> batchOwners = new List<string>();   
+            List<string> batchOwners = new List<string>();
 
             // if a batch size is specified            
-            if(exc.operationBatchSize > 0) {
+            if (exc.operationBatchSize > 0)
+            {
                 // store the number of batches required based on exc.operationBatchSize
-                numBatches = (int)Math.Ceiling((double)operationNames.Length/ (double)exc.operationBatchSize);
+                numBatches = (int)Math.Ceiling((double)operationNames.Length / (double)exc.operationBatchSize);
                 //Console.WriteLine ("Number of batches: {0}", numBatches);
             }
-            
+
 
             foreach (string operationName in operationNames)
             {
@@ -544,7 +554,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                 //add batch owners into array
                 // ensure each owner is linked to the one before
-                if(exc.operationBatchSize > 0 && opIndex < numBatches) {
+                if (exc.operationBatchSize > 0 && opIndex < numBatches)
+                {
                     batchOwners.Add(operationName);
                     //Console.WriteLine("Adding operation {0} to owner list", operationName);
                 }
@@ -580,18 +591,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // add to batch if flagged
                 string batchdependsOn;
 
-                if(exc.operationBatchSize > 0 && opIndex > 0) {
-                    if(opIndex >= 1 && opIndex <= numBatches - 1) {
+                if (exc.operationBatchSize > 0 && opIndex > 0)
+                {
+                    if (opIndex >= 1 && opIndex <= numBatches - 1)
+                    {
                         // chain the owners to each other
                         batchdependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{batchOwners[opIndex - 1]}')]";
                         //Console.WriteLine("Owner chaining: this request {0} to previous {1}", operationName, batchOwners[opIndex-1]);
-                    } else {
+                    }
+                    else
+                    {
                         // chain the operation to respective owner
-                        int ownerIndex = (int)Math.Floor((opIndex - numBatches)/((double)exc.operationBatchSize-1));
+                        int ownerIndex = (int)Math.Floor((opIndex - numBatches) / ((double)exc.operationBatchSize - 1));
                         batchdependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{batchOwners[ownerIndex]}')]";
                         //Console.WriteLine("Operation {0} chained to owner {1}", operationName, batchOwners[ownerIndex]);
                     }
-                    
+
                     operationDependsOn.Add(batchdependsOn);
                 }
 
@@ -693,7 +708,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             catch (Exception) { }
             #endregion
 
-	    #region API Tags				
+            #region API Tags				
             // add tags associated with the api to template 
             try
             {
@@ -716,9 +731,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
             }
             catch (Exception) { }
-			#endregion
+            #endregion
 
-								
+
             // add product api associations to template
             #region API Products
             try
@@ -764,8 +779,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 diagnosticResource.scale = null;
                 diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
 
-                if (exc.paramApiLoggerId) {
-				 
+                if (exc.paramApiLoggerId)
+                {
+
                     diagnosticResource.properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ExtractorUtils.GenValidParamName(apiName, ParameterPrefix.Api)}.{ExtractorUtils.GenValidParamName(diagnosticName, ParameterPrefix.Diagnostic)}]";
                 }
 
