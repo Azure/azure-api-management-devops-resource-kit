@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             string[] dependsOn = new string[] { "dependsOn" };
 
             // act
-            MasterTemplateResource masterTemplateResource = masterTemplateCreator.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn, null, false);
+            MasterTemplateResource masterTemplateResource = masterTemplateCreator.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
 
             // assert
             Assert.Equal(name, masterTemplateResource.name);
