@@ -14,6 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public static string baseUrl = "https://management.azure.com";
         internal Authentication auth = new Authentication();
         private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+        private static HttpClient httpClient = new HttpClient();
 
         public static async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
         {
@@ -22,21 +23,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 return cachedResponseBody;
             }
 
-            using (HttpClient httpClient = new HttpClient())
-            {
-                var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
 
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
 
-                HttpResponseMessage response = await httpClient.SendAsync(request);
+            HttpResponseMessage response = await httpClient.SendAsync(request);
 
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
 
-                _cache.Set(requestUrl, responseBody);
+            _cache.Set(requestUrl, responseBody);
 
-                return responseBody;
-            }
+            return responseBody;
         }
 
         public Template GenerateEmptyTemplate()
