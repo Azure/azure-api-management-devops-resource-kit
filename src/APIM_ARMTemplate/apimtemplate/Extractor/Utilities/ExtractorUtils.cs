@@ -1,16 +1,20 @@
-using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using System;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using apimtemplate.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     static class ExtractorUtils
     {
+        private static readonly IMemoryCache _policyCache = new MemoryCache(new MemoryCacheOptions());
+
         public static List<TemplateResource> removeResourceType(string resourceType, List<TemplateResource> resources)
         {
             List<TemplateResource> newResourcesList = new List<TemplateResource>();
@@ -400,6 +404,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
 
             return ApiLoggerId;
+        }        
+        
+        public static string GetPolicyContent(Extractor exc, PolicyTemplateResource policyTemplateResource)
+        {
+            // the backend is used in a policy if the xml contains a set-backend-service policy, which will reference the backend's url or id
+            string policyContent = policyTemplateResource.properties.value;
+
+            // check if this is a file or is it the raw policy content
+            if (policyContent.Contains(".xml"))
+            {
+                var key = policyContent;
+                //check cache
+                if (_policyCache.TryGetValue(key, out string content))
+                    return content;
+
+                var filename = policyContent.Split(',')[1].Replace("'", string.Empty).Trim();
+                var policyFolder = $@"{exc.fileFolder}/policies";
+                var filepath = $@"{Directory.GetCurrentDirectory()}/{policyFolder}/{filename}";
+
+                if (File.Exists(filepath))
+                {
+                    policyContent = File.ReadAllText(filepath);
+                    _policyCache.Set(key, policyContent);
+                }
+            }
+
+            return policyContent;
         }
     }
 }
