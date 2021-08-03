@@ -37,6 +37,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | tags                   | Array<[TagConfiguration](#tagConfiguration)>      | No                   | List of Tags configurations.                                |
 | subscriptionKeyParameterNames | APITemplateSubscriptionKeyParameterNames      | No                   | subscription key parameter name.                    |
 | baseFileName | string      | No                   | base file name for the templates file               |
+| serviceUrlParameters | Array<[ServiceUrlProperty](#ServiceUrlProperty)> | No                   | List of parameterized ServiceUrl.                    |
 
 #### APIConfiguration
 
@@ -140,6 +141,13 @@ _Additional properties found in [TagContractProperties](https://docs.microsoft.c
 | query                 | string                | Yes                   | query parameter name of the subscription.        |
 
 _Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions)_
+
+#### ServiceUrlProperty
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| apiName               | string                | Yes                   | Name of API.                 |
+| serviceUrl            | string                | Yes                   | API ServiceUrl parameter.        |
 
 
 
@@ -292,6 +300,9 @@ linked: false
 linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
 linkedTemplatesUrlQueryString : ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-22T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFTldJEYPH888QVzKb7q7eLq0Xt%2Bu35UTqpFGUYo6uc%3D
 baseFileName: baseName
+serviceUrlParameters: 
+  - apiName: myAPI
+    serviceUrl: httpbin.com/myAPI
 ```
 
 <a name="creator2"></a>
@@ -381,10 +392,11 @@ You have two choices when specifying your settings:
 | serviceUrlParameters  | No                    | Parameterize service url in advance (you can replace serviceUrl afterwards as well, you can refer example for more information).  |
 |  paramServiceUrl | No                    |  Set to "true" will parameterize all serviceUrl for each api and generate serviceUrl parameter to api template/parameter template/master template files |
 |  paramNamedValue | No                    |  Set to "true" will parameterize all named values and add named values parameter to property template/parameter template/mastert emplate files |
-|  paramApiLoggerId | No                    |  Set to "true" will parameterize all logger ids in all apis (within api templates) |
+|  paramApiLoggerId | No                    |  Set to "true" will parameterize all logger ids in all apis (within api templates), Also includes the "All API" monitoring configuration |
 |  paramLogResourceId | No                    |  Set to "true" will parameterize all loggers' resource ids (within logger template)|
 | serviceBaseUrl | No                    | Specify the base url where you want to run your extractor |
 | notIncludeNamedValue | No                    | Set to "true" will not generate Named Value Templates|
+| paramNamedValuesKeyVaultSecrets | No | Set to true will parameterize all named values where the value is from a key vault secret |
 
 #### Note
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API

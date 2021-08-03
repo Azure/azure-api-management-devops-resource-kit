@@ -74,6 +74,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 };
                 armTemplate.parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
             }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
+            }
             return armTemplate;
         }
 
