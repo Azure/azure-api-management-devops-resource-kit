@@ -67,11 +67,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
         
-        public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string policyXMLBaseUrl, string policyXMLSasToken, string fileFolder)
+        public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string fileFolder, Extractor exc)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting products from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
+
+            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
+            {
+                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
+            }
+            if (exc.policyXMLBaseUrl != null)
+            {
+                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "string"
+                };
+                armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
+            }
 
             // isolate product api associations in the case of a single api extraction
             var productAPIResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.ProductAPI);
@@ -126,7 +143,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         productPolicyResource.dependsOn = productResourceId;
 
                         // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-                        if (policyXMLBaseUrl != null)
+                        if (exc.policyXMLBaseUrl != null)
                         {
                             string policyXMLContent = productPolicyResource.properties.value;
                             string policyFolder = String.Concat(fileFolder, $@"/policies");
@@ -134,7 +151,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             this.fileWriter.CreateFolderIfNotExists(policyFolder);
                             this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, productPolicyFileName));
                             productPolicyResource.properties.format = "rawxml-link";
-                            if (policyXMLSasToken != null)
+                            if (exc.policyXMLSasToken != null)
                             {
                                 productPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{productPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                             }

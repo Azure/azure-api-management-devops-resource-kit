@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using Newtonsoft.Json;
 using System;
+using apimtemplate.Common.TemplateModels;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -30,11 +31,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateBackendsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources, string policyXMLBaseUrl, string policyXMLSasToken)
+        /// <summary>
+        /// Generate the ARM assets for the backend resources
+        /// </summary>
+        /// <param name="apimname"></param>
+        /// <param name="resourceGroup"></param>
+        /// <param name="singleApiName"></param>
+        /// <param name="apiTemplateResources"></param>
+        /// <param name="propertyResources"></param>
+        /// <param name="policyXMLBaseUrl"></param>
+        /// <param name="policyXMLSasToken"></param>
+        /// <param name="extractBackendParameters"></param>
+        /// <returns>a combination of a Template and the value for the BackendSettings parameter</returns>
+        public async Task<Tuple<Template,Dictionary<string,BackendApiParameters> > > GenerateBackendsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources, Extractor exc)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting backends from service");
-            Template armTemplate = GenerateEmptyTemplateWithParameters(policyXMLBaseUrl, policyXMLSasToken);
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
+
+            if (exc.paramBackend)
+            {
+                TemplateParameterProperties extractBackendParametersProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                armTemplate.parameters.Add(ParameterNames.BackendSettings, extractBackendParametersProperties);
+            }
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -44,6 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // pull all backends for service
             JObject oBackends = new JObject();
+            var oBackendParameters = new Dictionary<string, BackendApiParameters>();
             int skipNumberOfBackends = 0;
 
             do
@@ -60,6 +83,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
                     backendTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendName}')]";
                     backendTemplateResource.apiVersion = GlobalConstants.APIVersion;
+
+                    if(exc.paramBackend)
+                    {
+                        var apiToken = new BackendApiParameters();
+                        string validApiParamName = ExtractorUtils.GenValidParamName(backendName, ParameterPrefix.Diagnostic).ToLower();
+          
+                        
+                        if (!string.IsNullOrEmpty(backendTemplateResource.properties.resourceId))
+                        {
+                            apiToken.resourceId = backendTemplateResource.properties.resourceId;
+                            backendTemplateResource.properties.resourceId = $"[parameters('{ParameterNames.BackendSettings}').{validApiParamName}.resourceId]";
+                        }
+
+                        if (!string.IsNullOrEmpty(backendTemplateResource.properties.url))
+                        {
+                            apiToken.url = backendTemplateResource.properties.url;
+                            backendTemplateResource.properties.url = $"[parameters('{ParameterNames.BackendSettings}').{validApiParamName}.url]";
+                        }
+
+                        if (!string.IsNullOrEmpty(backendTemplateResource.properties.protocol))
+                        {
+                            apiToken.protocol = backendTemplateResource.properties.protocol;
+                            backendTemplateResource.properties.protocol = $"[parameters('{ParameterNames.BackendSettings}').{validApiParamName}.protocol]";
+                        }
+                        oBackendParameters.Add(validApiParamName, apiToken);
+                    }
 
                     ////only extract the backend if this is a full extraction, or in the case of a single api, if it is referenced by one of the policies
                     //if (singleApiName == null)
@@ -94,7 +143,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             while (oBackends["nextLink"] != null);
 
             armTemplate.resources = templateResources.ToArray();
-            return armTemplate;
+            return new Tuple<Template, Dictionary<string, BackendApiParameters>>(armTemplate, oBackendParameters);
         }
 
         public bool DoesPolicyReferenceBackend(string policyContent, IEnumerable<TemplateResource> namedValueResources, string backendName, BackendTemplateResource backendTemplateResource)
