@@ -404,6 +404,7 @@ You have two choices when specifying your settings:
 | serviceBaseUrl | No                    | Specify the base url where you want to run your extractor |
 | notIncludeNamedValue | No                    | Set to "true" will not generate Named Value Templates|
 | paramNamedValuesKeyVaultSecrets | No | Set to true will parameterize all named values where the value is from a key vault secret |
+| paramBackend | No | Set to true will parameterize sepcific backend values (limited to resourceId, url and protocol) |
 
 #### Note
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
