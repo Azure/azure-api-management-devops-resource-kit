@@ -107,7 +107,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template productAPITemplate = await productAPIExtractor.GenerateAPIProductsARMTemplateAsync(singleApiName, multipleApiNames, exc);
             Template apiTagTemplate = await apiTagExtractor.GenerateAPITagsARMTemplateAsync(singleApiName, multipleApiNames, exc);
             List<TemplateResource> productTemplateResources = productTemplate.resources.ToList();
-            Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc);
+            List<TemplateResource> loggerResources = loggerTemplate.resources.ToList();
+            Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc, backendExtractor, loggerResources);
             Template tagTemplate = await tagExtractor.GenerateTagsTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, productTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
             List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
 
@@ -115,14 +116,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             Dictionary<string, string> loggerResourceIds = null;
             if (exc.paramLogResourceId)
-            {
-                List<TemplateResource> loggerResources = loggerTemplate.resources.ToList();
+            {                
                 loggerResourceIds = loggerExtractor.GetAllLoggerResourceIds(loggerResources);
                 loggerTemplate = loggerExtractor.SetLoggerResourceId(loggerTemplate);
             }
 
             // create parameters file
-            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc, apiLoggerId, loggerResourceIds, backendResult.Item2);
+            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc, apiLoggerId, loggerResourceIds, backendResult.Item2, namedValueResources);
 
             // write templates to output file location
             string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, fileNames.baseFileName);

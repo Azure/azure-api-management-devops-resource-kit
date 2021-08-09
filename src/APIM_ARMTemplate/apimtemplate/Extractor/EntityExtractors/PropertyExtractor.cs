@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc)
+        public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc, BackendExtractor backendExtractor, List<TemplateResource> loggerTemplateResources)
         {
             Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
@@ -81,6 +81,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // pull all named values (properties) for service
             string[] properties = await GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
+
+            // isolate api and operation policy resources in the case of a single api extraction, as they may reference named value
+            var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
 
             foreach (var extractedProperty in properties)
             {
@@ -119,14 +122,58 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 }
                 else
                 {
-                    // TODO - if the user is executing a single api, extract all the named values used in the template resources
-                    Console.WriteLine("'{0}' Named value found", propertyName);
-                    templateResources.Add(propertyTemplateResource);
-                };
+                    // if the user is executing a single api, extract all the named values used in the template resources
+                    bool foundInPolicy = DoesPolicyReferenceNamedValue(exc, policyResources, propertyName, propertyTemplateResource);
+                    bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(exc.sourceApimName, exc.resourceGroup, singleApiName, apiTemplateResources, exc, propertyName, propertyTemplateResource.properties.displayName);
+                    bool foundInLogger = DoesLoggerReferenceNamedValue(loggerTemplateResources, propertyName, propertyTemplateResource);
+
+                    // check if named value is referenced in a backend
+                    if (foundInPolicy || foundInBackEnd || foundInLogger)
+                    {
+                        // named value was used in policy, extract it
+                        Console.WriteLine("'{0}' Named value found", propertyName);
+                        templateResources.Add(propertyTemplateResource);
+                    }
+                }
             }
 
             armTemplate.resources = templateResources.ToArray();
             return armTemplate;
+        }
+
+        private bool DoesPolicyReferenceNamedValue(Extractor exc, IEnumerable<TemplateResource> policyResources, string propertyName, PropertyTemplateResource propertyTemplateResource)
+        {
+            // check if named value is referenced in a policy file
+            foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+            {
+                string policyContent = ExtractorUtils.GetPolicyContent(exc, policyTemplateResource);
+                
+                if (policyContent.Contains(string.Concat("{{", propertyTemplateResource.properties.displayName, "}}")) || policyContent.Contains(string.Concat("{{", propertyName, "}}")))
+                {
+                    // dont need to go through all policies if the named value has already been found
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool DoesLoggerReferenceNamedValue(IEnumerable<TemplateResource> loggerTemplateResources, string propertyName, PropertyTemplateResource propertyTemplateResource)
+        {
+            foreach(LoggerTemplateResource logger in loggerTemplateResources)
+            {
+                if (logger.properties.credentials != null)
+                {
+                    if ((!string.IsNullOrEmpty(logger.properties.credentials.connectionString) && logger.properties.credentials.connectionString.Contains(propertyName)) ||
+                        (!string.IsNullOrEmpty(logger.properties.credentials.instrumentationKey) && logger.properties.credentials.instrumentationKey.Contains(propertyName)) ||
+                        (!string.IsNullOrEmpty(logger.properties.credentials.connectionString) && logger.properties.credentials.connectionString.Contains(propertyTemplateResource.properties.displayName)) ||
+                        (!string.IsNullOrEmpty(logger.properties.credentials.instrumentationKey) && logger.properties.credentials.instrumentationKey.Contains(propertyTemplateResource.properties.displayName)))
+                    {
+                        // dont need to go through all loggers if the named value has already been found
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

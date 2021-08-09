@@ -440,7 +440,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, Extractor exc, 
             Dictionary<string, object> apiLoggerId, 
             Dictionary<string, string> loggerResourceIds,
-            Dictionary<string, BackendApiParameters> backendParams)
+            Dictionary<string, BackendApiParameters> backendParams,
+             List<TemplateResource> propertyResources)
         {
             // used to create the parameter values for use in parameters file
             // create empty template
@@ -523,14 +524,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     JToken oProperty = JObject.Parse(extractedProperty);
                     string propertyName = ((JValue)oProperty["name"]).Value.ToString();
-                    string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
-                    PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                    //Only add the property if it is not controlled by keyvault
-                    if (propertyTemplateResource?.properties.keyVault == null)
+
+                    // check if the property has been extracted as it is being used in a policy or backend
+                    if (propertyResources.Count(item => item.name.Contains(propertyName)) > 0)
                     {
-                        string propertyValue = propertyTemplateResource.properties.value;
-                        string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
-                        namedValues.Add(validPName, propertyValue);
+                        string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
+                        PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+
+                        //Only add the property if it is not controlled by keyvault
+                        if (propertyTemplateResource?.properties.keyVault == null)
+                        {
+                            string propertyValue = propertyTemplateResource.properties.value;
+                            string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
+                            namedValues.Add(validPName, propertyValue);
+                        }
                     }
                 }
                 TemplateObjectParameterProperties namedValueProperties = new TemplateObjectParameterProperties()
@@ -549,13 +556,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     JToken oProperty = JObject.Parse(extractedProperty);
                     string propertyName = ((JValue)oProperty["name"]).Value.ToString();
-                    string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
-                    PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                    if (propertyTemplateResource?.properties.keyVault != null)
+
+                    // check if the property has been extracted as it is being used in a policy or backend
+                    if (propertyResources.Count(item => item.name.Contains(propertyName)) > 0)
                     {
-                        string propertyValue = propertyTemplateResource.properties.keyVault.secretIdentifier;
-                        string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
-                        keyVaultNamedValues.Add(validPName, propertyValue);
+                        string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
+                        PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+                        if (propertyTemplateResource?.properties.keyVault != null)
+                        {
+                            string propertyValue = propertyTemplateResource.properties.keyVault.secretIdentifier;
+                            string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
+                            keyVaultNamedValues.Add(validPName, propertyValue);
+                        }
                     }
                 }
                 TemplateObjectParameterProperties keyVaultNamedValueProperties = new TemplateObjectParameterProperties()

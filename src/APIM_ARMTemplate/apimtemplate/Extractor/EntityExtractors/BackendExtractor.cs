@@ -179,5 +179,69 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 || namedValue == backendTemplateResource.properties.description
                 || namedValue == backendTemplateResource.properties.title);
         }
+
+        public async Task<bool> IsNamedValueUsedInBackends(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc, string propertyName, string propertyDisplayName)
+        {
+            // isolate api and operation policy resources in the case of a single api extraction, as they may reference backends
+            var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
+            var emptyNamedValueResources = new List<TemplateResource>();
+
+            // pull all backends for service
+            JObject oBackends = new JObject();
+            int skipNumberOfBackends = 0;
+
+            do
+            {
+                string backends = await GetBackendsAsync(apimname, resourceGroup, skipNumberOfBackends);
+                oBackends = JObject.Parse(backends);
+
+                foreach (var item in oBackends["value"])
+                {
+                    var content = item.ToString();
+
+                    // check if backend references the named value, credentials for example
+                    if (content.Contains(string.Concat("{{", propertyName, "}}")) || content.Contains(string.Concat("{{", propertyDisplayName, "}}")))
+                    {
+                        //only true if this is a full extraction, or in the case of a single api, if it is referenced by one of the API policies
+                        if (singleApiName == null)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            // is this backend related to the single api?
+                            // is backend used in the extracted policies for this API
+                            // if backend id is referenced in policy
+                            // or a named value is referenced in policy to a backend, we have already checked the policy for named value.
+
+                            // check if this backend is used by any of the policies extracted
+                            string backendName = ((JValue)item["name"]).Value.ToString();
+                            string backend = await GetBackendDetailsAsync(apimname, resourceGroup, backendName);
+
+                            // convert returned backend to template resource class
+                            BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
+
+                            // we have already checked if the named value is used in a policy, we just need to confirm if the backend is referenced by this single api within the policy file
+                            // this is why an empty named values must be passed to this method for validation
+                            foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+                            {
+                                string policyContent = ExtractorUtils.GetPolicyContent(exc, policyTemplateResource);
+
+                                if (DoesPolicyReferenceBackend(policyContent, emptyNamedValueResources, backendName, backendTemplateResource))
+                                {
+                                    // dont need to go through all policies and backends if the named values has already been found
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                skipNumberOfBackends += GlobalConstants.NumOfRecords;
+            }
+            while (oBackends["nextLink"] != null);
+
+            return false;
+        }
     }
 }
