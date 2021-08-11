@@ -135,6 +135,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     List<Template> apiTemplates = new List<Template>();
                     Console.WriteLine("Creating API templates");
                     Console.WriteLine("------------------------------------------");
+
+                    IDictionary<string, string[]> apiVersions = APITemplateCreator.GetApiVersionSets(creatorConfig);
+
                     foreach (APIConfig api in creatorConfig.apis)
                     {
                         if (considerAllApiForDeployments || preferredApis.Contains(api.name))
@@ -155,7 +158,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                                 name = api.name,
                                 isSplit = apiTemplateCreator.isSplitAPI(api),
                                 dependsOnGlobalServicePolicies = creatorConfig.policy != null,
-                                dependsOnVersionSets = api.apiVersionSetId != null,
+                            	dependsOnVersionSets = api.apiVersionSetId != null,
+                            	dependsOnVersion = masterTemplateCreator.GetDependsOnPreviousApiVersion(api, apiVersions),
                                 dependsOnProducts = api.products != null,
                                 dependsOnTags = api.tags != null,
                                 dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),

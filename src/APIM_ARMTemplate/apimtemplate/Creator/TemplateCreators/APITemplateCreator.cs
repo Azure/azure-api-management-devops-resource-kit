@@ -5,6 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using apimtemplate.Creator.Utilities;
 using System.Net;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -245,6 +246,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 }
             }
             return apiTemplateResource;
+        }
+
+        internal static IDictionary<string, string[]> GetApiVersionSets(CreatorConfig creatorConfig)
+        {
+            var apiVersions = (creatorConfig.apiVersionSets ?? new List<APIVersionSetConfig>())
+                .ToDictionary(v => v.id, v => new List<string>())
+                ;
+
+            foreach (var api in creatorConfig.apis.Where(a => !string.IsNullOrEmpty(a.apiVersionSetId)))
+                apiVersions[api.apiVersionSetId].Add(api.name)
+                    ;
+
+            return apiVersions.ToDictionary(
+                kv => kv.Key,
+                kv => kv.Value.OrderBy(v => v).ToArray()
+                );
         }
 
         private static string GetOpenApiSpecFormat(bool isUrl, bool isJSON, bool isVersionThree)
