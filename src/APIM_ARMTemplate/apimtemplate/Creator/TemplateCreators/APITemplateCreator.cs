@@ -5,6 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using apimtemplate.Creator.Utilities;
 using System.Net;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -238,13 +239,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 }
                 apiTemplateResource.properties.format = format;
                 apiTemplateResource.properties.value = value;
-                apiTemplateResource.properties.path = api.suffix;
+
+                // #562: deploying multiple versions of an API may fail because while trying to deploy the initial template
+                // overwrite the initial template’s path property to a dummy value
+                // this value will be restored when the subsequent template is deployed
+
+                if (isSplit && isInitial)
+                {
+                    apiTemplateResource.properties.path = api.suffix + $"/{Guid.NewGuid():n}";
+                }
+                else
+                {
+                    apiTemplateResource.properties.path = api.suffix;
+                }
+                
                 if (!String.IsNullOrEmpty(api.serviceUrl))
                 {
                     apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
                 }
             }
             return apiTemplateResource;
+        }
+
+        internal static IDictionary<string, string[]> GetApiVersionSets(CreatorConfig creatorConfig)
+        {
+            var apiVersions = (creatorConfig.apiVersionSets ?? new List<APIVersionSetConfig>())
+                .ToDictionary(v => v.id, v => new List<string>())
+                ;
+
+            foreach (var api in creatorConfig.apis.Where(a => !string.IsNullOrEmpty(a.apiVersionSetId)))
+                apiVersions[api.apiVersionSetId].Add(api.name)
+                    ;
+
+            return apiVersions.ToDictionary(
+                kv => kv.Key,
+                kv => kv.Value.OrderBy(v => v).ToArray()
+                );
         }
 
         private static string GetOpenApiSpecFormat(bool isUrl, bool isJSON, bool isVersionThree)

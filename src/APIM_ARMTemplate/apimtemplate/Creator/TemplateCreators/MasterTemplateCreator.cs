@@ -109,7 +109,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                     string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string initialAPIUri = GenerateLinkedTemplateUri(creatorConfig, initialAPIFileName);
-                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName);
+                    string[] initialAPIDependsOn = CreateAPIResourceDependencies(creatorConfig, globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName);
                     resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn, originalAPIName, apiInfo.isServiceUrlParameterize));
 
                     string subsequentAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, false);
@@ -128,7 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string unifiedAPIDeploymentResourceName = $"{originalAPIName}-APITemplate";
                     string unifiedAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                     string unifiedAPIUri = GenerateLinkedTemplateUri(creatorConfig, unifiedAPIFileName);
-                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName);
+                    string[] unifiedAPIDependsOn = CreateAPIResourceDependencies(creatorConfig, globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName);
                     resources.Add(this.CreateLinkedMasterTemplateResource(unifiedAPIDeploymentResourceName, unifiedAPIUri, unifiedAPIDependsOn, originalAPIName, apiInfo.isServiceUrlParameterize));
 
                     // Set previous API name for dependency chain
@@ -140,7 +140,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return masterTemplate;
         }
 
-        public string[] CreateAPIResourceDependencies(Template globalServicePolicyTemplate,
+        public string[] CreateAPIResourceDependencies(
+            CreatorConfig creatorConfig,
+            Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
             Template loggersTemplate,
@@ -178,6 +180,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             if (tagTemplate != null && apiInfo.dependsOnTags == true)
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
+            }
+            if (apiInfo.dependsOnVersion != null)
+            {
+                apiDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{apiInfo.dependsOnVersion}-SubsequentAPITemplate')]");
             }
             if (previousAPI != null && apiInfo.dependsOnTags == true)
             {
@@ -238,6 +244,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
 
             return masterTemplateResource;
+        }
+
+        public string GetDependsOnPreviousApiVersion(APIConfig api, IDictionary<string, string[]> apiVersions)
+        {
+            if (api?.apiVersionSetId == null)
+                return null;
+
+            // get all apis associated with the same versionSet
+            // versions must be deployed in sequence and thus
+            // each api must depend on the previous version.
+
+            var versions = apiVersions.ContainsKey(api.apiVersionSetId)
+                ? apiVersions[api.apiVersionSetId]
+                : null
+                ;
+
+            var index = Array.IndexOf(versions, api.name);
+            var previous = index > 0
+                ? (int?)index - 1
+                : null
+                ;
+
+            return previous.HasValue
+                ? versions[previous.Value]
+                : null
+                ;
         }
 
         public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(CreatorConfig creatorConfig)
@@ -417,6 +449,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool dependsOnAuthorizationServers { get; set; }
         public bool dependsOnTags { get; set; }
         public bool isServiceUrlParameterize { get; set; }
+        public string dependsOnVersion { get; set; }
     }
 
 }
