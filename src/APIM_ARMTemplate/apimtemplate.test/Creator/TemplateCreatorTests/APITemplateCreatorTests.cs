@@ -113,7 +113,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal("swagger-json", apiTemplateResource.properties.format);
+            Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
 
