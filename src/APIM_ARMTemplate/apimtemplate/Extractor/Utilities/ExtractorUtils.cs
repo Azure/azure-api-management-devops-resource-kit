@@ -1,15 +1,20 @@
-using System.Collections.Generic;
+using apimtemplate.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using System;
-using System.Linq;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
     static class ExtractorUtils
     {
+        private static readonly IMemoryCache _policyCache = new MemoryCache(new MemoryCacheOptions());
+
         public static List<TemplateResource> removeResourceType(string resourceType, List<TemplateResource> resources)
         {
             List<TemplateResource> newResourcesList = new List<TemplateResource>();
@@ -50,6 +55,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             PolicyExtractor policyExtractor = new PolicyExtractor(fileWriter);
             PropertyExtractor propertyExtractor = new PropertyExtractor();
             TagExtractor tagExtractor = new TagExtractor();
+            ProductAPIExtractor productAPIExtractor = new ProductAPIExtractor(fileWriter);
+            APITagExtractor apiTagExtractor = new APITagExtractor(fileWriter);
             ProductExtractor productExtractor = new ProductExtractor(fileWriter);
             MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
@@ -80,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 List<string> allApis = await apiExtractor.GetAllAPINamesAsync(exc.sourceApimName, exc.resourceGroup);
                 apisToExtract.AddRange(allApis);
             }
-            Dictionary<string, Dictionary<string, string>> apiLoggerId = null;
+            Dictionary<string, object> apiLoggerId = null;
             if (exc.paramApiLoggerId)
             {
                 apiLoggerId = await GetAllReferencedLoggers(apisToExtract, exc);
@@ -93,26 +100,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(singleApiName, multipleApiNames, exc);
             }
             List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
-            Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
-            Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
+            Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
+            Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
             Template loggerTemplate = await loggerExtractor.GenerateLoggerTemplateAsync(exc, singleApiName, apiTemplateResources, apiLoggerId);
-            Template productTemplate = await productExtractor.GenerateProductsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, policyXMLBaseUrl, policyXMLSasToken, dirName);
+            Template productTemplate = await productExtractor.GenerateProductsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, dirName, exc);
+            Template productAPITemplate = await productAPIExtractor.GenerateAPIProductsARMTemplateAsync(singleApiName, multipleApiNames, exc);
+            Template apiTagTemplate = await apiTagExtractor.GenerateAPITagsARMTemplateAsync(singleApiName, multipleApiNames, exc);
             List<TemplateResource> productTemplateResources = productTemplate.resources.ToList();
-            Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc);
+            List<TemplateResource> loggerResources = loggerTemplate.resources.ToList();
+            Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc, backendExtractor, loggerResources);
             Template tagTemplate = await tagExtractor.GenerateTagsTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, productTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
             List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
-            Template backendTemplate = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, policyXMLBaseUrl, policyXMLSasToken);
+
+            Tuple<Template, Dictionary<string, BackendApiParameters>> backendResult = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, exc);
 
             Dictionary<string, string> loggerResourceIds = null;
             if (exc.paramLogResourceId)
-            {
-                List<TemplateResource> loggerResources = loggerTemplate.resources.ToList();
+            {                
                 loggerResourceIds = loggerExtractor.GetAllLoggerResourceIds(loggerResources);
                 loggerTemplate = loggerExtractor.SetLoggerResourceId(loggerTemplate);
             }
 
             // create parameters file
-            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc, apiLoggerId, loggerResourceIds);
+            Template templateParameters = await masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, exc, apiLoggerId, loggerResourceIds, backendResult.Item2, namedValueResources);
 
             // write templates to output file location
             string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, fileNames.baseFileName);
@@ -123,9 +133,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 fileWriter.WriteJSONToFile(apiVersionSetTemplate, String.Concat(@dirName, fileNames.apiVersionSets));
             }
-            if (backendTemplate.resources.Count() != 0)
+            if (backendResult.Item1.resources.Count() != 0)
             {
-                fileWriter.WriteJSONToFile(backendTemplate, String.Concat(@dirName, fileNames.backends));
+                fileWriter.WriteJSONToFile(backendResult.Item1, String.Concat(@dirName, fileNames.backends));
             }
             if (loggerTemplate.resources.Count() != 0)
             {
@@ -138,6 +148,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (productTemplate.resources.Count() != 0)
             {
                 fileWriter.WriteJSONToFile(productTemplate, String.Concat(@dirName, fileNames.products));
+            }
+            if (productAPITemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(productAPITemplate, String.Concat(@dirName, fileNames.productAPIs));
+            }
+            if (apiTagTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(apiTagTemplate, String.Concat(@dirName, fileNames.apiTags));
             }
             if (tagTemplate.resources.Count() != 0)
             {
@@ -155,8 +173,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 // create a master template that links to all other templates
                 Template masterTemplate = masterTemplateExtractor.GenerateLinkedMasterTemplate(
-                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate,
-                    loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
+                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productAPITemplate,
+                    apiTagTemplate, loggerTemplate, backendResult.Item1, authorizationServerTemplate, namedValueTemplate,
                     tagTemplate, fileNames, apiFileName, exc);
 
                 fileWriter.WriteJSONToFile(masterTemplate, String.Concat(@dirName, fileNames.linkedMaster));
@@ -200,12 +218,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         // this function will generate templates for multiple specified APIs
         public static async Task GenerateMultipleAPIsTemplates(ExtractorConfig exc, FileNameGenerator fileNameGenerator, FileWriter fileWriter, FileNames fileNames)
         {
-            if (exc.mutipleAPIs == null && exc.mutipleAPIs.Equals(""))
+            if (exc.multipleAPIs == null && exc.multipleAPIs.Equals(""))
             {
-                throw new Exception("mutipleAPIs parameter doesn't have any data");
+                throw new Exception("multipleAPIs parameter doesn't have any data");
             }
 
-            string[] apis = exc.mutipleAPIs.Split(',');
+            string[] apis = exc.multipleAPIs.Split(',');
             for (int i = 0; i < apis.Length; i++)
             {
                 apis[i] = apis[i].Trim();
@@ -351,10 +369,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         }
 
         // this function generate all reference loggers in all extracted apis
-        public static async Task<Dictionary<string, Dictionary<string, string>>> GetAllReferencedLoggers(List<string> apisToExtract, Extractor exc)
+        public static async Task<Dictionary<string, object>> GetAllReferencedLoggers(List<string> apisToExtract, Extractor exc)
         {
-            Dictionary<string, Dictionary<string, string>> ApiLoggerId = new Dictionary<string, Dictionary<string, string>>();
+            Dictionary<string, object> ApiLoggerId = new Dictionary<string, object>();
+
             APIExtractor apiExc = new APIExtractor(new FileWriter());
+            string serviceDiagnostics = await apiExc.GetServiceDiagnosticsAsync(exc.sourceApimName, exc.resourceGroup);
+            JObject oServiceDiagnostics = JObject.Parse(serviceDiagnostics);
+
+            Dictionary<string, string> serviceloggerIds = new Dictionary<string, string>();
+            foreach (var serviceDiagnostic in oServiceDiagnostics["value"])
+            {
+                string diagnosticName = ((JValue)serviceDiagnostic["name"]).Value.ToString();
+                string loggerId = ((JValue)serviceDiagnostic["properties"]["loggerId"]).Value.ToString();
+                ApiLoggerId.Add(ExtractorUtils.GenValidParamName(diagnosticName, ParameterPrefix.Diagnostic), loggerId);
+            }
+
+
             foreach (string curApiName in apisToExtract)
             {
                 Dictionary<string, string> loggerIds = new Dictionary<string, string>();
@@ -371,7 +402,35 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     ApiLoggerId.Add(ExtractorUtils.GenValidParamName(curApiName, ParameterPrefix.Api), loggerIds);
                 }
             }
+
             return ApiLoggerId;
+        }        
+        
+        public static string GetPolicyContent(Extractor exc, PolicyTemplateResource policyTemplateResource)
+        {
+            // the backend is used in a policy if the xml contains a set-backend-service policy, which will reference the backend's url or id
+            string policyContent = policyTemplateResource.properties.value;
+
+            // check if this is a file or is it the raw policy content
+            if (policyContent.Contains(".xml"))
+            {
+                var key = policyContent;
+                //check cache
+                if (_policyCache.TryGetValue(key, out string content))
+                    return content;
+
+                var filename = policyContent.Split(',')[1].Replace("'", string.Empty).Trim();
+                var policyFolder = $@"{exc.fileFolder}/policies";
+                var filepath = $@"{Directory.GetCurrentDirectory()}/{policyFolder}/{filename}";
+
+                if (File.Exists(filepath))
+                {
+                    policyContent = File.ReadAllText(filepath);
+                    _policyCache.Set(key, policyContent);
+                }
+            }
+
+            return policyContent;
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string API = "Microsoft.ApiManagement/service/apis";
         public const string APIVersionSet = "Microsoft.ApiManagement/service/apiVersionSets";
         public const string APIDiagnostic = "Microsoft.ApiManagement/service/apis/diagnostics";
+        public const string APIServiceDiagnostic = "Microsoft.ApiManagement/service/diagnostics";
         public const string APIOperation = "Microsoft.ApiManagement/service/apis/operations";
         public const string APIOperationPolicy = "Microsoft.ApiManagement/service/apis/operations/policies";
         public const string APIOperationTag = "Microsoft.ApiManagement/service/apis/operations/tags";
@@ -22,7 +23,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string ProductGroup = "Microsoft.ApiManagement/service/products/groups";
         public const string ProductTag = "Microsoft.ApiManagement/service/products/tags";
         public const string ProductPolicy = "Microsoft.ApiManagement/service/products/policies";
-        public const string Property = "Microsoft.ApiManagement/service/properties";
+        public const string Property = "Microsoft.ApiManagement/service/namedValues";
+        public const string Subscription = "Microsoft.ApiManagement/service/subscriptions";
         public const string Tag = "Microsoft.ApiManagement/service/tags";
     }
 }

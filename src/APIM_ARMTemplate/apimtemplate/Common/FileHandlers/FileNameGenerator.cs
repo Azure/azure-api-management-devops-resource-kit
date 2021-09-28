@@ -21,6 +21,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 namedValues = $@"/{baseFileName}namedValues.template.json",
                 tags = $@"/{baseFileName}tags.template.json",
                 products = $@"/{baseFileName}products.template.json",
+                productAPIs = $@"/{baseFileName}productAPIs.template.json",
+                apiTags = $@"/{baseFileName}apiTags.template.json",
                 parameters = $@"/{baseFileName}parameters.json",
                 linkedMaster = $@"/{baseFileName}master.template.json",
                 apis = "/Apis",
@@ -49,9 +51,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 
         public string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
-            if (baseFileName.Length > 0)
-                baseFileName += "-";
-
             return singleAPIName == null ? $@"/{baseFileName}apis.template.json" : $@"/{baseFileName}{singleAPIName}-api.template.json";
         }
 
@@ -73,6 +72,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string namedValues { get; set; }
         public string tags { get; set; }
         public string products { get; set; }
+        public string productAPIs { get; set; }
+        public string apiTags { get; set; }
         public string parameters { get; set; }
         // linked property outputs 1 master template
         public string linkedMaster { get; set; }

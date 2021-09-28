@@ -26,6 +26,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | apiVersionSets         | Array<[APIVersionSetConfiguration](#APIVersionSetConfiguration)> | No               | List of API Version Set configurations.                        |
 | apis                   | Array<[APIConfiguration](#APIConfiguration)>      | Yes                   | List of API configurations.                                |
 | products                   | Array<[ProductConfiguration](#ProductConfiguration)>      | No                   | List of Product configurations.                                |
+| namedValues               | Array<[PropertyConfiguration](#PropertyConfiguration)>     | No                   | List of Named Values
 | loggers                   | Array<[LoggerConfiguration](#LoggerConfiguration)>      | No                   | List of Logger configurations.                                |
 | authorizationServers                   | Array<[AuthorizationServerContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/authorizationservers#AuthorizationServerContractProperties)>      | No                   | List of Authorization Server configurations.                                |
 | backends                   | Array<[BackendContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/backends#BackendContractProperties)>      | No                   | List of Backend configurations.                                |
@@ -36,16 +37,19 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | tags                   | Array<[TagConfiguration](#tagConfiguration)>      | No                   | List of Tags configurations.                                |
 | subscriptionKeyParameterNames | APITemplateSubscriptionKeyParameterNames      | No                   | subscription key parameter name.                    |
 | baseFileName | string      | No                   | base file name for the templates file               |
+| serviceUrlParameters | Array<[ServiceUrlProperty](#ServiceUrlProperty)> | No                   | List of parameterized ServiceUrl.                    |
 
 #### APIConfiguration
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                  | string                | Yes                   | API identifier. Must be unique in the current API Management service instance.                                 |
+| displayName           | string                | No                    | User-friendly name for the API.           |
 | description           | string                | No                    | Description of the API.                          |
 | serviceUrl            | string                | No                    | Absolute URL of the backend service implementing this API.                                 |
 | type                  | enum                  | No                    | Type of API. - http or soap                      |
 | openApiSpec           | string                | Yes                   | Location of the Open API Spec file. Can be url or local file.                          |
+| openApiSpecFormat           | string                | No                   | Format of the API definition. When the `openApiSpec` property refers to a local file, the program will infer the format if this property is omitted. If the `openApiSpec` property refers to a url, you can prevent downloading the API definition by specifying this property. Valid values are `Swagger` (JSON), `Swagger_Json`, `OpenApi20` (YAML), `OpenApi20_Yaml`, `OpenApi20_Json`, `OpenApi30` (YAML), `OpenApi30_Yaml`, or `OpenApi30_Json`.
 | policy                | string                | No                    | Location of the API policy XML file. Can be url or local file.                          |
 | suffix                | string                | Yes                    | Relative URL uniquely identifying this API and all of its resource paths within the API Management service instance. It is appended to the API endpoint base URL specified during the service instance creation to form a public URL for this API.                       |
 | subscriptionRequired  | boolean               | No                    | Specifies whether an API or Product subscription is required for accessing the API.                         |
@@ -88,9 +92,37 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
-| policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          |
+| name                | string                | No                    | Name of the product resource. If omitted, the display name is used.                          |
+| policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          
+| subscriptions                | Array<[SubscriptionConfiguration](#SubscriptionConfiguration)>                | No                    | List of Subscriptions
 
 _Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+
+#### SubscriptionConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| name                | string                | No                    | Name of the subscription resource. If omitted, the display name is used.                          |
+
+_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+
+#### PropertyConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| tags                | array                | No                    | Optional tags that when provided can be used to filter the property list. - string
+| secret                | boolean                | No                    | Determines whether the value is a secret and should be encrypted or not. Default value is false.
+| displayName                | string                | Yes                    | Unique name of Property. It may contain only letters, digits, period, dash, and underscore characters.                          |
+| value                | string                | No                    | Value of the property. Can contain policy expressions. It can be empty or consist only of whitespace only if the keyvault parameter is set.                          |
+| keyvault                | [PropertyKeyVaultConfiguration](#PropertyKeyVaultConfiguration)                 | No                    | The keyvault settings for the property.                          |
+
+_Additional properties found in [PropertyContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/properties#propertycontractproperties-object)_
+
+#### PropertyKeyVaultConfiguration
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| secretIdentifier                | string                | Yes                    | KeyVault secret id which will map to the property.   
 
 #### LoggerConfiguration
 
@@ -116,6 +148,13 @@ _Additional properties found in [TagContractProperties](https://docs.microsoft.c
 | query                 | string                | Yes                   | query parameter name of the subscription.        |
 
 _Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions)_
+
+#### ServiceUrlProperty
+
+| Property              | Type                  | Required              | Value                                            |
+|-----------------------|-----------------------|-----------------------|--------------------------------------------------|
+| apiName               | string                | Yes                   | Name of API.                 |
+| serviceUrl            | string                | Yes                   | API ServiceUrl parameter.        |
 
 
 
@@ -143,9 +182,11 @@ apiVersionSets:
 apis:
     - name: myAPI
       type: http
+      displayName: My API
       description: myFirstAPI
       serviceUrl: http://myApiBackendUrl.com
       openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
+      openApiSpecFormat: swagger
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
       suffix: conf
       subscriptionRequired: true
@@ -194,7 +235,8 @@ apis:
               bytes: 512
         enableHttpCorrelationHeaders: true
 products:
-    - displayName: platinum
+    - name: platinum
+      displayName: Platinum
       description: a test product
       terms: some terms
       subscriptionRequired: true
@@ -202,6 +244,12 @@ products:
       subscriptionsLimit: 1
       state: notPublished
       policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
+      subscriptions:
+          - name: platinum
+            primaryKey: a240691f-03fd-4557-a5cb-6e0f65cd976a
+            secondaryKey: 032338aa-0076-4379-910c-32ddd42f38a1
+            state: active
+            allowTracing: true 
 tags:
     - displayName: Universe
 loggers:
@@ -259,6 +307,9 @@ linked: false
 linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
 linkedTemplatesUrlQueryString : ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-22T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFTldJEYPH888QVzKb7q7eLq0Xt%2Bu35UTqpFGUYo6uc%3D
 baseFileName: baseName
+serviceUrlParameters: 
+  - apiName: myAPI
+    serviceUrl: httpbin.com/myAPI
 ```
 
 <a name="creator2"></a>
@@ -270,8 +321,33 @@ Below are the steps to run the Creator from the source code:
 - Navigate to {path_to_folder}/src/APIM_ARMTemplate/apimtemplate directory
 - Run the following command:
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
+- Run the following command to pass apim Name as a parameter:
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --apimNameValue apimname1```
+- Run the following command to pass api name to generate ARM templates only for this specified APIs semicolon separated where the api1 (api name) will be same as name used in valid.yml file for that api(here it is myBackend):
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --preferredAPIsForDeployment myBackend;api2;api3;```
+- Run the following command to pass BackendUrls as an json input file into the parameter(sample file available in the same path as below in this repository):
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --backendurlconfigFile .\apimtemplate\Creator\ExampleFiles\BackendUrlParameter\BackendUrlParameters.json```
+- Run the following command to pass AppinsightsName and Appinsights InstrumentationKey as an parameter:
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --appInsightsInstrumentationKey 45d4v88-fdfs-4b35-9232-731d82d4d1c6 --appInsightsName  myAppInsights ```
+- Run the following command to pass namedValueKeys as an parameter to provide environment specific named values with key name and value like following:
+- Add new key to namedValues section in valid yaml file then use the same key name here in this cli parameter
+    **Here namedvalue displayname can not have | or ; in their name.**
+```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --namedValues namedvalue1|namevaluevalue1;namedvalue2|namevaluevalue2 ```
+Add new key to namedValues section in valid yaml file then use the same key name here in this cli parameter
+    **Here displayName can not have | or ; in their name.**
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
+
+Additionaly, the Creator can also be made available as a global [dotnet CLI tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) in your Azure DevOps artifacts or private NuGet repository. Build the Creator, and run the following commands to package the Creator as a dotnet tool:
+
+```
+dotnet pack -c Release
+dotnet tool install -g --add-source .\bin\Release apimtemplate
+```
+
+The Creator tool is now available anywhere on the command-line:
+
+```apim-templates create --configFile CONFIG_YAML_FILE_LOCATION ```
 
 # Extractor
 
@@ -315,7 +391,7 @@ You have two choices when specifying your settings:
 | policyXMLBaseUrl      | No                    | Policy XML files remote location. If provided, Extractor generates policies folder with xml files, and requires they be pushed to remote location.                              |
 | splitAPIs     | No                    | If set to "true", then generate multiple api folders, each api will have a seperate folder, with a separate master template to deploy this api. If this single api has a version set, then a version set folder will generate instead, then all apis that belongs to this version set will be included in the version set folder, apis in this version set can be deployed separately using every api's master template, or they can be deployed together using the master template in "VersionSetMasterFolder" folder                        |
 | apiVersionSetName  | No                    | Name of the APIVersionSet.  If provided, extract all apis within this apiversionset. It will generate seperate folder for each api and also a master folder to link all apis in this apiversionset      |
-| mutipleAPIs  | No                    | Specify multiple APIs to extract. Generate templates for each API, also generate an aggregated templates folder to deploy these APIs together at a time      |
+| multipleAPIs  | No                    | Specify multiple APIs to extract. Generate templates for each API, also generate an aggregated templates folder to deploy these APIs together at a time      |
 | includeAllRevisions  | No                    |  Set to "true" will extract all revisions for the single API. Will work only with "apiName" paramter, where you specify which API's revisions to extract. Generate templates for each revision, also generate an aggregated master folder to deploy these revisions together at one time. Note: there are many complicated issues with deploying revisions, make sure your deployment won't overwrite or break the existing ones      |
 | baseFileName  | No                    | Specify base file name of the template files      |
 |  policyXMLSasToken | No                    | Specify sasToken for fetching policy files    |
@@ -323,13 +399,16 @@ You have two choices when specifying your settings:
 | serviceUrlParameters  | No                    | Parameterize service url in advance (you can replace serviceUrl afterwards as well, you can refer example for more information).  |
 |  paramServiceUrl | No                    |  Set to "true" will parameterize all serviceUrl for each api and generate serviceUrl parameter to api template/parameter template/master template files |
 |  paramNamedValue | No                    |  Set to "true" will parameterize all named values and add named values parameter to property template/parameter template/mastert emplate files |
-|  paramApiLoggerId | No                    |  Set to "true" will parameterize all logger ids in all apis (within api templates) |
+|  paramApiLoggerId | No                    |  Set to "true" will parameterize all logger ids in all apis (within api templates), Also includes the "All API" monitoring configuration |
 |  paramLogResourceId | No                    |  Set to "true" will parameterize all loggers' resource ids (within logger template)|
 | serviceBaseUrl | No                    | Specify the base url where you want to run your extractor |
+| notIncludeNamedValue | No                    | Set to "true" will not generate Named Value Templates|
+| paramNamedValuesKeyVaultSecrets | No | Set to true will parameterize all named values where the value is from a key vault secret |
+| paramBackend | No | Set to true will parameterize sepcific backend values (limited to resourceId, url and protocol) |
 
 #### Note
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
-* Can not use "apiName" and "mutipleAPIs" at the same time
+* Can not use "apiName" and "multipleAPIs" at the same time
 * Can only "includeAllRevisions" with "apiName"
 
 <a name="extractorParameterFileExamples"></a>
@@ -404,7 +483,7 @@ Extract **multiple APIs**, use the following parameters:
     "fileFolder": "<destination-file-folder>",
     "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
     "policyXMLBaseUrl": "<policies_remote_location>",
-    "mutipleAPIs": "api1, api2, api3"
+    "multipleAPIs": "api1, api2, api3"
 }
 ```
 Extract **single API with baseFileName**, use the following parameters: 
@@ -473,3 +552,9 @@ dotnet run extract
 
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
+
+Likewise, if you [package the Extractor as a dotnet CLI tool](#creator2), you can run it from anywhere on the command-line:
+
+```
+apim-templates extract
+```

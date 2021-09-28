@@ -8,8 +8,67 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
     public class ProductAPITemplateCreatorTests
     {
         [Fact]
+        public void ShouldCreateProductAPIFromCreatorConfig()
+        {
+            // arrange
+            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
+            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>(), apis = new List<APIConfig>() };
+            ProductConfig product = new ProductConfig()
+            {
+                name = "productName",
+                displayName = "display name",
+                description = "description",
+                terms = "terms",
+                subscriptionRequired = true,
+                approvalRequired = true,
+                subscriptionsLimit = 1,
+                state = "state"
+            };
+            creatorConfig.products.Add(product);
+            APIConfig api = new APIConfig()
+            {
+                name = "apiName",
+                apiVersion = "apiVersion",
+                apiVersionDescription = "apiVersionDescription",
+                apiVersionSetId = "apiVersionSetId",
+                apiRevision = "revision",
+                apiRevisionDescription = "revisionDescription",
+                suffix = "suffix",
+                products = "productName",
+                subscriptionRequired = true,
+                authenticationSettings = new APITemplateAuthenticationSettings()
+                {
+                    oAuth2 = new APITemplateOAuth2()
+                    {
+                        authorizationServerId = "",
+                        scope = ""
+                    },
+                    openid = new APITemplateOpenID()
+                    {
+                        openidProviderId = "",
+                        bearerTokenSendingMethods = new string[] { }
+                    },
+                    subscriptionKeyRequired = true
+                },
+                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+                protocols = "https",
+                isCurrent = true,
+                type = "http"
+            };
+            creatorConfig.apis.Add(api);
+
+            // act
+            Template productAPITemplate = productAPITemplateCreator.CreateProductAPITemplate(creatorConfig);
+            ProductAPITemplateResource productAPITemplateResource = (ProductAPITemplateResource)productAPITemplate.resources[0];
+
+            // assert
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name}')]", productAPITemplateResource.name);
+        }
+
+        [Fact]
         public void ShouldCreateProductAPITemplateResourceFromValues()
         {
+
             // arrange
             ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
             string productId = "productId";

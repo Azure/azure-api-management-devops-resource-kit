@@ -16,17 +16,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Template apiVersionSetsTemplate = new Template();
             Template globalServicePolicyTemplate = new Template();
             Template productsTemplate = new Template();
+            Template productAPIsTemplate = new Template();
+            Template propertyTemplate = new Template();
             Template tagTemplate = new Template();
             Template loggersTemplate = new Template();
             List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 7 resources (globalServicePolicy, apiVersionSet, product, tag, logger, both api templates)
-            int count = 7;
+            // should create 8 resources (globalServicePolicy, apiVersionSet, product, property, tag, logger, both api templates)
+            int count = 9;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);
@@ -79,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             string[] dependsOn = new string[] { "dependsOn" };
 
             // act
-            MasterTemplateResource masterTemplateResource = masterTemplateCreator.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
+            MasterTemplateResource masterTemplateResource = masterTemplateCreator.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn, null, false);
 
             // assert
             Assert.Equal(name, masterTemplateResource.name);

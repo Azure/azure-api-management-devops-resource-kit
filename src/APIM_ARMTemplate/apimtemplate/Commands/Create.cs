@@ -3,6 +3,8 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using apimtemplate.Creator.Utilities;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 {
@@ -13,8 +15,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.Name = GlobalConstants.CreateName;
             this.Description = GlobalConstants.CreateDescription;
 
+            CommandOption appInsightsInstrumentationKey = this.Option("--appInsightsInstrumentationKey <appInsightsInstrumentationKey>", "AppInsights intrumentationkey", CommandOptionType.SingleValue);
+
+            CommandOption appInsightsName = this.Option("--appInsightsName <appInsightsName>", "AppInsights Name", CommandOptionType.SingleValue);
+
+            // Allow Named values to pass as parameters
+            CommandOption namedValueKeys = this.Option("--namedValues <namedValues>", "Named Values", CommandOptionType.SingleValue);
+
+            // apimNameValue values to pass as parameters
+            CommandOption apimNameValue = this.Option("--apimNameValue <apimNameValue>", "Apim Name Value", CommandOptionType.SingleValue);
+
             // list command options
             CommandOption configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
+
+            // list command options
+            CommandOption backendurlconfigFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
+
+            // command options
+            CommandOption preferredAPIsForDeployment = this.Option("--preferredAPIsForDeployment <preferredAPIsForDeployment>", "create ARM templates for the given APIs Name(comma separated) else leave this parameter blank then by default all api's will be considered", CommandOptionType.SingleValue);
 
             this.HelpOption();
 
@@ -22,10 +40,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             {
                 // convert config file to CreatorConfig class
                 FileReader fileReader = new FileReader();
+                bool considerAllApiForDeployments = true;
+                string[] preferredApis = null;
+
+                GlobalConstants.CommandStartDateTime = DateTime.Now.ToString("MMyyyydd  hh mm ss");
+
                 CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(configFile.Value());
+
+                if (apimNameValue != null && !string.IsNullOrEmpty(apimNameValue.Value()))
+                {
+                    creatorConfig.apimServiceName = apimNameValue.Value();
+                }
+
+                AppInsightsUpdater appInsightsUpdater = new AppInsightsUpdater();
+                appInsightsUpdater.UpdateAppInsightNameAndInstrumentationKey(creatorConfig, appInsightsInstrumentationKey, appInsightsName);
+
+                // Overwrite named values from build pipeline
+                NamedValuesUpdater namedValuesUpdater = new NamedValuesUpdater();
+                namedValuesUpdater.UpdateNamedValueInstances(creatorConfig, namedValueKeys);
 
                 // validate creator config
                 CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
+
+                //if preferredAPIsForDeployment passed as parameter
+                if (preferredAPIsForDeployment != null && !string.IsNullOrEmpty(preferredAPIsForDeployment.Value()))
+                {
+                    considerAllApiForDeployments = false;
+                    preferredApis = preferredAPIsForDeployment.Value().Split(",");
+                }
+
+                //if backendurlfile passed as parameter
+                if (backendurlconfigFile != null && !string.IsNullOrEmpty(backendurlconfigFile.Value()))
+                {
+                    CreatorApiBackendUrlUpdater creatorApiBackendUrlUpdater = new CreatorApiBackendUrlUpdater();
+                    creatorConfig = creatorApiBackendUrlUpdater.UpdateBackendServiceUrl(backendurlconfigFile.Value(), creatorConfig);
+                }
+
                 bool isValidCreatorConfig = creatorConfigurationValidator.ValidateCreatorConfig(creatorConfig);
                 if (isValidCreatorConfig == true)
                 {
@@ -45,9 +95,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     TagAPITemplateCreator tagAPITemplateCreator = new TagAPITemplateCreator();
                     PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
                     ProductGroupTemplateCreator productGroupTemplateCreator = new ProductGroupTemplateCreator();
+                    SubscriptionTemplateCreator productSubscriptionsTemplateCreator = new SubscriptionTemplateCreator();
                     DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
                     ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
-                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator);
+                    ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator, productSubscriptionsTemplateCreator);
+                    PropertyTemplateCreator propertyTemplateCreator = new PropertyTemplateCreator();
                     TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
                     APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
                     MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
@@ -62,6 +114,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     Console.WriteLine("Creating product template");
                     Console.WriteLine("------------------------------------------");
                     Template productsTemplate = creatorConfig.products != null ? productTemplateCreator.CreateProductTemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating product/APIs template");
+                    Console.WriteLine("------------------------------------------");
+                    Template productAPIsTemplate = (creatorConfig.products != null && creatorConfig.apis != null) ? productAPITemplateCreator.CreateProductAPITemplate(creatorConfig) : null;
+                    Console.WriteLine("Creating named values template");
+                    Console.WriteLine("------------------------------------------");
+                    Template propertyTemplate = creatorConfig.namedValues != null ? propertyTemplateCreator.CreatePropertyTemplate(creatorConfig) : null;
                     Console.WriteLine("Creating logger template");
                     Console.WriteLine("------------------------------------------");
                     Template loggersTemplate = creatorConfig.loggers != null ? loggerTemplateCreator.CreateLoggerTemplate(creatorConfig) : null;
@@ -77,24 +135,39 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     List<Template> apiTemplates = new List<Template>();
                     Console.WriteLine("Creating API templates");
                     Console.WriteLine("------------------------------------------");
+
+                    IDictionary<string, string[]> apiVersions = APITemplateCreator.GetApiVersionSets(creatorConfig);
+
                     foreach (APIConfig api in creatorConfig.apis)
                     {
-                        // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
-                        List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
-                        apiTemplates.AddRange(apiTemplateSet);
-                        // create the relevant info that will be needed to properly link to the api template(s) from the master template
-                        apiInformation.Add(new LinkedMasterTemplateAPIInformation()
+                        if (considerAllApiForDeployments || preferredApis.Contains(api.name))
                         {
-                            name = api.name,
-                            isSplit = apiTemplateCreator.isSplitAPI(api),
-                            dependsOnGlobalServicePolicies = creatorConfig.policy != null,
-                            dependsOnVersionSets = api.apiVersionSetId != null,
-                            dependsOnProducts = api.products != null,
-                            dependsOnTags = api.tags != null,
-                            dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
-                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
-                            dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader)
-                        });
+                            bool isServiceUrlParameterizeInYml = false;
+                            if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
+                            {
+                                isServiceUrlParameterizeInYml = creatorConfig.serviceUrlParameters.Any(s => s.apiName.Equals(api.name));
+                                api.serviceUrl = isServiceUrlParameterizeInYml ?
+                                    creatorConfig.serviceUrlParameters.Where(s => s.apiName.Equals(api.name)).FirstOrDefault().serviceUrl : api.serviceUrl;
+                            }
+                            // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
+                            List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
+                            apiTemplates.AddRange(apiTemplateSet);
+                            // create the relevant info that will be needed to properly link to the api template(s) from the master template
+                            apiInformation.Add(new LinkedMasterTemplateAPIInformation()
+                            {
+                                name = api.name,
+                                isSplit = apiTemplateCreator.isSplitAPI(api),
+                                dependsOnGlobalServicePolicies = creatorConfig.policy != null,
+                            	dependsOnVersionSets = api.apiVersionSetId != null,
+                            	dependsOnVersion = masterTemplateCreator.GetDependsOnPreviousApiVersion(api, apiVersions),
+                                dependsOnProducts = api.products != null,
+                                dependsOnTags = api.tags != null,
+                                dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
+                                dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
+                                dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader),
+                                isServiceUrlParameterize = isServiceUrlParameterizeInYml
+                            });
+                        }
                     }
 
                     Console.WriteLine("Creating tag template");
@@ -108,13 +181,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     if (creatorConfig.linked == true)
                     {
                         // create linked master template
-                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
+                        Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, productAPIsTemplate, propertyTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName, fileNameGenerator);
                         fileWriter.WriteJSONToFile(masterTemplate, String.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
                     }
                     foreach (Template apiTemplate in apiTemplates)
                     {
                         APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
-                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => apiResource.name.Contains(api.name, StringComparison.Ordinal));
+                        APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.name, APITemplateCreator.MakeResourceName(api), true) == 0);
                         // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
                         string apiFileName = fileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
                         fileWriter.WriteJSONToFile(apiTemplate, String.Concat(creatorConfig.outputLocation, apiFileName));
@@ -131,6 +204,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         fileWriter.WriteJSONToFile(productsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.products));
                     }
+                    if (productAPIsTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(productAPIsTemplate, String.Concat(creatorConfig.outputLocation, fileNames.productAPIs));
+                    }
+                    if (propertyTemplate != null)
+                    {
+                        fileWriter.WriteJSONToFile(propertyTemplate, String.Concat(creatorConfig.outputLocation, fileNames.namedValues));
+                    }
                     if (loggersTemplate != null)
                     {
                         fileWriter.WriteJSONToFile(loggersTemplate, String.Concat(creatorConfig.outputLocation, fileNames.loggers));
@@ -143,7 +224,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         fileWriter.WriteJSONToFile(authorizationServersTemplate, String.Concat(creatorConfig.outputLocation, fileNames.authorizationServers));
                     }
-                    if (tagTemplate != null) {
+                    if (tagTemplate != null)
+                    {
                         fileWriter.WriteJSONToFile(tagTemplate, String.Concat(creatorConfig.outputLocation, fileNames.tags));
                     }
 

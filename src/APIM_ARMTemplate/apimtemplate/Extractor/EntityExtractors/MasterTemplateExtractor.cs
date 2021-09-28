@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using apimtemplate.Common.TemplateModels;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 {
@@ -14,6 +15,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
+            Template productAPIsTemplate,
+            Template apiTagsTemplate,
             Template loggersTemplate,
             Template backendsTemplate,
             Template authorizationServersTemplate,
@@ -41,6 +44,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // api dependsOn
             List<string> apiDependsOn = new List<string>();
+            List<string> productAPIDependsOn = new List<string>();
+            List<string> apiTagDependsOn = new List<string>();
 
             if (namedValuesTemplate != null && namedValuesTemplate.resources.Count() != 0)
             {
@@ -63,22 +68,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'versionSetTemplate')]");
                 string apiVersionSetUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.apiVersionSets);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("versionSetTemplate", apiVersionSetUri, dependsOnNamedValues, exc));
+                resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, dependsOnNamedValues));
             }
 
             // product
             if (productsTemplate != null && productsTemplate.resources.Count() != 0)
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
+                productAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
                 string productsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.products);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("productsTemplate", productsUri, dependsOnNamedValues, exc));
+                var templateResource = this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, dependsOnNamedValues);
+                if (exc.policyXMLBaseUrl != null)
+                {
+                    templateResource.properties.parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
+                }
+                if (exc.policyXMLSasToken != null)
+                {
+                    templateResource.properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
+                }
+                resources.Add(templateResource);
             }
 
             if (tagTemplate != null && tagTemplate.resources.Count() != 0)
             {
+                apiTagDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'tagTemplate')]");
                 string tagUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.tags);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("tagTemplate", tagUri, dependsOnNamedValues, exc));
+                resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, dependsOnNamedValues));
             }
 
             // logger
@@ -94,7 +110,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'backendsTemplate')]");
                 string backendsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.backends);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("backendsTemplate", backendsUri, dependsOnNamedValues, exc));
+                var templateResource = this.CreateLinkedMasterTemplateResource("backendsTemplate", backendsUri, dependsOnNamedValues);
+                if(exc.paramBackend)
+                {
+                    templateResource.properties.parameters.Add(ParameterNames.BackendSettings,
+                        new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.BackendSettings}')]" });
+                }
+                
+                resources.Add(templateResource);
             }
 
             // authorizationServer
@@ -102,14 +125,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'authorizationServersTemplate')]");
                 string authorizationServersUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.authorizationServers);
-                resources.Add(this.CreateLinkedMasterTemplateResourceWithPolicyToken("authorizationServersTemplate", authorizationServersUri, dependsOnNamedValues, exc));
+                resources.Add(this.CreateLinkedMasterTemplateResource("authorizationServersTemplate", authorizationServersUri, dependsOnNamedValues));
             }
 
             // api
             if (apiTemplate != null && apiTemplate.resources.Count() != 0)
             {
+                apiTagDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
+                productAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
                 string apisUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, apiFileName);
                 resources.Add(this.CreateLinkedMasterTemplateResourceForApiTemplate("apisTemplate", apisUri, apiDependsOn.ToArray(), exc));
+            }
+
+            // productAPIs
+            if (productAPIsTemplate != null && productAPIsTemplate.resources.Count() != 0)
+            {
+                string productAPIsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.productAPIs);
+                
+                resources.Add(this.CreateLinkedMasterTemplateResource("productAPIsTemplate", productAPIsUri, productAPIDependsOn.ToArray()));
+            }
+
+            // apiTags
+            if (apiTagsTemplate != null && apiTagsTemplate.resources.Count() != 0)
+            {
+                string apiTagsUri = GenerateLinkedTemplateUri(exc.linkedTemplatesUrlQueryString, exc.linkedTemplatesSasToken, fileNames.apiTags);
+                resources.Add(this.CreateLinkedMasterTemplateResource("apiTagsTemplate", apiTagsUri, apiTagDependsOn.ToArray()));
             }
             Console.WriteLine("Master template generated");
             masterTemplate.resources = resources.ToArray();
@@ -119,6 +159,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public MasterTemplateResource CreateLinkedMasterTemplateResourceForApiTemplate(string name, string uriLink, string[] dependsOn, Extractor exc)
         {
             MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
+            if (exc.policyXMLBaseUrl != null)
+            {
+                masterResourceTemplate.properties.parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
+            }
             if (exc.policyXMLSasToken != null)
             {
                 masterResourceTemplate.properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
@@ -137,38 +181,36 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public MasterTemplateResource CreateLinkedMasterTemplateResourceForPropertyTemplate(string name, string uriLink, string[] dependsOn, Extractor exc)
         {
             MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
-            if (exc.policyXMLSasToken != null)
-            {
-                masterResourceTemplate.properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
-            }
             if (exc.paramNamedValue)
             {
                 masterResourceTemplate.properties.parameters.Add(ParameterNames.NamedValues, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.NamedValues}')]" });
+            }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                masterResourceTemplate.properties.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}')]" });
             }
             return masterResourceTemplate;
         }
 
         public MasterTemplateResource CreateLinkedMasterTemplateResourceWithPolicyToken(string name, string uriLink, string[] dependsOn, Extractor exc)
         {
-            if (exc.policyXMLSasToken == null)
-            {
-                return this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
-            }
-            else
-            {
-                MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
-                masterResourceTemplate.properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
-                return masterResourceTemplate;
-            }
-        }
-
-        public MasterTemplateResource CreateLinkedMasterTemplateResourceForLoggerTemplate(string name, string uriLink, string[] dependsOn, Extractor exc)
-        {
             MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
+
+            if (exc.policyXMLBaseUrl != null)
+            {
+                masterResourceTemplate.properties.parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
+            }
             if (exc.policyXMLSasToken != null)
             {
                 masterResourceTemplate.properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
             }
+            return masterResourceTemplate;
+        }
+
+
+        public MasterTemplateResource CreateLinkedMasterTemplateResourceForLoggerTemplate(string name, string uriLink, string[] dependsOn, Extractor exc)
+        {
+            MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
             if (exc.paramLogResourceId)
             {
                 masterResourceTemplate.properties.parameters.Add(ParameterNames.LoggerResourceId, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.LoggerResourceId}')]" });
@@ -194,8 +236,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     },
                     parameters = new Dictionary<string, TemplateParameterProperties>
                     {
-                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ value = $"[parameters('{ParameterNames.ApimServiceName}')]" } },
-                        { ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties(){ value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" } }
+                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
                     }
                 },
                 dependsOn = dependsOn
@@ -328,6 +369,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 };
                 parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdProperties);
             }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                TemplateParameterProperties namedValueKeyVaultSecretsProperties = new TemplateParameterProperties()
+                {
+                    metadata = new TemplateParameterMetadata()
+                    {
+                        description = "Key Vault Secrets for Named Values"
+                    },
+                    type = "object"
+                };
+                parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, namedValueKeyVaultSecretsProperties);
+            }
+            if (exc.paramBackend)
+            {
+                TemplateParameterProperties backendSettingsProperties = new TemplateParameterProperties()
+                {
+                    metadata = new TemplateParameterMetadata()
+                    {
+                        description = "The settings for the Backends"
+                    },
+                    type = "object"
+                };
+                parameters.Add(ParameterNames.BackendSettings, backendSettingsProperties);
+            }
             return parameters;
         }
 
@@ -372,7 +437,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return revDependsOn.ToArray();
         }
 
-        public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, Extractor exc, Dictionary<string, Dictionary<string, string>> apiLoggerId, Dictionary<string, string> loggerResourceIds)
+        public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, Extractor exc, 
+            Dictionary<string, object> apiLoggerId, 
+            Dictionary<string, string> loggerResourceIds,
+            Dictionary<string, BackendApiParameters> backendParams,
+             List<TemplateResource> propertyResources)
         {
             // used to create the parameter values for use in parameters file
             // create empty template
@@ -449,23 +518,63 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 Dictionary<string, string> namedValues = new Dictionary<string, string>();
                 PropertyExtractor pExc = new PropertyExtractor();
-                string properties = await pExc.GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
-                JObject oProperties = JObject.Parse(properties);
+                string[] properties = await pExc.GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
 
-                foreach (var extractedProperty in oProperties["value"])
+                foreach (var extractedProperty in properties)
                 {
-                    string propertyName = ((JValue)extractedProperty["name"]).Value.ToString();
-                    string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
-                    PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                    string propertyValue = propertyTemplateResource.properties.value;
-                    string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
-                    namedValues.Add(validPName, propertyValue);
+                    JToken oProperty = JObject.Parse(extractedProperty);
+                    string propertyName = ((JValue)oProperty["name"]).Value.ToString();
+
+                    // check if the property has been extracted as it is being used in a policy or backend
+                    if (propertyResources.Count(item => item.name.Contains(propertyName)) > 0)
+                    {
+                        string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
+                        PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+
+                        //Only add the property if it is not controlled by keyvault
+                        if (propertyTemplateResource?.properties.keyVault == null)
+                        {
+                            string propertyValue = propertyTemplateResource.properties.value;
+                            string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
+                            namedValues.Add(validPName, propertyValue);
+                        }
+                    }
                 }
                 TemplateObjectParameterProperties namedValueProperties = new TemplateObjectParameterProperties()
                 {
                     value = namedValues
                 };
                 parameters.Add(ParameterNames.NamedValues, namedValueProperties);
+            }
+            if (exc.paramNamedValuesKeyVaultSecrets)
+            {
+                Dictionary<string, string> keyVaultNamedValues = new Dictionary<string, string>();
+                PropertyExtractor pExc = new PropertyExtractor();
+                string[] properties = await pExc.GetPropertiesAsync(exc.sourceApimName, exc.resourceGroup);
+
+                foreach (var extractedProperty in properties)
+                {
+                    JToken oProperty = JObject.Parse(extractedProperty);
+                    string propertyName = ((JValue)oProperty["name"]).Value.ToString();
+
+                    // check if the property has been extracted as it is being used in a policy or backend
+                    if (propertyResources.Count(item => item.name.Contains(propertyName)) > 0)
+                    {
+                        string fullPropertyResource = await pExc.GetPropertyDetailsAsync(exc.sourceApimName, exc.resourceGroup, propertyName);
+                        PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+                        if (propertyTemplateResource?.properties.keyVault != null)
+                        {
+                            string propertyValue = propertyTemplateResource.properties.keyVault.secretIdentifier;
+                            string validPName = ExtractorUtils.GenValidParamName(propertyName, ParameterPrefix.Property);
+                            keyVaultNamedValues.Add(validPName, propertyValue);
+                        }
+                    }
+                }
+                TemplateObjectParameterProperties keyVaultNamedValueProperties = new TemplateObjectParameterProperties()
+                {
+                    value = keyVaultNamedValues
+                };
+                parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueProperties);
             }
             if (exc.paramApiLoggerId)
             {
@@ -482,6 +591,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     value = loggerResourceIds
                 };
                 parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdProperties);
+            }
+
+            if(exc.paramBackend)
+            {
+                TemplateObjectParameterProperties backendProperties = new TemplateObjectParameterProperties()
+                {
+                    value = backendParams
+                };
+                parameters.Add(ParameterNames.BackendSettings, backendProperties);
             }
             masterTemplate.parameters = parameters;
             return masterTemplate;

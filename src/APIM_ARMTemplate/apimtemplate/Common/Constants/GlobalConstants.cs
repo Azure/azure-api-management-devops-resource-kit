@@ -1,8 +1,11 @@
 
+using System;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
 {
     internal static class GlobalConstants
     {
+        public static string CommandStartDateTime = "";
         public const string AppShortName = "apimtemplate";
         public const string AppLongName = "API Management DevOps Toolkit";
         public const string AppDescription = "API Management DevOps Toolkit is a tool to create API Management definitions from files and to extract existing API Management APIs to files.";
@@ -11,8 +14,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string ExtractName = "extract";
         public const string ExtractDescription = "Extract an existing API Management instance";
 
-        public const string APIVersion = "2019-01-01";
-        public const string LinkedAPIVersion = "2018-01-01";
+        public const string APIVersion = "2021-01-01-preview";
+        public const string LinkedAPIVersion = "2018-05-01";
         public const int NumOfRecords = 100;
 
         public const string azAccessToken = "account get-access-token --query \"accessToken\" --output json";
@@ -31,6 +34,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string LinkedTemplatesSasToken = "LinkedTemplatesSasToken";
         public const string ApimServiceName = "ApimServiceName";
         public const string LinkedTemplatesBaseUrl = "LinkedTemplatesBaseUrl";
+        public const string NamedValueKeyVaultSecrets = "NamedValueKeyVaultSecrets";
+        public const string BackendSettings = "BackendSettings";
     }
 
     public static class ParameterPrefix
@@ -39,5 +44,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string Diagnostic = "Diagnostic";
         public const string Property = "Property";
         public const string LogResourceId = "LogResourceId";
+        public const string Backend = "Backend";
     }
 }

@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         [Description("API name")]
         public string apiName { get; set; }
         [Description("Comma-separated list of API names")]
-        public string mutipleAPIs { get; set; }
+        public string multipleAPIs { get; set; }
         [Description("Creates a master template with links")]
         public string linkedTemplatesBaseUrl { get; set; }
         public string linkedTemplatesSasToken { get; set; }
@@ -46,6 +46,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string paramLogResourceId { get; set; }
         [Description("Specify the the base url for calling api management")]
         public string serviceBaseUrl { get; set; }
+        [Description("Should not include named values template")]
+        public string notIncludeNamedValue { get; set; }
+
+        [Description("Parameterize named values where value is retrieved from a Key Vault secret")]
+        public string paramNamedValuesKeyVaultSecrets { get; set; }
+
+        [Description("Group the operations into batches of x?")]
+        public int operationBatchSize {get;set;}
+
+        [Description("Parameterize environment specific values from backend")]
+        public string paramBackend { get; set; }
+
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -57,7 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             bool hasVersionSetName = apiVersionSetName != null;
             bool hasSingleApi = apiName != null;
             bool includeRevisions = includeAllRevisions != null && includeAllRevisions.Equals("true");
-            bool hasMultipleAPIs = mutipleAPIs != null;
+            bool hasMultipleAPIs = multipleAPIs != null;
 
             if (shouldSplitAPIs && hasSingleApi)
             {
@@ -71,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             if ((hasVersionSetName || hasSingleApi) && hasMultipleAPIs)
             {
-                throw new NotSupportedException("Can't use mutipleAPIs with apiName or apiVersionSetName at the same time");
+                throw new NotSupportedException("Can't use multipleAPIs with apiName or apiVersionSetName at the same time");
             }
 
             if (hasSingleApi && hasVersionSetName)
@@ -104,6 +116,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public bool paramNamedValue { get; private set; }
         public bool paramApiLoggerId { get; private set; }
         public bool paramLogResourceId { get; private set; }
+        public bool notIncludeNamedValue { get; private set; }
+        public bool paramNamedValuesKeyVaultSecrets { get; private set; }
+
+        public int operationBatchSize { get; private set;}
+
+        public bool paramBackend { get; set; }
 
         public Extractor(ExtractorConfig exc, string dirName)
         {
@@ -123,6 +141,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.paramNamedValue = exc.paramNamedValue != null && exc.paramNamedValue.Equals("true");
             this.paramApiLoggerId = exc.paramApiLoggerId != null && exc.paramApiLoggerId.Equals("true");
             this.paramLogResourceId = exc.paramLogResourceId != null && exc.paramLogResourceId.Equals("true");
+            this.notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
+            this.operationBatchSize  = exc.operationBatchSize;
+            this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets != null && exc.paramNamedValuesKeyVaultSecrets.Equals("true");
+            this.paramBackend = exc.paramBackend != null && exc.paramBackend.Equals("true");
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)

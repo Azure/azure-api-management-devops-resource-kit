@@ -50,7 +50,7 @@ namespace apimtemplate.test.Extractor
                 apiName = apiName,
                 apiVersionSetName = apiVersionSetName,
                 includeAllRevisions = includeAllRevisions,
-                mutipleAPIs = multipleApis
+                multipleAPIs = multipleApis
             };
 
             Assert.Throws<NotSupportedException>(() => extractorConfig.Validate());
