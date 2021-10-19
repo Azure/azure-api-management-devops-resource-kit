@@ -8,8 +8,9 @@ trigger:
 
 stages:
 
-  - stage: plan
-    displayName: plan
+  - stage: Deploy_Dev
+
+    displayName: "Deploy APIM to Dev Environment" 
     variables:
       - group: ExternalVars-Dev
 
@@ -148,5 +149,74 @@ stages:
           location: $(location)
           templateLocation: 'Linked artifact'
           csmFile: './example/api-httpbin/v2-switch-rev/api-httpbin.v2.switch.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+
+  - stage: Deploy_Prod
+
+    displayName: "Deploy APIM to Production Environment" 
+    variables:
+      - group: ExternalVars-Prod
+
+    jobs:
+      
+    - job : "Deploy_Prod"
+      displayName: "Deploy APIM to Prod Environment"
+      pool:
+        vmImage: ubuntu-latest
+      steps:
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy APIM Service'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './example/service.template.json'
+          overrideParameters: '-publisherEmail $(publisherEmail) -ApimServiceName $(ApimServiceName) -publisherName $(publisherName)'
+          deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy APIM Groups'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './example/groups.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy APIM Starter product'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './example/products/product-starter.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy APIM Unlimited product'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './example/products/product-unlimited.template.json'
           overrideParameters: '-ApimServiceName $(ApimServiceName) '
           deploymentMode: 'Incremental'
