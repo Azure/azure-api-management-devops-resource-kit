@@ -419,9 +419,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 if (_policyCache.TryGetValue(key, out string content))
                     return content;
 
-                var filename = policyContent.Split(',')[1].Replace("'", string.Empty).Trim();
+                // if the file name is paramterized, pull out the filename between the single quotes in the second segment
+                var filename = policyContent.Split(',')[1]?.Split("'")[1]?.Trim();
                 var policyFolder = $@"{exc.fileFolder}/policies";
-                var filepath = $@"{Directory.GetCurrentDirectory()}/{policyFolder}/{filename}";
+                // Account for either rooted or non-rooted fileFolder value in extractor params
+                var filepath = string.Empty;
+                if ( Path.IsPathRooted($@"{policyFolder}/{filename}"))
+                    {
+                    filepath = $@"{policyFolder}/{filename}";
+                    }
+                else
+                    {
+                    filepath = $@"{Directory.GetCurrentDirectory()}/{policyFolder}/{filename}";
+                    }
 
                 if (File.Exists(filepath))
                 {

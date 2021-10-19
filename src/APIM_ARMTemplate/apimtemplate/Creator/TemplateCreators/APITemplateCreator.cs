@@ -177,7 +177,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 string value;
 
                 // determine if the open api spec is remote or local, yaml or json
-                bool isJSON = false;
                 bool isUrl = IsUri(api, out var _);
 
                 string fileContents = null;
@@ -192,7 +191,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 bool isVersionThree = false;
                 if (api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
                 {
-                    isJSON = this.fileReader.isJSON(fileContents);
+                    bool isJSON = this.fileReader.isJSON(fileContents);
 
                     if (isJSON == true)
                     {
@@ -204,7 +203,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                 else
                 {
-                    isJSON = IsOpenApiSpecJson(api.openApiSpecFormat);
                     format = GetOpenApiSpecFormat(isUrl, api.openApiSpecFormat);
                 }
 
@@ -213,8 +211,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
                 if (!string.IsNullOrEmpty(api.displayName))
                 {
-                    format = GetOpenApiSpecFormat(false, isJSON, isVersionThree);
-
                     // download definition
 
                     if (isUrl)
