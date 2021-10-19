@@ -7,12 +7,6 @@
             "metadata": {
                 "description": "The name of the API Management"
             }
-        },
-        "repoBaseUrl": {
-            "type": "string",
-            "metadata": {
-                "description": "Base URL of the repository"
-            }
         }
     },
     "variables": {},
@@ -37,8 +31,8 @@
             "name": "[concat(parameters('ApimServiceName'), '/unlimited/policy')]",
             "apiVersion": "2018-01-01",
             "properties": {
-                "policyContent": "[concat(parameters('repoBaseUrl'), '/products/product-unlimited.policy.xml')]",
-                "contentFormat": "rawxml-link"
+                "policyContent": "<policies><inbound><base /></inbound><outbound><base /></outbound><backend><base /></backend><on-error><base /></on-error></policies>",
+                "contentFormat": "rawxml"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'unlimited')]"

@@ -23,14 +23,14 @@ Login to your Azure subscription:
 
 Create a new resource group `apim-rg` that will be used to deploy an APIM instance:
 
-`az group create -n apim-rg -l westeurope`
+`az group create -n apim-rg -l eastus`
 
 Deploy the _service template_ to host the APIM _instance_ (note this command can take several minutes to complete): 
 
-`az group deployment create --resource-group apim-rg --template-file ./example/service.template.json --parameters ./example/service.parameters.json`
+`az deployment group create --resource-group apim-rg --template-file ./example/service.template.json --parameters ./example/service.parameters.json`
 
 Deploy the `api-httpbin` _API template_ to create an API in the APIM instance:
 
-`az group deployment create --resource-group apim-rg --template-file ./example/api-httpbin/api-httpbin.template.json --parameters ./example/api-httpbin/api-httpbin.parameters.json`
+`az deployment group create --resource-group apim-rg --template-file ./example/api-httpbin/api-httpbin.template.json --parameters ./example/api-httpbin/api-httpbin.parameters.json`
 
 It is of interest the command to create the `api-httpbin` API uses an Open API (swagger) specification `api-httpbin.openapi.json` file when creating the API.

@@ -11,6 +11,9 @@
         },
         "SamplingRate": {
             "value": 50
+        },
+        "ApimServiceName": {
+            "value": "contosoapim-dev"
         }
     }
 }

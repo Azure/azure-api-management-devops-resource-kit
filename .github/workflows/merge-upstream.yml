@@ -1,0 +1,33 @@
+name: Manual Merge Remote Action
+on: 
+  workflow_dispatch:
+    inputs:
+      upstream:
+        description: 'Upstream repository owner/name. For example, exions/merge-upstream'
+        required: true
+        default: 'Azure/azure-api-management-devops-resource-kit'           # set the upstream Upstream repository owner/name
+      upstream-branch:
+        description: 'Upstream branch to merge from. Eg. master'
+        required: true
+        default: 'master'           # set the upstream branch to merge from
+      branch:
+        description: 'Branch to merge to'
+        required: true
+        default: 'master'         # set the branch to merge to
+
+jobs:
+  merge-upstream:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0 
+      - name: Merge Upstream
+        uses: exions/merge-upstream@v1
+        with:
+          upstream: ${{ github.event.inputs.upstream }}
+          upstream-branch: ${{ github.event.inputs.upstream-branch }}
+          branch: ${{ github.event.inputs.branch }}
+          token: ${{ secrets.TOKEN }}
