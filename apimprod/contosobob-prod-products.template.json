@@ -1,0 +1,92 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "properties": {
+        "description": "Include 3 APIs. Limited to 1 subscription per developer. Throttled at 3 calls per 10 second.",
+        "subscriptionRequired": true,
+        "approvalRequired": true,
+        "subscriptionsLimit": 1,
+        "state": "published",
+        "displayName": "Starter"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/starter')]",
+      "type": "Microsoft.ApiManagement/service/products",
+      "apiVersion": "2021-01-01-preview"
+    },
+    {
+      "properties": {
+        "description": "Administrators is a built-in group. Its membership is managed by the system. Microsoft Azure subscription administrators fall into this group.",
+        "displayName": "Administrators",
+        "type": "system",
+        "builtIn": true
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/starter/administrators')]",
+      "type": "Microsoft.ApiManagement/service/products/groups",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+      ]
+    },
+    {
+      "properties": {
+        "description": "Group containing all developers from Contoso who will be consuming our APIs",
+        "displayName": "ContosoGroup",
+        "type": "custom",
+        "builtIn": false
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/starter/contosogroup')]",
+      "type": "Microsoft.ApiManagement/service/products/groups",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+      ]
+    },
+    {
+      "properties": {
+        "description": "Developers is a built-in group. Its membership is managed by the system. Signed-in users fall into this group.",
+        "displayName": "Developers",
+        "type": "system",
+        "builtIn": true
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/starter/developers')]",
+      "type": "Microsoft.ApiManagement/service/products/groups",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+      ]
+    },
+    {
+      "properties": {
+        "description": "Guests is a built-in group. Its membership is managed by the system. Unauthenticated users visiting the developer portal fall into this group.",
+        "displayName": "Guests",
+        "type": "system",
+        "builtIn": true
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/starter/guests')]",
+      "type": "Microsoft.ApiManagement/service/products/groups",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+      ]
+    },
+    {
+      "properties": {
+        "value": "<policies>\r\n\t<inbound>\r\n\t\t<rate-limit calls=\"3\" renewal-period=\"10\" />\r\n\t\t<base />\r\n\t</inbound>\r\n\t<outbound>\r\n\t\t<base />\r\n\t</outbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/starter/policy')]",
+      "type": "Microsoft.ApiManagement/service/products/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), 'starter')]"
+      ]
+    }
+  ]
+}

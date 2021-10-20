@@ -220,3 +220,74 @@ stages:
           csmFile: './example/products/product-unlimited.template.json'
           overrideParameters: '-ApimServiceName $(ApimServiceName) '
           deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy httpbin Version Set to prod'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './apimprod/contosobob-prod-apiVersionSets.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy Global Policy to prod'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './apimprod/contosobob-prod-globalServicePolicy.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy Products to prod'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './apimprod/contosobob-prod-products.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy Products API to prod'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './apimprod/contosobob-prod-productAPIs.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Deploy API HttpBin to prod'
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+          subscriptionId: $(subscriptionId)
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(resourceGroupName)
+          location: $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: './apimprod/contosobob-prod-httpBinAPI-api.template.json'
+          overrideParameters: '-ApimServiceName $(ApimServiceName) '
+          deploymentMode: 'Incremental'
+      
