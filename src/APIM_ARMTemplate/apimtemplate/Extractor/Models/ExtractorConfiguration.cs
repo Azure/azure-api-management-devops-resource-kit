@@ -58,6 +58,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         [Description("Parameterize environment specific values from backend")]
         public string paramBackend { get; set; }
 
+        [Description("Extract self hosted gateways")]
+        public string extractGateways { get; set; }
+
         public void Validate()
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
@@ -123,6 +126,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public bool paramBackend { get; set; }
 
+        public bool extractGateways { get; set; }
+
         public Extractor(ExtractorConfig exc, string dirName)
         {
             this.sourceApimName = exc.sourceApimName;
@@ -145,6 +150,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.operationBatchSize  = exc.operationBatchSize;
             this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets != null && exc.paramNamedValuesKeyVaultSecrets.Equals("true");
             this.paramBackend = exc.paramBackend != null && exc.paramBackend.Equals("true");
+            this.extractGateways = exc.extractGateways != null && exc.extractGateways.Equals("true");
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)

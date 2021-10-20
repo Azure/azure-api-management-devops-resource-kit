@@ -26,5 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public const string Property = "Microsoft.ApiManagement/service/namedValues";
         public const string Subscription = "Microsoft.ApiManagement/service/subscriptions";
         public const string Tag = "Microsoft.ApiManagement/service/tags";
+        public const string Gateway = "Microsoft.ApiManagement/service/gateways";
+        public const string GatewayAPI = "Microsoft.ApiManagement/service/gateways/apis";
     }
 }

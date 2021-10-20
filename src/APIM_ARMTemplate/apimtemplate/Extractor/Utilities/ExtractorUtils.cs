@@ -59,6 +59,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             APITagExtractor apiTagExtractor = new APITagExtractor(fileWriter);
             ProductExtractor productExtractor = new ProductExtractor(fileWriter);
             MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
+            GatewayExtractor gatewayExtractor = new GatewayExtractor();
+            GatewayAPIExtractor gatewayAPIExtractor = new GatewayAPIExtractor();
 
             // read parameters
             string sourceApim = exc.sourceApimName;
@@ -99,6 +101,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(singleApiName, multipleApiNames, exc);
             }
+
             List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
             Template apiVersionSetTemplate = await apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
             Template authorizationServerTemplate = await authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources);
@@ -111,6 +114,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc, backendExtractor, loggerResources);
             Template tagTemplate = await tagExtractor.GenerateTagsTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, productTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
             List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
+            Template gatewayTemplate = await gatewayExtractor.GenerateGatewayARMTemplateAsync(sourceApim, resourceGroup, singleApiName, exc);
+            List<TemplateResource> gatewayResources = gatewayTemplate.resources.ToList();
+            Template gatewayAPITemplate = await gatewayAPIExtractor.GenerateGatewayAPIARMTemplateAsync(singleApiName, multipleApiNames, exc);
+            List<TemplateResource> gatewayAPIResources = gatewayAPITemplate.resources.ToList();
 
             Tuple<Template, Dictionary<string, BackendApiParameters>> backendResult = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, exc);
 
@@ -168,6 +175,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (globalServicePolicyTemplate.resources.Count() != 0)
             {
                 fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(@dirName, fileNames.globalServicePolicy));
+            }
+            if (gatewayResources.Count != 0)
+            {
+                fileWriter.WriteJSONToFile(gatewayTemplate, String.Concat(@dirName, fileNames.gateways));
+            }
+            if (gatewayAPIResources.Count != 0)
+            {
+                fileWriter.WriteJSONToFile(gatewayAPITemplate, String.Concat(@dirName, fileNames.gatewayAPIs));
             }
             if (linkedBaseUrl != null)
             {
