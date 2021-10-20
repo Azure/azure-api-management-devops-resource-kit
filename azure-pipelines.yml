@@ -231,7 +231,7 @@ stages:
           resourceGroupName: $(resourceGroupName)
           location: $(location)
           templateLocation: 'Linked artifact'
-          csmFile: './apimprod/contosobob-prod-apiVersionSets.template.json'
+          csmFile: './APIs/httpBinAPI/contosobob-prod-apiVersionSets.template.json'
           overrideParameters: '-ApimServiceName $(ApimServiceName) '
           deploymentMode: 'Incremental'
 
@@ -245,7 +245,7 @@ stages:
           resourceGroupName: $(resourceGroupName)
           location: $(location)
           templateLocation: 'Linked artifact'
-          csmFile: './apimprod/contosobob-prod-globalServicePolicy.template.json'
+          csmFile: './APIs/httpBinAPI/contosobob-prod-globalServicePolicy.template.json'
           overrideParameters: '-ApimServiceName $(ApimServiceName) '
           deploymentMode: 'Incremental'
 
@@ -259,7 +259,7 @@ stages:
           resourceGroupName: $(resourceGroupName)
           location: $(location)
           templateLocation: 'Linked artifact'
-          csmFile: './apimprod/contosobob-prod-products.template.json'
+          csmFile: './APIs/httpBinAPI/contosobob-prod-products.template.json'
           overrideParameters: '-ApimServiceName $(ApimServiceName) '
           deploymentMode: 'Incremental'
 
@@ -273,7 +273,7 @@ stages:
           resourceGroupName: $(resourceGroupName)
           location: $(location)
           templateLocation: 'Linked artifact'
-          csmFile: './apimprod/contosobob-prod-httpBinAPI-api.template.json'
+          csmFile: './APIs/httpBinAPI/contosobob-prod-httpBinAPI-api.template.json'
           overrideParameters: '-ApimServiceName $(ApimServiceName) '
           deploymentMode: 'Incremental'
           
@@ -287,6 +287,6 @@ stages:
           resourceGroupName: $(resourceGroupName)
           location: $(location)
           templateLocation: 'Linked artifact'
-          csmFile: './apimprod/contosobob-prod-productAPIs.template.json'
+          csmFile: './APIs/httpBinAPI/contosobob-prod-productAPIs.template.json'
           overrideParameters: '-ApimServiceName $(ApimServiceName) '
           deploymentMode: 'Incremental'
