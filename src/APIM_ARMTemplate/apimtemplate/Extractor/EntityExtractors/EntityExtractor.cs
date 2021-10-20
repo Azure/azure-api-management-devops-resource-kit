@@ -51,8 +51,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return armTemplate;
         }
 
+        public Template GenerateEmptyTemplateParameters()
+        {
+            TemplateCreator templateCreator = new TemplateCreator();
+            Template armTemplate = templateCreator.CreateEmptyParameters();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
+            return armTemplate;
+        }
 
-        
+
 
     }
 }

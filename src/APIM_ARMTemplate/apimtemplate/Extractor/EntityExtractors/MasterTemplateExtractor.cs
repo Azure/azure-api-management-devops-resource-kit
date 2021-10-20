@@ -445,7 +445,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = GenerateEmptyTemplate();
+            Template masterTemplate = GenerateEmptyTemplateParameters();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
