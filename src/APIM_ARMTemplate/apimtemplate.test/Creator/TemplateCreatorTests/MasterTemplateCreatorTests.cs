@@ -8,7 +8,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
     public class MasterTemplateCreatorTests
     {
         [Fact]
-        public void ShouldCreateCorrectNumberOfDeploymentResources()
+        public void ShouldCreate6DeploymentResources()
         {
             // arrange
             CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
@@ -24,8 +24,88 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 8 resources (globalServicePolicy, apiVersionSet, product, property, tag, logger, both api templates)
-            int count = 9;
+            // should create 6 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, no api templates)
+            int count = 6;
+
+            // act
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+
+            // assert
+            Assert.Equal(count, masterTemplate.resources.Length);
+        }
+        [Fact]
+        public void ShouldCreate7DeploymentResourcesForInitial()
+        {
+            // arrange
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            Template apiVersionSetsTemplate = new Template();
+            Template globalServicePolicyTemplate = new Template();
+            Template productsTemplate = new Template();
+            Template propertyTemplate = new Template();
+            Template tagTemplate = new Template();
+            Template loggersTemplate = new Template();
+            List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true, hasInitialRevisionOrVersion = true } };
+            FileNameGenerator fileNameGenerator = new FileNameGenerator();
+            FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
+
+            // should create 7 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, Initial api templates)
+            int count = 7;
+
+            // act
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+
+            // assert
+            Assert.Equal(count, masterTemplate.resources.Length);
+        }
+
+        [Fact]
+        public void ShouldCreate7DeploymentResourcesForSubsequent()
+        {
+            // arrange
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            Template apiVersionSetsTemplate = new Template();
+            Template globalServicePolicyTemplate = new Template();
+            Template productsTemplate = new Template();
+            Template propertyTemplate = new Template();
+            Template tagTemplate = new Template();
+            Template loggersTemplate = new Template();
+            List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true, hasRevision = true } };
+            FileNameGenerator fileNameGenerator = new FileNameGenerator();
+            FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
+
+            // should create 7 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, Initial api templates)
+            int count = 7;
+
+            // act
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+
+            // assert
+            Assert.Equal(count, masterTemplate.resources.Length);
+        }
+        [Fact]
+        public void ShouldCreate8DeploymentResources()
+        {
+            // arrange
+            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            Template apiVersionSetsTemplate = new Template();
+            Template globalServicePolicyTemplate = new Template();
+            Template productsTemplate = new Template();
+            Template propertyTemplate = new Template();
+            Template tagTemplate = new Template();
+            Template loggersTemplate = new Template();
+            List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true, hasInitialRevisionOrVersion = true, hasRevision= true } };
+            FileNameGenerator fileNameGenerator = new FileNameGenerator();
+            FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
+
+            // should create 8 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, both api templates)
+            int count = 8;
 
             // act
             Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);

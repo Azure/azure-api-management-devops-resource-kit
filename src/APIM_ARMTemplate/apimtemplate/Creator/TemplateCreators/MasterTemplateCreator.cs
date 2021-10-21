@@ -107,18 +107,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     string subsequentAPIDeploymentResourceName = $"{originalAPIName}-SubsequentAPITemplate";
                     string initialAPIDeploymentResourceName = $"{originalAPIName}-InitialAPITemplate";
 
-                    string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
-                    string initialAPIUri = GenerateLinkedTemplateUri(creatorConfig, initialAPIFileName);
+                    if(apiInfo.hasInitialRevisionOrVersion)
+                    {
+                        string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
+                        string initialAPIUri = GenerateLinkedTemplateUri(creatorConfig, initialAPIFileName);
                     string[] initialAPIDependsOn = CreateAPIResourceDependencies(creatorConfig, globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName);
                     resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn, originalAPIName, apiInfo.isServiceUrlParameterize));
 
-                    string subsequentAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, false);
-                    string subsequentAPIUri = GenerateLinkedTemplateUri(creatorConfig, subsequentAPIFileName);
-                    string[] subsequentAPIDependsOn = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
-                    resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn, originalAPIName, apiInfo.isServiceUrlParameterize));
+                    }
 
-                    // Set previous API name for dependency chain
-                    previousAPIName = subsequentAPIDeploymentResourceName;
+                    if(apiInfo.hasRevision)
+                    {
+                        string subsequentAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, false);
+                        string subsequentAPIUri = GenerateLinkedTemplateUri(creatorConfig, subsequentAPIFileName);
+                        string[] subsequentAPIDependsOn = Array.Empty<string>();
+                        if (apiInfo.hasInitialRevisionOrVersion) 
+                           subsequentAPIDependsOn = new string[]{ $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
+                        
+                        resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
+                    }
+                    
                 }
                 else
                 {
@@ -450,6 +458,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool dependsOnTags { get; set; }
         public bool isServiceUrlParameterize { get; set; }
         public string dependsOnVersion { get; set; }
+
+        public bool hasRevision { get; set; }
+        public bool hasInitialRevisionOrVersion { get; set; }
+
     }
 
 }
