@@ -51,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name};rev={api.apiRevision}')]", apiTemplateResource.name);
             Assert.Equal($"[parameters('{api.name}-ServiceUrl')]", apiTemplateResource.properties.serviceUrl);
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
@@ -248,7 +248,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, false, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name};rev={api.apiRevision}')]", apiTemplateResource.name);
             Assert.Equal(api.name, apiTemplateResource.properties.displayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
             Assert.Equal(api.type, apiTemplateResource.properties.type);

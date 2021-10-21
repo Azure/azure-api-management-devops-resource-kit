@@ -33,17 +33,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // determine if api needs to be split into multiple templates
             bool isSplit = isSplitAPI(api);
 
-            // update api name if necessary (apiRevision > 1 and isCurrent = true) 
-            int revisionNumber = 0;
-            if (Int32.TryParse(api.apiRevision, out revisionNumber))
-            {
-                if (revisionNumber > 1 && api.isCurrent == false)
-                {
-                    string currentAPIName = api.name;
-                    api.name += $";rev={revisionNumber}";
-                }
-            }
-
             List<Template> apiTemplates = new List<Template>();
             if (isSplit == true)
             {
@@ -93,7 +82,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         {
             List<TemplateResource> resources = new List<TemplateResource>();
             // all child resources will depend on the api
-            string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{api.name}')]" };
+            string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{MakeApiResourceName(api)}')]" };
 
             PolicyTemplateResource apiPolicyResource = api.policy != null ? this.policyTemplateCreator.CreateAPIPolicyTemplateResource(api, dependsOn) : null;
             List<PolicyTemplateResource> operationPolicyResources = api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(api, dependsOn) : null;
@@ -101,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<TagAPITemplateResource> tagAPIResources = api.tags != null ? this.tagAPITemplateCreator.CreateTagAPITemplateResources(api, dependsOn) : null;
             DiagnosticTemplateResource diagnosticTemplateResource = api.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn) : null;
             // add release resource if the name has been appended with ;rev{revisionNumber}
-            ReleaseTemplateResource releaseTemplateResource = api.name.Contains(";rev") == true && api.isCurrent == true ? this.releaseTemplateCreator.CreateAPIReleaseTemplateResource(api, dependsOn) : null;
+            ReleaseTemplateResource releaseTemplateResource = api.apiRevision != null && api.isCurrent == true ? this.releaseTemplateCreator.CreateAPIReleaseTemplateResource(api, dependsOn) : null;
 
             // add resources if not null
             if (apiPolicyResource != null) resources.Add(apiPolicyResource);
@@ -333,7 +322,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public static string MakeResourceName(APIConfig api)
         {
-            return $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]";
+            return $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{MakeApiResourceName(api)}')]";
+        }
+
+        public static string MakeApiResourceName(APIConfig api)
+        {
+            var apiRevision = api.apiRevision != null ? ";rev=" + api.apiRevision : String.Empty;
+            return $"{api.name}{apiRevision}";
         }
 
         public static string SanitizeApiSuffix(string path)
