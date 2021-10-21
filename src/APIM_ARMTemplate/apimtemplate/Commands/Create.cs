@@ -170,7 +170,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                                 dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
                                 dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
                                 dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader),
-                                isServiceUrlParameterize = isServiceUrlParameterizeInYml
+                                isServiceUrlParameterize = isServiceUrlParameterizeInYml,
                                 hasInitialRevisionOrVersion = creatorConfig.apis.Any(c => c.name == api.name && string.IsNullOrWhiteSpace(c.apiRevision)),
                                 hasRevision = creatorConfig.apis.Any(c => c.name == api.name && (c.apiRevision ?? "").Trim() != ""),
                             });
