@@ -125,25 +125,98 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 properties = new APITemplateProperties(),
                 dependsOn = new string[] { }
             };
+            apiTemplateResource.properties.apiVersion = api.apiVersion;
+            apiTemplateResource.properties.apiVersionDescription = api.apiVersionDescription;
+            if (!String.IsNullOrEmpty(api.serviceUrl))
+            {
+                apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
+            }
+            apiTemplateResource.properties.type = api.type;
+            apiTemplateResource.properties.apiType = api.type;
+            apiTemplateResource.properties.description = api.description;
+            apiTemplateResource.properties.subscriptionRequired = api.subscriptionRequired;
+            apiTemplateResource.properties.path = SanitizeApiSuffix(api.suffix);
+            apiTemplateResource.properties.displayName = string.IsNullOrEmpty(api.displayName) ? api.name : api.displayName;
+            
+            // add open api spec properties for subsequent and unified templates
+            string format;
+            string value;
+
+            // determine if the open api spec is remote or local, yaml or json
+                bool isJSON = false;
+            bool isUrl = IsUri(api, out var _);
+
+            string fileContents = null;
+            if (!isUrl || api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
+                fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
+
+            value = isUrl
+                ? api.openApiSpec
+                : fileContents
+                ;
+
+            bool isVersionThree = false;
+            if (api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
+            {
+                    isJSON = this.fileReader.isJSON(fileContents);
+
+                if (isJSON == true)
+                {
+                    var openAPISpecReader = new OpenAPISpecReader();
+                    isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
+                }
+                format = GetOpenApiSpecFormat(isUrl, isJSON, isVersionThree);
+            }
+
+            else
+            {
+                    isJSON = IsOpenApiSpecJson(api.openApiSpecFormat);
+                format = GetOpenApiSpecFormat(isUrl, api.openApiSpecFormat);
+            }
+
+            // if the title needs to be modified
+            // we need to embed the OpenAPI definition
+
+            if (!string.IsNullOrEmpty(api.displayName))
+            {
+                    format = GetOpenApiSpecFormat(false, isJSON, isVersionThree);
+
+                // download definition
+
+                if (isUrl)
+                {
+                    try
+                    {
+                        using (var client = new WebClient())
+                            value = client.DownloadString(value);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine($"Unable to download contract definition for {api.displayName} at the following location: '{api.openApiSpec}'.");
+                        throw;
+                    }
+                }
+
+                // update title
+
+                value = new OpenApi(value, format)
+                    .SetTitle(api.displayName)
+                    .GetDefinition()
+                    ;
+            }
+            apiTemplateResource.properties.format = format;
+            apiTemplateResource.properties.value = value;
+
 
             // add properties depending on whether the template is the initial, subsequent, or unified 
             if (!isSplit || !isInitial)
             {
                 // add metadata properties for initial and unified templates
-                apiTemplateResource.properties.apiVersion = api.apiVersion;
-                apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
-                apiTemplateResource.properties.type = api.type;
-                apiTemplateResource.properties.apiType = api.type;
-                apiTemplateResource.properties.description = api.description;
-                apiTemplateResource.properties.subscriptionRequired = api.subscriptionRequired;
                 apiTemplateResource.properties.apiRevision = api.apiRevision;
                 apiTemplateResource.properties.apiRevisionDescription = api.apiRevisionDescription;
-                apiTemplateResource.properties.apiVersionDescription = api.apiVersionDescription;
                 apiTemplateResource.properties.authenticationSettings = api.authenticationSettings;
                 apiTemplateResource.properties.subscriptionKeyParameterNames = api.subscriptionKeyParameterNames;
-                apiTemplateResource.properties.path = SanitizeApiSuffix(api.suffix);
                 apiTemplateResource.properties.isCurrent = api.isCurrent;
-                apiTemplateResource.properties.displayName = string.IsNullOrEmpty(api.displayName) ? api.name : api.displayName;
                 apiTemplateResource.properties.protocols = this.CreateProtocols(api);
                 // set the version set id
                 if (api.apiVersionSetId != null)
@@ -172,64 +245,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             }
             if (!isSplit || isInitial)
             {
-                // add open api spec properties for subsequent and unified templates
-                string format;
-                string value;
-
-                // determine if the open api spec is remote or local, yaml or json
-                bool isJSON = false;
-                bool isUrl = IsUri(api, out var _);
-
-                string fileContents = null;
-                if (!isUrl || api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
-                    fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
-
-                value = isUrl
-                    ? api.openApiSpec
-                    : fileContents
-                    ;
-
-                bool isVersionThree = false;
-                if (api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
-                {
-                    isJSON = this.fileReader.isJSON(fileContents);
-
-                    if (isJSON == true)
-                    {
-                        var openAPISpecReader = new OpenAPISpecReader();
-                        isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
-                    }
-                    format = GetOpenApiSpecFormat(isUrl, isJSON, isVersionThree);
-                }
-
-                else
-                {
-                    isJSON = IsOpenApiSpecJson(api.openApiSpecFormat);
-                    format = GetOpenApiSpecFormat(isUrl, api.openApiSpecFormat);
-                }
-
-                // if the title needs to be modified
-                // we need to embed the OpenAPI definition
-
-                if (!string.IsNullOrEmpty(api.displayName))
-                {
-                    format = GetOpenApiSpecFormat(false, isJSON, isVersionThree);
-
-                    // download definition
-
-                    if (isUrl)
-                    {
-                        using (var client = new WebClient())
-                            value = client.DownloadString(value);
-                    }
-
-                    // update title
-
-                    value = new OpenApi(value, format)
-                        .SetTitle(api.displayName)
-                        .GetDefinition()
-                        ;
-                }
+               
 
                 // set the version set id
                 if (api.apiVersionSetId != null)
@@ -237,14 +253,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     // point to the supplied version set if the apiVersionSetId is provided
                     apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
                 }
-                apiTemplateResource.properties.format = format;
-                apiTemplateResource.properties.value = value;
-                apiTemplateResource.properties.path = SanitizeApiSuffix(api.suffix);
                 
-                if (!String.IsNullOrEmpty(api.serviceUrl))
-                {
-                    apiTemplateResource.properties.serviceUrl = MakeServiceUrl(api);
-                }
+
             }
             return apiTemplateResource;
         }
@@ -328,7 +338,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public static string SanitizeApiSuffix(string path)
         {
-            if (path.StartsWith("/"))
+            if (path?.StartsWith("/") == true)
                 return path.Substring(1);
             return path;
         }
