@@ -354,8 +354,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
         public bool isSplitAPI(APIConfig apiConfig)
         {
-            // the api needs to be split into multiple templates if the user has supplied a version or version set - deploying swagger related properties at the same time as api version related properties fails, so they must be written and deployed separately
-            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null || (apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.oAuth2 != null && apiConfig.authenticationSettings.oAuth2.authorizationServerId != null);
+            // the api needs to be split into multiple templates if the user has supplied a revision, version or version set
+            // deploying swagger related properties at the same time as api version related properties fails,
+            // so they must be written and deployed separately
+            return apiConfig.apiRevision != null || 
+                    apiConfig.apiVersion != null || 
+                    apiConfig.apiVersionSetId != null || 
+                    (apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.oAuth2 != null && apiConfig.authenticationSettings.oAuth2.authorizationServerId != null)
+                    ;
         }
 
         private string MakeServiceUrl(APIConfig api)
