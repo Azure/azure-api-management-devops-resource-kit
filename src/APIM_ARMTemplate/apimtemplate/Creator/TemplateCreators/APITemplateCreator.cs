@@ -28,11 +28,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             this.releaseTemplateCreator = releaseTemplateCreator;
         }
 
-        public async Task<List<Template>> CreateAPITemplatesAsync(APIConfig api)
+        public async Task<List<Template>> CreateAPITemplatesAsync(APIConfig api, bool isSplit)
         {
-            // determine if api needs to be split into multiple templates
-            bool isSplit = isSplitAPI(api);
-
             List<Template> apiTemplates = new List<Template>();
             if (isSplit == true)
             {
@@ -352,7 +349,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             return protocols;
         }
 
-        public bool isSplitAPI(APIConfig apiConfig)
+        public static bool isSplitAPI(APIConfig apiConfig)
         {
             // the api needs to be split into multiple templates if the user has supplied a revision, version or version set
             // deploying swagger related properties at the same time as api version related properties fails,
@@ -362,6 +359,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     apiConfig.apiVersionSetId != null || 
                     (apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.oAuth2 != null && apiConfig.authenticationSettings.oAuth2.authorizationServerId != null)
                     ;
+        }
+
+        public static IList<string> GetSplittedAPI(CreatorConfig creatorConfig)
+        {
+            var apisSplitted =  
+                from apis in creatorConfig.apis
+                group apis by apis.name into grp
+                where grp.Count() > 1
+                    || (grp.Count() == 1 && isSplitAPI(grp.First()))
+                select grp.Key
+            ;
+            return apisSplitted.ToList<string>();
+            
         }
 
         private string MakeServiceUrl(APIConfig api)
