@@ -23,6 +23,7 @@ stages:
       steps:
 
       - task: AzureCLI@2
+        displayName: 'Deploy APIM ' 
         inputs:
           azureSubscription: 'myserviceconnectionname'
           scriptType: 'pscore'
