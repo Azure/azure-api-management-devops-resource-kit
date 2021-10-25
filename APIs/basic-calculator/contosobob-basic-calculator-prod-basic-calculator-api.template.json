@@ -1,0 +1,356 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "properties": {
+        "description": "Arithmetics is just a call away!",
+        "authenticationSettings": {
+          "oAuth2": {
+            "authorizationServerId": "oauth-authcodeflow"
+          },
+          "subscriptionKeyRequired": false
+        },
+        "subscriptionKeyParameterNames": {
+          "header": "Ocp-Apim-Subscription-Key",
+          "query": "subscription-key"
+        },
+        "apiRevision": "1",
+        "isCurrent": true,
+        "subscriptionRequired": true,
+        "displayName": "Basic Calculator",
+        "serviceUrl": "http://calcapi.cloudapp.net/api",
+        "path": "calc",
+        "protocols": [
+          "https"
+        ]
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator')]",
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": []
+    },
+    {
+      "properties": {
+        "contentType": "application/vnd.oai.openapi.components+json",
+        "document": {
+          "components": {
+            "schemas": {
+              "AddGetRequest": {
+                "enum": [
+                  "51"
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              },
+              "AddGetRequest-1": {
+                "enum": [
+                  "49"
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              },
+              "SubGetRequest": {
+                "enum": [
+                  ""
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              },
+              "SubGetRequest-1": {
+                "enum": [
+                  ""
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              },
+              "MulGetRequest": {
+                "enum": [
+                  ""
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              },
+              "MulGetRequest-1": {
+                "enum": [
+                  ""
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              },
+              "DivGetRequest": {
+                "enum": [
+                  ""
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              },
+              "DivGetRequest-1": {
+                "enum": [
+                  ""
+                ],
+                "type": "string",
+                "x-apim-inline": true
+              }
+            }
+          }
+        }
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/617038a4217d200db0e83e27')]",
+      "type": "Microsoft.ApiManagement/service/apis/schemas",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "properties": {
+        "templateParameters": [
+          {
+            "name": "a",
+            "description": "First operand. Default value is <code>51</code>. Hello world",
+            "type": "string",
+            "required": true,
+            "values": [
+              "51"
+            ]
+          },
+          {
+            "name": "b",
+            "description": "Second operand. Default value is <code>49</code>.",
+            "type": "string",
+            "required": true,
+            "values": [
+              "49"
+            ]
+          }
+        ],
+        "description": "Produces a sum of two numbers.",
+        "request": {
+          "queryParameters": [],
+          "headers": [],
+          "representations": []
+        },
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "null",
+            "headers": [],
+            "representations": []
+          }
+        ],
+        "displayName": "Add two integers",
+        "method": "GET",
+        "urlTemplate": "/add?a={a}&b={b}"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/61703724217d200db0e83e1a')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "properties": {
+        "value": "<!--\n    IMPORTANT:\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\n    - To add a policy, place the cursor at the desired insertion point and select a policy from the sidebar.\n    - To remove a policy, delete the corresponding policy statement from the policy document.\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\n    - Policies are applied in the order of their appearance, from the top down.\n    - Comments within policy elements are not supported and may disappear. Place your comments between policy elements or at a higher level scope.\n-->\r\n<policies>\r\n\t<inbound>\r\n\t\t<base />\r\n\t\t<set-query-parameter name=\"x-product-name\" exists-action=\"override\">\r\n\t\t\t<value>@(context.Product.Name)</value>\r\n\t\t</set-query-parameter>\r\n\t\t<set-header name=\"x-request-context-data\" exists-action=\"override\">\r\n\t\t\t<value>@(context.Deployment.Region)</value>\r\n\t\t</set-header>\r\n\t\t<set-header name=\"username\" exists-action=\"override\">\r\n\t\t\t<value>@{\n                Jwt jwt;\n                context.Request.Headers.GetValueOrDefault(\"Authorization\",\"scheme param\")\n                                    .Split(' ').Last().TryParseJwt(out jwt);\n                return jwt.Claims.GetValueOrDefault(\"name\", \"?\");\n                }</value>\r\n\t\t</set-header>\r\n\t\t<validate-jwt header-name=\"Authorization\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized. Access token is missing or invalid.\">\r\n\t\t\t<openid-config url=\"https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration\" />\r\n\t\t\t<audiences>\r\n\t\t\t\t<audience>649ca0e0-6996-406b-a821-59995c3e552d</audience>\r\n\t\t\t</audiences>\r\n\t\t</validate-jwt>\r\n\t</inbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<outbound>\r\n\t\t<base />\r\n\t\t<xml-to-json kind=\"direct\" apply=\"always\" consider-accept-header=\"false\" />\r\n\t\t<choose>\r\n\t\t\t<when condition=\"@(context.Response.StatusCode >= 299)\">\r\n\t\t\t\t<send-one-way-request mode=\"new\">\r\n\t\t\t\t\t<set-url>https://microsoft.webhook.office.com/webhookb2/f0102398-5ca9-43a8-bf1f-f8f8ad9f6d3e@72f988bf-86f1-41af-91ab-2d7cd011db47/IncomingWebhook/7b7ddcc7e8f64f30ad2d54cad9f4b4f6/53b9646e-4471-4d0f-94a7-18de319eab50</set-url>\r\n\t\t\t\t\t<set-method>POST</set-method>\r\n\t\t\t\t\t<set-body>@{\n                            return new JObject(\n                                new JProperty(\"@type\",\"MessageCard\"),\n                                new JProperty(\"@context\", \"http://schema.org/extensions\"),\n                                new JProperty(\"summary\",\"Summary\"),\n                                new JProperty(\"themeColor\", \"0075FF\"),\n                                new JProperty(\"sections\",\n                                    new JArray (\n                                        new JObject (\n                                            new JProperty(\"Hello From Roberto\",\"Error - details: [link](http://azure1.org)\")\n                                            )\n                                        )\n                                    )\n                                ).ToString();\n                    }</set-body>\r\n\t\t\t\t</send-one-way-request>\r\n\t\t\t</when>\r\n\t\t</choose>\r\n\t</outbound>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/61703724217d200db0e83e1a/policy')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), 'basic-calculator', '61703724217d200db0e83e1a')]"
+      ]
+    },
+    {
+      "properties": {
+        "templateParameters": [
+          {
+            "name": "a",
+            "description": "First operand. Default value is <code>51</code>.",
+            "type": "string",
+            "required": true,
+            "values": [
+              ""
+            ]
+          },
+          {
+            "name": "b",
+            "description": "Second operand. Default value is <code>49</code>.",
+            "type": "string",
+            "required": true,
+            "values": [
+              ""
+            ]
+          }
+        ],
+        "description": "Produces a quotient of two numbers.",
+        "request": {
+          "queryParameters": [],
+          "headers": [],
+          "representations": []
+        },
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "null",
+            "headers": [],
+            "representations": []
+          }
+        ],
+        "displayName": "Divide two integers",
+        "method": "GET",
+        "urlTemplate": "/div?a={a}&b={b}"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/61703724217d200db0e83e1d')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "properties": {
+        "templateParameters": [
+          {
+            "name": "a",
+            "description": "First operand. Default value is <code>51</code>.",
+            "type": "string",
+            "required": true,
+            "values": [
+              ""
+            ]
+          },
+          {
+            "name": "b",
+            "description": "Second operand. Default value is <code>49</code>.",
+            "type": "string",
+            "required": true,
+            "values": [
+              ""
+            ]
+          }
+        ],
+        "description": "Produces a product of two numbers.",
+        "request": {
+          "queryParameters": [],
+          "headers": [],
+          "representations": []
+        },
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "null",
+            "headers": [],
+            "representations": []
+          }
+        ],
+        "displayName": "Multiply two integers",
+        "method": "GET",
+        "urlTemplate": "/mul?a={a}&b={b}"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/61703724217d200db0e83e1c')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "properties": {
+        "templateParameters": [
+          {
+            "name": "a",
+            "description": "First operand. Default value is <code>51</code>.",
+            "type": "string",
+            "required": true,
+            "values": [
+              ""
+            ]
+          },
+          {
+            "name": "b",
+            "description": "Second operand. Default value is <code>49</code>.",
+            "type": "string",
+            "required": true,
+            "values": [
+              ""
+            ]
+          }
+        ],
+        "description": "Produces a difference between two numbers.",
+        "request": {
+          "queryParameters": [],
+          "headers": [],
+          "representations": []
+        },
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "null",
+            "headers": [],
+            "representations": []
+          }
+        ],
+        "displayName": "Subtract two integers",
+        "method": "GET",
+        "urlTemplate": "/sub?a={a}&b={b}"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/61703724217d200db0e83e1b')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "properties": {
+        "value": "<!--\n    IMPORTANT:\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\n    - To add a policy, place the cursor at the desired insertion point and select a policy from the sidebar.\n    - To remove a policy, delete the corresponding policy statement from the policy document.\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\n    - Policies are applied in the order of their appearance, from the top down.\n    - Comments within policy elements are not supported and may disappear. Place your comments between policy elements or at a higher level scope.\n-->\r\n<policies>\r\n\t<inbound>\r\n\t\t<base />\r\n\t\t<set-header name=\"timeheader\" exists-action=\"override\">\r\n\t\t\t<value>{{TimeNow}}</value>\r\n\t\t</set-header>\r\n\t</inbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<outbound>\r\n\t\t<base />\r\n\t\t<set-header name=\"x-aspnet-version\" exists-action=\"delete\" />\r\n\t\t<set-header name=\"x-powered-by\" exists-action=\"delete\" />\r\n\t\t<set-header name=\"timeheader\" exists-action=\"override\">\r\n\t\t\t<value>{{TimeNow}}</value>\r\n\t\t</set-header>\r\n\t</outbound>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/policy')]",
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('ApimServiceName'), '/starter/basic-calculator')]",
+      "type": "Microsoft.ApiManagement/service/products/apis",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('ApimServiceName'), '/unlimited/basic-calculator')]",
+      "type": "Microsoft.ApiManagement/service/products/apis",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "properties": {
+        "alwaysLog": "allErrors",
+        "loggerId": "/subscriptions/dea5dcc6-1a1a-4694-8e6c-f340da9c7ea1/resourceGroups/apim-rg/providers/Microsoft.ApiManagement/service/contosobob-dev/loggers/pfeborgesappi",
+        "httpCorrelationProtocol": "Legacy",
+        "logClientIp": true,
+        "sampling": {
+          "samplingType": "fixed",
+          "percentage": 100.0
+        }
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/applicationinsights')]",
+      "type": "Microsoft.ApiManagement/service/diagnostics",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": []
+    }
+  ]
+}

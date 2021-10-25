@@ -28,141 +28,33 @@ stages:
           azureSubscription: 'myserviceconnectionname'
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
-          inlineScript: |
-            echo 1
-                        
+          inlineScript: |    
+            echo 'Deploy APIM Service'                  
             az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/service.template.json' --mode 'Incremental' --parameters publisherEmail=$(publisherEmail) ApimServiceName=$(ApimServiceName) publisherName=$(publisherName)
 
-      # - task: AzureResourceManagerTemplateDeployment@3
-      #   displayName: 'Deploy APIM Service'
-      #   inputs:
-      #     deploymentScope: 'Resource Group'
-      #     azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-      #     subscriptionId: $(subscriptionId)
-      #     action: 'Create Or Update Resource Group'
-      #     resourceGroupName: $(resourceGroupName)
-      #     location: $(location)
-      #     templateLocation: 'Linked artifact'
-      #     csmFile: './example/service.template.json'
-      #     overrideParameters: '-publisherEmail $(publisherEmail) -ApimServiceName $(ApimServiceName) -publisherName $(publisherName)'
-      #     deploymentMode: 'Incremental'
+            echo 'Deploy APIM Groups'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/groups.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
 
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy APIM Groups'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/groups.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
+            echo 'Deploy APIM Starter product'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/products/product-starter.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
 
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy APIM Starter product'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/products/product-starter.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
+            echo 'Deploy APIM Unlimited product'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/products/product-unlimited.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
 
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy APIM Unlimited product'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/products/product-unlimited.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
+            echo 'Deploy API httpbin version set base'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/api-httpbin/api-httpbin.version-set.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-      # The example shows how to create `Versions` and `Revisions` of a sample `HttpBin` API in ApiManagement service. 
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy API httpbin version set base'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/api-httpbin/api-httpbin.version-set.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
+            echo 'Deploy API httpbin v1'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/api-httpbin/v1/api-httpbin.v1.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-      # Execute this template to create a new `Http Bin` Api having a `GET` and `POST` Operation and associated to the `Started` Product.
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy API httpbin v1'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/api-httpbin/v1/api-httpbin.v1.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
+            echo 'Deploy API httpbin v2'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/api-httpbin/v2/api-httpbin.v2.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-      # Execute this template to create a new Version `v2` of the `Http Bin` API.
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy API httpbin v2'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/api-httpbin/v2/api-httpbin.v2.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
+            echo 'Deploy API httpbin v2-rev2'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/api-httpbin/v2-rev2/api-httpbin.v2-rev2.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-      # Execute this template to create a new revision of the `v2` `Http Bin` Api having which adds a `DELETE` Operation to the API.
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy API httpbin v2-rev2'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/api-httpbin/v2-rev2/api-httpbin.v2-rev2.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
-      
-      # Execute this template to create a `beta` release and switch the `HttpBinAPI-v2;rev2` to be the current Api Revision of the `v2` `HttpBin` API.
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy API httpbin v2-switch-rev'
-        inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/api-httpbin/v2-switch-rev/api-httpbin.v2.switch.template.json'
-          overrideParameters: '-ApimServiceName $(ApimServiceName) '
-          deploymentMode: 'Incremental'
+            echo 'Deploy API httpbin v2-switch-rev'
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/api-httpbin/v2-switch-rev/api-httpbin.v2.switch.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
   - stage: Deploy_Prod
 

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "properties": {
+        "authorizationMethods": [
+          "GET",
+          "POST"
+        ],
+        "clientAuthenticationMethod": [
+          "Body"
+        ],
+        "tokenBodyParameters": [],
+        "tokenEndpoint": "https://login.microsoftonline.com/organizations/oauth2/v2.0/token",
+        "supportState": false,
+        "defaultScope": "api://649ca0e0-6996-406b-a821-59995c3e552d/Files.Read",
+        "bearerTokenSendingMethods": [
+          "authorizationHeader"
+        ],
+        "displayName": "OAuth-AuthCodeFlow-Client",
+        "clientRegistrationEndpoint": "http://localhost",
+        "authorizationEndpoint": "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize",
+        "grantTypes": [
+          "authorizationCode"
+        ],
+        "clientId": "649ca0e0-6996-406b-a821-59995c3e552d"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/oauth-authcodeflow')]",
+      "type": "Microsoft.ApiManagement/service/authorizationServers",
+      "apiVersion": "2021-01-01-preview"
+    }
+  ]
+}
