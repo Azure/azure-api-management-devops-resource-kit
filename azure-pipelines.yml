@@ -21,18 +21,33 @@ stages:
       pool:
         vmImage: ubuntu-latest
       steps:
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: 'Deploy APIM Service'
+      - task: AzureCLI@2
         inputs:
-          deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          subscriptionId: $(subscriptionId)
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: $(resourceGroupName)
-          location: $(location)
-          templateLocation: 'Linked artifact'
-          csmFile: './example/service.template.json'
-          overrideParameters: '-publisherEmail $(publisherEmail) -ApimServiceName $(ApimServiceName) -publisherName $(publisherName)'
+          azureSubscription: 'myserviceconnectionname'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            echo 1
+                        
+            az deployment group create \
+              --name DeployAPIM \
+              --resource-group $(resourceGroupName) \
+              --template-file './example/service.template.json' \
+              --mode 'Incremental'
+              --parameters -publisherEmail $(publisherEmail) -ApimServiceName $(ApimServiceName) -publisherName $(publisherName)'
+    
+      # - task: AzureResourceManagerTemplateDeployment@3
+      #   displayName: 'Deploy APIM Service'
+      #   inputs:
+      #     deploymentScope: 'Resource Group'
+      #     azureResourceManagerConnection: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+      #     subscriptionId: $(subscriptionId)
+      #     action: 'Create Or Update Resource Group'
+      #     resourceGroupName: $(resourceGroupName)
+      #     location: $(location)
+      #     templateLocation: 'Linked artifact'
+      #     csmFile: './example/service.template.json'
+      #     overrideParameters: '-publisherEmail $(publisherEmail) -ApimServiceName $(ApimServiceName) -publisherName $(publisherName)'
           deploymentMode: 'Incremental'
 
       - task: AzureResourceManagerTemplateDeployment@3
