@@ -358,21 +358,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
       ]
-    },
-    {
-      "properties": {
-        "alwaysLog": "allErrors",
-        "httpCorrelationProtocol": "Legacy",
-        "logClientIp": true,
-        "sampling": {
-          "samplingType": "fixed",
-          "percentage": 100.0
-        }
-      },
-      "name": "[concat(parameters('ApimServiceName'), '/applicationinsights')]",
-      "type": "Microsoft.ApiManagement/service/diagnostics",
-      "apiVersion": "2021-01-01-preview",
-      "dependsOn": []
     }
   ]
 }
