@@ -216,6 +216,18 @@
     },
     {
       "properties": {
+        "value": "<!--\n    IMPORTANT:\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\n    - To add a policy, place the cursor at the desired insertion point and select a policy from the sidebar.\n    - To remove a policy, delete the corresponding policy statement from the policy document.\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\n    - Policies are applied in the order of their appearance, from the top down.\n    - Comments within policy elements are not supported and may disappear. Place your comments between policy elements or at a higher level scope.\n-->\r\n<policies>\r\n\t<inbound>\r\n\t\t<base />\r\n\t</inbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<outbound>\r\n\t\t<choose>\r\n\t\t\t<when condition=\"@(context.Request.Url.Query.GetValueOrDefault(\"version\") == \"2013-05\")\">\r\n\t\t\t\t<set-backend-service base-url=\"http://contoso.com/api/8.2/\" />\r\n\t\t\t</when>\r\n\t\t\t<when condition=\"@(context.Request.Url.Query.GetValueOrDefault(\"version\") == \"2014-03\")\">\r\n\t\t\t\t<set-backend-service base-url=\"http://contoso.com/api/9.1/\" />\r\n\t\t\t</when>\r\n\t\t</choose>\r\n\t\t<base />\r\n\t</outbound>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/61703724217d200db0e83e1d/policy')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('ApimServiceName'), 'basic-calculator', '61703724217d200db0e83e1d')]"
+      ]
+    },
+    {
+      "properties": {
         "templateParameters": [
           {
             "name": "a",
@@ -315,6 +327,17 @@
       },
       "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/policy')]",
       "type": "Microsoft.ApiManagement/service/apis/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
+      ]
+    },
+    {
+      "properties": {
+        "displayName": "basicglobaltagcalc"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/basicglobaltagcalc')]",
+      "type": "Microsoft.ApiManagement/service/apis/tags",
       "apiVersion": "2021-01-01-preview",
       "dependsOn": [
         "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'basic-calculator')]"
