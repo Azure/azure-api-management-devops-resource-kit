@@ -1,0 +1,33 @@
+---
+# Source: apim-helm-engine/templates/apim-templates.config.yaml
+version: 0.0.1
+apimServiceName: azure-api-management
+apiVersionSets:
+  - displayName: versionset-httpbin-api
+    id: versionset-httpbin-api
+    versionHeaderName: Accept-Version
+    versioningScheme: Header
+apis:
+  - description: API Management facade for a very handy and free online HTTP tool
+    name: httpBinAPI
+    openApiSpec: https://gist.githubusercontent.com/jdevillard/586cd137767b9fe33f18458862e0e587/raw/07816b2037ad2daa161f57baeb4a5fde72d815c1/httpbin-org.json
+    serviceUrl: https://httpbin.org
+    subscriptionRequired: false
+    suffix: httpbin
+    policy: ./all-operations.xml
+    apiVersion: v1
+    operations: 
+      get: 
+        policy: ./operations/get.xml
+    products: starter
+    apiVersionSetId: versionset-httpbin-api
+namedValues:
+products:
+  - name: starter
+    displayName: Starter  
+tags:
+backends:
+linked: true
+linkedTemplatesBaseUrl: https://linked-url
+linkedTemplatesUrlQueryString: queryString
+outputLocation: .

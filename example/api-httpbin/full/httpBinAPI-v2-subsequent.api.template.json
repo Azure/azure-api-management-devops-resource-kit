@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ApimServiceName": {
+      "type": "string"
+    },
+    "httpBinAPI-v2-ServiceUrl": {
+      "type": "string",
+      "defaultValue": "https://httpbin.org"
+    }
+  },
+  "resources": [
+    {
+      "properties": {
+        "description": "API Management facade for a very handy and free online HTTP tool",
+        "apiVersion": "v2",
+        "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), 'versionset-httpbin-api')]",
+        "subscriptionRequired": false,
+        "displayName": "httpBinAPI-v2",
+        "serviceUrl": "[parameters('httpBinAPI-v2-ServiceUrl')]",
+        "path": "httpbin",
+        "value": "https://gist.githubusercontent.com/jdevillard/9e6e9ec4865ca3f656fc44dfe0f51d40/raw/ffafbdac395e8eb9514ace14157afbe663642944/httpbin-org-v2-rev2.json",
+        "format": "openapi-link"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2')]",
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": []
+    },
+    {
+      "properties": {
+        "value": "<!--\r\n        IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - Only the <forward-request> policy element can appear within the <backend> section element.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy position the cursor at the desired insertion point and click on the round button associated with the policy.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\r\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n-->\r\n<policies>\r\n  <inbound>\r\n    <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2/policy')]",
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]"
+      ]
+    },
+    {
+      "properties": {
+        "value": "<!--\r\n        IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - Only the <forward-request> policy element can appear within the <backend> section element.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy position the cursor at the desired insertion point and click on the round button associated with the policy.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\r\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n-->\r\n<policies>\r\n  <inbound>\r\n    <base />\r\n    <set-backend-service base-url=\"https://api.apis.guru/v2/\" />\r\n    <rewrite-uri template=\"/metrics.json\" />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>",
+        "format": "rawxml"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/httpBinAPI-v2;rev=2/get/policy')]",
+      "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+      "apiVersion": "2021-01-01-preview",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), 'httpBinAPI-v2;rev=2')]"
+      ]
+    }
+  ]
+}
