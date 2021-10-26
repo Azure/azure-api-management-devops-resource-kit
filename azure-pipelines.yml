@@ -25,7 +25,7 @@ stages:
       - task: AzureCLI@2
         displayName: 'Deploy APIM ' 
         inputs:
-          azureSubscription: $(serviceconnectionname)
+          azureSubscription: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |    
@@ -74,7 +74,7 @@ stages:
       - task: AzureCLI@2
         displayName: 'Deploy APIM Service'
         inputs:
-          azureSubscription: $(serviceconnectionname)
+          azureSubscription: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |    
