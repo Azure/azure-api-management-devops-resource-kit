@@ -55,11 +55,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
-                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
+                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, APITemplateCreator.MakeApiResourceName(api), dependsOn);
                 // Add previous product/API resource as a dependency for next product/API resource
                 allDependsOn = new string[dependsOn.Length + 1];
                 dependsOn.CopyTo(allDependsOn, 1);
-                allDependsOn[0] = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]";
+                allDependsOn[0] = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{APITemplateCreator.MakeApiResourceName(api)}')]";
                 productAPITemplates.Add(productAPITemplate);
             }
             return productAPITemplates;

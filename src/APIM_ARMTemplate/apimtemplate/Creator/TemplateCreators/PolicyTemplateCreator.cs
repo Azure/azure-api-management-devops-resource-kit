@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/policy')]",
+                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{APITemplateCreator.MakeApiResourceName(api)}/policy')]",
                 type = ResourceTypeConstants.APIPolicy,
                 apiVersion = GlobalConstants.APIVersion,
                 properties = new PolicyTemplateProperties()
@@ -125,7 +125,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<PolicyTemplateResource> policyTemplateResources = new List<PolicyTemplateResource>();
             foreach (KeyValuePair<string, OperationsConfig> pair in api.operations)
             {
-                policyTemplateResources.Add(this.CreateOperationPolicyTemplateResource(pair, api.name, dependsOn));
+                policyTemplateResources.Add(this.CreateOperationPolicyTemplateResource(pair, APITemplateCreator.MakeApiResourceName(api), dependsOn));
             }
             return policyTemplateResources;
         }
