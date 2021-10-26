@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             return new FileNames()
             {
                 apiVersionSets = $@"/4.{baseFileName}apiVersionSets.template.json",
-                authorizationServers = $@"/{baseFileName}authorizationServers.template.json",
+                authorizationServers = $@"/9.{baseFileName}authorizationServers.template.json",
                 backends = $@"/9.{baseFileName}backends.template.json",
                 globalServicePolicy = $@"/5.{baseFileName}globalServicePolicy.template.json",
                 loggers = $@"/6.{baseFileName}loggers.template.json",

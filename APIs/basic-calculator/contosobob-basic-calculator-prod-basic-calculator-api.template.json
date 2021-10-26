@@ -362,7 +362,6 @@
     {
       "properties": {
         "alwaysLog": "allErrors",
-        "loggerId": "/subscriptions/dea5dcc6-1a1a-4694-8e6c-f340da9c7ea1/resourceGroups/apim-rg/providers/Microsoft.ApiManagement/service/contosobob-dev/loggers/pfeborgesappi",
         "httpCorrelationProtocol": "Legacy",
         "logClientIp": true,
         "sampling": {
