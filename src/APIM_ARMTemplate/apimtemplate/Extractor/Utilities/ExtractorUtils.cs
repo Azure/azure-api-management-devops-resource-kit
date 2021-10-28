@@ -126,7 +126,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // write templates to output file location
             string apiFileName = fileNameGenerator.GenerateExtractorAPIFileName(singleApiName, fileNames.baseFileName);
-
+            if (!Directory.Exists(dirName))
+            {
+                Directory.CreateDirectory(dirName);
+            }
             fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@dirName, apiFileName));
             // won't generate template when there is no resources
             if (apiVersionSetTemplate.resources.Count() != 0)

@@ -1,7 +1,8 @@
 {
   "profiles": {
     "apimtemplate": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "extract --sourceApimName contosobob-dev --destinationApimName contosobob-prod --resourceGroup apim-rg --fileFolder ..\\..\\..\\..\\apimprod --apiName \"httpBinAPI\""
     }
   }
 }
