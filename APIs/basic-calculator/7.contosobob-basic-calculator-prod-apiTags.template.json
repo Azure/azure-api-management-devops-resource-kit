@@ -9,9 +9,9 @@
   "resources": [
     {
       "properties": {
-        "displayName": "basicglobaltagcalc"
+        "displayName": "Internal Payroll - International"
       },
-      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/basicglobaltagcalc')]",
+      "name": "[concat(parameters('ApimServiceName'), '/basic-calculator/internal-payroll-international')]",
       "type": "Microsoft.ApiManagement/service/apis/tags",
       "apiVersion": "2021-01-01-preview",
       "dependsOn": []
