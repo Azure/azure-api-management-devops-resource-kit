@@ -112,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                     {
                         string initialAPIFileName = fileNameGenerator.GenerateCreatorAPIFileName(apiInfo.name, apiInfo.isSplit, true);
                         string initialAPIUri = GenerateLinkedTemplateUri(creatorConfig, initialAPIFileName);
-                        string[] initialAPIDependsOn = CreateAPIResourceDependencies(creatorConfig, globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousApiName,apiInformation);
+                        string[] initialAPIDependsOn = CreateAPIResourceDependencies(creatorConfig, globalServicePolicyTemplate, apiVersionSetTemplate, productsTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInfo, previousAPIName,apiInformation);
                     resources.Add(this.CreateLinkedMasterTemplateResource(initialAPIDeploymentResourceName, initialAPIUri, initialAPIDependsOn, originalAPIName, apiInfo.isServiceUrlParameterize));
 
                     }
@@ -125,7 +125,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                         if (apiInfo.hasInitialRevisionOrVersion) 
                            subsequentAPIDependsOn = new string[]{ $"[resourceId('Microsoft.Resources/deployments', '{initialAPIDeploymentResourceName}')]" };
                         
-                        resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn));
+                        resources.Add(this.CreateLinkedMasterTemplateResource(subsequentAPIDeploymentResourceName, subsequentAPIUri, subsequentAPIDependsOn, originalAPIName, apiInfo.isServiceUrlParameterize));
                     }
                     
                 }
