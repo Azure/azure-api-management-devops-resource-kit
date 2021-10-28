@@ -218,7 +218,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             foreach (LinkedMasterTemplateAPIInformation apiInfo in apiInformation)
             {
                 string originalAPIName = fileNameGenerator.GenerateOriginalAPIName(apiInfo.name);
-                string apiDeploymentResourceName = apiInfo.isSplit ? $"{originalAPIName}-SubsequentAPITemplate" : $"{originalAPIName}-APITemplate";
+                string apiDeploymentResourceName = apiInfo.isSplit ? 
+                                                                    apiInfo.hasRevision 
+                                                                        ? $"{originalAPIName}-SubsequentAPITemplate" 
+                                                                        : $"{originalAPIName}-InitialAPITemplate"
+                                                                   : $"{originalAPIName}-APITemplate";
                 apiProductDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{apiDeploymentResourceName}')]");
             }
             return apiProductDependsOn.ToArray();
