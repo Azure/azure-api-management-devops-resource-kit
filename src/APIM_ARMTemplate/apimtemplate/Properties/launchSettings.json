@@ -1,7 +1,8 @@
 {
   "profiles": {
     "apimtemplate": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "create --configFile \"D:\\Users\\daroszko\\Source\\Repos\\Defra.Trade.Apim\\apim\\api-creator\\yaml-configs\\apis\\trade-application-store.yml\" --mergeApiTemplates \"true\""
     }
   }
 }
