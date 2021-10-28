@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             ProductAPITemplateResource productAPITemplateResource = (ProductAPITemplateResource)productAPITemplate.resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name}')]", productAPITemplateResource.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name};rev={api.apiRevision}')]", productAPITemplateResource.name);
         }
 
         [Fact]

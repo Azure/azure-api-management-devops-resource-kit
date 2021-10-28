@@ -24,9 +24,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 6 template resources in master template 
-            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, no api templates)
-            int count = 6;
+            // should create 7 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product,productApi,  property, tag, logger, no api templates)
+            int count = 7;
 
             // act
             Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig,
@@ -58,9 +58,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 7 template resources in master template 
-            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, Initial api templates)
-            int count = 7;
+            // should create 8 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product,productAPI, property, tag, logger, Initial api templates)
+            int count = 8;
 
             // act
             Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate,productAPIsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
@@ -86,9 +86,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 7 template resources in master template 
-            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, Initial api templates)
-            int count = 7;
+            // should create 8 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product,productApi, property, tag, logger, Subsequent api templates)
+            int count = 8;
 
             // act
             Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate,productAPIsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
@@ -113,9 +113,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             FileNameGenerator fileNameGenerator = new FileNameGenerator();
             FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
-            // should create 8 template resources in master template 
-            // (globalServicePolicy, apiVersionSet, product, property, tag, logger, both api templates)
-            int count = 8;
+            // should create 9 template resources in master template 
+            // (globalServicePolicy, apiVersionSet, product,productAPI property, tag, logger, both api templates)
+            int count = 9;
 
             // act
             Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
