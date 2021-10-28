@@ -92,7 +92,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             // add resources if not null
             if (apiPolicyResource != null) resources.Add(apiPolicyResource);
             if (operationPolicyResources != null) resources.AddRange(operationPolicyResources);
-            if (productAPIResources != null) resources.AddRange(productAPIResources);
             if (tagAPIResources != null) resources.AddRange(tagAPIResources);
             if (diagnosticTemplateResource != null) resources.Add(diagnosticTemplateResource);
             if (releaseTemplateResource != null) resources.Add(releaseTemplateResource);
