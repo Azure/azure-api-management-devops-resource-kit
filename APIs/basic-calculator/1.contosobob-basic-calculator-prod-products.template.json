@@ -78,7 +78,7 @@
     },
     {
       "properties": {
-        "value": "<policies>\r\n\t<inbound>\r\n\t\t<rate-limit calls=\"3\" renewal-period=\"10\" />\r\n\t\t<base />\r\n\t</inbound>\r\n\t<outbound>\r\n\t\t<base />\r\n\t</outbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
+        "value": "<policies>\r\n\t<inbound>\r\n\t\t<rate-limit calls=\"3\" renewal-period=\"10\" />\r\n\t\t<base />\r\n\t</inbound>\r\n\t<outbound>\r\n\t\t<base />\r\n\t\t<set-header name=\"timeheader\" exists-action=\"override\">\r\n\t\t\t<value>{{TimeNow2}}</value>\r\n\t\t</set-header>\r\n\t</outbound>\r\n\t<backend>\r\n\t\t<base />\r\n\t</backend>\r\n\t<on-error>\r\n\t\t<base />\r\n\t</on-error>\r\n</policies>",
         "format": "rawxml"
       },
       "name": "[concat(parameters('ApimServiceName'), '/starter/policy')]",

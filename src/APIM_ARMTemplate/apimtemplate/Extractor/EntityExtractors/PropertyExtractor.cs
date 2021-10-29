@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc, BackendExtractor backendExtractor, List<TemplateResource> loggerTemplateResources)
+        public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources, Extractor exc, BackendExtractor backendExtractor, List<TemplateResource> loggerTemplateResources)
         {
             Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
@@ -84,6 +84,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             // isolate api and operation policy resources in the case of a single api extraction, as they may reference named value
             var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
+
+            // isolate api and operation policy resources in the case of a single api extraction, as they may reference named value on the product level
+            var productPolicyResources = productTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
 
             foreach (var extractedProperty in properties)
             {
@@ -124,11 +127,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 {
                     // if the user is executing a single api, extract all the named values used in the template resources
                     bool foundInPolicy = DoesPolicyReferenceNamedValue(exc, policyResources, propertyName, propertyTemplateResource);
+                    bool foundInProductPolicy = DoesPolicyReferenceNamedValue(exc, productPolicyResources, propertyName, propertyTemplateResource);
                     bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(exc.sourceApimName, exc.resourceGroup, singleApiName, apiTemplateResources, exc, propertyName, propertyTemplateResource.properties.displayName);
                     bool foundInLogger = DoesLoggerReferenceNamedValue(loggerTemplateResources, propertyName, propertyTemplateResource);
 
                     // check if named value is referenced in a backend
-                    if (foundInPolicy || foundInBackEnd || foundInLogger)
+                    if (foundInPolicy || foundInBackEnd || foundInLogger || foundInProductPolicy)
                     {
                         // named value was used in policy, extract it
                         Console.WriteLine("'{0}' Named value found", propertyName);

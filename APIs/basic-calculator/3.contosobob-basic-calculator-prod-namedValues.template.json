@@ -17,6 +17,19 @@
       "name": "[concat(parameters('ApimServiceName'), '/TimeNow')]",
       "type": "Microsoft.ApiManagement/service/namedValues",
       "apiVersion": "2021-01-01-preview"
+    },
+    {
+      "properties": {
+        "tags": [
+          "NamedValueTag"
+        ],
+        "secret": false,
+        "displayName": "TimeNow2",
+        "value": "@(DateTime.Now.ToString())"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/TimeNow2')]",
+      "type": "Microsoft.ApiManagement/service/namedValues",
+      "apiVersion": "2021-01-01-preview"
     }
   ]
 }
