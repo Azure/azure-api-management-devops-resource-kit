@@ -9,6 +9,19 @@
   "resources": [
     {
       "properties": {
+        "tags": [
+          "MyNewTime3"
+        ],
+        "secret": false,
+        "displayName": "NewTime3",
+        "value": "@(DateTime.Now.ToString())"
+      },
+      "name": "[concat(parameters('ApimServiceName'), '/NewTime3')]",
+      "type": "Microsoft.ApiManagement/service/namedValues",
+      "apiVersion": "2021-01-01-preview"
+    },
+    {
+      "properties": {
         "tags": [],
         "secret": false,
         "displayName": "TimeNow",
