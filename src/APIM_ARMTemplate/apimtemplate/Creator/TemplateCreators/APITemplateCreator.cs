@@ -73,6 +73,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 { ParameterNames.ServiceUrl, new TemplateParameterProperties(){ type = "string" } }
             };
 
+      if (api.name.EndsWith("-uat", StringComparison.OrdinalIgnoreCase))
+      {
+        apiTemplate.parameters.Add(ParameterNames.UatServiceUrl, new TemplateParameterProperties() { type = "string" });
+      }
+
       List<TemplateResource> resources = new List<TemplateResource>();
       // create api resource
       APITemplateResource apiTemplateResource = await this.CreateAPITemplateResourceAsync(api, isSplit, isInitial, mergeTemplates);
@@ -149,7 +154,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
     /// </summary>
     /// <param name="xmlPolicy"></param>
     /// <param name="apiTemplate"></param>
-    /// <param name="string"></param>
+    /// <param name="type"></param>
     /// <returns></returns>
     private static Template AddValuesToDictionary(MatchCollection parameters, Template apiTemplate, string type = "string")
     {
@@ -161,7 +166,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
 
           if (!apiTemplate.parameters.TryGetValue(param, out _))
           {
-            apiTemplate.parameters.Add(param, new TemplateParameterProperties() { type = type });
+            //dnamically understand if values should be "secure string"
+            if (type == "string" && param.EndsWith("ClientId", StringComparison.OrdinalIgnoreCase) || param.EndsWith("Secret", StringComparison.OrdinalIgnoreCase))
+            {
+              apiTemplate.parameters.Add(param, new TemplateParameterProperties() { type = "securestring" });
+            }
+            else
+            {
+              apiTemplate.parameters.Add(param, new TemplateParameterProperties() { type = type });
+            }
           }
         }
       }
@@ -185,7 +198,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
       {
         // add metadata properties for initial and unified templates
         apiTemplateResource.properties.apiVersion = api.apiVersion;
-        apiTemplateResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}')]";
+        apiTemplateResource.properties.serviceUrl = api.serviceUrl.StartsWith("parameters") ? $"[{api.serviceUrl}]" : api.serviceUrl;
         apiTemplateResource.properties.type = api.type;
         apiTemplateResource.properties.apiType = api.type;
         apiTemplateResource.properties.description = api.description;
@@ -286,7 +299,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         apiTemplateResource.properties.format = format;
         apiTemplateResource.properties.value = value;
         apiTemplateResource.properties.path = api.suffix;
-        apiTemplateResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}')]";
+        apiTemplateResource.properties.serviceUrl = api.serviceUrl.StartsWith("parameters") ? $"[{api.serviceUrl}]" : api.serviceUrl;
+
         if (mergeTemplates)
         {
           apiTemplateResource.dependsOn = apiTemplateResource.dependsOn.Append($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]").ToArray();
