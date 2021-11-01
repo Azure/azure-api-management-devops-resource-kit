@@ -57,7 +57,7 @@ stages:
             az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/9.contosobob-authorizationServers.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
             echo 'Deploy API basic-calculator'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/APIs/basic-calculator/contosobob-parameters.json' --parameters ApimServiceName=$(ApimServiceName)
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/APIs/basic-calculator/contosobob-basic-calculator-api.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
 
   - stage: Deploy_Prod
@@ -110,4 +110,4 @@ stages:
             az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/9.contosobob-authorizationServers.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
             echo 'Deploy API basic-calculator'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/APIs/basic-calculator/contosobob-parameters.json' --parameters ApimServiceName=$(ApimServiceName)
+            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/APIs/basic-calculator/contosobob-basic-calculator-api.template.json' --parameters ApimServiceName=$(ApimServiceName)
