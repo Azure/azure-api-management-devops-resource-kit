@@ -130,7 +130,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 Directory.CreateDirectory(dirName);
             }
-            fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@dirName, apiFileName));
+            if (!Directory.Exists(String.Concat(dirName, @"\APIs\", singleApiName)))
+            {
+                Directory.CreateDirectory(String.Concat(dirName, @"\APIs\", singleApiName));
+            }
+            fileWriter.WriteJSONToFile(apiTemplate, String.Concat(@dirName, @"\APIs\", singleApiName, apiFileName));
             // won't generate template when there is no resources
             if (apiVersionSetTemplate.resources.Count() != 0)
             {
@@ -184,7 +188,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
 
             // write parameters to outputLocation
-            fileWriter.WriteJSONToFile(templateParameters, String.Concat(dirName, fileNames.parameters));
+            fileWriter.WriteJSONToFile(templateParameters, String.Concat(dirName, @"\APIs\", singleApiName, fileNames.parameters));
         }
 
         // this function will generate master template for each API within this version set and an extra master template to link these apis

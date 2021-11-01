@@ -2,7 +2,7 @@
   "profiles": {
     "apimtemplate": {
       "commandName": "Project",
-      "commandLineArgs": "extract --sourceApimName contosobob-dev --destinationApimName contosobob-prod --resourceGroup apim-rg --fileFolder ..\\..\\..\\..\\apimprod --apiName \"httpBinAPI\""
+      "commandLineArgs": "extract --sourceApimName contosobob-dev --destinationApimName contosobob-prod --resourceGroup apim-rg --fileFolder ..\\..\\..\\..\\Apis3 --apiName basic-calculator"
     }
   }
 }

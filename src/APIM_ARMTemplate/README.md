@@ -548,6 +548,9 @@ Extract **all APIs within parameterServiceUrl**, use the following parameters:
 #### Run the extractor
 ```
 dotnet run extract
+
+e.g: dotnet run extract --sourceApimName contosobob-dev --destinationApimName contosobob-prod --resourceGroup apim-rg --fileFolder ..\..\..\APIs --apiName "basic-calculator" --baseFileName contosobob-basic-calculator-prod
+
 ```
 
 
@@ -557,4 +560,7 @@ Likewise, if you [package the Extractor as a dotnet CLI tool](#creator2), you ca
 
 ```
 apim-templates extract
+
+e.g: apim-templates extract --sourceApimName contosobob-dev --destinationApimName contosobob-prod --resourceGroup apim-rg --fileFolder ..\..\..\APIs --apiName "basic-calculator" --baseFileName contosobob-basic-calculator-prod
+
 ```

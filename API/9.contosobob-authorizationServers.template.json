@@ -29,7 +29,7 @@
         "grantTypes": [
           "authorizationCode"
         ],
-        "clientId": "649ca0e0-6996-406b-a821-59995c3e552d"
+        "clientId": "649ca0e0-6996-406b-a821-999999999"
       },
       "name": "[concat(parameters('ApimServiceName'), '/oauth-authcodeflow')]",
       "type": "Microsoft.ApiManagement/service/authorizationServers",
