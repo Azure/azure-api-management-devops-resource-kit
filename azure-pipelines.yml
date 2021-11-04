@@ -18,13 +18,13 @@ stages:
     - deployment : "Deploy_Dev"
       environment: "DevAPIM"
       displayName: "Deploy APIM to Dev Environment"
-      
       pool:
         vmImage: ubuntu-latest
       strategy:
        runOnce:
          deploy:
            steps:
+            - checkout: self
             - task: AzureCLI@2
               displayName: 'Deploy APIM ' 
               inputs:
@@ -71,46 +71,49 @@ stages:
 
     jobs:
       
-    - job : "Deploy_Prod"
+    - deployment : "Deploy_Prod"
+      environment: "ProdAPIM"
       displayName: "Deploy APIM to Prod Environment"
       pool:
         vmImage: ubuntu-latest
-      steps:
+      strategy:
+       runOnce:
+         deploy:
+           steps:
+            - checkout: self
+            - task: AzureCLI@2
+              displayName: 'Deploy APIM Service'
+              inputs:
+                azureSubscription: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: |    
+                  echo 'Deploy APIM Service'                  
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/service.template.json' --mode 'Incremental' --parameters publisherEmail=$(publisherEmail) ApimServiceName=$(ApimServiceName) publisherName=$(publisherName)
 
-        
-      - task: AzureCLI@2
-        displayName: 'Deploy APIM Service'
-        inputs:
-          azureSubscription: myserviceconnectionname #https://github.com/microsoft/azure-pipelines-tasks/issues/14365
-          scriptType: 'pscore'
-          scriptLocation: 'inlineScript'
-          inlineScript: |    
-            echo 'Deploy APIM Service'                  
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/service.template.json' --mode 'Incremental' --parameters publisherEmail=$(publisherEmail) ApimServiceName=$(ApimServiceName) publisherName=$(publisherName)
+                  echo 'Deploy APIM Groups'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/groups.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy APIM Groups'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './example/groups.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy APIM Starter product'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/1.contosobob-products.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy APIM Starter product'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/1.contosobob-products.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy APIM Tags'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/2.contosobob-tags.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy APIM Tags'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/2.contosobob-tags.template.json' --mode 'Incremental' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy API basic-calculator named values'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/3.contosobob-namedValues.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy API basic-calculator named values'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/3.contosobob-namedValues.template.json' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy Global Policies for All APIs'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/5.contosobob-globalServicePolicy.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy Global Policies for All APIs'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/5.contosobob-globalServicePolicy.template.json' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy API Tags for basic-calculator'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/7.contosobob-apiTags.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy API Tags for basic-calculator'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/7.contosobob-apiTags.template.json' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy API products for basic-calculator'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/8.contosobob-productAPIs.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy API products for basic-calculator'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/8.contosobob-productAPIs.template.json' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy API OAuth config for basic-calculator'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/9.contosobob-authorizationServers.template.json' --parameters ApimServiceName=$(ApimServiceName)
 
-            echo 'Deploy API OAuth config for basic-calculator'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/9.contosobob-authorizationServers.template.json' --parameters ApimServiceName=$(ApimServiceName)
-
-            echo 'Deploy API basic-calculator'
-            az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/APIs/basic-calculator/contosobob-basic-calculator-api.template.json' --parameters ApimServiceName=$(ApimServiceName)
+                  echo 'Deploy API basic-calculator'
+                  az deployment group create --name DeployAPIM --resource-group $(resourceGroupName) --template-file './API/APIs/basic-calculator/contosobob-basic-calculator-api.template.json' --parameters ApimServiceName=$(ApimServiceName)
