@@ -30,6 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
                 versionSetMasterFolder = "/VersionSetMasterFolder",
                 revisionMasterFolder = "/RevisionMasterFolder",
                 groupAPIsMasterFolder = "/MultipleApisMasterFolder",
+                groups = $@"/{baseFileName}groups.template.json",
                 baseFileName = baseFileName
             };
         }
@@ -83,5 +84,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string revisionMasterFolder { get; set; }
         public string groupAPIsMasterFolder{ get; set; }
         public string baseFileName { get; set; }
+        public string groups { get; set; }
     }
 }

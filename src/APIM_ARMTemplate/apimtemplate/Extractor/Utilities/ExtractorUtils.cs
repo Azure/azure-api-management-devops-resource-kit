@@ -58,6 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             ProductAPIExtractor productAPIExtractor = new ProductAPIExtractor(fileWriter);
             APITagExtractor apiTagExtractor = new APITagExtractor(fileWriter);
             ProductExtractor productExtractor = new ProductExtractor(fileWriter);
+            GroupExtractor groupExtractor = new GroupExtractor(fileWriter);
             MasterTemplateExtractor masterTemplateExtractor = new MasterTemplateExtractor();
 
             // read parameters
@@ -111,6 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             Template namedValueTemplate = await propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, exc, backendExtractor, loggerResources);
             Template tagTemplate = await tagExtractor.GenerateTagsTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, productTemplateResources, policyXMLBaseUrl, policyXMLSasToken);
             List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
+            Template groupTemplate = await groupExtractor.GenerateGroupsTemplateAsync(exc, singleApiName);
 
             Tuple<Template, Dictionary<string, BackendApiParameters>> backendResult = await backendExtractor.GenerateBackendsARMTemplateAsync(sourceApim, resourceGroup, singleApiName, apiTemplateResources, namedValueResources, exc);
 
@@ -168,6 +170,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             if (globalServicePolicyTemplate.resources.Count() != 0)
             {
                 fileWriter.WriteJSONToFile(globalServicePolicyTemplate, String.Concat(@dirName, fileNames.globalServicePolicy));
+            }
+            if(groupTemplate.resources.Count() != 0)
+            {
+                fileWriter.WriteJSONToFile(groupTemplate, String.Concat(dirName, fileNames.groups));
             }
             if (linkedBaseUrl != null)
             {
