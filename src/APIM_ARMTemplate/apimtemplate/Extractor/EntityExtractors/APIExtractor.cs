@@ -422,7 +422,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         private static string[] ContentTypes()
         {
-            return new string[] { "application/json", "text/json", "application/*+json" };
+            return new string[] { "application/json", "text/json", "application/*+json", "application/json-patch+json" };
         }
 
         private static void AddSchemaDependencyToOperationIfNecessary(string apiName, List<string> operationDependsOn, OperationTemplateRepresentation operationTemplateRepresentation)
