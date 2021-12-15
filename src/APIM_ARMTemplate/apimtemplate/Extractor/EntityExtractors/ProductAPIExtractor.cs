@@ -88,9 +88,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string[] dependsOn = new string[] {};
                 foreach (string apiName in multipleApiNames)
                 {
-                    templateResources.AddRange(await GenerateSingleProductAPIResourceAsync(apiName, exc, dependsOn));
-                    string apiProductName = templateResources.Last().name.Split('/', 3)[1];
-                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+                    List<TemplateResource> productResources = await GenerateSingleProductAPIResourceAsync(apiName, exc, dependsOn);
+
+                    if (productResources.Count > 0)
+                    {
+                        templateResources.AddRange(productResources);
+                        string apiProductName = templateResources.Last().name.Split('/', 3)[1];
+                        dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+                    }
                 }
             }
             // when extract all APIs and generate one master template
@@ -103,10 +108,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 foreach (JToken oApi in oApis)
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await GenerateSingleProductAPIResourceAsync(apiName, exc, dependsOn));
 
-                    if (templateResources.Count > 0)
+                    List<TemplateResource> productResources = await GenerateSingleProductAPIResourceAsync(apiName, exc, dependsOn);
+                    if (productResources.Count > 0)
                     {
+                        templateResources.AddRange(productResources);
                         string apiProductName = templateResources.Last().name.Split('/', 3)[1];
                         dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
                     }

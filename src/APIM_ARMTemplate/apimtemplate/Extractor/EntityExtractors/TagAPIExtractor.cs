@@ -126,10 +126,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 string[] dependsOn = new string[] {};
                 foreach (string apiName in multipleApiNames)
                 {
-                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, exc, dependsOn));
-
-                    if (templateResources.Count > 0)
+                    List<TemplateResource> tagResources = await GenerateSingleAPITagResourceAsync(apiName, exc, dependsOn);
+                    if (tagResources.Count > 0)
                     {
+                        templateResources.AddRange(tagResources);
 
                         // Extract the tag name from the last resource
                         string[] lastTagName = templateResources.Last().name.Replace("')]", "").Split('/');
@@ -156,9 +156,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 foreach (JToken oApi in oApis)
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, exc, dependsOn));
-                    if (templateResources.Count > 0)
+
+                    List<TemplateResource> tagResources = await GenerateSingleAPITagResourceAsync(apiName, exc, dependsOn);
+                    if (tagResources.Count > 0)
                     {
+                        templateResources.AddRange(tagResources);
+
                         // Extract the tag name from the last resource
                         string[] lastTagName = templateResources.Last().name.Replace("')]", "").Split('/');
                         if (lastTagName.Length > 3)
