@@ -54,8 +54,7 @@ If you have any questions or feedback, please raise issues in the repository or 
 ## Alternatives
 
 * For customers who are just starting out or have simple scenarios, they may not necessarily need to use the tools we provided and may find it easier to begin with the boilerplate templates we provided in the [example](./example/) folder.
-* Customers can also run [PowerShell](https://docs.microsoft.com/powershell/module/azurerm.apimanagement/?view=azurermps-6.13.0) scripts as part of their release process to deploy APIs to API Management.
-* There is also a **non-official** Azure DevOps [extension](https://marketplace.visualstudio.com/items?itemName=stephane-eyskens.apim) created by [Stephane Eyskens](https://stephaneeyskens.wordpress.com/).
+* Customers can also run [PowerShell](https://docs.microsoft.com/powershell/module/az.apimanagement) scripts as part of their release process to deploy APIs to API Management.
 
 ## Kudos
 
