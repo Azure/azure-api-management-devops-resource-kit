@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/apim-devops/ARM-template-generator/_apis/build/status/Master%20-%20Quality%20Gate?branchName=master)](https://dev.azure.com/apim-devops/ARM-template-generator/_build/latest?definitionId=1?branchName=master)
+[![Build Status](https://dev.azure.com/apim-devops/ARM-template-generator/_apis/build/status/Scheduled?branchName=master)](https://dev.azure.com/apim-devops/ARM-template-generator/_build/latest?definitionId=4&branchName=master)
 
 # Azure API Management DevOps Resource Kit
 
