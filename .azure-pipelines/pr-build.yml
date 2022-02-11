@@ -15,3 +15,13 @@ jobs:
     inputs:
       command: 'test'
       projects: 'src/APIM_ARMTemplate/**test**/**.*csproj'
+
+trigger:
+  branches:
+    include:
+    - '*'
+
+pr:
+  branches:
+    include:
+    - '*'
