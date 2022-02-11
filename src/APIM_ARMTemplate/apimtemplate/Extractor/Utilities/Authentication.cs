@@ -1,8 +1,8 @@
-﻿using Colors.Net;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using apimtemplate.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 return (true, stdout.ToString().Trim(' ', '\n', '\r', '"'));
             else
             {
-                ColoredConsole.WriteLine(($"Unable to fetch access token from az cli. Error: {stderr.ToString().Trim(' ', '\n', '\r')}"));
+                Logger.LogError($"Unable to fetch access token from az cli. Error: {stderr.ToString().Trim(' ', '\n', '\r')}");
                 return (false, stdout.ToString().Trim(' ', '\n', '\r', '"'));
             }
         }
