@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.Utilities
 {
     public class ApiVersionSetIdComparer : IEqualityComparer<JToken>
     {
@@ -25,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             if (obj[Properties] == null)
                 return obj.GetHashCode();
-            return (obj[Properties].Value<string>(ApiVersionSetId) ?? String.Empty).GetHashCode();
+            return (obj[Properties].Value<string>(ApiVersionSetId) ?? string.Empty).GetHashCode();
         }
     }
 }

@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-
-
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.Models
 {
     public class BackendUrlsConfig
     {

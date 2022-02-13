@@ -1,18 +1,22 @@
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class TagAPITemplateCreator
     {
         public TagAPITemplateResource CreateTagAPITemplateResource(string tagName, string apiName, string[] dependsOn)
         {
             // create tags/apis resource with properties
-            TagAPITemplateResource tagAPITemplateResource = new TagAPITemplateResource(){
+            TagAPITemplateResource tagAPITemplateResource = new TagAPITemplateResource()
+            {
                 name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{tagName}')]",
                 type = ResourceTypeConstants.APITag,
                 apiVersion = GlobalConstants.APIVersion,
-                properties = new TagAPITemplateProperties(){
+                properties = new TagAPITemplateProperties()
+                {
                     displayName = tagName
                 },
                 dependsOn = dependsOn
@@ -26,9 +30,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<TagAPITemplateResource> tagAPITemplates = new List<TagAPITemplateResource>();
             // tags is comma seperated list pf tags
             string[] tagIDs = api.tags.Split(", ");
-            foreach(string tagID in tagIDs) 
+            foreach (string tagID in tagIDs)
             {
-                TagAPITemplateResource tagAPITemplate = this.CreateTagAPITemplateResource(tagID, api.name, dependsOn);
+                TagAPITemplateResource tagAPITemplate = CreateTagAPITemplateResource(tagID, api.name, dependsOn);
                 tagAPITemplates.Add(tagAPITemplate);
             }
             return tagAPITemplates;

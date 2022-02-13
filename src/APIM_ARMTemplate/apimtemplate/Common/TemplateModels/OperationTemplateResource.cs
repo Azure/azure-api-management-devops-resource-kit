@@ -1,5 +1,7 @@
-﻿
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.Templates.Policy;
+
+namespace apimtemplate.Common.TemplateModels
 {
     public class OperationTemplateResource : APITemplateSubResource
     {

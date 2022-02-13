@@ -1,8 +1,10 @@
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using System;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Creator.Models;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Constants;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class TagTemplateCreator : TemplateCreator
     {

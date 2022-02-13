@@ -1,5 +1,6 @@
-﻿
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿using apimtemplate.Common.Templates.Abstractions;
+
+namespace apimtemplate.Common.TemplateModels
 {
     public class ProductAPITemplateResource : TemplateResource
     {

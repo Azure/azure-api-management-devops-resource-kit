@@ -1,9 +1,11 @@
 ﻿using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using System.Collections.Generic;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Creator.Models;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.TemplateCreators;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Creator.TemplateCreatorTests
 {
     public class BackendTemplateCreatorTests
     {

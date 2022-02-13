@@ -1,11 +1,9 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
-
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿namespace apimtemplate.Common.FileHandlers
 {
-    public class FileNameGenerator
+    public static class FileNameGenerator
     {
 
-        public FileNames GenerateFileNames(string baseFileName)
+        public static FileNames GenerateFileNames(string baseFileName)
         {
             if (baseFileName.Length > 0)
                 baseFileName += "-";
@@ -34,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             };
         }
 
-        public string GenerateCreatorAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI)
+        public static string GenerateCreatorAPIFileName(string apiName, bool isSplitAPI, bool isInitialAPI)
         {
             // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
             string sanitizedAPIName = GenerateOriginalAPIName(apiName);
@@ -49,39 +47,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
             }
         }
 
-        public string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
+        public static string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
             return singleAPIName == null ? $@"/{baseFileName}apis.template.json" : $@"/{baseFileName}{singleAPIName}-api.template.json";
         }
 
-        public string GenerateOriginalAPIName(string apiName)
+        public static string GenerateOriginalAPIName(string apiName)
         {
             // in case the api name has been appended with ;rev={revisionNumber}, take only the api name initially provided by the user in the creator config
             string originalName = apiName.Split(";")[0];
             return originalName;
         }
-    }
-
-    public class FileNames
-    {
-        public string apiVersionSets { get; set; }
-        public string authorizationServers { get; set; }
-        public string backends { get; set; }
-        public string globalServicePolicy { get; set; }
-        public string loggers { get; set; }
-        public string namedValues { get; set; }
-        public string tags { get; set; }
-        public string products { get; set; }
-        public string productAPIs { get; set; }
-        public string apiTags { get; set; }
-        public string parameters { get; set; }
-        // linked property outputs 1 master template
-        public string linkedMaster { get; set; }
-        public string apis { get; set; }
-        public string splitAPIs { get; set; }
-        public string versionSetMasterFolder { get; set; }
-        public string revisionMasterFolder { get; set; }
-        public string groupAPIsMasterFolder{ get; set; }
-        public string baseFileName { get; set; }
     }
 }

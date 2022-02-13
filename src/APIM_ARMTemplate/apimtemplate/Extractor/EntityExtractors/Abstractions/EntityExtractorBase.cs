@@ -1,22 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
-using System;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using Microsoft.Extensions.Caching.Memory;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Extractor.Utilities;
+using apimtemplate.Common.Constants;
+using apimtemplate.Creator.TemplateCreators;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.EntityExtractors.Abstractions
 {
-    public class EntityExtractor
+    public abstract class EntityExtractorBase
     {
         public static string baseUrl = "https://management.azure.com";
-        internal Authentication auth = new Authentication();
-        private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-        private static HttpClient httpClient = new HttpClient();
 
-        public static async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
+        protected Authentication Auth = new Authentication();
+
+        private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+        private static readonly HttpClient _httpClient = new HttpClient();
+
+        public async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
         {
             if (_cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {
@@ -27,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
 
-            HttpResponseMessage response = await httpClient.SendAsync(request);
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -39,20 +42,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public Template GenerateEmptyTemplate()
         {
-            TemplateCreator templateCreator = new TemplateCreator();
-            Template armTemplate = templateCreator.CreateEmptyTemplate();
-            return armTemplate;
+            var templateCreator = new TemplateCreator();
+            return templateCreator.CreateEmptyTemplate();
         }
 
         public Template GenerateEmptyPropertyTemplateWithParameters()
         {
-            Template armTemplate = GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
+            var armTemplate = GenerateEmptyTemplate();
+            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            {
+                {
+                    ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" }
+                }
+            };
+
             return armTemplate;
         }
-
-
-        
-
     }
 }

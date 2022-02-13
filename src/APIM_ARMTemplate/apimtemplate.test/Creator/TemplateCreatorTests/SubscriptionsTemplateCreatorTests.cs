@@ -1,9 +1,10 @@
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.Models;
+using apimtemplate.Creator.TemplateCreators;
 using Xunit;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Creator.TemplateCreatorTests
 {
     public class SubscriptionTemplateCreatorTests
     {

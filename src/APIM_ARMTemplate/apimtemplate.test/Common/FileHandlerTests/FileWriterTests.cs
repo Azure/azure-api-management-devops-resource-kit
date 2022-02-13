@@ -1,10 +1,10 @@
 ﻿using System.IO;
 using Xunit;
 using Newtonsoft.Json.Linq;
-using System;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.FileHandlers;
+using apimtemplate.Common.Templates.Abstractions;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Common.FileHandlerTests
 {
     public class FileWriterTests
     {
@@ -12,8 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         public void ShouldWriteJSONToFile()
         {
             // arrange
-            FileWriter fileWriter = new FileWriter();
-            string location = String.Concat("..", Path.DirectorySeparatorChar,
+            string location = string.Concat("..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
                    "Creator", Path.DirectorySeparatorChar,
@@ -26,8 +25,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             {
                 File.Delete(location);
             }
+            
             // write new 
-            fileWriter.WriteJSONToFile(testJSON, location);
+            FileWriter.WriteJSONToFile(testJSON, location);
 
             // assert
             Assert.True(File.Exists(location));

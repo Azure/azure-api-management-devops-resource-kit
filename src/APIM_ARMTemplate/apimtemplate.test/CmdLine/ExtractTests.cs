@@ -1,9 +1,7 @@
-using System;
 using Xunit;
-using McMaster.Extensions.CommandLineUtils;
 
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.CmdLine
 {
     public class ExtractTests
     {

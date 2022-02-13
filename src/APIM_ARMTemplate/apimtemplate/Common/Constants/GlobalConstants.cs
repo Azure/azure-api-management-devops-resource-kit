@@ -1,7 +1,4 @@
-
-using System;
-
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+namespace apimtemplate.Common.Constants
 {
     internal static class GlobalConstants
     {

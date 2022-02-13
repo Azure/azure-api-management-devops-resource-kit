@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.Templates.Logger;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.Models
 {
     public class CLICreatorArguments
     {
@@ -55,7 +57,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         // openApiSpec file location (local or url), used to build protocols, value, and format from APITemplateResource schema
         public string openApiSpec { get; set; }
         // format of the API definition.
-        public OpenApiSpecFormat openApiSpecFormat { get; set;  }
+        public OpenApiSpecFormat openApiSpecFormat { get; set; }
         // policy file location (local or url)
         public string policy { get; set; }
         // used to buld path from APITemplateResource schema

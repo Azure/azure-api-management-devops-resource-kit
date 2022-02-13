@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.Templates.Logger;
+using apimtemplate.Creator.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class LoggerTemplateCreator : TemplateCreator
     {

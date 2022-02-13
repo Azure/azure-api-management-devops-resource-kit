@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class SubscriptionTemplateCreator : TemplateCreator
     {

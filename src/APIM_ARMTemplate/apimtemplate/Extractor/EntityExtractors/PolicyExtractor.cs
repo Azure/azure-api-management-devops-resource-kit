@@ -1,23 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using apimtemplate.Extractor.EntityExtractors.Abstractions;
+using apimtemplate.Common.Templates.Policy;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.FileHandlers;
+using apimtemplate.Common.Constants;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.EntityExtractors
 {
-    public class PolicyExtractor: EntityExtractor
+    public class PolicyExtractor : EntityExtractorBase, IPolicyExtractor
     {
-        private FileWriter fileWriter;
-
-        public PolicyExtractor(FileWriter fileWriter)
-        {
-            this.fileWriter = fileWriter;
-        }
-
         public async Task<string> GetGlobalServicePolicyAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/policies/policy?api-version={4}&format=rawxml",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
@@ -65,10 +62,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 if (policyXMLBaseUrl != null)
                 {
                     string policyXMLContent = globalServicePolicyResource.properties.value;
-                    string policyFolder = String.Concat(fileFolder, $@"/policies");
+                    string policyFolder = string.Concat(fileFolder, $@"/policies");
                     string globalServicePolicyFileName = $@"/globalServicePolicy.xml";
-                    this.fileWriter.CreateFolderIfNotExists(policyFolder);
-                    this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, globalServicePolicyFileName));
+                    FileWriter.CreateFolderIfNotExists(policyFolder);
+                    FileWriter.WriteXMLToFile(policyXMLContent, string.Concat(policyFolder, globalServicePolicyFileName));
                     globalServicePolicyResource.properties.format = "rawxml-link";
                     if (policyXMLSasToken != null)
                     {

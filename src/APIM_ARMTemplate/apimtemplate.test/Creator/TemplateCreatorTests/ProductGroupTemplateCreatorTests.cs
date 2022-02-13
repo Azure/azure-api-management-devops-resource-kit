@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.Models;
+using apimtemplate.Creator.TemplateCreators;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Creator.TemplateCreatorTests
 {
     public class ProductGroupTemplateCreatorTests
     {
@@ -12,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         {
             // arrange
             ProductGroupTemplateCreator productgroupTemplateCreator = new ProductGroupTemplateCreator();
-            string groupName  = "groupName";
+            string groupName = "groupName";
             string productName = "productName";
             string[] dependsOn = new string[] { "dependsOn" };
 
@@ -41,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
             // assert
             Assert.Equal(count, productAPITemplateResources.Count);
-            
+
         }
     }
 }

@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.Templates.Policy;
+using apimtemplate.Creator.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class ProductTemplateCreator : TemplateCreator
     {
@@ -34,7 +38,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             List<TemplateResource> resources = new List<TemplateResource>();
             foreach (ProductConfig product in creatorConfig.products)
             {
-                if (string.IsNullOrEmpty(product.name)) {
+                if (string.IsNullOrEmpty(product.name))
+                {
                     product.name = product.displayName;
                 }
                 // create product resource with properties
@@ -61,7 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if (product.policy != null)
                 {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.name}')]" };
-                    PolicyTemplateResource productPolicy = this.policyTemplateCreator.CreateProductPolicyTemplateResource(product, dependsOn);
+                    PolicyTemplateResource productPolicy = policyTemplateCreator.CreateProductPolicyTemplateResource(product, dependsOn);
                     resources.Add(productPolicy);
                 }
 
@@ -69,15 +74,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 if (product.groups != null)
                 {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.name}')]" };
-                    List<ProductGroupsValue> productGroups = this.productGroupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
+                    List<ProductGroupsValue> productGroups = productGroupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
                     resources.AddRange(productGroups);
                 }
 
                 // create product subscriptions if provided
                 if (product.subscriptions != null)
-                { 
+                {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.name}')]" };
-                    List<SubscriptionsTemplateResource> subscriptions = this.subscriptionTemplateCreator.CreateSubscriptionsTemplateResources(product, dependsOn);
+                    List<SubscriptionsTemplateResource> subscriptions = subscriptionTemplateCreator.CreateSubscriptionsTemplateResources(product, dependsOn);
                     resources.AddRange(subscriptions);
                 }
             }

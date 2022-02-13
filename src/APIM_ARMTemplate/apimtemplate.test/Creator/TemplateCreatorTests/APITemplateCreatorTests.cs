@@ -1,11 +1,13 @@
 ﻿using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using apimtemplate.test.Creator.TemplateCreatorFactories;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Creator.Models;
+using apimtemplate.Creator.TemplateCreators;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Creator.TemplateCreatorTests
 {
     public class APITemplateCreatorTests
     {
@@ -120,7 +122,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             var yaml = apiTemplateResource.properties.value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
-            var info = (Dictionary<object, object>) definition["info"];
+            var info = (Dictionary<object, object>)definition["info"];
 
             Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
         }
@@ -161,7 +163,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             var yaml = apiTemplateResource.properties.value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
-            var info = (Dictionary<object, object>) definition["info"];
+            var info = (Dictionary<object, object>)definition["info"];
 
             Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
         }
@@ -202,7 +204,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             var yaml = apiTemplateResource.properties.value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
-            var info = (Dictionary<object, object>) definition["info"];
+            var info = (Dictionary<object, object>)definition["info"];
 
             Assert.Equal("Swagger Petstore (alternate title)", info["title"]);
         }

@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Linq;
+using apimtemplate.Extractor.EntityExtractors.Abstractions;
+using apimtemplate.Extractor.Models;
+using apimtemplate.Common.Templates.Policy;
+using apimtemplate.Common.Helpers;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.Templates.Logger;
+using apimtemplate.Common.Constants;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.EntityExtractors
 {
-    public class LoggerExtractor : EntityExtractor
+    public class LoggerExtractor : EntityExtractorBase, ILoggerExtractor
     {
         public async Task<string> GetLoggersAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers?api-version={4}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
@@ -22,7 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<string> GetLoggerDetailsAsync(string ApiManagementName, string ResourceGroupName, string loggerName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, loggerName, GlobalConstants.APIVersion);
@@ -30,46 +36,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public Dictionary<string, string> GetAllLoggerResourceIds(List<TemplateResource> resources)
-        {
-            Dictionary<string, string> logResIds = new Dictionary<string, string>();
-            foreach (LoggerTemplateResource resource in resources)
-            {
-                string validLoggerName = GetValidLoggerParamName(resource.name);
-                string resourceId = resource.properties.resourceId;
-                logResIds.Add(validLoggerName, resourceId);
-            }
-            return logResIds;
-        }
-
-        private string GetValidLoggerParamName(string resourceName)
-        {
-            string[] loggerNameStrs = resourceName.Split(new char[] { ',' });
-            string validLoggerName = ExtractorUtils.GenValidParamName(loggerNameStrs[loggerNameStrs.Length - 1], ParameterPrefix.LogResourceId);
-            return validLoggerName;
-        }
-
-        public Template SetLoggerResourceId(Template loggerTemplate)
-        {
-            TemplateResource[] loggerResources = loggerTemplate.resources.ToArray();
-            List<TemplateResource> nLoggerResource = new List<TemplateResource>();
-            foreach (LoggerTemplateResource resource in loggerResources)
-            {
-                string validLoggerName = GetValidLoggerParamName(resource.name);
-                resource.properties.resourceId = $"[parameters('{ParameterNames.LoggerResourceId}').{validLoggerName}]";
-                nLoggerResource.Add(resource);
-            }
-            loggerTemplate.resources = nLoggerResource.ToArray();
-            return loggerTemplate;
-        }
-
-        public async Task<Template> GenerateLoggerTemplateAsync(Extractor exc, string singleApiName, List<TemplateResource> apiTemplateResources, Dictionary<string, object> apiLoggerId)
+        public async Task<Template> GenerateLoggerTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<TemplateResource> apiTemplateResources, Dictionary<string, object> apiLoggerId)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
             Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
-            if (exc.paramLogResourceId)
+            if (extractorParameters.paramLogResourceId)
             {
                 TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
                 {
@@ -79,17 +52,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
 
             // isolate product api associations in the case of a single api extraction
-            var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
+            var policyResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all loggers for service
-            string loggers = await GetLoggersAsync(exc.sourceApimName, exc.resourceGroup);
+            string loggers = await GetLoggersAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
             JObject oLoggers = JObject.Parse(loggers);
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-                string fullLoggerResource = await GetLoggerDetailsAsync(exc.sourceApimName, exc.resourceGroup, loggerName);
+                string fullLoggerResource = await GetLoggerDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, loggerName);
 
                 // convert returned logger to template resource class
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
@@ -116,14 +89,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             isReferencedInPolicy = true;
                         }
                     }
-                    string validApiName = ExtractorUtils.GenValidParamName(singleApiName, ParameterPrefix.Api);
-                    if (exc.paramApiLoggerId && apiLoggerId.ContainsKey(validApiName))
+                    string validApiName = ParameterNamingHelper.GenerateValidParameterName(singleApiName, ParameterPrefix.Api);
+                    if (extractorParameters.paramApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {
                         object diagnosticObj = apiLoggerId[validApiName];
                         if (diagnosticObj is Dictionary<string, string>)
                         {
                             Dictionary<string, string> curDiagnostic = (Dictionary<string, string>)diagnosticObj;
-                            string validDName = ExtractorUtils.GenValidParamName(loggerResource.properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
+                            string validDName = ParameterNamingHelper.GenerateValidParameterName(loggerResource.properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
                             if (curDiagnostic.ContainsKey(validDName) && curDiagnostic[validDName].Contains(loggerName))
                             {
                                 isReferencedInDiagnostic = true;

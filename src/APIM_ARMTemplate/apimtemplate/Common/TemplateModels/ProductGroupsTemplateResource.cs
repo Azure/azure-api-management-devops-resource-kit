@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿using apimtemplate.Common.Templates.Abstractions;
+using System.Collections.Generic;
+namespace apimtemplate.Common.TemplateModels
 {
     public class ProductGroupsTemplateResource
     {
@@ -16,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string description { get; set; }
         public string displayName { get; set; }
         public string type { get; set; }
-        public string? externalId { get; set; }
+        public string externalId { get; set; }
         public bool builtIn { get; set; }
     }
 }

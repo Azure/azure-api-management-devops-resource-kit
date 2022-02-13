@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+﻿using System.Collections.Generic;
+using apimtemplate.Common.FileHandlers;
+using apimtemplate.Creator.Models;
 using Newtonsoft.Json;
 
 namespace apimtemplate.Creator.Utilities

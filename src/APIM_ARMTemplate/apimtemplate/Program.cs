@@ -1,14 +1,13 @@
 ﻿using System;
 using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Serilog;
 using Serilog.Extensions.Logging;
 using apimtemplate.Common;
 using Microsoft.Extensions.Logging;
+using apimtemplate.Common.Constants;
+using apimtemplate.Commands.Applications;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
+namespace apimtemplate
 {
     public class AppArgs
     {
@@ -24,18 +23,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             {
                 SetupApplicationLoggingToConsole();
 
-                var app = new CommandLineApplication() 
+                var app = new CommandLineApplication()
                 {
                     Name = GlobalConstants.AppShortName,
                     FullName = GlobalConstants.AppLongName,
                     Description = GlobalConstants.AppDescription
                 };
-                
+
                 app.HelpOption(inherited: true);
-                app.Commands.Add(new CreateCommand());
-                app.Commands.Add(new ExtractCommand());
-                
-                app.OnExecute(() => {
+                app.Commands.Add(new CreateApplication());
+                app.Commands.Add(new ExtractApplication());
+
+                app.OnExecute(() =>
+                {
                     Logger.LogError("No commands specified, please specify a command");
                     app.ShowHelp();
                     return 1;

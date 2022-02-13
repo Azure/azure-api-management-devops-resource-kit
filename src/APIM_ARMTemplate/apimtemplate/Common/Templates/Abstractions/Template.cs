@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+namespace apimtemplate.Common.Templates.Abstractions
 {
     public class Template
     {
@@ -14,7 +14,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public object outputs { get; set; }
     }
 
-    public class TemplateParameterProperties {
+    public class TemplateParameterProperties
+    {
         public string type { get; set; }
         public TemplateParameterMetadata metadata { get; set; }
         public string[] allowedValues { get; set; }
@@ -22,15 +23,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string value { get; set; }
     }
 
-    public class TemplateObjectParameterProperties: TemplateParameterProperties {
+    public class TemplateObjectParameterProperties : TemplateParameterProperties
+    {
         public new object value { get; set; }
     }
 
-    public class TemplateParameterMetadata {
+    public class TemplateParameterMetadata
+    {
         public string description { get; set; }
     }
-    
-    public class TemplateResource {
+
+    public class TemplateResource
+    {
         public string name { get; set; }
         public string type { get; set; }
         public string apiVersion { get; set; }

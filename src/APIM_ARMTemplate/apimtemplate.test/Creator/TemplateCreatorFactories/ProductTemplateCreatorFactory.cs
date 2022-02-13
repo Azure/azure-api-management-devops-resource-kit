@@ -1,7 +1,6 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+﻿using apimtemplate.Creator.TemplateCreators;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Creator.TemplateCreatorFactories
 {
     public class ProductTemplateCreatorFactory
     {

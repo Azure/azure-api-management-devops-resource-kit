@@ -4,10 +4,10 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract;
+using apimtemplate.Creator.Models;
+using apimtemplate.Extractor.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+namespace apimtemplate.Common.FileHandlers
 {
     public class FileReader
     {

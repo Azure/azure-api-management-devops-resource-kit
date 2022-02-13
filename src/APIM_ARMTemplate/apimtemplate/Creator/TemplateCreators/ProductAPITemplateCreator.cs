@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Creator.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class ProductAPITemplateCreator : TemplateCreator
     {
@@ -55,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
-                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
+                ProductAPITemplateResource productAPITemplate = CreateProductAPITemplateResource(productID, api.name, allDependsOn);
                 // Add previous product/API resource as a dependency for next product/API resource
                 allDependsOn = new string[dependsOn.Length + 1];
                 dependsOn.CopyTo(allDependsOn, 1);

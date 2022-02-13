@@ -1,10 +1,8 @@
 ﻿using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using System;
 using System.IO;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using apimtemplate.Common.FileHandlers;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Common.FileHandlerTests
 {
     public class OpenAPISpecReaderTests
     {
@@ -12,7 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
         public OpenAPISpecReaderTests()
         {
-            this.openAPISpecFolder = String.Concat("..", Path.DirectorySeparatorChar,
+            openAPISpecFolder = string.Concat("..", Path.DirectorySeparatorChar,
                  "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
@@ -27,8 +25,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
 
             // act
-            bool shouldOutputVersionTwo = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(String.Concat(this.openAPISpecFolder, "swaggerPetstore.json"));
-            bool shouldOutputVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(String.Concat(this.openAPISpecFolder, "swaggerPetstorev3.json"));
+            bool shouldOutputVersionTwo = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(string.Concat(openAPISpecFolder, "swaggerPetstore.json"));
+            bool shouldOutputVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(string.Concat(openAPISpecFolder, "swaggerPetstorev3.json"));
 
             // assert
             Assert.False(shouldOutputVersionTwo);

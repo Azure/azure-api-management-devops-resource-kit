@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Creator.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class APIVersionSetTemplateCreator : TemplateCreator
     {
@@ -17,11 +20,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            foreach(APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
+            foreach (APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
             {
                 // create apiVersionSet resource with properties
                 // default version set id to version set if id is not provided
-                string versionSetId = (apiVersionSet != null && apiVersionSet.id != null) ? apiVersionSet.id : "versionset";
+                string versionSetId = apiVersionSet != null && apiVersionSet.id != null ? apiVersionSet.id : "versionset";
                 APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
                 {
                     name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{versionSetId}')]",

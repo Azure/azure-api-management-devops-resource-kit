@@ -2,26 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using apimtemplate.Extractor.Utilities;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Extractor.EntityExtractors.Abstractions;
+using apimtemplate.Extractor.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.EntityExtractors
 {
-    public class APITagExtractor : APIExtractor
+    public class ApiTagExtractor : ApiExtractor, IApiTagExtractor
     {
-        private FileWriter fileWriter;
-
-        public APITagExtractor(FileWriter fileWriter) : base (fileWriter)
-        {
-            this.fileWriter = fileWriter;
-        }
-
-        public async Task<List<TemplateResource>> GenerateSingleAPITagResourceAsync(string apiName, Extractor exc, string[] dependsOn)
+        public async Task<List<TemplateResource>> GenerateSingleAPITagResourceAsync(string apiName, ExtractorParameters extractorParameters, string[] dependsOn)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            string apimname = exc.sourceApimName, resourceGroup = exc.resourceGroup, fileFolder = exc.fileFolder, policyXMLBaseUrl = exc.policyXMLBaseUrl, policyXMLSasToken = exc.policyXMLSasToken;
+            string apimname = extractorParameters.sourceApimName, resourceGroup = extractorParameters.resourceGroup, fileFolder = extractorParameters.fileFolder, policyXMLBaseUrl = extractorParameters.policyXMLBaseUrl, policyXMLSasToken = extractorParameters.policyXMLSasToken;
 
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting tags from {0} API:", apiName);
@@ -98,7 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return templateResources;
         }
 
-        public async Task<Template> GenerateAPITagsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, Extractor exc)
+        public async Task<Template> GenerateAPITagsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
             // initialize arm template
             Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
@@ -109,9 +105,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 // check if this api exist
                 try
                 {
-                    string apiDetails = await GetAPIDetailsAsync(exc.sourceApimName, exc.resourceGroup, singleApiName);
+                    string apiDetails = await GetAPIDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName);
                     Console.WriteLine("{0} API found ...", singleApiName);
-                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(singleApiName, exc, new string[] {}));
+                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(singleApiName, extractorParameters, new string[] { }));
                 }
                 catch (Exception)
                 {
@@ -123,10 +119,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 Console.WriteLine("{0} APIs found ...", multipleApiNames.Count().ToString());
 
-                string[] dependsOn = new string[] {};
+                string[] dependsOn = new string[] { };
                 foreach (string apiName in multipleApiNames)
                 {
-                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, exc, dependsOn));
+                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, extractorParameters, dependsOn));
 
                     if (templateResources.Count > 0)
                     {
@@ -149,14 +145,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             // when extract all APIs and generate one master template
             else
             {
-                JToken[] oApis = await GetAllAPIObjsAsync(exc.sourceApimName, exc.resourceGroup);
-                Console.WriteLine("{0} APIs found ...", (oApis.Count().ToString()));
+                JToken[] oApis = await GetAllApiObjsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+                Console.WriteLine("{0} APIs found ...", oApis.Count().ToString());
 
-                string[] dependsOn = new string[] {};
+                string[] dependsOn = new string[] { };
                 foreach (JToken oApi in oApis)
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, exc, dependsOn));
+                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, extractorParameters, dependsOn));
                     if (templateResources.Count > 0)
                     {
                         // Extract the tag name from the last resource
@@ -178,4 +174,4 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return armTemplate;
         }
     }
-} 
+}

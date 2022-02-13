@@ -1,9 +1,10 @@
 ﻿
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.Models;
 using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.Utilities
 {
     public class CreatorConfigurationValidator
     {
@@ -210,7 +211,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
         public bool ValidateAPIVersionSets(CreatorConfig creatorConfig)
         {
             bool isValid = true;
-            if(creatorConfig.apiVersionSets != null)
+            if (creatorConfig.apiVersionSets != null)
             {
                 foreach (APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
                 {

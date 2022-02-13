@@ -4,7 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+namespace apimtemplate.Common.FileHandlers
 {
     public class OpenAPISpecReader
     {

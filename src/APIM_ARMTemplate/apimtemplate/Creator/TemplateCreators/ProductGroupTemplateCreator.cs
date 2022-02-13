@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class ProductGroupTemplateCreator
     {
@@ -14,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
                 type = ResourceTypeConstants.ProductGroup,
                 apiVersion = GlobalConstants.APIVersion,
                 dependsOn = dependsOn,
-                properties=new ProductGroupTemplateProperties()
+                properties = new ProductGroupTemplateProperties()
             };
             return productAPITemplateResource;
         }
@@ -27,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
             string[] groupNames = product.groups.Split(", ");
             foreach (string groupName in groupNames)
             {
-                ProductGroupsValue productAPITemplate = this.CreateProductGroupTemplateResource(groupName, product.name, dependsOn);
+                ProductGroupsValue productAPITemplate = CreateProductGroupTemplateResource(groupName, product.name, dependsOn);
                 productGroupTemplates.Add(productAPITemplate);
             }
             return productGroupTemplates;

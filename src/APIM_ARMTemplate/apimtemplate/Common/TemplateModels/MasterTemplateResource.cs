@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using apimtemplate.Common.Templates.Abstractions;
+using System.Collections.Generic;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+namespace apimtemplate.Common.TemplateModels
 {
     public class MasterTemplateResource : TemplateResource
     {

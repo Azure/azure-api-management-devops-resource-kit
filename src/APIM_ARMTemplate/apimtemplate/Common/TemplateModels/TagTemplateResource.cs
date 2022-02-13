@@ -1,5 +1,6 @@
-﻿
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿using apimtemplate.Common.Templates.Abstractions;
+
+namespace apimtemplate.Common.TemplateModels
 {
 
     public class TagTemplateResource : APITemplateSubResource
@@ -8,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     }
 
     public class TagTemplateProperties
-    { 
-        public string displayName {get; set;}
+    {
+        public string displayName { get; set; }
     }
 }

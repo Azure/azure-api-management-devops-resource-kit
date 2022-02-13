@@ -1,10 +1,9 @@
-using System;
 using Xunit;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using apimtemplate.Commands.Applications;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.CmdLine
 {
     public class CreateTests
     {
@@ -12,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
 
         public CreateTests()
         {
-            this.invalidConfigurationFolder = String.Concat("..", Path.DirectorySeparatorChar,
+            invalidConfigurationFolder = string.Concat("..", Path.DirectorySeparatorChar,
                  "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
@@ -25,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithUnknownCommand()
         {
-            var createCommand = new CreateCommand();
+            var createCommand = new CreateApplication();
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute("test"));
             Assert.Contains("Unrecognized command or argument 'test'", ex.Message);
         }
@@ -33,8 +32,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithUnknownOption()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configurationFile", String.Concat(this.invalidConfigurationFolder, "invalidVersionSetDisplayName.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configurationFile", string.Concat(invalidConfigurationFolder, "invalidVersionSetDisplayName.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Unrecognized option '--configurationFile'", ex.Message);
         }
@@ -44,8 +43,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidOutputLocation()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidOutputLocation.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidOutputLocation.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Output location is required", ex.Message);
         }
@@ -53,8 +52,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidVersion()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidVersion.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidVersion.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Version is required", ex.Message);
         }
@@ -62,8 +61,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidAPIMServiceName()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidAPIMServiceName.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidAPIMServiceName.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("APIM service name is required", ex.Message);
         }
@@ -71,8 +70,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidLinking()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidLinking.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidLinking.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("LinkTemplatesBaseUrl is required for linked templates", ex.Message);
         }
@@ -82,8 +81,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidAPIConfiguration()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidAPI.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidAPI.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("API configuration is required", ex.Message);
         }
@@ -91,8 +90,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidOpenAPISpec()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidOpenAPISpec.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidOpenAPISpec.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Open API Spec is required", ex.Message);
         }
@@ -100,8 +99,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidSuffix()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidSuffix.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidSuffix.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("API suffix is required", ex.Message);
         }
@@ -109,8 +108,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidAPIName()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidAPIName.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidAPIName.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("API name is required", ex.Message);
         }
@@ -118,8 +117,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidOperationPolicy()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidOperationPolicy.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidOperationPolicy.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Policy XML is required if an API operation is provided", ex.Message);
         }
@@ -127,8 +126,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidDiagnosticLoggerId()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidDiagnosticLoggerId.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidDiagnosticLoggerId.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("LoggerId is required if an API diagnostic is provided", ex.Message);
         }
@@ -138,8 +137,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidVersionSetDisplayName()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidVersionSetDisplayName.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidVersionSetDisplayName.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Display name is required if an API Version Set is provided", ex.Message);
         }
@@ -149,8 +148,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidProductDisplayName()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidProductDisplayName.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidProductDisplayName.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Display name is required if an Product is provided", ex.Message);
         }
@@ -160,8 +159,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidLoggerDisplayName()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidLoggerName.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidLoggerName.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Name is required if an Logger is provided", ex.Message);
         }
@@ -171,8 +170,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidBackendDisplayName()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidBackendTitle.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidBackendTitle.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Title is required if a Backend is provided", ex.Message);
         }
@@ -182,8 +181,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         [Fact]
         public void ShouldFailWithInvalidAuthorizationServerDisplayName()
         {
-            var createCommand = new CreateCommand();
-            string[] args = new string[] { "--configFile", String.Concat(this.invalidConfigurationFolder, "invalidAuthorizationServerDisplayName.yml") };
+            var createCommand = new CreateApplication();
+            string[] args = new string[] { "--configFile", string.Concat(invalidConfigurationFolder, "invalidAuthorizationServerDisplayName.yml") };
             var ex = Assert.ThrowsAny<CommandParsingException>(() => createCommand.Execute(args));
             Assert.Contains("Display name is required if an Authorization Server is provided", ex.Message);
         }

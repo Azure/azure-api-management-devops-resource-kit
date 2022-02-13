@@ -1,9 +1,6 @@
-﻿
-using System;
-
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
+﻿namespace apimtemplate.Common.Templates.Abstractions
 {
-    public class APITemplateResource: TemplateResource
+    public class APITemplateResource : TemplateResource
     {
         public APITemplateProperties properties { get; set; }
         public APITemplateSubResource[] resources { get; set; }
@@ -17,11 +14,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         public string type { get; set; }
         public string apiRevision { get; set; }
         public string apiVersion { get; set; }
-        public Nullable<bool> isCurrent { get; set; }
+        public bool? isCurrent { get; set; }
         public string apiRevisionDescription { get; set; }
         public string apiVersionDescription { get; set; }
         public string apiVersionSetId { get; set; }
-        public Nullable<bool> subscriptionRequired { get; set; }
+        public bool? subscriptionRequired { get; set; }
         public string sourceApiId { get; set; }
         public string displayName { get; set; }
         public string serviceUrl { get; set; }

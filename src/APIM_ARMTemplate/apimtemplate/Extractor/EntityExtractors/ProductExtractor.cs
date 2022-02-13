@@ -1,25 +1,24 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using Newtonsoft.Json;
 using System;
+using apimtemplate.Extractor.EntityExtractors.Abstractions;
+using apimtemplate.Extractor.Models;
+using apimtemplate.Common.Templates.Policy;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.FileHandlers;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Constants;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.EntityExtractors
 {
-    public class ProductExtractor : EntityExtractor
+    public class ProductExtractor : EntityExtractorBase, IProductExtractor
     {
-        private FileWriter fileWriter;
-
-        public ProductExtractor(FileWriter fileWriter)
-        {
-            this.fileWriter = fileWriter;
-        }
-
         public async Task<string> GetProductsAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
@@ -29,7 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<string> GetProductDetailsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
@@ -39,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<string> GetProductPolicyAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies/policy?api-version={5}&format=rawxml",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
@@ -49,31 +48,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<string> GetProductGroupsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/groups?api-version={5}",
             baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
             return await CallApiManagementAsync(azToken, requestUrl);
         }
-        
+
         public async Task<string> GetProductTagsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/tags?api-version={5}&format=rawxml",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
             return await CallApiManagementAsync(azToken, requestUrl);
         }
-        
-        public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string fileFolder, Extractor exc)
+
+        public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string fileFolder, ExtractorParameters extractorParameters)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting products from service");
             Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
-            if (exc.policyXMLBaseUrl != null && exc.policyXMLSasToken != null)
+            if (extractorParameters.policyXMLBaseUrl != null && extractorParameters.policyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
@@ -81,7 +80,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 };
                 armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
             }
-            if (exc.policyXMLBaseUrl != null)
+            if (extractorParameters.policyXMLBaseUrl != null)
             {
                 TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
                 {
@@ -143,15 +142,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         productPolicyResource.dependsOn = productResourceId;
 
                         // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-                        if (exc.policyXMLBaseUrl != null)
+                        if (extractorParameters.policyXMLBaseUrl != null)
                         {
                             string policyXMLContent = productPolicyResource.properties.value;
-                            string policyFolder = String.Concat(fileFolder, $@"/policies");
+                            string policyFolder = string.Concat(fileFolder, $@"/policies");
                             string productPolicyFileName = $@"/{productName}-productPolicy.xml";
-                            this.fileWriter.CreateFolderIfNotExists(policyFolder);
-                            this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, productPolicyFileName));
+                            FileWriter.CreateFolderIfNotExists(policyFolder);
+                            FileWriter.WriteXMLToFile(policyXMLContent, string.Concat(policyFolder, productPolicyFileName));
                             productPolicyResource.properties.format = "rawxml-link";
-                            if (exc.policyXMLSasToken != null)
+                            if (extractorParameters.policyXMLSasToken != null)
                             {
                                 productPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{productPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                             }
@@ -165,7 +164,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     }
                     catch (Exception) { }
 
-                     // add tags associated with the product to template 
+                    // add tags associated with the product to template 
                     try
                     {
                         // pull tags associated with the product
@@ -187,7 +186,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         }
                     }
                     catch (Exception) { }
-                    }
+                }
             }
 
             armTemplate.resources = templateResources.ToArray();

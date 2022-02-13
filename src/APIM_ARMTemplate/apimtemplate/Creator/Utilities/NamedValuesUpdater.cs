@@ -1,6 +1,5 @@
-﻿using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
-using System.Collections.Generic;
+﻿using apimtemplate.Creator.Models;
+using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
 
 namespace apimtemplate.Creator.Utilities

@@ -3,16 +3,16 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using apimtemplate.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using apimtemplate.Common.Constants;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.Utilities
 {
     public class Authentication
     {
         internal static bool isTokenValid = false;
         public static DateTime start = DateTime.Now;
         internal static string internalAzToken;
-        internal static string internalAzSubscriptionId; 
+        internal static string internalAzSubscriptionId;
         public async Task<(string azToken, string azSubscriptionId)> GetAccessToken()
         {
             var tokenTimeout = DateTime.Now;
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                 start = DateTime.Now;
                 internalAzToken = cliToken;
                 internalAzSubscriptionId = cliSubscriptionId;
-                isTokenValid = true; 
+                isTokenValid = true;
                 return (cliToken, cliSubscriptionId);
             }
 

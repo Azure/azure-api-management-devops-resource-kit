@@ -1,6 +1,6 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+﻿using apimtemplate.Common.Templates.Abstractions;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create
+namespace apimtemplate.Creator.TemplateCreators
 {
     public class TemplateCreator
     {

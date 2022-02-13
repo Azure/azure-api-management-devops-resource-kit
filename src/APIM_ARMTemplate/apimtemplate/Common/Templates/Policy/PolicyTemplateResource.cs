@@ -1,7 +1,7 @@
-﻿
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
-{
+﻿using apimtemplate.Common.Templates.Abstractions;
 
+namespace apimtemplate.Common.Templates.Policy
+{
     public class PolicyTemplateResource : APITemplateSubResource
     {
         public PolicyTemplateProperties properties { get; set; }

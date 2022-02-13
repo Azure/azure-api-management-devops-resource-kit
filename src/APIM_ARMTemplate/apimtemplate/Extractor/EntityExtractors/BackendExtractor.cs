@@ -1,19 +1,24 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using Newtonsoft.Json;
 using System;
 using apimtemplate.Common.TemplateModels;
+using apimtemplate.Extractor.EntityExtractors.Abstractions;
+using apimtemplate.Extractor.Models;
+using apimtemplate.Common.Helpers;
+using apimtemplate.Common.Templates.Policy;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.Constants;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.EntityExtractors
 {
-    public class BackendExtractor : EntityExtractor
+    public class BackendExtractor : EntityExtractorBase, IBackendExtractor
     {
         public async Task<string> GetBackendsAsync(string ApiManagementName, string ResourceGroupName, int skipNumOfRecords)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/backends?$skip={4}&api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, skipNumOfRecords, GlobalConstants.APIVersion);
@@ -23,7 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
         public async Task<string> GetBackendDetailsAsync(string ApiManagementName, string ResourceGroupName, string backendName)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/backends/{4}?api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, backendName, GlobalConstants.APIVersion);
@@ -43,13 +48,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         /// <param name="policyXMLSasToken"></param>
         /// <param name="extractBackendParameters"></param>
         /// <returns>a combination of a Template and the value for the BackendSettings parameter</returns>
-        public async Task<Tuple<Template,Dictionary<string,BackendApiParameters> > > GenerateBackendsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources, Extractor exc)
+        public async Task<Tuple<Template, Dictionary<string, BackendApiParameters>>> GenerateBackendsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources, ExtractorParameters extractorParameters)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting backends from service");
             Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
-            if (exc.paramBackend)
+            if (extractorParameters.paramBackend)
             {
                 TemplateParameterProperties extractBackendParametersProperties = new TemplateParameterProperties()
                 {
@@ -61,8 +66,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // isolate api and operation policy resources in the case of a single api extraction, as they may reference backends
-            var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
-            var namedValueResources = propertyResources.Where(resource => (resource.type == ResourceTypeConstants.Property));
+            var policyResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy);
+            var namedValueResources = propertyResources.Where(resource => resource.type == ResourceTypeConstants.Property);
 
             // pull all backends for service
             JObject oBackends = new JObject();
@@ -96,7 +101,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         // check extracted policies to see if the backend is referenced.
                         foreach (PolicyTemplateResource policyTemplateResource in policyResources)
                         {
-                            string policyContent = ExtractorUtils.GetPolicyContent(exc, policyTemplateResource);
+                            string policyContent = PolicyTemplateUtils.GetPolicyContent(extractorParameters, policyTemplateResource);
 
                             if (DoesPolicyReferenceBackend(policyContent, namedValueResources, backendName, backendTemplateResource))
                             {
@@ -111,10 +116,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
 
                     if (includeBackend)
                     {
-                        if (exc.paramBackend)
+                        if (extractorParameters.paramBackend)
                         {
                             var apiToken = new BackendApiParameters();
-                            string validApiParamName = ExtractorUtils.GenValidParamName(backendName, ParameterPrefix.Diagnostic).ToLower();
+                            string validApiParamName = ParameterNamingHelper.GenerateValidParameterName(backendName, ParameterPrefix.Diagnostic).ToLower();
 
                             if (!string.IsNullOrEmpty(backendTemplateResource.properties.resourceId))
                             {
@@ -153,17 +158,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         {
             // a policy is referenced by a backend with the set-backend-service policy, which will reference use the backends name or url, or through referencing a named value that applies to the backend
             var namedValueResourcesUsedByBackend = namedValueResources.Where(resource => DoesBackendReferenceNamedValue(resource, backendTemplateResource));
-            if ((backendName != null && policyContent.Contains(backendName)) ||
-                (backendTemplateResource.properties.url != null && policyContent.Contains(backendTemplateResource.properties.url)) ||
-                (backendTemplateResource.properties.title != null && policyContent.Contains(backendTemplateResource.properties.title)) ||
-                (backendTemplateResource.properties.resourceId != null && policyContent.Contains(backendTemplateResource.properties.resourceId)))
+            if (backendName != null && policyContent.Contains(backendName) ||
+                backendTemplateResource.properties.url != null && policyContent.Contains(backendTemplateResource.properties.url) ||
+                backendTemplateResource.properties.title != null && policyContent.Contains(backendTemplateResource.properties.title) ||
+                backendTemplateResource.properties.resourceId != null && policyContent.Contains(backendTemplateResource.properties.resourceId))
             {
                 return true;
             }
             foreach (PropertyTemplateResource namedValueResource in namedValueResourcesUsedByBackend)
             {
-                if ((namedValueResource.properties.displayName != null && policyContent.Contains(namedValueResource.properties.displayName)) ||
-                    (namedValueResource.properties.value != null && policyContent.Contains(namedValueResource.properties.value)))
+                if (namedValueResource.properties.displayName != null && policyContent.Contains(namedValueResource.properties.displayName) ||
+                    namedValueResource.properties.value != null && policyContent.Contains(namedValueResource.properties.value))
                 {
                     return true;
                 }
@@ -175,15 +180,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public bool DoesBackendReferenceNamedValue(TemplateResource namedValueResource, BackendTemplateResource backendTemplateResource)
         {
             string namedValue = (namedValueResource as PropertyTemplateResource).properties.value;
-            return (namedValue == backendTemplateResource.properties.url
+            return namedValue == backendTemplateResource.properties.url
                 || namedValue == backendTemplateResource.properties.description
-                || namedValue == backendTemplateResource.properties.title);
+                || namedValue == backendTemplateResource.properties.title;
         }
 
-        public async Task<bool> IsNamedValueUsedInBackends(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, Extractor exc, string propertyName, string propertyDisplayName)
+        public async Task<bool> IsNamedValueUsedInBackends(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, ExtractorParameters extractorParameters, string propertyName, string propertyDisplayName)
         {
             // isolate api and operation policy resources in the case of a single api extraction, as they may reference backends
-            var policyResources = apiTemplateResources.Where(resource => (resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy));
+            var policyResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy);
             var emptyNamedValueResources = new List<TemplateResource>();
 
             // pull all backends for service
@@ -225,7 +230,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             // this is why an empty named values must be passed to this method for validation
                             foreach (PolicyTemplateResource policyTemplateResource in policyResources)
                             {
-                                string policyContent = ExtractorUtils.GetPolicyContent(exc, policyTemplateResource);
+                                string policyContent = PolicyTemplateUtils.GetPolicyContent(extractorParameters, policyTemplateResource);
 
                                 if (DoesPolicyReferenceBackend(policyContent, emptyNamedValueResources, backendName, backendTemplateResource))
                                 {

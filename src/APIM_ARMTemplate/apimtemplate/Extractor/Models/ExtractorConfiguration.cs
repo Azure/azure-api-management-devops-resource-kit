@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.Models
 {
     public class ExtractorConfig
     {
@@ -53,12 +53,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public string paramNamedValuesKeyVaultSecrets { get; set; }
 
         [Description("Group the operations into batches of x?")]
-        public int operationBatchSize {get;set;}
+        public int operationBatchSize { get; set; }
 
         [Description("Parameterize environment specific values from backend")]
         public string paramBackend { get; set; }
 
-        public void Validate()
+        public void Validate(bool ignorePreviousValidations = false)
         {
             if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
             if (string.IsNullOrEmpty(destinationApimName)) throw new ArgumentException("Missing parameter <destinationApimName>.");
@@ -95,71 +95,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             {
                 throw new NotSupportedException("\"includeAllRevisions\" can be used when you specify the API you want to extract with \"apiName\"");
             }
-        }
-    }
-
-    public class Extractor
-    {
-        public string sourceApimName { get; private set; }
-        public string destinationApimName { get; private set; }
-        public string resourceGroup { get; private set; }
-        public string fileFolder { get; private set; }
-        public string linkedTemplatesBaseUrl { get; private set; }
-        public string linkedTemplatesSasToken { get; private set; }
-        public string linkedTemplatesUrlQueryString { get; private set; }
-        public string policyXMLBaseUrl { get; private set; }
-        public string policyXMLSasToken { get; private set; }
-        public string apiVersionSetName { get; private set; }
-        public bool includeAllRevisions { get; private set; }
-        public serviceUrlProperty[] serviceUrlParameters { get; set; }
-        public bool paramServiceUrl { get; private set; }
-        public bool paramNamedValue { get; private set; }
-        public bool paramApiLoggerId { get; private set; }
-        public bool paramLogResourceId { get; private set; }
-        public bool notIncludeNamedValue { get; private set; }
-        public bool paramNamedValuesKeyVaultSecrets { get; private set; }
-
-        public int operationBatchSize { get; private set;}
-
-        public bool paramBackend { get; set; }
-
-        public Extractor(ExtractorConfig exc, string dirName)
-        {
-            this.sourceApimName = exc.sourceApimName;
-            this.destinationApimName = exc.destinationApimName;
-            this.resourceGroup = exc.resourceGroup;
-            this.fileFolder = dirName;
-            this.linkedTemplatesBaseUrl = exc.linkedTemplatesBaseUrl;
-            this.linkedTemplatesSasToken = exc.linkedTemplatesSasToken;
-            this.linkedTemplatesUrlQueryString = exc.linkedTemplatesUrlQueryString;
-            this.policyXMLBaseUrl = exc.policyXMLBaseUrl;
-            this.policyXMLSasToken = exc.policyXMLSasToken;
-            this.apiVersionSetName = exc.apiVersionSetName;
-            this.includeAllRevisions = exc.includeAllRevisions != null && exc.includeAllRevisions.Equals("true");
-            this.serviceUrlParameters = exc.serviceUrlParameters;
-            this.paramServiceUrl = (exc.paramServiceUrl != null && exc.paramServiceUrl.Equals("true")) || exc.serviceUrlParameters != null;
-            this.paramNamedValue = exc.paramNamedValue != null && exc.paramNamedValue.Equals("true");
-            this.paramApiLoggerId = exc.paramApiLoggerId != null && exc.paramApiLoggerId.Equals("true");
-            this.paramLogResourceId = exc.paramLogResourceId != null && exc.paramLogResourceId.Equals("true");
-            this.notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
-            this.operationBatchSize  = exc.operationBatchSize;
-            this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets != null && exc.paramNamedValuesKeyVaultSecrets.Equals("true");
-            this.paramBackend = exc.paramBackend != null && exc.paramBackend.Equals("true");
-        }
-
-        public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)
-        {
-        }
-    }
-
-    public class serviceUrlProperty
-    {
-        public string apiName { get; private set; }
-        public string serviceUrl { get; private set; }
-        public serviceUrlProperty(string apiName, string serviceUrl)
-        {
-            this.apiName = apiName;
-            this.serviceUrl = serviceUrl;
         }
     }
 }

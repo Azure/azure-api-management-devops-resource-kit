@@ -1,10 +1,10 @@
 ﻿using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System;
 using System.IO;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using apimtemplate.Creator.Models;
+using apimtemplate.Common.FileHandlers;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Common.FileHandlerTests
 {
     public class FileReaderTests
     {
@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
         {
             // arrange
             FileReader fileReader = new FileReader();
-            string fileLocation = String.Concat("..", Path.DirectorySeparatorChar,
+            string fileLocation = string.Concat("..", Path.DirectorySeparatorChar,
                  "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,
                    "..", Path.DirectorySeparatorChar,

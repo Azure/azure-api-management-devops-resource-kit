@@ -1,18 +1,21 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using apimtemplate.Extractor.EntityExtractors.Abstractions;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Common.Constants;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
+namespace apimtemplate.Extractor.EntityExtractors
 {
-    public class TagExtractor : EntityExtractor
+    public class TagExtractor : EntityExtractorBase, ITagExtractor
     {
-        public async Task<string> GetTagsAsync(string ApiManagementName, string ResourceGroupName, int skipNumOfRecords )
+        public async Task<string> GetTagsAsync(string ApiManagementName, string ResourceGroupName, int skipNumOfRecords)
         {
-            (string azToken, string azSubId) = await auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/Tags?$skip={4}&api-version={5}",
                baseUrl, azSubId, ResourceGroupName, ApiManagementName, skipNumOfRecords, GlobalConstants.APIVersion);
@@ -67,8 +70,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     if (singleApiName == null
                             || apiOperationTagResources.Any(t => t.name.Contains($"/{TagName}'"))
                             || apiTagResources.Any(t => t.name.Contains($"/{TagName}'"))
-                            || (productAPIResources.Any(t => t.name.Contains($"/{singleApiName}"))
-                                && productTagResources.Any(t => t.name.Contains($"/{TagName}'"))))
+                            || productAPIResources.Any(t => t.name.Contains($"/{singleApiName}"))
+                                && productTagResources.Any(t => t.name.Contains($"/{TagName}'")))
                     {
                         Console.WriteLine("'{0}' Tag found", TagName);
                         templateResources.Add(TagTemplateResource);

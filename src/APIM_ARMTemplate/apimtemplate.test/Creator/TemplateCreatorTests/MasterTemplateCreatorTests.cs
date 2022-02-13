@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Create;
+using apimtemplate.Common.Templates.Abstractions;
+using apimtemplate.Common.TemplateModels;
+using apimtemplate.Creator.Models;
+using apimtemplate.Creator.TemplateCreators;
+using apimtemplate.Common.FileHandlers;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
+namespace apimtemplate.test.Creator.TemplateCreatorTests
 {
     public class MasterTemplateCreatorTests
     {
@@ -21,14 +24,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Test
             Template tagTemplate = new Template();
             Template loggersTemplate = new Template();
             List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
-            FileNameGenerator fileNameGenerator = new FileNameGenerator();
-            FileNames creatorFileNames = fileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
+            FileNames creatorFileNames = FileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
 
             // should create 8 resources (globalServicePolicy, apiVersionSet, product, property, tag, logger, both api templates)
             int count = 9;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName, fileNameGenerator);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName);
 
             // assert
             Assert.Equal(count, masterTemplate.resources.Length);
