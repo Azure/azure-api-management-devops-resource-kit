@@ -13,3 +13,6 @@ schedules:
   branches:
     include:
     - master
+
+# no PR triggers
+pr: none
