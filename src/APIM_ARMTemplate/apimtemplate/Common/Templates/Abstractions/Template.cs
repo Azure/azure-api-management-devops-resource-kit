@@ -13,32 +13,4 @@ namespace apimtemplate.Common.Templates.Abstractions
         public TemplateResource[] resources { get; set; }
         public object outputs { get; set; }
     }
-
-    public class TemplateParameterProperties
-    {
-        public string type { get; set; }
-        public TemplateParameterMetadata metadata { get; set; }
-        public string[] allowedValues { get; set; }
-        public string defaultValue { get; set; }
-        public string value { get; set; }
-    }
-
-    public class TemplateObjectParameterProperties : TemplateParameterProperties
-    {
-        public new object value { get; set; }
-    }
-
-    public class TemplateParameterMetadata
-    {
-        public string description { get; set; }
-    }
-
-    public class TemplateResource
-    {
-        public string name { get; set; }
-        public string type { get; set; }
-        public string apiVersion { get; set; }
-        public string scale { get; set; }
-        public string[] dependsOn { get; set; }
-    }
 }
