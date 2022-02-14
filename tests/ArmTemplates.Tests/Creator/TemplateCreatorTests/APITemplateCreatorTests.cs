@@ -137,7 +137,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             // extract swagger as a local file
 
             var swaggerPath = Path.GetTempFileName();
-            using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("apimtemplate.test.Resources.swaggerPetstorev3.json"))
+            using (var stream = new FileStream($"Resources{Path.DirectorySeparatorChar}OpenApiSpecs{Path.DirectorySeparatorChar}swaggerPetstorev3.json", FileMode.Open))
             using (var reader = new StreamReader(stream))
                 File.WriteAllText(swaggerPath, reader.ReadToEnd());
 
@@ -178,7 +178,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             // extract swagger as a local file
 
             var openapiPath = Path.GetTempFileName();
-            using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("apimtemplate.test.Resources.swaggerPetstore.yml"))
+            using (var stream = new FileStream($"Resources{Path.DirectorySeparatorChar}OpenApiSpecs{Path.DirectorySeparatorChar}swaggerPetstore.yml", FileMode.Open))
             using (var reader = new StreamReader(stream))
                 File.WriteAllText(openapiPath, reader.ReadToEnd());
 

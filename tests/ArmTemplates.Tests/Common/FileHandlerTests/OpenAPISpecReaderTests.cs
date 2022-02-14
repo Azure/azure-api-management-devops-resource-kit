@@ -10,13 +10,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common.Fil
 
         public OpenAPISpecReaderTests()
         {
-            openAPISpecFolder = string.Concat("..", Path.DirectorySeparatorChar,
-                 "..", Path.DirectorySeparatorChar,
-                   "..", Path.DirectorySeparatorChar,
-                   "..", Path.DirectorySeparatorChar,
-                   "apimtemplate.test", Path.DirectorySeparatorChar,
-                   "Common", Path.DirectorySeparatorChar,
-                   "OpenAPISpecs", Path.DirectorySeparatorChar);
+            openAPISpecFolder = string.Concat(
+                "Resources", Path.DirectorySeparatorChar,
+               "OpenAPISpecs", Path.DirectorySeparatorChar);
         }
         [Fact]
         public async void ShouldDetermineCorrectOpenAPISpecVersion()

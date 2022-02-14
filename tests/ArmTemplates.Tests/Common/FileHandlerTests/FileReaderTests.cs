@@ -13,14 +13,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common.Fil
         {
             // arrange
             FileReader fileReader = new FileReader();
-            string fileLocation = string.Concat("..", Path.DirectorySeparatorChar,
-                 "..", Path.DirectorySeparatorChar,
-                   "..", Path.DirectorySeparatorChar,
-                   "..", Path.DirectorySeparatorChar,
-                   "apimtemplate", Path.DirectorySeparatorChar,
-                   "Creator", Path.DirectorySeparatorChar,
-                   "ExampleFiles", Path.DirectorySeparatorChar,
-                   "YAMLConfigs", Path.DirectorySeparatorChar, "valid.yml");
+            string fileLocation = string.Concat(
+                "Resources", Path.DirectorySeparatorChar,
+                "YAMLConfigs", Path.DirectorySeparatorChar, "valid.yml");
 
             // act
             CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(fileLocation);

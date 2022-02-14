@@ -26,4 +26,15 @@
     <ProjectReference Include="..\..\src\ArmTemplates\ArmTemplates.csproj" />
   </ItemGroup>
 
+  <!-- copy resources for tests -->
+  <ItemGroup>
+    <None Update="Resources\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+  <!-- END copy configurations for tests -->
+
 </Project>

@@ -11,13 +11,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
 
         public CreateTests()
         {
-            invalidConfigurationFolder = string.Concat("..", Path.DirectorySeparatorChar,
-                 "..", Path.DirectorySeparatorChar,
-                   "..", Path.DirectorySeparatorChar,
-                   "..", Path.DirectorySeparatorChar,
-                   "apimtemplate.test", Path.DirectorySeparatorChar,
-                   "CmdLine", Path.DirectorySeparatorChar,
-                   "InvalidConfigurations", Path.DirectorySeparatorChar);
+            invalidConfigurationFolder = string.Concat(
+                "Resources", Path.DirectorySeparatorChar,
+                "InvalidConfigurations", Path.DirectorySeparatorChar);
         }
 
         #region Unknown
