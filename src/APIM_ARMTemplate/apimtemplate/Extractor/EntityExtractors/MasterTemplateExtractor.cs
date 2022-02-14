@@ -8,9 +8,9 @@ using apimtemplate.Common.TemplateModels;
 using apimtemplate.Extractor.EntityExtractors.Abstractions;
 using apimtemplate.Extractor.Models;
 using apimtemplate.Common.FileHandlers;
-using apimtemplate.Common.Helpers;
 using apimtemplate.Common.Templates.Abstractions;
 using apimtemplate.Common.Constants;
+using apimtemplate.Common.Extensions;
 
 namespace apimtemplate.Extractor.EntityExtractors
 {

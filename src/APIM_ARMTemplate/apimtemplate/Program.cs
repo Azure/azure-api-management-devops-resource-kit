@@ -31,8 +31,8 @@ namespace apimtemplate
                 };
 
                 app.HelpOption(inherited: true);
-                app.Commands.Add(new CreateApplication());
-                app.Commands.Add(new ExtractApplication());
+                app.Commands.Add(new CreateApplicationCommand());
+                app.Commands.Add(new ExtractApplicationCommand());
 
                 app.OnExecute(() =>
                 {
@@ -45,7 +45,7 @@ namespace apimtemplate
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "apimtemplate application finished with an error...");
+                Logger.LogError(e, "Azure API Management DevOps Resource toolkit finished with an error...");
                 return 1;
             }
         }

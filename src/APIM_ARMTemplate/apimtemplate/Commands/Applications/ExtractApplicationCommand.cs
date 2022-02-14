@@ -12,11 +12,11 @@ using McMaster.Extensions.CommandLineUtils;
 
 namespace apimtemplate.Commands.Applications
 {
-    public class ExtractApplication : CommandLineApplicationBase
+    public class ExtractApplicationCommand : CommandLineApplicationBase
     {
         private ExtractorConfig _extractorConfig;
 
-        public ExtractApplication() : base()
+        public ExtractApplicationCommand() : base()
         {
         }
 

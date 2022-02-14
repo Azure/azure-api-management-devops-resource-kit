@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace apimtemplate.Common.Helpers
+namespace apimtemplate.Common.Extensions
 {
-    internal static class CollectionHelpers
+    internal static class CollectionExtensions
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> collection)
         {

@@ -13,7 +13,7 @@ using apimtemplate.Common.Constants;
 
 namespace apimtemplate.Commands.Applications
 {
-    public class CreateApplication : CommandLineApplicationBase
+    public class CreateApplicationCommand : CommandLineApplicationBase
     {
         private CommandOption _appInsightsInstrumentationKey;
         private CommandOption _appInsightsName;
@@ -23,7 +23,7 @@ namespace apimtemplate.Commands.Applications
         private CommandOption _backendUrlConfigFile;
         private CommandOption _preferredAPIsForDeployment;
 
-        public CreateApplication() : base()
+        public CreateApplicationCommand() : base()
         {
         }
 

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace apimtemplate.Common.Helpers
+namespace apimtemplate.Common.Extensions
 {
     internal static class ParameterNamingHelper
     {
@@ -10,7 +10,7 @@ namespace apimtemplate.Common.Helpers
         public static string GenerateValidParameterName(string apiName, string prefix)
         {
             var validApiName = _excludeOtherFromLettersAndDigitsRegex.Replace(apiName, string.Empty);
-            
+
             if (char.IsDigit(validApiName.First()))
             {
                 return prefix + validApiName;

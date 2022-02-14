@@ -19,7 +19,9 @@ namespace apimtemplate.Common.Templates.Policy
                 var key = policyContent;
                 //check cache
                 if (_policyCache.TryGetValue(key, out string content))
+                {
                     return content;
+                }
 
                 var filename = policyContent.Split(',')[1].Replace("'", string.Empty).Trim();
                 var policyFolder = $@"{extractorParameters.fileFolder}/policies";
