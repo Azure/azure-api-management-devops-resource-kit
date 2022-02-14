@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -6,10 +6,6 @@
     <ProjectGuid>{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}</ProjectGuid>
     <RootNamespace>$(SolutionName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="..\apimtemplate\Creator\ExampleFiles\OpenAPISpecs\swaggerPetstorev3.json" Link="Resources\swaggerPetstorev3.json" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
@@ -28,14 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ArmTemplates\ArmTemplates.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="..\apimtemplate\Creator\ExampleFiles\OpenAPISpecs\swaggerPetstore.yml" Link="Resources\swaggerPetstore.yml" />
   </ItemGroup>
 
 </Project>
