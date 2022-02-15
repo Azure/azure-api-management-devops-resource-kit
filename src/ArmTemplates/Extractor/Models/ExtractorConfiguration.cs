@@ -60,16 +60,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public void Validate(bool ignorePreviousValidations = false)
         {
-            if (string.IsNullOrEmpty(sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
-            if (string.IsNullOrEmpty(destinationApimName)) throw new ArgumentException("Missing parameter <destinationApimName>.");
-            if (string.IsNullOrEmpty(resourceGroup)) throw new ArgumentException("Missing parameter <resourceGroup>.");
-            if (string.IsNullOrEmpty(fileFolder)) throw new ArgumentException("Missing parameter <fileFolder>.");
+            if (string.IsNullOrEmpty(this.sourceApimName)) throw new ArgumentException("Missing parameter <sourceApimName>.");
+            if (string.IsNullOrEmpty(this.destinationApimName)) throw new ArgumentException("Missing parameter <destinationApimName>.");
+            if (string.IsNullOrEmpty(this.resourceGroup)) throw new ArgumentException("Missing parameter <resourceGroup>.");
+            if (string.IsNullOrEmpty(this.fileFolder)) throw new ArgumentException("Missing parameter <fileFolder>.");
 
-            bool shouldSplitAPIs = splitAPIs != null && splitAPIs.Equals("true");
-            bool hasVersionSetName = apiVersionSetName != null;
-            bool hasSingleApi = apiName != null;
-            bool includeRevisions = includeAllRevisions != null && includeAllRevisions.Equals("true");
-            bool hasMultipleAPIs = multipleAPIs != null;
+            bool shouldSplitAPIs = this.splitAPIs != null && this.splitAPIs.Equals("true");
+            bool hasVersionSetName = this.apiVersionSetName != null;
+            bool hasSingleApi = this.apiName != null;
+            bool includeRevisions = this.includeAllRevisions != null && this.includeAllRevisions.Equals("true");
+            bool hasMultipleAPIs = this.multipleAPIs != null;
 
             if (shouldSplitAPIs && hasSingleApi)
             {

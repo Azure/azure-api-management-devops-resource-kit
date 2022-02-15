@@ -9,12 +9,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Application
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    public class AppArgs
-    {
-        public bool create { get; set; }
-        public string extract { get; set; }
-    }
-
     class Program
     {
         public static int Main(string[] args)
@@ -50,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             }
         }
 
-        private static void SetupApplicationLoggingToConsole()
+        static void SetupApplicationLoggingToConsole()
         {
             var serilogConsoleLogger = new LoggerConfiguration()
                     .WriteTo.Console()

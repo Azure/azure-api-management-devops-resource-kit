@@ -3,7 +3,7 @@ using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions
 {
-    internal class TemplateCreator
+    class TemplateCreator
     {
         public TemplateCreator()
         {

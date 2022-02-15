@@ -10,7 +10,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 {
     public class PolicyTemplateCreator : TemplateCreator
     {
-        private FileReader fileReader;
+        FileReader fileReader;
 
         public PolicyTemplateCreator(FileReader fileReader)
         {
@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateGlobalServicePolicyTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template policyTemplate = CreateEmptyTemplate();
+            Template policyTemplate = this.CreateEmptyTemplate();
 
             // add parameters
             policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
                     format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? globalServicePolicy : fileReader.RetrieveLocalFileContents(globalServicePolicy)
+                    value = isUrl ? globalServicePolicy : this.fileReader.RetrieveLocalFileContents(globalServicePolicy)
                 },
                 dependsOn = new string[] { }
             };
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
                     format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? api.policy : fileReader.RetrieveLocalFileContents(api.policy)
+                    value = isUrl ? api.policy : this.fileReader.RetrieveLocalFileContents(api.policy)
                 },
                 dependsOn = dependsOn
             };
@@ -94,7 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
                     format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? product.policy : fileReader.RetrieveLocalFileContents(product.policy)
+                    value = isUrl ? product.policy : this.fileReader.RetrieveLocalFileContents(product.policy)
                 },
                 dependsOn = dependsOn
             };
@@ -115,7 +115,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
                     format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? policyPair.Value.policy : fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
+                    value = isUrl ? policyPair.Value.policy : this.fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
                 },
                 dependsOn = dependsOn
             };
@@ -128,7 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             List<PolicyTemplateResource> policyTemplateResources = new List<PolicyTemplateResource>();
             foreach (KeyValuePair<string, OperationsConfig> pair in api.operations)
             {
-                policyTemplateResources.Add(CreateOperationPolicyTemplateResource(pair, api.name, dependsOn));
+                policyTemplateResources.Add(this.CreateOperationPolicyTemplateResource(pair, api.name, dependsOn));
             }
             return policyTemplateResources;
         }

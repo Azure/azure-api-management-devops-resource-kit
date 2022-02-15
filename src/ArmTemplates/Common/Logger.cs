@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     /// </summary>
     public static class Logger
     {
-        private static ILogger _logger;
+        static ILogger _logger;
 
         /// <summary>
         /// Specify which logger to use for internal apimtemplate library messaging

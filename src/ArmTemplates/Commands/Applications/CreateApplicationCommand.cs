@@ -15,13 +15,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 {
     public class CreateApplicationCommand : CommandLineApplicationBase
     {
-        private CommandOption _appInsightsInstrumentationKey;
-        private CommandOption _appInsightsName;
-        private CommandOption _namedValueKeys;
-        private CommandOption _apimNameValue;
-        private CommandOption _configFile;
-        private CommandOption _backendUrlConfigFile;
-        private CommandOption _preferredAPIsForDeployment;
+        CommandOption appInsightsInstrumentationKey;
+        CommandOption appInsightsName;
+        CommandOption namedValueKeys;
+        CommandOption apimNameValue;
+        CommandOption configFile;
+        CommandOption backendUrlConfigFile;
+        CommandOption preferredAPIsForDeployment;
 
         public CreateApplicationCommand() : base()
         {
@@ -29,16 +29,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 
         protected override void SetupApplicationAndCommands()
         {
-            Name = GlobalConstants.CreateName;
-            Description = GlobalConstants.CreateDescription;
+            this.Name = GlobalConstants.CreateName;
+            this.Description = GlobalConstants.CreateDescription;
 
-            _appInsightsInstrumentationKey = Option("--appInsightsInstrumentationKey <appInsightsInstrumentationKey>", "AppInsights intrumentationkey", CommandOptionType.SingleValue);
-            _appInsightsName = Option("--appInsightsName <appInsightsName>", "AppInsights Name", CommandOptionType.SingleValue);
-            _namedValueKeys = Option("--namedValues <namedValues>", "Named Values", CommandOptionType.SingleValue);
-            _apimNameValue = Option("--apimNameValue <apimNameValue>", "Apim Name Value", CommandOptionType.SingleValue);
-            _configFile = Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
-            _backendUrlConfigFile = Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
-            _preferredAPIsForDeployment = Option("--preferredAPIsForDeployment <preferredAPIsForDeployment>", "create ARM templates for the given APIs Name(comma separated) else leave this parameter blank then by default all api's will be considered", CommandOptionType.SingleValue);
+            this.appInsightsInstrumentationKey = this.Option("--appInsightsInstrumentationKey <appInsightsInstrumentationKey>", "AppInsights intrumentationkey", CommandOptionType.SingleValue);
+            this.appInsightsName = this.Option("--appInsightsName <appInsightsName>", "AppInsights Name", CommandOptionType.SingleValue);
+            this.namedValueKeys = this.Option("--namedValues <namedValues>", "Named Values", CommandOptionType.SingleValue);
+            this.apimNameValue = this.Option("--apimNameValue <apimNameValue>", "Apim Name Value", CommandOptionType.SingleValue);
+            this.configFile = this.Option("--configFile <configFile>", "Config YAML file location", CommandOptionType.SingleValue).IsRequired();
+            this.backendUrlConfigFile = this.Option("--backendurlconfigFile <backendurlconfigFile>", "backend url json file location", CommandOptionType.SingleValue);
+            this.preferredAPIsForDeployment = this.Option("--preferredAPIsForDeployment <preferredAPIsForDeployment>", "create ARM templates for the given APIs Name(comma separated) else leave this parameter blank then by default all api's will be considered", CommandOptionType.SingleValue);
         }
 
         protected override async Task<int> ExecuteCommand()
@@ -50,35 +50,35 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 
             GlobalConstants.CommandStartDateTime = DateTime.Now.ToString("MMyyyydd  hh mm ss");
 
-            CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(_configFile.Value());
+            CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(this.configFile.Value());
 
-            if (_apimNameValue != null && !string.IsNullOrEmpty(_apimNameValue.Value()))
+            if (this.apimNameValue != null && !string.IsNullOrEmpty(this.apimNameValue.Value()))
             {
-                creatorConfig.apimServiceName = _apimNameValue.Value();
+                creatorConfig.apimServiceName = this.apimNameValue.Value();
             }
 
             AppInsightsUpdater appInsightsUpdater = new AppInsightsUpdater();
-            appInsightsUpdater.UpdateAppInsightNameAndInstrumentationKey(creatorConfig, _appInsightsInstrumentationKey, _appInsightsName);
+            appInsightsUpdater.UpdateAppInsightNameAndInstrumentationKey(creatorConfig, this.appInsightsInstrumentationKey, this.appInsightsName);
 
             // Overwrite named values from build pipeline
             NamedValuesUpdater namedValuesUpdater = new NamedValuesUpdater();
-            namedValuesUpdater.UpdateNamedValueInstances(creatorConfig, _namedValueKeys);
+            namedValuesUpdater.UpdateNamedValueInstances(creatorConfig, this.namedValueKeys);
 
             // validate creator config
             CreatorConfigurationValidator creatorConfigurationValidator = new CreatorConfigurationValidator(this);
 
             //if preferredAPIsForDeployment passed as parameter
-            if (_preferredAPIsForDeployment != null && !string.IsNullOrEmpty(_preferredAPIsForDeployment.Value()))
+            if (this.preferredAPIsForDeployment != null && !string.IsNullOrEmpty(this.preferredAPIsForDeployment.Value()))
             {
                 considerAllApiForDeployments = false;
-                preferredApis = _preferredAPIsForDeployment.Value().Split(",");
+                preferredApis = this.preferredAPIsForDeployment.Value().Split(",");
             }
 
             //if backendurlfile passed as parameter
-            if (_backendUrlConfigFile != null && !string.IsNullOrEmpty(_backendUrlConfigFile.Value()))
+            if (this.backendUrlConfigFile != null && !string.IsNullOrEmpty(this.backendUrlConfigFile.Value()))
             {
                 CreatorApiBackendUrlUpdater creatorApiBackendUrlUpdater = new CreatorApiBackendUrlUpdater();
-                creatorConfig = creatorApiBackendUrlUpdater.UpdateBackendServiceUrl(_backendUrlConfigFile.Value(), creatorConfig);
+                creatorConfig = creatorApiBackendUrlUpdater.UpdateBackendServiceUrl(this.backendUrlConfigFile.Value(), creatorConfig);
             }
 
             bool isValidCreatorConfig = creatorConfigurationValidator.ValidateCreatorConfig(creatorConfig);
@@ -161,7 +161,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                         apiInformation.Add(new LinkedMasterTemplateAPIInformation()
                         {
                             name = api.name,
-                            isSplit = apiTemplateCreator.isSplitAPI(api),
+                            isSplit = apiTemplateCreator.IsSplitAPI(api),
                             dependsOnGlobalServicePolicies = creatorConfig.policy != null,
                             dependsOnVersionSets = api.apiVersionSetId != null,
                             dependsOnVersion = masterTemplateCreator.GetDependsOnPreviousApiVersion(api, apiVersions),
@@ -194,7 +194,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                     APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
                     APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.name, APITemplateCreator.MakeResourceName(api), true) == 0);
                     // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
-                    string apiFileName = FileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.isSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
+                    string apiFileName = FileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.IsSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
                     FileWriter.WriteJSONToFile(apiTemplate, string.Concat(creatorConfig.outputLocation, apiFileName));
                 }
                 if (globalServicePolicyTemplate != null)
