@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateAuthorizationServerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template authorizationTemplate = CreateEmptyTemplate();
+            Template authorizationTemplate = this.CreateEmptyTemplate();
 
             // add parameters
             authorizationTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
