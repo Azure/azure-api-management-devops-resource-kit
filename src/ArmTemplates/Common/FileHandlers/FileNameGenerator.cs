@@ -9,26 +9,26 @@
                 baseFileName += "-";
 
             // generate useable object with file names for consistency throughout project
-            return new FileNames()
+            return new FileNames
             {
-                apiVersionSets = $@"/{baseFileName}apiVersionSets.template.json",
-                authorizationServers = $@"/{baseFileName}authorizationServers.template.json",
-                backends = $@"/{baseFileName}backends.template.json",
-                globalServicePolicy = $@"/{baseFileName}globalServicePolicy.template.json",
-                loggers = $@"/{baseFileName}loggers.template.json",
-                namedValues = $@"/{baseFileName}namedValues.template.json",
-                tags = $@"/{baseFileName}tags.template.json",
-                products = $@"/{baseFileName}products.template.json",
-                productAPIs = $@"/{baseFileName}productAPIs.template.json",
-                apiTags = $@"/{baseFileName}apiTags.template.json",
-                parameters = $@"/{baseFileName}parameters.json",
-                linkedMaster = $@"/{baseFileName}master.template.json",
-                apis = "/Apis",
-                splitAPIs = "/SplitAPIs",
-                versionSetMasterFolder = "/VersionSetMasterFolder",
-                revisionMasterFolder = "/RevisionMasterFolder",
-                groupAPIsMasterFolder = "/MultipleApisMasterFolder",
-                baseFileName = baseFileName
+                ApiVersionSets = $@"/{baseFileName}apiVersionSets.template.json",
+                AuthorizationServers = $@"/{baseFileName}authorizationServers.template.json",
+                Backends = $@"/{baseFileName}backends.template.json",
+                GlobalServicePolicy = $@"/{baseFileName}globalServicePolicy.template.json",
+                Loggers = $@"/{baseFileName}loggers.template.json",
+                NamedValues = $@"/{baseFileName}namedValues.template.json",
+                Tags = $@"/{baseFileName}tags.template.json",
+                Products = $@"/{baseFileName}products.template.json",
+                ProductAPIs = $@"/{baseFileName}productAPIs.template.json",
+                ApiTags = $@"/{baseFileName}apiTags.template.json",
+                Parameters = $@"/{baseFileName}parameters.json",
+                LinkedMaster = $@"/{baseFileName}master.template.json",
+                Apis = "/Apis",
+                SplitAPIs = "/SplitAPIs",
+                VersionSetMasterFolder = "/VersionSetMasterFolder",
+                RevisionMasterFolder = "/RevisionMasterFolder",
+                GroupAPIsMasterFolder = "/MultipleApisMasterFolder",
+                BaseFileName = baseFileName
             };
         }
 

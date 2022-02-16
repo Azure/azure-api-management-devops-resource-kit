@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             }
         }
 
-        public ExtractorConfig ConvertConfigJsonToExtractorConfig(string extractorJsonPath)
+        public ExtractorConsoleAppConfiguration ConvertConfigJsonToExtractorConfig(string extractorJsonPath)
         {
             if (string.IsNullOrWhiteSpace(extractorJsonPath) || !File.Exists(extractorJsonPath))
             {
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             using (StreamReader r = new StreamReader(extractorJsonPath))
             {
                 string extractorJson = r.ReadToEnd();
-                ExtractorConfig extractorConfig = JsonConvert.DeserializeObject<ExtractorConfig>(extractorJson);
+                ExtractorConsoleAppConfiguration extractorConfig = JsonConvert.DeserializeObject<ExtractorConsoleAppConfiguration>(extractorJson);
                 return extractorConfig;
             }
         }
@@ -106,7 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             }
         }
 
-        public bool isJSON(string fileContents)
+        public bool IsJSON(string fileContents)
         {
             try
             {

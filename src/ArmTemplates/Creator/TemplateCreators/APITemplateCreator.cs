@@ -196,7 +196,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 bool isVersionThree = false;
                 if (api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
                 {
-                    isJSON = this.fileReader.isJSON(fileContents);
+                    isJSON = this.fileReader.IsJSON(fileContents);
 
                     if (isJSON == true)
                     {

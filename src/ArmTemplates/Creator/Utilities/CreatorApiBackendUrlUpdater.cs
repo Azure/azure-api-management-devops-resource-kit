@@ -15,7 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             string backendurlConfigContent = fileReader.RetrieveLocalFileContents(backendServiceUrlFile);
 
             //if the file is json file
-            if (fileReader.isJSON(backendurlConfigContent))
+            if (fileReader.IsJSON(backendurlConfigContent))
             {
                 List<BackendUrlsConfig> backendUrls = JsonConvert.DeserializeObject<List<BackendUrlsConfig>>(backendurlConfigContent);
 

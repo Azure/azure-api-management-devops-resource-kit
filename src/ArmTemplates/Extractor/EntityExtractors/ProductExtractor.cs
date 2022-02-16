@@ -72,7 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Console.WriteLine("Extracting products from service");
             Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
-            if (extractorParameters.policyXMLBaseUrl != null && extractorParameters.policyXMLSasToken != null)
+            if (extractorParameters.PolicyXMLBaseUrl != null && extractorParameters.PolicyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
@@ -80,7 +80,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
             }
-            if (extractorParameters.policyXMLBaseUrl != null)
+            if (extractorParameters.PolicyXMLBaseUrl != null)
             {
                 TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
                 {
@@ -142,7 +142,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         productPolicyResource.dependsOn = productResourceId;
 
                         // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-                        if (extractorParameters.policyXMLBaseUrl != null)
+                        if (extractorParameters.PolicyXMLBaseUrl != null)
                         {
                             string policyXMLContent = productPolicyResource.properties.value;
                             string policyFolder = string.Concat(fileFolder, $@"/policies");
@@ -150,7 +150,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                             FileWriter.CreateFolderIfNotExists(policyFolder);
                             FileWriter.WriteXMLToFile(policyXMLContent, string.Concat(policyFolder, productPolicyFileName));
                             productPolicyResource.properties.format = "rawxml-link";
-                            if (extractorParameters.policyXMLSasToken != null)
+                            if (extractorParameters.PolicyXMLSasToken != null)
                             {
                                 productPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{productPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                             }

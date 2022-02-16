@@ -6,7 +6,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     static class PolicyTemplateUtils
     {
-        static readonly IMemoryCache _policyCache = new MemoryCache(new MemoryCacheOptions());
+        static readonly IMemoryCache PolicyCache = new MemoryCache(new MemoryCacheOptions());
 
         public static string GetPolicyContent(ExtractorParameters extractorParameters, PolicyTemplateResource policyTemplateResource)
         {
@@ -18,19 +18,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 var key = policyContent;
                 //check cache
-                if (_policyCache.TryGetValue(key, out string content))
+                if (PolicyCache.TryGetValue(key, out string content))
                 {
                     return content;
                 }
 
                 var filename = policyContent.Split(',')[1].Replace("'", string.Empty).Trim();
-                var policyFolder = $@"{extractorParameters.fileFolder}/policies";
+                var policyFolder = $@"{extractorParameters.FilesGenerationRootDirectory}/policies";
                 var filepath = $@"{Directory.GetCurrentDirectory()}/{policyFolder}/{filename}";
 
                 if (File.Exists(filepath))
                 {
                     policyContent = File.ReadAllText(filepath);
-                    _policyCache.Set(key, policyContent);
+                    PolicyCache.Set(key, policyContent);
                 }
             }
 

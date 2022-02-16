@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Console.WriteLine("Extracting loggers from service");
             Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
-            if (extractorParameters.paramLogResourceId)
+            if (extractorParameters.ToParameterizeLogResourceId)
             {
                 TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
                 {
@@ -57,12 +57,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all loggers for service
-            string loggers = await this.GetLoggersAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+            string loggers = await this.GetLoggersAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
             JObject oLoggers = JObject.Parse(loggers);
             foreach (var extractedLogger in oLoggers["value"])
             {
                 string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-                string fullLoggerResource = await this.GetLoggerDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, loggerName);
+                string fullLoggerResource = await this.GetLoggerDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, loggerName);
 
                 // convert returned logger to template resource class
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
@@ -90,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         }
                     }
                     string validApiName = ParameterNamingHelper.GenerateValidParameterName(singleApiName, ParameterPrefix.Api);
-                    if (extractorParameters.paramApiLoggerId && apiLoggerId.ContainsKey(validApiName))
+                    if (extractorParameters.ToParameterizeApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {
                         object diagnosticObj = apiLoggerId[validApiName];
                         if (diagnosticObj is Dictionary<string, string>)

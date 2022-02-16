@@ -54,7 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Console.WriteLine("Extracting backends from service");
             Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
-            if (extractorParameters.paramBackend)
+            if (extractorParameters.ToParameterizeBackend)
             {
                 TemplateParameterProperties extractBackendParametersProperties = new TemplateParameterProperties()
                 {
@@ -116,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                     if (includeBackend)
                     {
-                        if (extractorParameters.paramBackend)
+                        if (extractorParameters.ToParameterizeBackend)
                         {
                             var apiToken = new BackendApiParameters();
                             string validApiParamName = ParameterNamingHelper.GenerateValidParameterName(backendName, ParameterPrefix.Diagnostic).ToLower();

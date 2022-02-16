@@ -11,6 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Pol
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
+using Microsoft.Azure.Management.Monitor.Fluent.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -18,7 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public class ApiExtractor : EntityExtractorBase, IApiExtractor
     {
-        public async Task<string[]> GetAllOperationNames(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string[]> GetAllOperationNames(string apiManagementName, string resourceGroupName, string apiName)
         {
             var oOperations = new JObject();
             int numOfOps = 0;
@@ -28,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
                 string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations?$skip={5}&api-version={6}",
-                   BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, numOfOps, GlobalConstants.APIVersion);
+                   BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, numOfOps, GlobalConstants.APIVersion);
                 numOfOps += GlobalConstants.NumOfRecords;
 
                 string operations = await this.CallApiManagementAsync(azToken, requestUrl);
@@ -44,42 +45,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return operationNames.ToArray();
         }
 
-        public async Task<string> GetAPIOperationDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationName)
+        public async Task<string> GetAPIOperationDetailsAsync(string apiManagementName, string resourceGroupName, string apiName, string operationName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}?api-version={6}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, operationName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetOperationPolicyAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationId)
+        public async Task<string> GetOperationPolicyAsync(string apiManagementName, string resourceGroupName, string apiName, string operationId)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/policies/policy?api-version={6}&format=rawxml",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationId, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, operationId, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetOperationTagsAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string OperationId)
+        public async Task<string> GetOperationTagsAsync(string apiManagementName, string resourceGroupName, string apiName, string operationId)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/tags?api-version={6}&format=rawxml",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, OperationId, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, operationId, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAPIServiceUrl(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string> GetAPIServiceUrl(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.APIVersion);
 
             string apiDetails = await this.CallApiManagementAsync(azToken, requestUrl);
             JObject oApiDetails = JObject.Parse(apiDetails);
@@ -87,12 +88,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return apiResource.properties.serviceUrl;
         }
 
-        public async Task<string> GetAPIDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string> GetAPIDetailsAsync(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -136,12 +137,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return apiNames;
         }
 
-        public async Task<string> GetAPIChangeLogAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string> GetAPIChangeLogAsync(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/releases?api-version={5}",
-                BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+                BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -155,22 +156,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAPIPolicyAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string> GetAPIPolicyAsync(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/policies/policy?api-version={5}&format=rawxml",
-                BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+                BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAPITagsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string> GetAPITagsAsync(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/tags?api-version={5}",
-                BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+                BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -184,32 +185,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAPIProductsAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string> GetAPIProductsAsync(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/products?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAPISchemasAsync(string ApiManagementName, string ResourceGroupName, string ApiName)
+        public async Task<string> GetAPISchemasAsync(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/schemas?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAPISchemaDetailsAsync(string ApiManagementName, string ResourceGroupName, string ApiName, string schemaName)
+        public async Task<string> GetAPISchemaDetailsAsync(string apiManagementName, string resourceGroupName, string apiName, string schemaName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/schemas/{5}?api-version={6}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ApiName, schemaName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, schemaName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -224,11 +225,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<List<TemplateResource>> GenerateSingleAPIResourceAsync(string apiName, ExtractorParameters extractorParameters)
+        public async Task<List<TemplateResource>> GenerateSingleAPIResourceAsync(ExtractorParameters extractorParameters, string apiName, string baseFilesGenerationDirectory)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            string apimname = extractorParameters.sourceApimName, resourceGroup = extractorParameters.resourceGroup, fileFolder = extractorParameters.fileFolder, policyXMLBaseUrl = extractorParameters.policyXMLBaseUrl, policyXMLSasToken = extractorParameters.policyXMLSasToken;
-            string apiDetails = await this.GetAPIDetailsAsync(apimname, resourceGroup, apiName);
+            string apiDetails = await this.GetAPIDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, apiName);
 
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting resources from {0} API:", apiName);
@@ -242,7 +242,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             apiResource.apiVersion = GlobalConstants.APIVersion;
             apiResource.scale = null;
 
-            if (extractorParameters.paramServiceUrl)
+            if (extractorParameters.ToParameterizeServiceUrl)
             {
                 apiResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
             }
@@ -264,20 +264,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             templateResources.Add(apiResource);
 
-            templateResources.AddRange(await this.GetRelatedTemplateResourcesAsync(apiName, extractorParameters));
+            templateResources.AddRange(await this.GetRelatedTemplateResourcesAsync(extractorParameters, apiName, baseFilesGenerationDirectory));
 
             return templateResources;
         }
 
         // this function generate apiTemplate for single api with all its revisions
-        public async Task<Template> GenerateAPIRevisionTemplateAsync(string currentRevision, List<string> revList, string apiName, ExtractorParameters extractorParameters)
+        public async Task<Template> GenerateAPIRevisionTemplateAsync(ExtractorParameters extractorParameters, string currentRevision, List<string> revList, string baseFilesGenerationDirectory)
         {
             // generate apiTemplate
             Template armTemplate = this.GenerateEmptyApiTemplateWithParameters(extractorParameters);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
-            List<TemplateResource> apiResources = await this.GenerateSingleAPIResourceAsync(apiName, extractorParameters);
+            List<TemplateResource> apiResources = await this.GenerateSingleAPIResourceAsync(extractorParameters, extractorParameters.SingleApiName, baseFilesGenerationDirectory);
             templateResources.AddRange(apiResources);
 
             foreach (string curApi in revList)
@@ -286,19 +286,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 if (curApi.Equals(currentRevision))
                 {
                     // add current API revision resource to template
-                    apiResources = await this.GenerateCurrentRevisionAPIResourceAsync(curApi, extractorParameters);
+                    apiResources = await this.GenerateCurrentRevisionAPIResourceAsync(extractorParameters, curApi, baseFilesGenerationDirectory);
                     templateResources.AddRange(apiResources);
                 }
                 else
                 {
                     // add other API revision resources to template
-                    apiResources = await this.GenerateSingleAPIResourceAsync(curApi, extractorParameters);
+                    apiResources = await this.GenerateSingleAPIResourceAsync(extractorParameters, curApi, baseFilesGenerationDirectory);
 
                     // make current API a dependency to other revisions, in case destination apim doesn't have the this API 
                     TemplateResource apiResource = apiResources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as TemplateResource;
                     List<TemplateResource> newResourcesList = RemoveResourceType(ResourceTypeConstants.API, apiResources);
                     List<string> dependsOn = apiResource.dependsOn.ToList();
-                    dependsOn.Add($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]");
+                    dependsOn.Add($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{extractorParameters.SingleApiName}')]");
                     apiResource.dependsOn = dependsOn.ToArray();
                     newResourcesList.Add(apiResource);
 
@@ -311,10 +311,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         }
 
         // this function will get the current revision of this api and will remove "isCurrent" paramter
-        public async Task<List<TemplateResource>> GenerateCurrentRevisionAPIResourceAsync(string apiName, ExtractorParameters extractorParameters)
+        public async Task<List<TemplateResource>> GenerateCurrentRevisionAPIResourceAsync(ExtractorParameters extractorParameters, string apiName, string baseFilesGenerationDirectory)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            string apimname = extractorParameters.sourceApimName, resourceGroup = extractorParameters.resourceGroup, fileFolder = extractorParameters.fileFolder, policyXMLBaseUrl = extractorParameters.policyXMLBaseUrl, policyXMLSasToken = extractorParameters.policyXMLSasToken;
+            string apimname = extractorParameters.SourceApimName, resourceGroup = extractorParameters.ResourceGroup;
             string apiDetails = await this.GetAPIDetailsAsync(apimname, resourceGroup, apiName);
 
             Console.WriteLine("------------------------------------------");
@@ -330,7 +330,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             apiResource.scale = null;
             apiResource.properties.isCurrent = null;
 
-            if (extractorParameters.paramServiceUrl)
+            if (extractorParameters.ToParameterizeServiceUrl)
             {
                 apiResource.properties.serviceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
             }
@@ -351,25 +351,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             templateResources.Add(apiResource);
-            templateResources.AddRange(await this.GetRelatedTemplateResourcesAsync(apiName, extractorParameters));
+            templateResources.AddRange(await this.GetRelatedTemplateResourcesAsync(extractorParameters, apiName, baseFilesGenerationDirectory));
 
             return templateResources;
         }
 
-        public async Task<Template> GenerateAPIsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
+        public async Task<Template> GenerateAPIsARMTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory)
         {
             // initialize arm template
             Template armTemplate = this.GenerateEmptyApiTemplateWithParameters(extractorParameters);
             List<TemplateResource> templateResources = new List<TemplateResource>();
+            
             // when extract single API
             if (singleApiName != null)
             {
                 // check if this api exist
                 try
                 {
-                    string apiDetails = await this.GetAPIDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName);
+                    string apiDetails = await this.GetAPIDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, singleApiName);
                     Console.WriteLine("{0} API found ...", singleApiName);
-                    templateResources.AddRange(await this.GenerateSingleAPIResourceAsync(singleApiName, extractorParameters));
+                    templateResources.AddRange(await this.GenerateSingleAPIResourceAsync(extractorParameters, singleApiName, baseFilesGenerationDirectory));
                 }
                 catch (Exception)
                 {
@@ -382,19 +383,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 Console.WriteLine("{0} APIs found ...", multipleApiNames.Count().ToString());
                 foreach (string apiName in multipleApiNames)
                 {
-                    templateResources.AddRange(await this.GenerateSingleAPIResourceAsync(apiName, extractorParameters));
+                    templateResources.AddRange(await this.GenerateSingleAPIResourceAsync(extractorParameters, apiName, baseFilesGenerationDirectory));
                 }
             }
             // when extract all APIs and generate one master template
             else
             {
-                JToken[] oApis = await this.GetAllApiObjsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+                JToken[] oApis = await this.GetAllApiObjsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
                 Console.WriteLine("{0} APIs found ...", oApis.Count().ToString());
 
                 foreach (JToken oApi in oApis)
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await this.GenerateSingleAPIResourceAsync(apiName, extractorParameters));
+                    templateResources.AddRange(await this.GenerateSingleAPIResourceAsync(extractorParameters, apiName, baseFilesGenerationDirectory));
                 }
             }
 
@@ -450,7 +451,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return false;
         }
 
-        async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup, string fileFolder)
+        async Task<List<TemplateResource>> GenerateSchemasARMTemplate(string apimServiceName, string apiName, string resourceGroup)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -520,14 +521,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         /// <param name="apiName">The name of the API.</param>
         /// <param name="extractorParameters">The extractor.</param>
         /// <returns></returns>
-        async Task<IEnumerable<TemplateResource>> GetRelatedTemplateResourcesAsync(string apiName, ExtractorParameters extractorParameters)
+        async Task<IEnumerable<TemplateResource>> GetRelatedTemplateResourcesAsync(ExtractorParameters extractorParameters, string apiName, string baseFilesGenerationDirectory)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            string apimname = extractorParameters.sourceApimName, resourceGroup = extractorParameters.resourceGroup, fileFolder = extractorParameters.fileFolder, policyXMLBaseUrl = extractorParameters.policyXMLBaseUrl, policyXMLSasToken = extractorParameters.policyXMLSasToken;
+            var apimname = extractorParameters.SourceApimName;
+            var resourceGroup = extractorParameters.ResourceGroup;
+            var fileFolder = baseFilesGenerationDirectory;
+            var policyXMLBaseUrl = extractorParameters.PolicyXMLBaseUrl;
+            var policyXMLSasToken = extractorParameters.PolicyXMLSasToken;
 
             #region Schemas
             // add schema resources to api template
-            List<TemplateResource> schemaResources = await this.GenerateSchemasARMTemplate(apimname, apiName, resourceGroup, fileFolder);
+            List<TemplateResource> schemaResources = await this.GenerateSchemasARMTemplate(apimname, apiName, resourceGroup);
             templateResources.AddRange(schemaResources);
             #endregion
 
@@ -540,10 +545,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<string> batchOwners = new List<string>();
 
             // if a batch size is specified            
-            if (extractorParameters.operationBatchSize > 0)
+            if (extractorParameters.OperationBatchSize > 0)
             {
                 // store the number of batches required based on exc.operationBatchSize
-                numBatches = (int)Math.Ceiling(operationNames.Length / (double)extractorParameters.operationBatchSize);
+                numBatches = (int)Math.Ceiling(operationNames.Length / (double)extractorParameters.OperationBatchSize);
                 //Console.WriteLine ("Number of batches: {0}", numBatches);
             }
 
@@ -554,7 +559,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 //add batch owners into array
                 // ensure each owner is linked to the one before
-                if (extractorParameters.operationBatchSize > 0 && opIndex < numBatches)
+                if (extractorParameters.OperationBatchSize > 0 && opIndex < numBatches)
                 {
                     batchOwners.Add(operationName);
                     //Console.WriteLine("Adding operation {0} to owner list", operationName);
@@ -591,7 +596,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 // add to batch if flagged
                 string batchdependsOn;
 
-                if (extractorParameters.operationBatchSize > 0 && opIndex > 0)
+                if (extractorParameters.OperationBatchSize > 0 && opIndex > 0)
                 {
                     if (opIndex >= 1 && opIndex <= numBatches - 1)
                     {
@@ -602,7 +607,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     else
                     {
                         // chain the operation to respective owner
-                        int ownerIndex = (int)Math.Floor((opIndex - numBatches) / ((double)extractorParameters.operationBatchSize - 1));
+                        int ownerIndex = (int)Math.Floor((opIndex - numBatches) / ((double)extractorParameters.OperationBatchSize - 1));
                         batchdependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{batchOwners[ownerIndex]}')]";
                         //Console.WriteLine("Operation {0} chained to owner {1}", operationName, batchOwners[ownerIndex]);
                     }
@@ -779,7 +784,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 diagnosticResource.scale = null;
                 diagnosticResource.dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
 
-                if (extractorParameters.paramApiLoggerId)
+                if (extractorParameters.ToParameterizeApiLoggerId)
                 {
 
                     diagnosticResource.properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{ParameterNamingHelper.GenerateValidParameterName(diagnosticName, ParameterPrefix.Diagnostic)}]";
@@ -807,7 +812,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         async Task<IEnumerable<TemplateResource>> GetServiceDiagnosticsTemplateResourcesAsync(ExtractorParameters extractorParameters)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            string apimname = extractorParameters.sourceApimName, resourceGroup = extractorParameters.resourceGroup;
+            string apimname = extractorParameters.SourceApimName, resourceGroup = extractorParameters.ResourceGroup;
 
             string serviceDiagnostics = await this.GetServiceDiagnosticsAsync(apimname, resourceGroup);
             JObject oServiceDiagnostics = JObject.Parse(serviceDiagnostics);
@@ -825,7 +830,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 serviceDiagnosticResource.scale = null;
                 serviceDiagnosticResource.dependsOn = new string[] { };
 
-                if (extractorParameters.paramApiLoggerId)
+                if (extractorParameters.ToParameterizeApiLoggerId)
                 {
 
                     serviceDiagnosticResource.properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(serviceDiagnosticName, ParameterPrefix.Diagnostic)}]";
@@ -848,7 +853,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Template armTemplate = this.GenerateEmptyTemplate();
             armTemplate.parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
-            if (extractorParameters.policyXMLBaseUrl != null && extractorParameters.policyXMLSasToken != null)
+            if (extractorParameters.PolicyXMLBaseUrl != null && extractorParameters.PolicyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
@@ -856,7 +861,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
             }
-            if (extractorParameters.policyXMLBaseUrl != null)
+            if (extractorParameters.PolicyXMLBaseUrl != null)
             {
                 TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
                 {
@@ -864,7 +869,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 armTemplate.parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
             }
-            if (extractorParameters.paramServiceUrl || extractorParameters.serviceUrlParameters != null && extractorParameters.serviceUrlParameters.Length > 0)
+            if (extractorParameters.ToParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
             {
                 TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                 {
@@ -872,7 +877,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 armTemplate.parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
             }
-            if (extractorParameters.paramApiLoggerId)
+            if (extractorParameters.ToParameterizeApiLoggerId)
             {
                 TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
                 {

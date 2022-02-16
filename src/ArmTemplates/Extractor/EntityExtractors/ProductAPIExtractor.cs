@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<List<TemplateResource>> GenerateSingleProductAPIResourceAsync(string apiName, ExtractorParameters extractorParameters, string[] dependsOn)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
-            string apimname = extractorParameters.sourceApimName, resourceGroup = extractorParameters.resourceGroup, fileFolder = extractorParameters.fileFolder, policyXMLBaseUrl = extractorParameters.policyXMLBaseUrl, policyXMLSasToken = extractorParameters.policyXMLSasToken;
+            string apimname = extractorParameters.SourceApimName, resourceGroup = extractorParameters.ResourceGroup, fileFolder = extractorParameters.FilesGenerationRootDirectory, policyXMLBaseUrl = extractorParameters.PolicyXMLBaseUrl, policyXMLSasToken = extractorParameters.PolicyXMLSasToken;
 
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting products from {0} API:", apiName);
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 // check if this api exist
                 try
                 {
-                    string apiDetails = await this.GetAPIDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName);
+                    string apiDetails = await this.GetAPIDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, singleApiName);
                     Console.WriteLine("{0} API found ...", singleApiName);
                     templateResources.AddRange(await this.GenerateSingleProductAPIResourceAsync(singleApiName, extractorParameters, new string[] { }));
                 }
@@ -92,7 +92,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // when extract all APIs and generate one master template
             else
             {
-                JToken[] oApis = await this.GetAllApiObjsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+                JToken[] oApis = await this.GetAllApiObjsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
                 Console.WriteLine("{0} APIs found ...", oApis.Count().ToString());
 
                 string[] dependsOn = new string[] { };

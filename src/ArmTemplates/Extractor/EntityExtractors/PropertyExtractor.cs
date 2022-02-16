@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
-            if (extractorParameters.paramNamedValue)
+            if (extractorParameters.ToParameterizeNamedValue)
             {
                 TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
                 {
@@ -66,7 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 armTemplate.parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
             }
-            if (extractorParameters.paramNamedValuesKeyVaultSecrets)
+            if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
             {
                 TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
                 {
@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 armTemplate.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
             }
-            if (extractorParameters.notIncludeNamedValue == true)
+            if (extractorParameters.NotIncludeNamedValue == true)
             {
                 Console.WriteLine("------------------------------------------");
                 Console.WriteLine("Skipping extracting named values from service");
@@ -87,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (properties) for service
-            string[] properties = await this.GetPropertiesAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+            string[] properties = await this.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
 
             // isolate api and operation policy resources in the case of a single api extraction, as they may reference named value
             var policyResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy);
@@ -96,7 +96,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 JToken oProperty = JObject.Parse(extractedProperty);
                 string propertyName = ((JValue)oProperty["name"]).Value.ToString();
-                string fullPropertyResource = await this.GetPropertyDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, propertyName);
+                string fullPropertyResource = await this.GetPropertyDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, propertyName);
 
                 // convert returned named value to template resource class
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
@@ -105,7 +105,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
                 propertyTemplateResource.scale = null;
 
-                if (extractorParameters.paramNamedValue)
+                if (extractorParameters.ToParameterizeNamedValue)
                 {
                     propertyTemplateResource.properties.value = $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property)}]";
                 }
@@ -116,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     propertyTemplateResource.properties.value = null;
                 }
 
-                if (propertyTemplateResource.properties.keyVault != null && extractorParameters.paramNamedValuesKeyVaultSecrets)
+                if (propertyTemplateResource.properties.keyVault != null && extractorParameters.ParamNamedValuesKeyVaultSecrets)
                 {
                     propertyTemplateResource.properties.keyVault.secretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property)}]";
                 }
@@ -131,7 +131,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     // if the user is executing a single api, extract all the named values used in the template resources
                     bool foundInPolicy = this.DoesPolicyReferenceNamedValue(extractorParameters, policyResources, propertyName, propertyTemplateResource);
-                    bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName, apiTemplateResources, extractorParameters, propertyName, propertyTemplateResource.properties.displayName);
+                    bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, extractorParameters, propertyName, propertyTemplateResource.properties.displayName);
                     bool foundInLogger = this.DoesLoggerReferenceNamedValue(loggerTemplateResources, propertyName, propertyTemplateResource);
 
                     // check if named value is referenced in a backend

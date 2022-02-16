@@ -1,13 +1,15 @@
 ﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 {
-    public class serviceUrlProperty
+    public class ServiceUrlProperty
     {
-        public string apiName { get; private set; }
-        public string serviceUrl { get; private set; }
-        public serviceUrlProperty(string apiName, string serviceUrl)
+        public string ApiName { get; private set; }
+
+        public string ServiceUrl { get; private set; }
+
+        public ServiceUrlProperty(string apiName, string serviceUrl)
         {
-            this.apiName = apiName;
-            this.serviceUrl = serviceUrl;
+            this.ApiName = apiName;
+            this.ServiceUrl = serviceUrl;
         }
     }
 }

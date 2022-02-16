@@ -37,21 +37,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // globalServicePolicy
             if (globalServicePolicyTemplate != null)
             {
-                string globalServicePolicyUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.globalServicePolicy);
+                string globalServicePolicyUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.GlobalServicePolicy);
                 resources.Add(this.CreateLinkedMasterTemplateResource("globalServicePolicyTemplate", globalServicePolicyUri, new string[] { }, null, false));
             }
 
             // apiVersionSet
             if (apiVersionSetTemplate != null)
             {
-                string apiVersionSetUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.apiVersionSets);
+                string apiVersionSetUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.ApiVersionSets);
                 resources.Add(this.CreateLinkedMasterTemplateResource("versionSetTemplate", apiVersionSetUri, new string[] { }, null, false));
             }
 
             // product
             if (productsTemplate != null)
             {
-                string productsUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.products);
+                string productsUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.Products);
                 resources.Add(this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, new string[] { }, null, false));
             }
 
@@ -60,42 +60,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 // depends on all products and APIs
                 string[] dependsOn = this.CreateProductAPIResourceDependencies(productsTemplate, apiInformation);
-                string productAPIsUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.productAPIs);
+                string productAPIsUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.ProductAPIs);
                 resources.Add(this.CreateLinkedMasterTemplateResource("productAPIsTemplate", productAPIsUri, dependsOn, null, false));
             }
 
             // property
             if (propertyTemplate != null)
             {
-                string propertyUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.namedValues);
+                string propertyUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.NamedValues);
                 resources.Add(this.CreateLinkedMasterTemplateResource("propertyTemplate", propertyUri, new string[] { }, null, false));
             }
 
             // logger
             if (loggersTemplate != null)
             {
-                string loggersUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.loggers);
+                string loggersUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.Loggers);
                 resources.Add(this.CreateLinkedMasterTemplateResource("loggersTemplate", loggersUri, new string[] { }, null, false));
             }
 
             // backend
             if (backendsTemplate != null)
             {
-                string backendsUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.backends);
+                string backendsUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.Backends);
                 resources.Add(this.CreateLinkedMasterTemplateResource("backendsTemplate", backendsUri, new string[] { }, null, false));
             }
 
             // authorizationServer
             if (authorizationServersTemplate != null)
             {
-                string authorizationServersUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.authorizationServers);
+                string authorizationServersUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.AuthorizationServers);
                 resources.Add(this.CreateLinkedMasterTemplateResource("authorizationServersTemplate", authorizationServersUri, new string[] { }, null, false));
             }
 
             // tag
             if (tagTemplate != null)
             {
-                string tagUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.tags);
+                string tagUri = this.GenerateLinkedTemplateUri(creatorConfig, fileNames.Tags);
                 resources.Add(this.CreateLinkedMasterTemplateResource("tagTemplate", tagUri, new string[] { }, null, false));
             }
 
@@ -317,17 +317,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // add serviceUrl parameter for linked option
             if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
             {
-                foreach (ServiceUrlProperty serviceUrlProperty in creatorConfig.serviceUrlParameters)
+                foreach (var serviceUrlProperty in creatorConfig.serviceUrlParameters)
                 {
                     TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                     {
                         metadata = new TemplateParameterMetadata()
                         {
-                            description = "ServiceUrl parameter for API: " + serviceUrlProperty.apiName
+                            description = "ServiceUrl parameter for API: " + serviceUrlProperty.ApiName
                         },
                         type = "string"
                     };
-                    parameters.Add(serviceUrlProperty.apiName + "-ServiceUrl", serviceUrlParamProperty);
+                    parameters.Add(serviceUrlProperty.ApiName + "-ServiceUrl", serviceUrlParamProperty);
                 }
             }
 
@@ -366,13 +366,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
             if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
             {
-                foreach (ServiceUrlProperty serviceUrlProperty in creatorConfig.serviceUrlParameters)
+                foreach (var serviceUrlProperty in creatorConfig.serviceUrlParameters)
                 {
                     TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                     {
-                        value = serviceUrlProperty.serviceUrl
+                        value = serviceUrlProperty.ServiceUrl
                     };
-                    parameters.Add(serviceUrlProperty.apiName + "-ServiceUrl", serviceUrlParamProperty);
+                    parameters.Add(serviceUrlProperty.ApiName + "-ServiceUrl", serviceUrlParamProperty);
                 }
             }
 

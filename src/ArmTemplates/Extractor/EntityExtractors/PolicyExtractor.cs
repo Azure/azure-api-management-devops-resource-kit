@@ -7,28 +7,29 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class PolicyExtractor : EntityExtractorBase, IPolicyExtractor
     {
-        public async Task<string> GetGlobalServicePolicyAsync(string ApiManagementName, string ResourceGroupName)
+        public async Task<string> GetGlobalServicePolicyAsync(string apiManagementName, string resourceGroupName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/policies/policy?api-version={4}&format=rawxml",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, GlobalConstants.APIVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(string apimname, string resourceGroup, string policyXMLBaseUrl, string policyXMLSasToken, string fileFolder)
+        public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(ExtractorParameters extractorParameters, string fileFolder)
         {
             // extract global service policy in both full and single api extraction cases
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting global service policy from service");
             Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
-            if (policyXMLBaseUrl != null && policyXMLSasToken != null)
+            if (extractorParameters.PolicyXMLBaseUrl != null && extractorParameters.PolicyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
@@ -36,7 +37,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 armTemplate.parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
             }
-            if (policyXMLBaseUrl != null)
+
+            if (extractorParameters.PolicyXMLBaseUrl != null)
             {
                 TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
                 {
@@ -50,8 +52,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // add global service policy resource to template
             try
             {
-                string globalServicePolicy = await this.GetGlobalServicePolicyAsync(apimname, resourceGroup);
-                Console.WriteLine($" - Global policy found for {apimname} API Management service");
+                string globalServicePolicy = await this.GetGlobalServicePolicyAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
+                Console.WriteLine($" - Global policy found for {extractorParameters.SourceApimName} API Management service");
                 PolicyTemplateResource globalServicePolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(globalServicePolicy);
                 // REST API will return format property as rawxml and value property as the xml by default
                 globalServicePolicyResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/policy')]";
@@ -59,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 globalServicePolicyResource.scale = null;
 
                 // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-                if (policyXMLBaseUrl != null)
+                if (extractorParameters.PolicyXMLBaseUrl != null)
                 {
                     string policyXMLContent = globalServicePolicyResource.properties.value;
                     string policyFolder = string.Concat(fileFolder, $@"/policies");
@@ -67,7 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     FileWriter.CreateFolderIfNotExists(policyFolder);
                     FileWriter.WriteXMLToFile(policyXMLContent, string.Concat(policyFolder, globalServicePolicyFileName));
                     globalServicePolicyResource.properties.format = "rawxml-link";
-                    if (policyXMLSasToken != null)
+                    if (extractorParameters.PolicyXMLSasToken != null)
                     {
                         globalServicePolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{globalServicePolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                     }
