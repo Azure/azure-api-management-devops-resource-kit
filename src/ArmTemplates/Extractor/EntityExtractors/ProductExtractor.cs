@@ -18,59 +18,59 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         public async Task<string> GetProductsAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await Auth.GetAccessToken();
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+            return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<string> GetProductDetailsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await Auth.GetAccessToken();
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}?api-version={5}",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+            return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<string> GetProductPolicyAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await Auth.GetAccessToken();
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies/policy?api-version={5}&format=rawxml",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+            return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<string> GetProductGroupsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await Auth.GetAccessToken();
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/groups?api-version={5}",
-            baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+            BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+            return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<string> GetProductTagsAsync(string ApiManagementName, string ResourceGroupName, string ProductName)
         {
-            (string azToken, string azSubId) = await Auth.GetAccessToken();
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/tags?api-version={5}&format=rawxml",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, ProductName, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+            return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string fileFolder, ExtractorParameters extractorParameters)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting products from service");
-            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
             if (extractorParameters.policyXMLBaseUrl != null && extractorParameters.policyXMLSasToken != null)
             {
@@ -95,13 +95,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all products for service
-            string products = await GetProductsAsync(apimname, resourceGroup);
+            string products = await this.GetProductsAsync(apimname, resourceGroup);
             JObject oProducts = JObject.Parse(products);
 
             foreach (var item in oProducts["value"])
             {
                 string productName = ((JValue)item["name"]).Value.ToString();
-                string productDetails = await GetProductDetailsAsync(apimname, resourceGroup, productName);
+                string productDetails = await this.GetProductDetailsAsync(apimname, resourceGroup, productName);
 
                 // convert returned product to template resource class
                 JsonSerializerSettings settings = new JsonSerializerSettings
@@ -113,7 +113,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 productsTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}')]";
                 productsTemplateResource.apiVersion = GlobalConstants.APIVersion;
 
-                string productGroupDetails = await GetProductGroupsAsync(apimname, resourceGroup, productName);
+                string productGroupDetails = await this.GetProductGroupsAsync(apimname, resourceGroup, productName);
                 ProductGroupsTemplateResource productGroupsDetails = JsonConvert.DeserializeObject<ProductGroupsTemplateResource>(productGroupDetails, settings);
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
@@ -133,7 +133,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                             ProductGroup.dependsOn = productResourceId;
                             templateResources.Add(ProductGroup);
                         }
-                        string productPolicy = await GetProductPolicyAsync(apimname, resourceGroup, productName);
+                        string productPolicy = await this.GetProductPolicyAsync(apimname, resourceGroup, productName);
                         Console.WriteLine($" - Product policy found for {productName} product");
                         PolicyTemplateResource productPolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(productPolicy);
                         productPolicyResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/policy')]";
@@ -168,7 +168,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     try
                     {
                         // pull tags associated with the product
-                        string productTags = await GetProductTagsAsync(apimname, resourceGroup, productName);
+                        string productTags = await this.GetProductTagsAsync(apimname, resourceGroup, productName);
                         JObject oProductTags = JObject.Parse(productTags);
 
                         foreach (var tag in oProductTags["value"])

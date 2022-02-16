@@ -7,7 +7,7 @@ using System.Linq;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger
 {
 
-    internal static class LoggerTemplateUtils
+    static class LoggerTemplateUtils
     {
         public static Dictionary<string, string> GetAllLoggerResourceIds(List<TemplateResource> resources)
         {
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return loggerTemplate;
         }
 
-        private static string GetValidLoggerParamName(string resourceName)
+        static string GetValidLoggerParamName(string resourceName)
         {
             string[] loggerNameStrs = resourceName.Split(new char[] { ',' });
             string validLoggerName = ParameterNamingHelper.GenerateValidParameterName(loggerNameStrs[loggerNameStrs.Length - 1], ParameterPrefix.LogResourceId);

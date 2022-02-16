@@ -14,12 +14,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         public async Task<string> GetGlobalServicePolicyAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await Auth.GetAccessToken();
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/policies/policy?api-version={4}&format=rawxml",
-               baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await CallApiManagementAsync(azToken, requestUrl);
+            return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(string apimname, string resourceGroup, string policyXMLBaseUrl, string policyXMLSasToken, string fileFolder)
@@ -27,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // extract global service policy in both full and single api extraction cases
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting global service policy from service");
-            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
             if (policyXMLBaseUrl != null && policyXMLSasToken != null)
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // add global service policy resource to template
             try
             {
-                string globalServicePolicy = await GetGlobalServicePolicyAsync(apimname, resourceGroup);
+                string globalServicePolicy = await this.GetGlobalServicePolicyAsync(apimname, resourceGroup);
                 Console.WriteLine($" - Global policy found for {apimname} API Management service");
                 PolicyTemplateResource globalServicePolicyResource = JsonConvert.DeserializeObject<PolicyTemplateResource>(globalServicePolicy);
                 // REST API will return format property as rawxml and value property as the xml by default

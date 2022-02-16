@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             foreach (var subscription in product.subscriptions)
             {
                 subscription.scope = scope;
-                resources.Add(CreateSubscriptionsTemplateResource(subscription, dependsOn));
+                resources.Add(this.CreateSubscriptionsTemplateResource(subscription, dependsOn));
             }
 
             return resources;
