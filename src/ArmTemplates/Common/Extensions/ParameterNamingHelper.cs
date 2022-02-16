@@ -3,9 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions
 {
-    internal static class ParameterNamingHelper
+    static class ParameterNamingHelper
     {
-        private static readonly Regex _excludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
+        static readonly Regex _excludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
 
         public static string GenerateValidParameterName(string apiName, string prefix)
         {

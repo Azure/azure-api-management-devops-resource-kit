@@ -7,7 +7,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
 {
     public class CreatorConfigurationValidator
     {
-        private CommandLineApplication commandLineApplication;
+        CommandLineApplication commandLineApplication;
 
         public CreatorConfigurationValidator(CommandLineApplication commandLineApplication)
         {
@@ -17,35 +17,35 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         public bool ValidateCreatorConfig(CreatorConfig creatorConfig)
         {
             // ensure required parameters have been passed in
-            if (ValidateBaseProperties(creatorConfig) != true)
+            if (this.ValidateBaseProperties(creatorConfig) != true)
             {
                 return false;
             }
-            if (ValidateAPIs(creatorConfig) != true)
+            if (this.ValidateAPIs(creatorConfig) != true)
             {
                 return false;
             }
-            if (ValidateAPIVersionSets(creatorConfig) != true)
+            if (this.ValidateAPIVersionSets(creatorConfig) != true)
             {
                 return false;
             }
-            if (ValidateProducts(creatorConfig) != true)
+            if (this.ValidateProducts(creatorConfig) != true)
             {
                 return false;
             }
-            if (ValidateNamedValues(creatorConfig) != true)
+            if (this.ValidateNamedValues(creatorConfig) != true)
             {
                 return false;
             }
-            if (ValidateLoggers(creatorConfig) != true)
+            if (this.ValidateLoggers(creatorConfig) != true)
             {
                 return false;
             }
-            if (ValidateAuthorizationServers(creatorConfig) != true)
+            if (this.ValidateAuthorizationServers(creatorConfig) != true)
             {
                 return false;
             }
-            if (ValidateBackends(creatorConfig) != true)
+            if (this.ValidateBackends(creatorConfig) != true)
             {
                 return false;
             }
@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                     if (property.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(commandLineApplication, "Display name is required is a Named Value is provided");
+                        throw new CommandParsingException(this.commandLineApplication, "Display name is required is a Named Value is provided");
                     }
                 }
             }
@@ -78,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                     if (product.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(commandLineApplication, "Display name is required if an Product is provided");
+                        throw new CommandParsingException(this.commandLineApplication, "Display name is required if an Product is provided");
                     }
                 }
             }
@@ -95,7 +95,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                     if (logger.name == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(commandLineApplication, "Name is required if an Logger is provided");
+                        throw new CommandParsingException(this.commandLineApplication, "Name is required if an Logger is provided");
                     }
                 }
             }
@@ -112,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                     if (backend.title == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(commandLineApplication, "Title is required if a Backend is provided");
+                        throw new CommandParsingException(this.commandLineApplication, "Title is required if a Backend is provided");
                     }
                 }
             }
@@ -129,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                     if (authorizationServer.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(commandLineApplication, "Display name is required if an Authorization Server is provided");
+                        throw new CommandParsingException(this.commandLineApplication, "Display name is required if an Authorization Server is provided");
                     }
                 }
             }
@@ -142,22 +142,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             if (creatorConfig.outputLocation == null)
             {
                 isValid = false;
-                throw new CommandParsingException(commandLineApplication, "Output location is required");
+                throw new CommandParsingException(this.commandLineApplication, "Output location is required");
             }
             if (creatorConfig.version == null)
             {
                 isValid = false;
-                throw new CommandParsingException(commandLineApplication, "Version is required");
+                throw new CommandParsingException(this.commandLineApplication, "Version is required");
             }
             if (creatorConfig.apimServiceName == null)
             {
                 isValid = false;
-                throw new CommandParsingException(commandLineApplication, "APIM service name is required");
+                throw new CommandParsingException(this.commandLineApplication, "APIM service name is required");
             }
             if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
             {
                 isValid = false;
-                throw new CommandParsingException(commandLineApplication, "LinkTemplatesBaseUrl is required for linked templates");
+                throw new CommandParsingException(this.commandLineApplication, "LinkTemplatesBaseUrl is required for linked templates");
             }
             return isValid;
         }
@@ -168,24 +168,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             if (creatorConfig.apis == null)
             {
                 isValid = false;
-                throw new CommandParsingException(commandLineApplication, "API configuration is required");
+                throw new CommandParsingException(this.commandLineApplication, "API configuration is required");
             }
             foreach (APIConfig api in creatorConfig.apis)
             {
                 if (api.name == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(commandLineApplication, "API name is required");
+                    throw new CommandParsingException(this.commandLineApplication, "API name is required");
                 }
                 if (api.openApiSpec == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(commandLineApplication, "Open API Spec is required");
+                    throw new CommandParsingException(this.commandLineApplication, "Open API Spec is required");
                 }
                 if (api.suffix == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(commandLineApplication, "API suffix is required");
+                    throw new CommandParsingException(this.commandLineApplication, "API suffix is required");
                 }
                 if (api.operations != null)
                 {
@@ -194,14 +194,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                         if (operation.Value == null || operation.Value.policy == null)
                         {
                             isValid = false;
-                            throw new CommandParsingException(commandLineApplication, "Policy XML is required if an API operation is provided");
+                            throw new CommandParsingException(this.commandLineApplication, "Policy XML is required if an API operation is provided");
                         }
                     }
                 }
                 if (api.diagnostic != null && api.diagnostic.loggerId == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(commandLineApplication, "LoggerId is required if an API diagnostic is provided");
+                    throw new CommandParsingException(this.commandLineApplication, "LoggerId is required if an API diagnostic is provided");
                 }
             }
             return isValid;
@@ -217,7 +217,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                     if (apiVersionSet != null && apiVersionSet.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(commandLineApplication, "Display name is required if an API Version Set is provided");
+                        throw new CommandParsingException(this.commandLineApplication, "Display name is required if an API Version Set is provided");
                     }
                 }
             }

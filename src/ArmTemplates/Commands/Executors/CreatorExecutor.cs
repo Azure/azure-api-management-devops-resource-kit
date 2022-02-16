@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors
 {
-    internal class CreatorExecutor
+    class CreatorExecutor
     {
+        // TODO refactor creatorApplicationCommand like ExtractorExecutor
+        // Issue: https://github.com/Azure/azure-api-management-devops-resource-kit/issues/623
     }
 }

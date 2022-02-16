@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateTagTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template tagTemplate = CreateEmptyTemplate();
+            Template tagTemplate = this.CreateEmptyTemplate();
 
             // add parameters
             tagTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
