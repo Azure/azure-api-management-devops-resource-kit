@@ -11,6 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -21,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers?api-version={4}",
-               BaseUrl, azSubId, resourceGroupName, apiManagementName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, GlobalConstants.ApiVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -31,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers/{4}?api-version={5}",
-               BaseUrl, azSubId, resourceGroupName, apiManagementName, loggerName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, loggerName, GlobalConstants.ApiVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -40,7 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
 
             if (extractorParameters.ToParameterizeLogResourceId)
             {
@@ -48,11 +49,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     type = "object"
                 };
-                armTemplate.parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
+                armTemplate.Parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
             }
 
             // isolate product api associations in the case of a single api extraction
-            var policyResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy);
+            var policyResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.APIPolicy || resource.Type == ResourceTypeConstants.APIOperationPolicy || resource.Type == ResourceTypeConstants.ProductPolicy);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
@@ -66,10 +67,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 // convert returned logger to template resource class
                 LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
-                loggerResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{loggerName}')]";
-                loggerResource.type = ResourceTypeConstants.Logger;
-                loggerResource.apiVersion = GlobalConstants.APIVersion;
-                loggerResource.scale = null;
+                loggerResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{loggerName}')]";
+                loggerResource.Type = ResourceTypeConstants.Logger;
+                loggerResource.ApiVersion = GlobalConstants.ApiVersion;
+                loggerResource.Scale = null;
 
                 if (singleApiName == null)
                 {
@@ -84,7 +85,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     bool isReferencedInDiagnostic = false;
                     foreach (PolicyTemplateResource policyTemplateResource in policyResources)
                     {
-                        if (policyTemplateResource.properties.value.Contains(loggerName))
+                        if (policyTemplateResource.Properties.Value.Contains(loggerName))
                         {
                             isReferencedInPolicy = true;
                         }
@@ -96,7 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         if (diagnosticObj is Dictionary<string, string>)
                         {
                             Dictionary<string, string> curDiagnostic = (Dictionary<string, string>)diagnosticObj;
-                            string validDName = ParameterNamingHelper.GenerateValidParameterName(loggerResource.properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
+                            string validDName = ParameterNamingHelper.GenerateValidParameterName(loggerResource.Properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
                             if (curDiagnostic.ContainsKey(validDName) && curDiagnostic[validDName].Contains(loggerName))
                             {
                                 isReferencedInDiagnostic = true;
@@ -112,7 +113,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
             }
 
-            armTemplate.resources = templateResources.ToArray();
+            armTemplate.Resources = templateResources.ToArray();
             return armTemplate;
         }
     }

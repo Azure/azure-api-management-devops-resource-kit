@@ -11,11 +11,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 {
     public abstract class ExtractorTestsBase
     {
-        protected const string MockSourceApimName = "test-source-apim-instance-name";
+        protected const string TESTS_OUTPUT_DIRECTORY = "tests-output";
+
+        protected const string MockSourceApimName = "dmkorolev-APIM-test";
         protected const string MockDestinationApimName = "test-destination-apim-name";
-        protected const string MockResourceGroup = "test-resource-group";
+        protected const string MockResourceGroup = "dmkorolev-test";
         protected const string MockFileFolder = "test-file-folder";
-        protected const string MockApiName = "test-api-name";
+        protected const string MockApiName = "echo-api";
         protected const string MockMultipleApis = " test-multiple-api-1, test-multiple-api-2 ";
         protected const string MockLinkedTemplatesBaseUrl = "test-linked-templates-base-url";
         protected const string MockLinkedTemplatesSasToken = "test-linked-templates-sas-token";
@@ -37,33 +39,41 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const int MockOperationBatchSize = 32;
         protected const bool MockToParameterizeBackend = true;
 
-        protected ExtractorConsoleAppConfiguration GetDefaultExtractorConfiguration() => new ExtractorConsoleAppConfiguration
+        protected ExtractorConsoleAppConfiguration GetMockedExtractorConsoleAppConfiguration(
+            bool splitApis = MockSplitApis,
+            string apiVersionSetName = MockApiVersionSetName,
+            string multipleApiNames = MockMultipleApis,
+            bool includeAllRevisions = MockIncludeAllRevisions,
+            bool toParameterizeApiLoggerId = MockToParameterizeApiLoggerId)
         {
-            SourceApimName = MockSourceApimName,
-            DestinationApimName = MockDestinationApimName,
-            ResourceGroup = MockResourceGroup,
-            FileFolder = MockFileFolder,
-            ApiName = MockApiName,
-            MultipleAPIs = MockMultipleApis,
-            LinkedTemplatesBaseUrl = MockLinkedTemplatesBaseUrl,
-            LinkedTemplatesSasToken = MockLinkedTemplatesSasToken,
-            LinkedTemplatesUrlQueryString = MockLinkedTemplatesUrlQueryString,
-            PolicyXMLBaseUrl = MockPolicyXMLBaseUrl,
-            PolicyXMLSasToken = MockPolicyXMLSasToken,
-            SplitAPIs = MockSplitApis.ToString(),
-            ApiVersionSetName = MockApiVersionSetName,
-            IncludeAllRevisions = MockIncludeAllRevisions.ToString(),
-            BaseFileName = MockBaseFileName,
-            ServiceUrlParameters = MockServiceUrlParameters,
-            ParamServiceUrl = MockToParameterizeServiceUrl.ToString(),
-            ParamNamedValue = MockToParameterizeNamedValue.ToString(),
-            ParamApiLoggerId = MockToParameterizeApiLoggerId.ToString(),
-            ParamLogResourceId = MockToParameterizeLogResourceId.ToString(),
-            ServiceBaseUrl = MockServiceBaseUrl,
-            NotIncludeNamedValue = MockNotIncludeNamedValue.ToString(),
-            ParamNamedValuesKeyVaultSecrets = MockToParameterizeNamedValuesKeyVaultSecrets.ToString(),
-            OperationBatchSize = MockOperationBatchSize,
-            ParamBackend = MockToParameterizeBackend.ToString()
-        };
+            return new ExtractorConsoleAppConfiguration
+            {
+                SourceApimName = MockSourceApimName,
+                DestinationApimName = MockDestinationApimName,
+                ResourceGroup = MockResourceGroup,
+                FileFolder = MockFileFolder,
+                ApiName = MockApiName,
+                MultipleAPIs = multipleApiNames,
+                LinkedTemplatesBaseUrl = MockLinkedTemplatesBaseUrl,
+                LinkedTemplatesSasToken = MockLinkedTemplatesSasToken,
+                LinkedTemplatesUrlQueryString = MockLinkedTemplatesUrlQueryString,
+                PolicyXMLBaseUrl = MockPolicyXMLBaseUrl,
+                PolicyXMLSasToken = MockPolicyXMLSasToken,
+                SplitAPIs = splitApis.ToString(),
+                ApiVersionSetName = apiVersionSetName,
+                IncludeAllRevisions = includeAllRevisions.ToString(),
+                BaseFileName = MockBaseFileName,
+                ServiceUrlParameters = MockServiceUrlParameters,
+                ParamServiceUrl = MockToParameterizeServiceUrl.ToString(),
+                ParamNamedValue = MockToParameterizeNamedValue.ToString(),
+                ParamApiLoggerId = toParameterizeApiLoggerId.ToString(),
+                ParamLogResourceId = MockToParameterizeLogResourceId.ToString(),
+                ServiceBaseUrl = MockServiceBaseUrl,
+                NotIncludeNamedValue = MockNotIncludeNamedValue.ToString(),
+                ParamNamedValuesKeyVaultSecrets = MockToParameterizeNamedValuesKeyVaultSecrets.ToString(),
+                OperationBatchSize = MockOperationBatchSize,
+                ParamBackend = MockToParameterizeBackend.ToString()
+            };
+        }  
     }
 }

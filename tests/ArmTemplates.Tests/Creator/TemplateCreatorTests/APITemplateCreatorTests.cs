@@ -30,17 +30,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 subscriptionRequired = true,
                 authenticationSettings = new APITemplateAuthenticationSettings()
                 {
-                    oAuth2 = new APITemplateOAuth2()
+                    OAuth2 = new APITemplateOAuth2()
                     {
-                        authorizationServerId = "",
-                        scope = ""
+                        AuthorizationServerId = "",
+                        Scope = ""
                     },
-                    openid = new APITemplateOpenID()
+                    Openid = new APITemplateOpenID()
                     {
-                        openidProviderId = "",
-                        bearerTokenSendingMethods = new string[] { }
+                        OpenIdProviderId = "",
+                        BearerTokenSendingMethods = new string[] { }
                     },
-                    subscriptionKeyRequired = true
+                    SubscriptionKeyRequired = true
                 },
                 openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
                 protocols = "https",
@@ -53,25 +53,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal($"[parameters('{api.name}-ServiceUrl')]", apiTemplateResource.properties.serviceUrl);
-            Assert.Equal(api.name, apiTemplateResource.properties.displayName);
-            Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
-            Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
-            Assert.Equal(api.type, apiTemplateResource.properties.type);
-            Assert.Equal(api.type, apiTemplateResource.properties.apiType);
-            Assert.Equal(api.isCurrent, apiTemplateResource.properties.isCurrent);
-            Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
-            Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
-            Assert.Equal(api.apiRevisionDescription, apiTemplateResource.properties.apiRevisionDescription);
-            Assert.Equal(api.suffix, apiTemplateResource.properties.path);
-            Assert.Equal(api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
-            Assert.Equal(api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);
-            Assert.Equal(api.authenticationSettings.oAuth2.scope, apiTemplateResource.properties.authenticationSettings.oAuth2.scope);
-            Assert.Equal(api.authenticationSettings.openid.openidProviderId, apiTemplateResource.properties.authenticationSettings.openid.openidProviderId);
-            Assert.Equal(api.authenticationSettings.openid.bearerTokenSendingMethods, apiTemplateResource.properties.authenticationSettings.openid.bearerTokenSendingMethods);
-            Assert.Equal(api.authenticationSettings.subscriptionKeyRequired, apiTemplateResource.properties.authenticationSettings.subscriptionKeyRequired);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal($"[parameters('{api.name}-ServiceUrl')]", apiTemplateResource.Properties.ServiceUrl);
+            Assert.Equal(api.name, apiTemplateResource.Properties.DisplayName);
+            Assert.Equal(api.apiVersion, apiTemplateResource.Properties.ApiVersion);
+            Assert.Equal(api.apiVersionDescription, apiTemplateResource.Properties.ApiVersionDescription);
+            Assert.Equal(api.type, apiTemplateResource.Properties.Type);
+            Assert.Equal(api.type, apiTemplateResource.Properties.ApiType);
+            Assert.Equal(api.isCurrent, apiTemplateResource.Properties.IsCurrent);
+            Assert.Equal(new string[] { api.protocols }, apiTemplateResource.Properties.Protocols);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.Properties.ApiVersionSetId);
+            Assert.Equal(api.apiRevision, apiTemplateResource.Properties.ApiRevision);
+            Assert.Equal(api.apiRevisionDescription, apiTemplateResource.Properties.ApiRevisionDescription);
+            Assert.Equal(api.suffix, apiTemplateResource.Properties.Path);
+            Assert.Equal(api.subscriptionRequired, apiTemplateResource.Properties.SubscriptionRequired);
+            Assert.Equal(api.authenticationSettings.OAuth2.AuthorizationServerId, apiTemplateResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId);
+            Assert.Equal(api.authenticationSettings.OAuth2.Scope, apiTemplateResource.Properties.AuthenticationSettings.OAuth2.Scope);
+            Assert.Equal(api.authenticationSettings.Openid.OpenIdProviderId, apiTemplateResource.Properties.AuthenticationSettings.Openid.OpenIdProviderId);
+            Assert.Equal(api.authenticationSettings.Openid.BearerTokenSendingMethods, apiTemplateResource.Properties.AuthenticationSettings.Openid.BearerTokenSendingMethods);
+            Assert.Equal(api.authenticationSettings.SubscriptionKeyRequired, apiTemplateResource.Properties.AuthenticationSettings.SubscriptionKeyRequired);
         }
 
         [Fact]
@@ -91,9 +91,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
-            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal("swagger-link-json", apiTemplateResource.Properties.Format);
+            Assert.Equal(api.openApiSpec, apiTemplateResource.Properties.Value);
         }
 
         [Fact]
@@ -114,12 +114,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal("swagger-json", apiTemplateResource.properties.format);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal("swagger-json", apiTemplateResource.Properties.Format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
 
-            var yaml = apiTemplateResource.properties.value;
+            var yaml = apiTemplateResource.Properties.Value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
             var info = (Dictionary<object, object>)definition["info"];
@@ -155,12 +155,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal("openapi+json", apiTemplateResource.properties.format);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal("openapi+json", apiTemplateResource.Properties.Format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
 
-            var yaml = apiTemplateResource.properties.value;
+            var yaml = apiTemplateResource.Properties.Value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
             var info = (Dictionary<object, object>)definition["info"];
@@ -196,12 +196,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal("openapi", apiTemplateResource.properties.format);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal("openapi", apiTemplateResource.Properties.Format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
 
-            var yaml = apiTemplateResource.properties.value;
+            var yaml = apiTemplateResource.Properties.Value;
             var deserializer = new YamlDotNet.Serialization.Deserializer();
             var definition = deserializer.Deserialize<Dictionary<string, object>>(yaml);
             var info = (Dictionary<object, object>)definition["info"];
@@ -227,17 +227,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 subscriptionRequired = true,
                 authenticationSettings = new APITemplateAuthenticationSettings()
                 {
-                    oAuth2 = new APITemplateOAuth2()
+                    OAuth2 = new APITemplateOAuth2()
                     {
-                        authorizationServerId = "",
-                        scope = ""
+                        AuthorizationServerId = "",
+                        Scope = ""
                     },
-                    openid = new APITemplateOpenID()
+                    Openid = new APITemplateOpenID()
                     {
-                        openidProviderId = "",
-                        bearerTokenSendingMethods = new string[] { }
+                        OpenIdProviderId = "",
+                        BearerTokenSendingMethods = new string[] { }
                     },
-                    subscriptionKeyRequired = true
+                    SubscriptionKeyRequired = true
                 },
                 openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
                 protocols = "https",
@@ -250,26 +250,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, false, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.name);
-            Assert.Equal(api.name, apiTemplateResource.properties.displayName);
-            Assert.Equal(api.apiVersion, apiTemplateResource.properties.apiVersion);
-            Assert.Equal(api.type, apiTemplateResource.properties.type);
-            Assert.Equal(api.type, apiTemplateResource.properties.apiType);
-            Assert.Equal(api.isCurrent, apiTemplateResource.properties.isCurrent);
-            Assert.Equal(new string[] { api.protocols }, apiTemplateResource.properties.protocols);
-            Assert.Equal(api.apiVersionDescription, apiTemplateResource.properties.apiVersionDescription);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.properties.apiVersionSetId);
-            Assert.Equal(api.apiRevision, apiTemplateResource.properties.apiRevision);
-            Assert.Equal(api.apiRevisionDescription, apiTemplateResource.properties.apiRevisionDescription);
-            Assert.Equal(api.suffix, apiTemplateResource.properties.path);
-            Assert.Equal(api.subscriptionRequired, apiTemplateResource.properties.subscriptionRequired);
-            Assert.Equal(api.authenticationSettings.oAuth2.authorizationServerId, apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId);
-            Assert.Equal(api.authenticationSettings.oAuth2.scope, apiTemplateResource.properties.authenticationSettings.oAuth2.scope);
-            Assert.Equal(api.authenticationSettings.openid.openidProviderId, apiTemplateResource.properties.authenticationSettings.openid.openidProviderId);
-            Assert.Equal(api.authenticationSettings.openid.bearerTokenSendingMethods, apiTemplateResource.properties.authenticationSettings.openid.bearerTokenSendingMethods);
-            Assert.Equal(api.authenticationSettings.subscriptionKeyRequired, apiTemplateResource.properties.authenticationSettings.subscriptionKeyRequired);
-            Assert.Equal("swagger-link-json", apiTemplateResource.properties.format);
-            Assert.Equal(api.openApiSpec, apiTemplateResource.properties.value);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal(api.name, apiTemplateResource.Properties.DisplayName);
+            Assert.Equal(api.apiVersion, apiTemplateResource.Properties.ApiVersion);
+            Assert.Equal(api.type, apiTemplateResource.Properties.Type);
+            Assert.Equal(api.type, apiTemplateResource.Properties.ApiType);
+            Assert.Equal(api.isCurrent, apiTemplateResource.Properties.IsCurrent);
+            Assert.Equal(new string[] { api.protocols }, apiTemplateResource.Properties.Protocols);
+            Assert.Equal(api.apiVersionDescription, apiTemplateResource.Properties.ApiVersionDescription);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.Properties.ApiVersionSetId);
+            Assert.Equal(api.apiRevision, apiTemplateResource.Properties.ApiRevision);
+            Assert.Equal(api.apiRevisionDescription, apiTemplateResource.Properties.ApiRevisionDescription);
+            Assert.Equal(api.suffix, apiTemplateResource.Properties.Path);
+            Assert.Equal(api.subscriptionRequired, apiTemplateResource.Properties.SubscriptionRequired);
+            Assert.Equal(api.authenticationSettings.OAuth2.AuthorizationServerId, apiTemplateResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId);
+            Assert.Equal(api.authenticationSettings.OAuth2.Scope, apiTemplateResource.Properties.AuthenticationSettings.OAuth2.Scope);
+            Assert.Equal(api.authenticationSettings.Openid.OpenIdProviderId, apiTemplateResource.Properties.AuthenticationSettings.Openid.OpenIdProviderId);
+            Assert.Equal(api.authenticationSettings.Openid.BearerTokenSendingMethods, apiTemplateResource.Properties.AuthenticationSettings.Openid.BearerTokenSendingMethods);
+            Assert.Equal(api.authenticationSettings.SubscriptionKeyRequired, apiTemplateResource.Properties.AuthenticationSettings.SubscriptionKeyRequired);
+            Assert.Equal("swagger-link-json", apiTemplateResource.Properties.Format);
+            Assert.Equal(api.openApiSpec, apiTemplateResource.Properties.Value);
         }
 
         [Fact]
@@ -292,10 +292,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             // act
             // the above api config will create a unified api template with a single resource
             List<Template> apiTemplates = await apiTemplateCreator.CreateAPITemplatesAsync(api);
-            APITemplateResource apiTemplateResource = apiTemplates.FirstOrDefault().resources[0] as APITemplateResource;
+            APITemplateResource apiTemplateResource = apiTemplates.FirstOrDefault().Resources[0] as APITemplateResource;
 
             // assert
-            Assert.Contains(";rev", apiTemplateResource.name);
+            Assert.Contains(";rev", apiTemplateResource.Name);
         }
     }
 

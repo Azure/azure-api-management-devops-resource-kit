@@ -12,11 +12,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create products/apis resource with properties
             ProductGroupsValue productAPITemplateResource = new ProductGroupsValue()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{groupName}')]",
-                type = ResourceTypeConstants.ProductGroup,
-                apiVersion = GlobalConstants.APIVersion,
-                dependsOn = dependsOn,
-                properties = new ProductGroupTemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{groupName}')]",
+                Type = ResourceTypeConstants.ProductGroup,
+                ApiVersion = GlobalConstants.ApiVersion,
+                DependsOn = dependsOn,
+                Properties = new ProductGroupTemplateProperties()
             };
             return productAPITemplateResource;
         }

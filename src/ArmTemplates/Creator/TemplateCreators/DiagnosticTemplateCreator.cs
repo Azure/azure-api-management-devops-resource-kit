@@ -4,17 +4,17 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class DiagnosticTemplateCreator
+    public class DiagnosticTemplateCreator : TemplateCreator
     {
         public DiagnosticTemplateResource CreateAPIDiagnosticTemplateResource(APIConfig api, string[] dependsOn)
         {
             // create diagnostic resource with properties
             DiagnosticTemplateResource diagnosticTemplateResource = new DiagnosticTemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/{api.diagnostic.name}')]",
-                type = ResourceTypeConstants.APIDiagnostic,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new DiagnosticTemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/{api.diagnostic.name}')]",
+                Type = ResourceTypeConstants.APIDiagnostic,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new DiagnosticTemplateProperties()
                 {
                     alwaysLog = api.diagnostic.alwaysLog,
                     sampling = api.diagnostic.sampling,
@@ -22,12 +22,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     backend = api.diagnostic.backend,
                     enableHttpCorrelationHeaders = api.diagnostic.enableHttpCorrelationHeaders
                 },
-                dependsOn = dependsOn
+                DependsOn = dependsOn
             };
             // reference the provided logger if loggerId is provided
             if (api.diagnostic.loggerId != null)
             {
-                diagnosticTemplateResource.properties.loggerId = $"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('{ParameterNames.ApimServiceName}'), '{api.diagnostic.loggerId}')]";
+                diagnosticTemplateResource.Properties.loggerId = $"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('{ParameterNames.ApimServiceName}'), '{api.diagnostic.loggerId}')]";
             }
             return diagnosticTemplateResource;
         }

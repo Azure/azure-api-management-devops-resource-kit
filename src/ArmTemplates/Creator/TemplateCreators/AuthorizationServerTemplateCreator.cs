@@ -11,10 +11,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateAuthorizationServerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template authorizationTemplate = this.CreateEmptyTemplate();
+            Template authorizationTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            authorizationTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            authorizationTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
@@ -25,16 +25,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 // create authorization server resource with properties
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = new AuthorizationServerTemplateResource()
                 {
-                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServerTemplateProperties.displayName}')]",
-                    type = ResourceTypeConstants.AuthorizationServer,
-                    apiVersion = GlobalConstants.APIVersion,
-                    properties = authorizationServerTemplateProperties,
-                    dependsOn = new string[] { }
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServerTemplateProperties.displayName}')]",
+                    Type = ResourceTypeConstants.AuthorizationServer,
+                    ApiVersion = GlobalConstants.ApiVersion,
+                    Properties = authorizationServerTemplateProperties,
+                    DependsOn = new string[] { }
                 };
                 resources.Add(authorizationServerTemplateResource);
             }
 
-            authorizationTemplate.resources = resources.ToArray();
+            authorizationTemplate.Resources = resources.ToArray();
             return authorizationTemplate;
         }
     }

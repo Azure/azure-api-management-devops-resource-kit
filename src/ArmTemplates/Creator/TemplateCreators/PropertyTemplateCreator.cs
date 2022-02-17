@@ -11,10 +11,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreatePropertyTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template propertyTemplate = this.CreateEmptyTemplate();
+            Template propertyTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            propertyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            propertyTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
@@ -25,10 +25,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 // create property resource with properties
                 PropertyTemplateResource propertyTemplateResource = new PropertyTemplateResource()
                 {
-                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{namedValue.displayName}')]",
-                    type = ResourceTypeConstants.Property,
-                    apiVersion = GlobalConstants.APIVersion,
-                    properties = new PropertyResourceProperties()
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{namedValue.displayName}')]",
+                    Type = ResourceTypeConstants.Property,
+                    ApiVersion = GlobalConstants.ApiVersion,
+                    Properties = new PropertyResourceProperties()
                     {
                         displayName = namedValue.displayName,
                         value = namedValue.value,
@@ -37,12 +37,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                         keyVault = namedValue.keyVault
 
                     },
-                    dependsOn = new string[] { }
+                    DependsOn = new string[] { }
                 };
                 resources.Add(propertyTemplateResource);
             }
 
-            propertyTemplate.resources = resources.ToArray();
+            propertyTemplate.Resources = resources.ToArray();
             return propertyTemplate;
         }
     }

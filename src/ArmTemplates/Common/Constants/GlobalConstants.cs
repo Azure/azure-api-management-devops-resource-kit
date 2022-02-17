@@ -1,6 +1,6 @@
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
+﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
 {
-    static class GlobalConstants
+    public static class GlobalConstants
     {
         public static string CommandStartDateTime = "";
         public const string AppShortName = "apimtemplate";
@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string ExtractName = "extract";
         public const string ExtractDescription = "Extract an existing API Management instance";
 
-        public const string APIVersion = "2021-01-01-preview";
+        public const string ApiVersion = "2021-01-01-preview";
         public const string LinkedAPIVersion = "2018-05-01";
         public const int NumOfRecords = 100;
 

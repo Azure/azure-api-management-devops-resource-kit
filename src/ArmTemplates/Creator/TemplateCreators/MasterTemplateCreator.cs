@@ -26,10 +26,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             string apimServiceName)
         {
             // create empty template
-            Template masterTemplate = this.CreateEmptyTemplate();
+            Template masterTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            masterTemplate.parameters = this.CreateMasterTemplateParameters(creatorConfig);
+            masterTemplate.Parameters = this.CreateMasterTemplateParameters(creatorConfig);
 
             // add deployment resources that links to all resource files
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -139,7 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 }
             }
 
-            masterTemplate.resources = resources.ToArray();
+            masterTemplate.Resources = resources.ToArray();
             return masterTemplate;
         }
 
@@ -217,10 +217,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create deployment resource with provided arguments
             MasterTemplateResource masterTemplateResource = new MasterTemplateResource()
             {
-                name = name,
-                type = "Microsoft.Resources/deployments",
-                apiVersion = GlobalConstants.LinkedAPIVersion,
-                properties = new MasterTemplateProperties()
+                Name = name,
+                Type = "Microsoft.Resources/deployments",
+                ApiVersion = GlobalConstants.LinkedAPIVersion,
+                Properties = new MasterTemplateProperties()
                 {
                     mode = "Incremental",
                     templateLink = new MasterTemplateLink()
@@ -233,7 +233,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                         { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
                     }
                 },
-                dependsOn = dependsOn
+                DependsOn = dependsOn
             };
 
             if (name.IndexOf("APITemplate") > 0 && isServiceUrlParameterizeInApi)
@@ -242,7 +242,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     value = $"[parameters('{apiName}-ServiceUrl')]"
                 };
-                masterTemplateResource.properties.parameters.Add(apiName + "-ServiceUrl", serviceUrlParamProperty);
+                masterTemplateResource.Properties.parameters.Add(apiName + "-ServiceUrl", serviceUrlParamProperty);
             }
 
             return masterTemplateResource;
@@ -338,7 +338,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = this.CreateEmptyParameters();
+            Template masterTemplate = CreateEmptyParameters();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
@@ -376,7 +376,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 }
             }
 
-            masterTemplate.parameters = parameters;
+            masterTemplate.Parameters = parameters;
             return masterTemplate;
         }
 

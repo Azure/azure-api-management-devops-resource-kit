@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Newtonsoft.Json;
@@ -37,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 // convert returned operation to template resource class
                 OperationTemplateResource operationResource = JsonConvert.DeserializeObject<OperationTemplateResource>(operationDetails);
-                string operationResourceName = operationResource.name;
+                string operationResourceName = operationResource.Name;
 
                 // add tags associated with the operation to template 
                 try
@@ -53,10 +54,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                         // convert operation tag association to template resource class
                         TagTemplateResource operationTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
-                        operationTagResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{operationResourceName}/{apiOperationTagName}')]";
-                        operationTagResource.apiVersion = GlobalConstants.APIVersion;
-                        operationTagResource.scale = null;
-                        operationTagResource.dependsOn = dependencyChain;
+                        operationTagResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{operationResourceName}/{apiOperationTagName}')]";
+                        operationTagResource.ApiVersion = GlobalConstants.ApiVersion;
+                        operationTagResource.Scale = null;
+                        operationTagResource.DependsOn = dependencyChain;
                         templateResources.Add(operationTagResource);
                         dependencyChain = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{operationResourceName}', '{apiOperationTagName}')]" };
                     }
@@ -80,10 +81,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                     // convert associations between api and tags to template resource class
                     TagTemplateResource apiTagResource = JsonConvert.DeserializeObject<TagTemplateResource>(tag.ToString());
-                    apiTagResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiTagName}')]";
-                    apiTagResource.apiVersion = GlobalConstants.APIVersion;
-                    apiTagResource.scale = null;
-                    apiTagResource.dependsOn = dependencyChain;
+                    apiTagResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiTagName}')]";
+                    apiTagResource.ApiVersion = GlobalConstants.ApiVersion;
+                    apiTagResource.Scale = null;
+                    apiTagResource.DependsOn = dependencyChain;
                     templateResources.Add(apiTagResource);
                     dependencyChain = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{apiTagName}')]" };
                 }
@@ -97,7 +98,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPITagsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
             // initialize arm template
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             // when extract single API
             if (singleApiName != null)
@@ -128,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     {
 
                         // Extract the tag name from the last resource
-                        string[] lastTagName = templateResources.Last().name.Replace("')]", "").Split('/');
+                        string[] lastTagName = templateResources.Last().Name.Replace("')]", "").Split('/');
                         if (lastTagName.Length > 3)
                         {
                             // Operations tag
@@ -156,7 +157,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     if (templateResources.Count > 0)
                     {
                         // Extract the tag name from the last resource
-                        string[] lastTagName = templateResources.Last().name.Replace("')]", "").Split('/');
+                        string[] lastTagName = templateResources.Last().Name.Replace("')]", "").Split('/');
                         if (lastTagName.Length > 3)
                         {
                             // Operations tag
@@ -170,7 +171,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     }
                 }
             }
-            armTemplate.resources = templateResources.ToArray();
+            armTemplate.Resources = templateResources.ToArray();
             return armTemplate;
         }
     }

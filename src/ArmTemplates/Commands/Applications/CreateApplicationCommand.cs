@@ -168,7 +168,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                             dependsOnProducts = api.products != null,
                             dependsOnTags = api.tags != null,
                             dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
-                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
+                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.OAuth2 != null && api.authenticationSettings.OAuth2.AuthorizationServerId != null,
                             dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader),
                             isServiceUrlParameterize = isServiceUrlParameterizeInYml
                         });
@@ -191,10 +191,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                 }
                 foreach (Template apiTemplate in apiTemplates)
                 {
-                    APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
-                    APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.name, APITemplateCreator.MakeResourceName(api), true) == 0);
+                    APITemplateResource apiResource = apiTemplate.Resources.FirstOrDefault(resource => resource.Type == ResourceTypeConstants.API) as APITemplateResource;
+                    APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.Name, APITemplateCreator.MakeResourceName(api), true) == 0);
                     // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
-                    string apiFileName = FileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.IsSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
+                    string apiFileName = FileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.IsSplitAPI(providedAPIConfiguration), apiResource.Properties.Value != null);
                     FileWriter.WriteJSONToFile(apiTemplate, string.Concat(creatorConfig.outputLocation, apiFileName));
                 }
                 if (globalServicePolicyTemplate != null)

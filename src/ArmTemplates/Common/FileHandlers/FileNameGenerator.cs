@@ -14,7 +14,7 @@
                 ApiVersionSets = $@"/{baseFileName}apiVersionSets.template.json",
                 AuthorizationServers = $@"/{baseFileName}authorizationServers.template.json",
                 Backends = $@"/{baseFileName}backends.template.json",
-                GlobalServicePolicy = $@"/{baseFileName}globalServicePolicy.template.json",
+                GlobalServicePolicy = $@"{baseFileName}globalServicePolicy.template.json",
                 Loggers = $@"/{baseFileName}loggers.template.json",
                 NamedValues = $@"/{baseFileName}namedValues.template.json",
                 Tags = $@"/{baseFileName}tags.template.json",

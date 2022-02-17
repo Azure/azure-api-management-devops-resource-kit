@@ -66,17 +66,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
-            Template apiTemplate = this.CreateEmptyTemplate();
+            Template apiTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            apiTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            apiTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
             if (!string.IsNullOrEmpty(api.serviceUrl))
             {
-                apiTemplate.parameters.Add(api.name + "-ServiceUrl", new TemplateParameterProperties() { type = "string" });
+                apiTemplate.Parameters.Add(api.name + "-ServiceUrl", new TemplateParameterProperties() { type = "string" });
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -88,7 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 resources.AddRange(this.CreateChildResourceTemplates(api));
             }
-            apiTemplate.resources = resources.ToArray();
+            apiTemplate.Resources = resources.ToArray();
 
             return apiTemplate;
         }
@@ -123,54 +123,54 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create api resource
             APITemplateResource apiTemplateResource = new APITemplateResource()
             {
-                name = MakeResourceName(api),
-                type = ResourceTypeConstants.API,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new APITemplateProperties(),
-                dependsOn = new string[] { }
+                Name = MakeResourceName(api),
+                Type = ResourceTypeConstants.API,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new APITemplateProperties(),
+                DependsOn = new string[] { }
             };
 
             // add properties depending on whether the template is the initial, subsequent, or unified 
             if (!isSplit || !isInitial)
             {
                 // add metadata properties for initial and unified templates
-                apiTemplateResource.properties.apiVersion = api.apiVersion;
-                apiTemplateResource.properties.serviceUrl = this.MakeServiceUrl(api);
-                apiTemplateResource.properties.type = api.type;
-                apiTemplateResource.properties.apiType = api.type;
-                apiTemplateResource.properties.description = api.description;
-                apiTemplateResource.properties.subscriptionRequired = api.subscriptionRequired;
-                apiTemplateResource.properties.apiRevision = api.apiRevision;
-                apiTemplateResource.properties.apiRevisionDescription = api.apiRevisionDescription;
-                apiTemplateResource.properties.apiVersionDescription = api.apiVersionDescription;
-                apiTemplateResource.properties.authenticationSettings = api.authenticationSettings;
-                apiTemplateResource.properties.subscriptionKeyParameterNames = api.subscriptionKeyParameterNames;
-                apiTemplateResource.properties.path = api.suffix;
-                apiTemplateResource.properties.isCurrent = api.isCurrent;
-                apiTemplateResource.properties.displayName = string.IsNullOrEmpty(api.displayName) ? api.name : api.displayName;
-                apiTemplateResource.properties.protocols = this.CreateProtocols(api);
+                apiTemplateResource.Properties.ApiVersion = api.apiVersion;
+                apiTemplateResource.Properties.ServiceUrl = this.MakeServiceUrl(api);
+                apiTemplateResource.Properties.Type = api.type;
+                apiTemplateResource.Properties.ApiType = api.type;
+                apiTemplateResource.Properties.Description = api.description;
+                apiTemplateResource.Properties.SubscriptionRequired = api.subscriptionRequired;
+                apiTemplateResource.Properties.ApiRevision = api.apiRevision;
+                apiTemplateResource.Properties.ApiRevisionDescription = api.apiRevisionDescription;
+                apiTemplateResource.Properties.ApiVersionDescription = api.apiVersionDescription;
+                apiTemplateResource.Properties.AuthenticationSettings = api.authenticationSettings;
+                apiTemplateResource.Properties.SubscriptionKeyParameterNames = api.subscriptionKeyParameterNames;
+                apiTemplateResource.Properties.Path = api.suffix;
+                apiTemplateResource.Properties.IsCurrent = api.isCurrent;
+                apiTemplateResource.Properties.DisplayName = string.IsNullOrEmpty(api.displayName) ? api.name : api.displayName;
+                apiTemplateResource.Properties.Protocols = this.CreateProtocols(api);
                 // set the version set id
                 if (api.apiVersionSetId != null)
                 {
                     // point to the supplied version set if the apiVersionSetId is provided
-                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
+                    apiTemplateResource.Properties.ApiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
                 }
                 // set the authorization server id
-                if (api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null
-                    && apiTemplateResource.properties.authenticationSettings != null && apiTemplateResource.properties.authenticationSettings.oAuth2 != null && apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId != null)
+                if (api.authenticationSettings != null && api.authenticationSettings.OAuth2 != null && api.authenticationSettings.OAuth2.AuthorizationServerId != null
+                    && apiTemplateResource.Properties.AuthenticationSettings != null && apiTemplateResource.Properties.AuthenticationSettings.OAuth2 != null && apiTemplateResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId != null)
                 {
-                    apiTemplateResource.properties.authenticationSettings.oAuth2.authorizationServerId = api.authenticationSettings.oAuth2.authorizationServerId;
+                    apiTemplateResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId = api.authenticationSettings.OAuth2.AuthorizationServerId;
                 }
                 // set the subscriptionKey Parameter Names
                 if (api.subscriptionKeyParameterNames != null)
                 {
-                    if (api.subscriptionKeyParameterNames.header != null)
+                    if (api.subscriptionKeyParameterNames.Header != null)
                     {
-                        apiTemplateResource.properties.subscriptionKeyParameterNames.header = api.subscriptionKeyParameterNames.header;
+                        apiTemplateResource.Properties.SubscriptionKeyParameterNames.Header = api.subscriptionKeyParameterNames.Header;
                     }
-                    if (api.subscriptionKeyParameterNames.query != null)
+                    if (api.subscriptionKeyParameterNames.Query != null)
                     {
-                        apiTemplateResource.properties.subscriptionKeyParameterNames.query = api.subscriptionKeyParameterNames.query;
+                        apiTemplateResource.Properties.SubscriptionKeyParameterNames.Query = api.subscriptionKeyParameterNames.Query;
                     }
                 }
             }
@@ -239,10 +239,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 if (api.apiVersionSetId != null)
                 {
                     // point to the supplied version set if the apiVersionSetId is provided
-                    apiTemplateResource.properties.apiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
+                    apiTemplateResource.Properties.ApiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
                 }
-                apiTemplateResource.properties.format = format;
-                apiTemplateResource.properties.value = value;
+                apiTemplateResource.Properties.Format = format;
+                apiTemplateResource.Properties.Value = value;
 
                 // #562: deploying multiple versions of an API may fail because while trying to deploy the initial template
                 // overwrite the initial template’s path property to a dummy value
@@ -250,16 +250,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
                 if (isSplit && isInitial)
                 {
-                    apiTemplateResource.properties.path = api.suffix + $"/{Guid.NewGuid():n}";
+                    apiTemplateResource.Properties.Path = api.suffix + $"/{Guid.NewGuid():n}";
                 }
                 else
                 {
-                    apiTemplateResource.properties.path = api.suffix;
+                    apiTemplateResource.Properties.Path = api.suffix;
                 }
 
                 if (!string.IsNullOrEmpty(api.serviceUrl))
                 {
-                    apiTemplateResource.properties.serviceUrl = this.MakeServiceUrl(api);
+                    apiTemplateResource.Properties.ServiceUrl = this.MakeServiceUrl(api);
                 }
             }
             return apiTemplateResource;
@@ -359,7 +359,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public bool IsSplitAPI(APIConfig apiConfig)
         {
             // the api needs to be split into multiple templates if the user has supplied a version or version set - deploying swagger related properties at the same time as api version related properties fails, so they must be written and deployed separately
-            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null || apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.oAuth2 != null && apiConfig.authenticationSettings.oAuth2.authorizationServerId != null;
+            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null || apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.OAuth2 != null && apiConfig.authenticationSettings.OAuth2.AuthorizationServerId != null;
         }
 
         string MakeServiceUrl(APIConfig api)

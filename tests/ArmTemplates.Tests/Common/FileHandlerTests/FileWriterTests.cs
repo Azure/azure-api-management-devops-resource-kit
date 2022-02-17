@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common.Fil
                    "..", Path.DirectorySeparatorChar,
                    "Creator", Path.DirectorySeparatorChar,
                    "example.json");
-            APITemplateResource testObject = new APITemplateResource() { apiVersion = "" };
+            APITemplateResource testObject = new APITemplateResource() { ApiVersion = "" };
             JObject testJSON = JObject.FromObject(testObject);
 
             // delete existing file if exists

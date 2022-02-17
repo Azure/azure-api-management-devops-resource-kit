@@ -33,18 +33,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // assert
 
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{subscription.name}')]", subscriptionsTemplateResource.name);
-            Assert.Equal($"Microsoft.ApiManagement/service/subscriptions", subscriptionsTemplateResource.type);
-            Assert.Equal("2019-01-01", subscriptionsTemplateResource.apiVersion);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{subscription.name}')]", subscriptionsTemplateResource.Name);
+            Assert.Equal($"Microsoft.ApiManagement/service/subscriptions", subscriptionsTemplateResource.Type);
+            Assert.Equal("2019-01-01", subscriptionsTemplateResource.ApiVersion);
 
-            Assert.Equal(subscription.scope, subscriptionsTemplateResource.properties.scope);
-            Assert.Equal(subscription.displayName, subscriptionsTemplateResource.properties.displayName);
-            Assert.Equal(subscription.primaryKey, subscriptionsTemplateResource.properties.primaryKey);
-            Assert.Equal(subscription.secondaryKey, subscriptionsTemplateResource.properties.secondaryKey);
-            Assert.Equal(subscription.state, subscriptionsTemplateResource.properties.state);
-            Assert.Equal(subscription.allowTracing, subscriptionsTemplateResource.properties.allowTracing);
+            Assert.Equal(subscription.scope, subscriptionsTemplateResource.Properties.scope);
+            Assert.Equal(subscription.displayName, subscriptionsTemplateResource.Properties.displayName);
+            Assert.Equal(subscription.primaryKey, subscriptionsTemplateResource.Properties.primaryKey);
+            Assert.Equal(subscription.secondaryKey, subscriptionsTemplateResource.Properties.secondaryKey);
+            Assert.Equal(subscription.state, subscriptionsTemplateResource.Properties.state);
+            Assert.Equal(subscription.allowTracing, subscriptionsTemplateResource.Properties.allowTracing);
 
-            Assert.Equal(dependsOn, subscriptionsTemplateResource.dependsOn);
+            Assert.Equal(dependsOn, subscriptionsTemplateResource.DependsOn);
         }
 
         [Fact]
@@ -91,12 +91,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             var subscriptionsTemplateResource = subscriptionsTemplateResources[0];
 
-            Assert.Equal($"/products/{product.name}", subscriptionsTemplateResource.properties.scope);
-            Assert.Equal(subscription.displayName, subscriptionsTemplateResource.properties.displayName);
-            Assert.Equal(subscription.primaryKey, subscriptionsTemplateResource.properties.primaryKey);
-            Assert.Equal(subscription.secondaryKey, subscriptionsTemplateResource.properties.secondaryKey);
-            Assert.Equal(subscription.state, subscriptionsTemplateResource.properties.state);
-            Assert.Equal(subscription.allowTracing, subscriptionsTemplateResource.properties.allowTracing);
+            Assert.Equal($"/products/{product.name}", subscriptionsTemplateResource.Properties.scope);
+            Assert.Equal(subscription.displayName, subscriptionsTemplateResource.Properties.displayName);
+            Assert.Equal(subscription.primaryKey, subscriptionsTemplateResource.Properties.primaryKey);
+            Assert.Equal(subscription.secondaryKey, subscriptionsTemplateResource.Properties.secondaryKey);
+            Assert.Equal(subscription.state, subscriptionsTemplateResource.Properties.state);
+            Assert.Equal(subscription.allowTracing, subscriptionsTemplateResource.Properties.allowTracing);
         }
     }
 }

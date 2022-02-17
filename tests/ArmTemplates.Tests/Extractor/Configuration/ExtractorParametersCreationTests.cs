@@ -19,7 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         public void ExtractorConfigValidate_NoPropertiesSet_MissingParameterException()
         {
             // arrange
-            var defaultExtractorConfig = this.GetDefaultExtractorConfiguration();
+            var defaultExtractorConfig = this.GetMockedExtractorConsoleAppConfiguration();
 
             // act
             var extractorParameters = new ExtractorParameters(defaultExtractorConfig);
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         public void ExtractorConfigValidate_MultipleApisNoStringPassed_DoesntThrowAnyException()
         {
             // arrange
-            var defaultExtractorConfig = this.GetDefaultExtractorConfiguration();
+            var defaultExtractorConfig = this.GetMockedExtractorConsoleAppConfiguration();
             defaultExtractorConfig.MultipleAPIs = string.Empty;
 
             // act

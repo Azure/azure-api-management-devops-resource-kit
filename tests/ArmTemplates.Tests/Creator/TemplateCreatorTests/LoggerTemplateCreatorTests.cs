@@ -34,17 +34,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             Template loggerTemplate = loggerTemplateCreator.CreateLoggerTemplate(creatorConfig);
-            LoggerTemplateResource loggerTemplateResource = (LoggerTemplateResource)loggerTemplate.resources[0];
+            LoggerTemplateResource loggerTemplateResource = (LoggerTemplateResource)loggerTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{logger.name}')]", loggerTemplateResource.name);
-            Assert.Equal(logger.loggerType, loggerTemplateResource.properties.loggerType);
-            Assert.Equal(logger.description, loggerTemplateResource.properties.description);
-            Assert.Equal(logger.isBuffered, loggerTemplateResource.properties.isBuffered);
-            Assert.Equal(logger.resourceId, loggerTemplateResource.properties.resourceId);
-            Assert.Equal(logger.credentials.connectionString, loggerTemplateResource.properties.credentials.connectionString);
-            Assert.Equal(logger.credentials.instrumentationKey, loggerTemplateResource.properties.credentials.instrumentationKey);
-            Assert.Equal(logger.credentials.name, loggerTemplateResource.properties.credentials.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{logger.name}')]", loggerTemplateResource.Name);
+            Assert.Equal(logger.loggerType, loggerTemplateResource.Properties.loggerType);
+            Assert.Equal(logger.description, loggerTemplateResource.Properties.description);
+            Assert.Equal(logger.isBuffered, loggerTemplateResource.Properties.isBuffered);
+            Assert.Equal(logger.resourceId, loggerTemplateResource.Properties.resourceId);
+            Assert.Equal(logger.credentials.connectionString, loggerTemplateResource.Properties.credentials.connectionString);
+            Assert.Equal(logger.credentials.instrumentationKey, loggerTemplateResource.Properties.credentials.instrumentationKey);
+            Assert.Equal(logger.credentials.name, loggerTemplateResource.Properties.credentials.name);
         }
     }
 }

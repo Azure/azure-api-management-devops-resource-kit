@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 
     public class ProductGroupsValue : TemplateResource
     {
-        public ProductGroupTemplateProperties properties { get; set; }
+        public ProductGroupTemplateProperties Properties { get; set; }
     }
 
     public class ProductGroupTemplateProperties

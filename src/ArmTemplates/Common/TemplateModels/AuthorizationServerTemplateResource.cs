@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class AuthorizationServerTemplateResource : TemplateResource
     {
-        public AuthorizationServerTemplateProperties properties { get; set; }
+        public AuthorizationServerTemplateProperties Properties { get; set; }
     }
 
     public class AuthorizationServerTemplateProperties

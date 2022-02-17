@@ -27,10 +27,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateProductTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template productTemplate = this.CreateEmptyTemplate();
+            Template productTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            productTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            productTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
@@ -45,10 +45,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 // create product resource with properties
                 ProductsTemplateResource productsTemplateResource = new ProductsTemplateResource()
                 {
-                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.name}')]",
-                    type = ResourceTypeConstants.Product,
-                    apiVersion = GlobalConstants.APIVersion,
-                    properties = new ProductsTemplateProperties()
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.name}')]",
+                    Type = ResourceTypeConstants.Product,
+                    ApiVersion = GlobalConstants.ApiVersion,
+                    Properties = new ProductsTemplateProperties()
                     {
                         description = product.description,
                         terms = product.terms,
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                         state = product.state,
                         displayName = product.displayName
                     },
-                    dependsOn = new string[] { }
+                    DependsOn = new string[] { }
                 };
                 resources.Add(productsTemplateResource);
 
@@ -87,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 }
             }
 
-            productTemplate.resources = resources.ToArray();
+            productTemplate.Resources = resources.ToArray();
             return productTemplate;
         }
     }

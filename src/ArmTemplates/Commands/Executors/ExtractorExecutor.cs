@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
@@ -299,28 +300,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 apiLoggerId = await this.GetAllReferencedLoggers(apisToExtract, this.extractorParameters);
             }
 
-            // extract templates from apim service
-            Template globalServicePolicyTemplate = await this.policyExtractor.GenerateGlobalServicePolicyTemplateAsync(
-                this.extractorParameters,
-                baseFilesGenerationDirectory);
-
             if (apiTemplate == null)
             {
                 apiTemplate = await this.apiExtractor.GenerateAPIsARMTemplateAsync(this.extractorParameters, singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             }
 
-            List<TemplateResource> apiTemplateResources = apiTemplate.resources.ToList();
+            // generate different templates using extractors and write to output
+
+            var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
+
+            List<TemplateResource> apiTemplateResources = apiTemplate.Resources.ToList();
             Template apiVersionSetTemplate = await this.apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);
             Template authorizationServerTemplate = await this.authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);
             Template loggerTemplate = await this.loggerExtractor.GenerateLoggerTemplateAsync(this.extractorParameters, singleApiName, apiTemplateResources, apiLoggerId);
             Template productTemplate = await this.productExtractor.GenerateProductsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, baseFilesGenerationDirectory, this.extractorParameters);
             Template productAPITemplate = await this.productApiExtractor.GenerateAPIProductsARMTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
             Template apiTagTemplate = await this.apiTagExtractor.GenerateAPITagsARMTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
-            List<TemplateResource> productTemplateResources = productTemplate.resources.ToList();
-            List<TemplateResource> loggerResources = loggerTemplate.resources.ToList();
+            List<TemplateResource> productTemplateResources = productTemplate.Resources.ToList();
+            List<TemplateResource> loggerResources = loggerTemplate.Resources.ToList();
             Template namedValueTemplate = await this.propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, this.extractorParameters, this.backendExtractor, loggerResources);
             Template tagTemplate = await this.tagExtractor.GenerateTagsTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, productTemplateResources, this.extractorParameters.PolicyXMLBaseUrl, this.extractorParameters.PolicyXMLSasToken);
-            List<TemplateResource> namedValueResources = namedValueTemplate.resources.ToList();
+            List<TemplateResource> namedValueResources = namedValueTemplate.Resources.ToList();
 
             var backendResult = await this.backendExtractor.GenerateBackendsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, namedValueResources, this.extractorParameters);
 
@@ -339,46 +339,43 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             FileWriter.WriteJSONToFile(apiTemplate, string.Concat(baseFilesGenerationDirectory, apiFileName));
             // won't generate template when there is no resources
-            if (!apiVersionSetTemplate.resources.IsNullOrEmpty())
+            if (!apiVersionSetTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(apiVersionSetTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ApiVersionSets));
             }
-            if (!backendResult.Item1.resources.IsNullOrEmpty())
+            if (!backendResult.Item1.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(backendResult.Item1, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Backends));
             }
-            if (!loggerTemplate.resources.IsNullOrEmpty())
+            if (!loggerTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(loggerTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Loggers));
             }
-            if (!authorizationServerTemplate.resources.IsNullOrEmpty())
+            if (!authorizationServerTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(authorizationServerTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.AuthorizationServers));
             }
-            if (!productTemplate.resources.IsNullOrEmpty())
+            if (!productTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(productTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Products));
             }
-            if (!productAPITemplate.resources.IsNullOrEmpty())
+            if (!productAPITemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(productAPITemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ProductAPIs));
             }
-            if (!apiTagTemplate.resources.IsNullOrEmpty())
+            if (!apiTagTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(apiTagTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ApiTags));
             }
-            if (!tagTemplate.resources.IsNullOrEmpty())
+            if (!tagTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(tagTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Tags));
             }
-            if (!namedValueTemplate.resources.IsNullOrEmpty())
+            if (!namedValueTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(namedValueTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.NamedValues));
             }
-            if (!globalServicePolicyTemplate.resources.IsNullOrEmpty())
-            {
-                FileWriter.WriteJSONToFile(globalServicePolicyTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.GlobalServicePolicy));
-            }
+
             if (this.extractorParameters.LinkedTemplatesBaseUrl != null)
             {
                 // create a master template that links to all other templates
@@ -392,6 +389,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             // write parameters to outputLocation
             FileWriter.WriteJSONToFile(templateParameters, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Parameters));
+        }
+
+        /// <summary>
+        /// Generates policy templates in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save files</param>
+        /// <returns>generated global service policy template</returns>
+        public async Task<Template> GeneratePolicyTemplateAsync(string baseFilesGenerationDirectory)
+        {
+            var globalServicePolicyTemplate = await this.policyExtractor.GenerateGlobalServicePolicyTemplateAsync(
+                this.extractorParameters,
+                baseFilesGenerationDirectory);
+
+            if (globalServicePolicyTemplate.HasResources)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    globalServicePolicyTemplate,
+                    directory: baseFilesGenerationDirectory, 
+                    fileName: this.extractorParameters.FileNames.GlobalServicePolicy);
+            }
+
+            return globalServicePolicyTemplate;
         }
 
         /// <summary>

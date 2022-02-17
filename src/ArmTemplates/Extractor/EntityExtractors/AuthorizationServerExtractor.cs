@@ -8,27 +8,28 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class AuthorizationServerExtractor : EntityExtractorBase, IAuthorizationServerExtractor
     {
-        public async Task<string> GetAuthorizationServersAsync(string ApiManagementName, string ResourceGroupName)
+        public async Task<string> GetAuthorizationServersAsync(string apiManagementName, string resourceGroupName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/authorizationServers?api-version={4}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, GlobalConstants.ApiVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<string> GetAuthorizationServerDetailsAsync(string ApiManagementName, string ResourceGroupName, string authorizationServerName)
+        public async Task<string> GetAuthorizationServerDetailsAsync(string apiManagementName, string resourceGroupName, string authorizationServerName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/authorizationServers/{4}?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, authorizationServerName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, authorizationServerName, GlobalConstants.ApiVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -37,12 +38,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting authorization servers from service");
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // isolate api resources in the case of a single api extraction, as they may reference authorization servers
-            var apiResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
+            var apiResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.API);
 
             // pull all authorization servers for service
             string authorizationServers = await this.GetAuthorizationServersAsync(apimname, resourceGroup);
@@ -55,17 +56,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 // convert returned authorization server to template resource class
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = JsonConvert.DeserializeObject<AuthorizationServerTemplateResource>(authorizationServer);
-                authorizationServerTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServerName}')]";
-                authorizationServerTemplateResource.apiVersion = GlobalConstants.APIVersion;
+                authorizationServerTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServerName}')]";
+                authorizationServerTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
 
                 // only extract the authorization server if this is a full extraction, or in the case of a single api, if it is referenced by one of the api's authentication settings
                 bool isReferencedByAPI = false;
                 foreach (APITemplateResource apiResource in apiResources)
                 {
-                    if (apiResource.properties.authenticationSettings != null &&
-                        apiResource.properties.authenticationSettings.oAuth2 != null &&
-                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId != null &&
-                        apiResource.properties.authenticationSettings.oAuth2.authorizationServerId.Contains(authorizationServerName))
+                    if (apiResource.Properties.AuthenticationSettings != null &&
+                        apiResource.Properties.AuthenticationSettings.OAuth2 != null &&
+                        apiResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId != null &&
+                        apiResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId.Contains(authorizationServerName))
                     {
                         isReferencedByAPI = true;
                     }
@@ -77,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
             }
 
-            armTemplate.resources = templateResources.ToArray();
+            armTemplate.Resources = templateResources.ToArray();
             return armTemplate;
         }
     }

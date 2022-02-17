@@ -12,14 +12,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create tags/apis resource with properties
             TagAPITemplateResource tagAPITemplateResource = new TagAPITemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{tagName}')]",
-                type = ResourceTypeConstants.APITag,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new TagAPITemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{tagName}')]",
+                Type = ResourceTypeConstants.APITag,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new TagAPITemplateProperties()
                 {
                     displayName = tagName
                 },
-                dependsOn = dependsOn
+                DependsOn = dependsOn
             };
             return tagAPITemplateResource;
         }

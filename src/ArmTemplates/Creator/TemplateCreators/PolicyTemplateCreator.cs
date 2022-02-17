@@ -20,10 +20,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateGlobalServicePolicyTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template policyTemplate = this.CreateEmptyTemplate();
+            Template policyTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            policyTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            policyTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
@@ -37,20 +37,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/policy')]",
-                type = ResourceTypeConstants.GlobalServicePolicy,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new PolicyTemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/policy')]",
+                Type = ResourceTypeConstants.GlobalServicePolicy,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new PolicyTemplateProperties()
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
-                    format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? globalServicePolicy : this.fileReader.RetrieveLocalFileContents(globalServicePolicy)
+                    Format = isUrl ? "rawxml-link" : "rawxml",
+                    Value = isUrl ? globalServicePolicy : this.fileReader.RetrieveLocalFileContents(globalServicePolicy)
                 },
-                dependsOn = new string[] { }
+                DependsOn = new string[] { }
             };
             resources.Add(policyTemplateResource);
 
-            policyTemplate.resources = resources.ToArray();
+            policyTemplate.Resources = resources.ToArray();
             return policyTemplate;
         }
 
@@ -61,16 +61,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/policy')]",
-                type = ResourceTypeConstants.APIPolicy,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new PolicyTemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/policy')]",
+                Type = ResourceTypeConstants.APIPolicy,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new PolicyTemplateProperties()
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
-                    format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? api.policy : this.fileReader.RetrieveLocalFileContents(api.policy)
+                    Format = isUrl ? "rawxml-link" : "rawxml",
+                    Value = isUrl ? api.policy : this.fileReader.RetrieveLocalFileContents(api.policy)
                 },
-                dependsOn = dependsOn
+                DependsOn = dependsOn
             };
             return policyTemplateResource;
         }
@@ -87,16 +87,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.name}/policy')]",
-                type = ResourceTypeConstants.ProductPolicy,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new PolicyTemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.name}/policy')]",
+                Type = ResourceTypeConstants.ProductPolicy,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new PolicyTemplateProperties()
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
-                    format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? product.policy : this.fileReader.RetrieveLocalFileContents(product.policy)
+                    Format = isUrl ? "rawxml-link" : "rawxml",
+                    Value = isUrl ? product.policy : this.fileReader.RetrieveLocalFileContents(product.policy)
                 },
-                dependsOn = dependsOn
+                DependsOn = dependsOn
             };
             return policyTemplateResource;
         }
@@ -108,16 +108,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create policy resource with properties
             PolicyTemplateResource policyTemplateResource = new PolicyTemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{policyPair.Key}/policy')]",
-                type = ResourceTypeConstants.APIOperationPolicy,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new PolicyTemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{policyPair.Key}/policy')]",
+                Type = ResourceTypeConstants.APIOperationPolicy,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new PolicyTemplateProperties()
                 {
                     // if policy is a url inline the url, if it is a local file inline the file contents
-                    format = isUrl ? "rawxml-link" : "rawxml",
-                    value = isUrl ? policyPair.Value.policy : this.fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
+                    Format = isUrl ? "rawxml-link" : "rawxml",
+                    Value = isUrl ? policyPair.Value.policy : this.fileReader.RetrieveLocalFileContents(policyPair.Value.policy)
                 },
-                dependsOn = dependsOn
+                DependsOn = dependsOn
             };
             return policyTemplateResource;
         }

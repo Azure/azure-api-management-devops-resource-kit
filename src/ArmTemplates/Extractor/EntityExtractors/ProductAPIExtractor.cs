@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Newtonsoft.Json;
@@ -39,11 +40,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                     // convert returned api product associations to template resource class
                     ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(item.ToString());
-                    productAPIResource.type = ResourceTypeConstants.ProductAPI;
-                    productAPIResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiProductName}/{apiName}')]";
-                    productAPIResource.apiVersion = GlobalConstants.APIVersion;
-                    productAPIResource.scale = null;
-                    productAPIResource.dependsOn = lastProductAPIName != null ? new string[] { lastProductAPIName } : dependsOn;
+                    productAPIResource.Type = ResourceTypeConstants.ProductAPI;
+                    productAPIResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiProductName}/{apiName}')]";
+                    productAPIResource.ApiVersion = GlobalConstants.ApiVersion;
+                    productAPIResource.Scale = null;
+                    productAPIResource.DependsOn = lastProductAPIName != null ? new string[] { lastProductAPIName } : dependsOn;
 
                     templateResources.Add(productAPIResource);
 
@@ -59,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIProductsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
             // initialize arm template
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             // when extract single API
             if (singleApiName != null)
@@ -85,7 +86,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 foreach (string apiName in multipleApiNames)
                 {
                     templateResources.AddRange(await this.GenerateSingleProductAPIResourceAsync(apiName, extractorParameters, dependsOn));
-                    string apiProductName = templateResources.Last().name.Split('/', 3)[1];
+                    string apiProductName = templateResources.Last().Name.Split('/', 3)[1];
                     dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
                 }
             }
@@ -103,12 +104,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                     if (templateResources.Count > 0)
                     {
-                        string apiProductName = templateResources.Last().name.Split('/', 3)[1];
+                        string apiProductName = templateResources.Last().Name.Split('/', 3)[1];
                         dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
                     }
                 }
             }
-            armTemplate.resources = templateResources.ToArray();
+            armTemplate.Resources = templateResources.ToArray();
             return armTemplate;
         }
     }

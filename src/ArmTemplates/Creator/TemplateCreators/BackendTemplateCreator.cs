@@ -11,10 +11,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateBackendTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template backendTemplate = this.CreateEmptyTemplate();
+            Template backendTemplate = GenerateEmptyTemplate();
 
             // add parameters
-            backendTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            backendTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
@@ -25,16 +25,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 // create backend resource with properties
                 BackendTemplateResource backendTemplateResource = new BackendTemplateResource()
                 {
-                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendTemplatePropeties.title}')]",
-                    type = ResourceTypeConstants.Backend,
-                    apiVersion = GlobalConstants.APIVersion,
-                    properties = backendTemplatePropeties,
-                    dependsOn = new string[] { }
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendTemplatePropeties.title}')]",
+                    Type = ResourceTypeConstants.Backend,
+                    ApiVersion = GlobalConstants.ApiVersion,
+                    Properties = backendTemplatePropeties,
+                    DependsOn = new string[] { }
                 };
                 resources.Add(backendTemplateResource);
             }
 
-            backendTemplate.resources = resources.ToArray();
+            backendTemplate.Resources = resources.ToArray();
             return backendTemplate;
         }
     }
