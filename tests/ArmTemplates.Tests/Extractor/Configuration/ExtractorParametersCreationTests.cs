@@ -40,14 +40,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             extractorParameters.PolicyXMLSasToken.Should().Be(MockPolicyXMLSasToken);
             extractorParameters.ApiVersionSetName.Should().Be(MockApiVersionSetName);
             extractorParameters.ServiceUrlParameters.Should().Contain(MockServiceUrlParameters);
-            extractorParameters.ToParameterizeServiceUrl.Should().Be(MockToParameterizeServiceUrl);
-            extractorParameters.ToParameterizeNamedValue.Should().Be(MockToParameterizeNamedValue);
-            extractorParameters.ToParameterizeApiLoggerId.Should().Be(MockToParameterizeApiLoggerId);
-            extractorParameters.ToParameterizeLogResourceId.Should().Be(MockToParameterizeLogResourceId);
+            extractorParameters.ParameterizeServiceUrl.Should().Be(MockParameterizeServiceUrl);
+            extractorParameters.ParameterizeNamedValue.Should().Be(MockParameterizeNamedValue);
+            extractorParameters.ParameterizeApiLoggerId.Should().Be(MockParameterizeApiLoggerId);
+            extractorParameters.ParameterizeLogResourceId.Should().Be(MockParameterizeLogResourceId);
             extractorParameters.NotIncludeNamedValue.Should().Be(MockNotIncludeNamedValue);
             extractorParameters.ParamNamedValuesKeyVaultSecrets.Should().Be(MockToParameterizeNamedValuesKeyVaultSecrets);
             extractorParameters.OperationBatchSize.Should().Be(MockOperationBatchSize);
-            extractorParameters.ToParameterizeBackend.Should().Be(MockToParameterizeBackend);
+            extractorParameters.ParameterizeBackend.Should().Be(MockParameterizeBackend);
 
             // more complicated assertions with parsing arguments
             extractorParameters.MultipleApiNames.Should().Contain(new[] { "test-multiple-api-1", "test-multiple-api-2" });

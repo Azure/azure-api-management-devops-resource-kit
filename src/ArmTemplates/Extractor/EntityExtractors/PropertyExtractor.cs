@@ -59,7 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
 
-            if (extractorParameters.ToParameterizeNamedValue)
+            if (extractorParameters.ParameterizeNamedValue)
             {
                 TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
                 {
@@ -106,7 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 propertyTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
                 propertyTemplateResource.Scale = null;
 
-                if (extractorParameters.ToParameterizeNamedValue)
+                if (extractorParameters.ParameterizeNamedValue)
                 {
                     propertyTemplateResource.Properties.value = $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property)}]";
                 }

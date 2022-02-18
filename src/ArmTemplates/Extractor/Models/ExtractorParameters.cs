@@ -57,13 +57,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public ServiceUrlProperty[] ServiceUrlParameters { get; private set; }
 
-        public bool ToParameterizeServiceUrl { get; private set; }
+        public bool ParameterizeServiceUrl { get; private set; }
 
-        public bool ToParameterizeNamedValue { get; private set; }
+        public bool ParameterizeNamedValue { get; private set; }
 
-        public bool ToParameterizeApiLoggerId { get; private set; }
+        public bool ParameterizeApiLoggerId { get; private set; }
 
-        public bool ToParameterizeLogResourceId { get; private set; }
+        public bool ParameterizeLogResourceId { get; private set; }
 
         public bool NotIncludeNamedValue { get; private set; }
 
@@ -71,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public int OperationBatchSize { get; private set; }
 
-        public bool ToParameterizeBackend { get; private set; }
+        public bool ParameterizeBackend { get; private set; }
 
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
         {
@@ -88,14 +88,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ApiVersionSetName = extractorConfig.ApiVersionSetName;
             this.IncludeAllRevisions = extractorConfig.IncludeAllRevisions != null && extractorConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ServiceUrlParameters = extractorConfig.ServiceUrlParameters;
-            this.ToParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || extractorConfig.ServiceUrlParameters != null;
-            this.ToParameterizeNamedValue = extractorConfig.ParamNamedValue != null && extractorConfig.ParamNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ToParameterizeApiLoggerId = extractorConfig.ParamApiLoggerId != null && extractorConfig.ParamApiLoggerId.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ToParameterizeLogResourceId = extractorConfig.ParamLogResourceId != null && extractorConfig.ParamLogResourceId.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || extractorConfig.ServiceUrlParameters != null;
+            this.ParameterizeNamedValue = extractorConfig.ParamNamedValue != null && extractorConfig.ParamNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParameterizeApiLoggerId = extractorConfig.ParamApiLoggerId != null && extractorConfig.ParamApiLoggerId.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParameterizeLogResourceId = extractorConfig.ParamLogResourceId != null && extractorConfig.ParamLogResourceId.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.NotIncludeNamedValue = extractorConfig.NotIncludeNamedValue != null && extractorConfig.NotIncludeNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.OperationBatchSize = extractorConfig.OperationBatchSize;
             this.ParamNamedValuesKeyVaultSecrets = extractorConfig.ParamNamedValuesKeyVaultSecrets != null && extractorConfig.ParamNamedValuesKeyVaultSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ToParameterizeBackend = extractorConfig.ParamBackend != null && extractorConfig.ParamBackend.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParameterizeBackend = extractorConfig.ParamBackend != null && extractorConfig.ParamBackend.Equals("true", StringComparison.OrdinalIgnoreCase);
 
             this.SplitApis = !string.IsNullOrEmpty(extractorConfig.SplitAPIs) && extractorConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.IncludeAllRevisions = !string.IsNullOrEmpty(extractorConfig.IncludeAllRevisions) && extractorConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);

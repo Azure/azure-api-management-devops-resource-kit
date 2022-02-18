@@ -29,22 +29,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const bool MockIncludeAllRevisions = true;
         protected const string MockBaseFileName = "test-base-file-name";
         protected static ServiceUrlProperty[] MockServiceUrlParameters = new[] { new ServiceUrlProperty("test-service-url-property-api-name", "test-service-url-property-url") };
-        protected const bool MockToParameterizeServiceUrl = true;
-        protected const bool MockToParameterizeNamedValue = true;
-        protected const bool MockToParameterizeApiLoggerId = true;
-        protected const bool MockToParameterizeLogResourceId = true;
+        protected const bool MockParameterizeServiceUrl = true;
+        protected const bool MockParameterizeNamedValue = true;
+        protected const bool MockParameterizeApiLoggerId = true;
+        protected const bool MockParameterizeLogResourceId = true;
         protected const string MockServiceBaseUrl = "test-service-base-url";
         protected const bool MockNotIncludeNamedValue = true;
         protected const bool MockToParameterizeNamedValuesKeyVaultSecrets = true;
         protected const int MockOperationBatchSize = 32;
-        protected const bool MockToParameterizeBackend = true;
+        protected const bool MockParameterizeBackend = true;
 
         protected ExtractorConsoleAppConfiguration GetMockedExtractorConsoleAppConfiguration(
             bool splitApis = MockSplitApis,
             string apiVersionSetName = MockApiVersionSetName,
             string multipleApiNames = MockMultipleApis,
             bool includeAllRevisions = MockIncludeAllRevisions,
-            bool toParameterizeApiLoggerId = MockToParameterizeApiLoggerId)
+            bool toParameterizeApiLoggerId = MockParameterizeApiLoggerId)
         {
             return new ExtractorConsoleAppConfiguration
             {
@@ -64,15 +64,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 IncludeAllRevisions = includeAllRevisions.ToString(),
                 BaseFileName = MockBaseFileName,
                 ServiceUrlParameters = MockServiceUrlParameters,
-                ParamServiceUrl = MockToParameterizeServiceUrl.ToString(),
-                ParamNamedValue = MockToParameterizeNamedValue.ToString(),
+                ParamServiceUrl = MockParameterizeServiceUrl.ToString(),
+                ParamNamedValue = MockParameterizeNamedValue.ToString(),
                 ParamApiLoggerId = toParameterizeApiLoggerId.ToString(),
-                ParamLogResourceId = MockToParameterizeLogResourceId.ToString(),
+                ParamLogResourceId = MockParameterizeLogResourceId.ToString(),
                 ServiceBaseUrl = MockServiceBaseUrl,
                 NotIncludeNamedValue = MockNotIncludeNamedValue.ToString(),
                 ParamNamedValuesKeyVaultSecrets = MockToParameterizeNamedValuesKeyVaultSecrets.ToString(),
                 OperationBatchSize = MockOperationBatchSize,
-                ParamBackend = MockToParameterizeBackend.ToString()
+                ParamBackend = MockParameterizeBackend.ToString()
             };
         }  
     }

@@ -317,7 +317,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
 
             Dictionary<string, object> apiLoggerId = null;
-            if (this.extractorParameters.ToParameterizeApiLoggerId)
+            if (this.extractorParameters.ParameterizeApiLoggerId)
             {
                 apiLoggerId = await this.GetAllReferencedLoggers(apisToExtract, this.extractorParameters);
             }
@@ -347,7 +347,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var backendResult = await this.backendExtractor.GenerateBackendsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, namedValueResources, this.extractorParameters);
 
             Dictionary<string, string> loggerResourceIds = null;
-            if (this.extractorParameters.ToParameterizeLogResourceId)
+            if (this.extractorParameters.ParameterizeLogResourceId)
             {
                 loggerResourceIds = LoggerTemplateUtils.GetAllLoggerResourceIds(loggerResources);
                 loggerTemplate = LoggerTemplateUtils.SetLoggerResourceId(loggerTemplate);

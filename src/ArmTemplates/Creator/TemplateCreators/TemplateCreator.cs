@@ -40,7 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 };
                 armTemplate.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
             }
-            if (extractorParameters.ToParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
+            if (extractorParameters.ParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
             {
                 TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                 {
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 };
                 armTemplate.Parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
             }
-            if (extractorParameters.ToParameterizeApiLoggerId)
+            if (extractorParameters.ParameterizeApiLoggerId)
             {
                 TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
                 {

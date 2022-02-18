@@ -117,7 +117,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'backendsTemplate')]");
                 string backendsUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, fileNames.Backends);
                 var templateResource = this.CreateLinkedMasterTemplateResource("backendsTemplate", backendsUri, dependsOnNamedValues);
-                if (extractorParameters.ToParameterizeBackend)
+                if (extractorParameters.ParameterizeBackend)
                 {
                     templateResource.Properties.parameters.Add(ParameterNames.BackendSettings,
                         new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.BackendSettings}')]" });
@@ -173,11 +173,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 masterResourceTemplate.Properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
             }
-            if (extractorParameters.ToParameterizeServiceUrl)
+            if (extractorParameters.ParameterizeServiceUrl)
             {
                 masterResourceTemplate.Properties.parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.ServiceUrl}')]" });
             }
-            if (extractorParameters.ToParameterizeApiLoggerId)
+            if (extractorParameters.ParameterizeApiLoggerId)
             {
                 masterResourceTemplate.Properties.parameters.Add(ParameterNames.ApiLoggerId, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.ApiLoggerId}')]" });
             }
@@ -192,7 +192,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
-            if (extractorParameters.ToParameterizeNamedValue)
+            if (extractorParameters.ParameterizeNamedValue)
             {
                 masterResourceTemplate.Properties.parameters.Add(ParameterNames.NamedValues, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.NamedValues}')]" });
             }
@@ -222,7 +222,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public MasterTemplateResource CreateLinkedMasterTemplateResourceForLoggerTemplate(string name, string uriLink, string[] dependsOn, ExtractorParameters extractorParameters)
         {
             MasterTemplateResource masterResourceTemplate = this.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
-            if (extractorParameters.ToParameterizeLogResourceId)
+            if (extractorParameters.ParameterizeLogResourceId)
             {
                 masterResourceTemplate.Properties.parameters.Add(ParameterNames.LoggerResourceId, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.LoggerResourceId}')]" });
             }
@@ -332,7 +332,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     parameters.Add(ParameterNames.PolicyXMLSasToken, policyXMLSasTokenProperties);
                 }
             }
-            if (extractorParameters.ToParameterizeServiceUrl)
+            if (extractorParameters.ParameterizeServiceUrl)
             {
                 TemplateParameterProperties paramServiceUrlProperties = new TemplateParameterProperties()
                 {
@@ -344,7 +344,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 parameters.Add(ParameterNames.ServiceUrl, paramServiceUrlProperties);
             }
-            if (extractorParameters.ToParameterizeNamedValue)
+            if (extractorParameters.ParameterizeNamedValue)
             {
                 TemplateParameterProperties namedValueProperties = new TemplateParameterProperties()
                 {
@@ -356,7 +356,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 parameters.Add(ParameterNames.NamedValues, namedValueProperties);
             }
-            if (extractorParameters.ToParameterizeApiLoggerId)
+            if (extractorParameters.ParameterizeApiLoggerId)
             {
                 TemplateParameterProperties loggerIdProperties = new TemplateParameterProperties()
                 {
@@ -368,7 +368,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 parameters.Add(ParameterNames.ApiLoggerId, loggerIdProperties);
             }
-            if (extractorParameters.ToParameterizeLogResourceId)
+            if (extractorParameters.ParameterizeLogResourceId)
             {
                 TemplateParameterProperties loggerResourceIdProperties = new TemplateParameterProperties()
                 {
@@ -392,7 +392,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, namedValueKeyVaultSecretsProperties);
             }
-            if (extractorParameters.ToParameterizeBackend)
+            if (extractorParameters.ParameterizeBackend)
             {
                 TemplateParameterProperties backendSettingsProperties = new TemplateParameterProperties()
                 {
@@ -508,7 +508,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenProperties);
                 }
             }
-            if (extractorParameters.ToParameterizeServiceUrl)
+            if (extractorParameters.ParameterizeServiceUrl)
             {
                 Dictionary<string, string> serviceUrls = new Dictionary<string, string>();
                 foreach (string apiName in apisToExtract)
@@ -524,7 +524,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 parameters.Add(ParameterNames.ServiceUrl, serviceUrlProperties);
             }
-            if (extractorParameters.ToParameterizeNamedValue)
+            if (extractorParameters.ParameterizeNamedValue)
             {
                 Dictionary<string, string> namedValues = new Dictionary<string, string>();
                 PropertyExtractor pExc = new PropertyExtractor();
@@ -586,7 +586,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueProperties);
             }
-            if (extractorParameters.ToParameterizeApiLoggerId)
+            if (extractorParameters.ParameterizeApiLoggerId)
             {
                 TemplateObjectParameterProperties loggerIdProperties = new TemplateObjectParameterProperties()
                 {
@@ -594,7 +594,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 };
                 parameters.Add(ParameterNames.ApiLoggerId, loggerIdProperties);
             }
-            if (extractorParameters.ToParameterizeLogResourceId)
+            if (extractorParameters.ParameterizeLogResourceId)
             {
                 TemplateObjectParameterProperties loggerResourceIdProperties = new TemplateObjectParameterProperties()
                 {
@@ -603,7 +603,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdProperties);
             }
 
-            if (extractorParameters.ToParameterizeBackend)
+            if (extractorParameters.ParameterizeBackend)
             {
                 TemplateObjectParameterProperties backendProperties = new TemplateObjectParameterProperties()
                 {

@@ -243,7 +243,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             apiResource.ApiVersion = GlobalConstants.ApiVersion;
             apiResource.Scale = null;
 
-            if (extractorParameters.ToParameterizeServiceUrl)
+            if (extractorParameters.ParameterizeServiceUrl)
             {
                 apiResource.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
             }
@@ -331,7 +331,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             apiResource.Scale = null;
             apiResource.Properties.IsCurrent = null;
 
-            if (extractorParameters.ToParameterizeServiceUrl)
+            if (extractorParameters.ParameterizeServiceUrl)
             {
                 apiResource.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
             }
@@ -785,7 +785,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 diagnosticResource.Scale = null;
                 diagnosticResource.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
 
-                if (extractorParameters.ToParameterizeApiLoggerId)
+                if (extractorParameters.ParameterizeApiLoggerId)
                 {
 
                     diagnosticResource.Properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{ParameterNamingHelper.GenerateValidParameterName(diagnosticName, ParameterPrefix.Diagnostic)}]";
@@ -831,7 +831,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 serviceDiagnosticResource.Scale = null;
                 serviceDiagnosticResource.DependsOn = new string[] { };
 
-                if (extractorParameters.ToParameterizeApiLoggerId)
+                if (extractorParameters.ParameterizeApiLoggerId)
                 {
 
                     serviceDiagnosticResource.Properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(serviceDiagnosticName, ParameterPrefix.Diagnostic)}]";

@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Console.WriteLine("Extracting loggers from service");
             Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
 
-            if (extractorParameters.ToParameterizeLogResourceId)
+            if (extractorParameters.ParameterizeLogResourceId)
             {
                 TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
                 {
@@ -91,7 +91,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         }
                     }
                     string validApiName = ParameterNamingHelper.GenerateValidParameterName(singleApiName, ParameterPrefix.Api);
-                    if (extractorParameters.ToParameterizeApiLoggerId && apiLoggerId.ContainsKey(validApiName))
+                    if (extractorParameters.ParameterizeApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {
                         object diagnosticObj = apiLoggerId[validApiName];
                         if (diagnosticObj is Dictionary<string, string>)
