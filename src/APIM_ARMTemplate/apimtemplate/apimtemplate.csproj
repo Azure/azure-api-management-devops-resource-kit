@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ProjectGuid>{B5183465-2BC1-4206-9C9F-5AC9615AC941}</ProjectGuid>
+    <LangVersion>preview</LangVersion>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>apim-templates</ToolCommandName>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extractor\TemplateCreators\**" />
+    <EmbeddedResource Remove="Extractor\TemplateCreators\**" />
+    <None Remove="Extractor\TemplateCreators\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="microsoft.gpg" />
+    <None Remove="packages-microsoft-prod.deb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Colors.Net" Version="1.1.0" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />
+    <PackageReference Include="Microsoft.Azure.Management.ApiManagement" Version="4.0.6-preview" />
+    <PackageReference Include="Microsoft.Azure.Management.Authorization" Version="2.9.0-preview" />
+    <PackageReference Include="Microsoft.Azure.Management.Fluent" Version="1.18.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.1" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Include="Colors.Net" Version="1.1.0" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="YamlDotNet" Version="5.3.0" />
+  </ItemGroup>
+
+</Project>

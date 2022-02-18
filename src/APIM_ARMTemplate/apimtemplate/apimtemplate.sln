@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "apimtemplate", "apimtemplate.csproj", "{B5183465-2BC1-4206-9C9F-5AC9615AC941}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "apimtemplate.test", "..\apimtemplate.test\apimtemplate.test.csproj", "{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5183465-2BC1-4206-9C9F-5AC9615AC941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5183465-2BC1-4206-9C9F-5AC9615AC941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5183465-2BC1-4206-9C9F-5AC9615AC941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5183465-2BC1-4206-9C9F-5AC9615AC941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86622F7B-B2EB-4FC7-9164-36F06B2F8B1D}
+	EndGlobalSection
+EndGlobal
