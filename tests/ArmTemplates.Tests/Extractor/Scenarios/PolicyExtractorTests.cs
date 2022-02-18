@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             OutputPoliciesDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, "policy-tests");
 
             // remember to clean up the output directory before each test
-            Directory.Delete(OutputPoliciesDirectory, true);
+            if (Directory.Exists(OutputPoliciesDirectory)) Directory.Delete(OutputPoliciesDirectory, true);
         }
 
         [Fact]
