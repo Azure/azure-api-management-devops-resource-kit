@@ -4,8 +4,8 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
+using System;
 using FluentAssertions;
-using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
 using Xunit;
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             defaultExtractorConfig.MultipleAPIs = string.Empty;
 
             // act
-            var createExtractorParameters = () => { _ = new ExtractorParameters(defaultExtractorConfig); };
+            Action createExtractorParameters = () => { _ = new ExtractorParameters(defaultExtractorConfig); };
             createExtractorParameters.Should().NotThrow();
         }
     }
