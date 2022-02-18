@@ -27,11 +27,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             #region Operations
 
             // pull api operations for service
-            string[] operationNames = await this.GetAllOperationNames(apimname, resourceGroup, apiName);
+            string[] operationNames = await GetAllOperationNames(apimname, resourceGroup, apiName);
 
             foreach (string operationName in operationNames)
             {
-                string operationDetails = await this.GetAPIOperationDetailsAsync(apimname, resourceGroup, apiName, operationName);
+                string operationDetails = await GetAPIOperationDetailsAsync(apimname, resourceGroup, apiName, operationName);
 
                 Console.WriteLine("'{0}' Operation found", operationName);
 
@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 try
                 {
                     // pull tags associated with the operation
-                    string apiOperationTags = await this.GetOperationTagsAsync(apimname, resourceGroup, apiName, operationName);
+                    string apiOperationTags = await GetOperationTagsAsync(apimname, resourceGroup, apiName, operationName);
                     JObject oApiOperationTags = JObject.Parse(apiOperationTags);
 
                     foreach (var tag in oApiOperationTags["value"])
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             try
             {
                 // pull tags associated with the api
-                string apiTags = await this.GetAPITagsAsync(apimname, resourceGroup, apiName);
+                string apiTags = await GetAPITagsAsync(apimname, resourceGroup, apiName);
                 JObject oApiTags = JObject.Parse(apiTags);
 
                 foreach (var tag in oApiTags["value"])
@@ -97,7 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPITagsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
             // initialize arm template
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             // when extract single API
             if (singleApiName != null)
@@ -105,9 +105,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 // check if this api exist
                 try
                 {
-                    string apiDetails = await this.GetAPIDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName);
+                    string apiDetails = await GetAPIDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName);
                     Console.WriteLine("{0} API found ...", singleApiName);
-                    templateResources.AddRange(await this.GenerateSingleAPITagResourceAsync(singleApiName, extractorParameters, new string[] { }));
+                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(singleApiName, extractorParameters, new string[] { }));
                 }
                 catch (Exception)
                 {
@@ -122,7 +122,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 string[] dependsOn = new string[] { };
                 foreach (string apiName in multipleApiNames)
                 {
-                    templateResources.AddRange(await this.GenerateSingleAPITagResourceAsync(apiName, extractorParameters, dependsOn));
+                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, extractorParameters, dependsOn));
 
                     if (templateResources.Count > 0)
                     {
@@ -145,14 +145,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // when extract all APIs and generate one master template
             else
             {
-                JToken[] oApis = await this.GetAllApiObjsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+                JToken[] oApis = await GetAllApiObjsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
                 Console.WriteLine("{0} APIs found ...", oApis.Count().ToString());
 
                 string[] dependsOn = new string[] { };
                 foreach (JToken oApi in oApis)
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await this.GenerateSingleAPITagResourceAsync(apiName, extractorParameters, dependsOn));
+                    templateResources.AddRange(await GenerateSingleAPITagResourceAsync(apiName, extractorParameters, dependsOn));
                     if (templateResources.Count > 0)
                     {
                         // Extract the tag name from the last resource

@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 {
     public class ExtractApplicationCommand : CommandLineApplicationBase
     {
-        ExtractorConfig extractorConfig;
+        private ExtractorConfig _extractorConfig;
 
         public ExtractApplicationCommand() : base()
         {
@@ -22,28 +22,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 
         protected override void SetupApplicationAndCommands()
         {
-            this.Name = GlobalConstants.ExtractName;
-            this.Description = GlobalConstants.ExtractDescription;
+            Name = GlobalConstants.ExtractName;
+            Description = GlobalConstants.ExtractDescription;
 
-            var extractorConfigFilePathOption = this.Option("--extractorConfig <extractorConfig>", "Config file of the extractor", CommandOptionType.SingleValue);
-            this.AddExtractorConfigPropertiesToCommandLineOptions();
+            var extractorConfigFilePathOption = Option("--extractorConfig <extractorConfig>", "Config file of the extractor", CommandOptionType.SingleValue);
+            AddExtractorConfigPropertiesToCommandLineOptions();
 
             if (extractorConfigFilePathOption.HasValue())
             {
                 var fileReader = new FileReader();
-                this.extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig(extractorConfigFilePathOption.Value());
+                _extractorConfig = fileReader.ConvertConfigJsonToExtractorConfig(extractorConfigFilePathOption.Value());
             }
 
-            this.UpdateExtractorConfigFromAdditionalArguments();
+            UpdateExtractorConfigFromAdditionalArguments();
         }
 
         protected override async Task<int> ExecuteCommand()
         {
             try
             {
-                this.extractorConfig.Validate();
+                _extractorConfig.Validate();
 
-                var extractorExecutor = new ExtractorExecutor(this.extractorConfig);
+                var extractorExecutor = new ExtractorExecutor(_extractorConfig);
                 await extractorExecutor.ExecuteGenerationBasedOnExtractorConfiguration();
 
                 Logger.LogInformation("Templates written to output location");
@@ -61,22 +61,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
             }
         }
 
-        void AddExtractorConfigPropertiesToCommandLineOptions()
+        private void AddExtractorConfigPropertiesToCommandLineOptions()
         {
             foreach (var propertyInfo in typeof(ExtractorConfig).GetProperties())
             {
                 var description = Attribute.IsDefined(propertyInfo, typeof(DescriptionAttribute)) ? (Attribute.GetCustomAttribute(propertyInfo, typeof(DescriptionAttribute)) as DescriptionAttribute).Description : string.Empty;
 
-                this.Option($"--{propertyInfo.Name} <{propertyInfo.Name}>", description, CommandOptionType.SingleValue);
+                Option($"--{propertyInfo.Name} <{propertyInfo.Name}>", description, CommandOptionType.SingleValue);
             }
         }
 
-        void UpdateExtractorConfigFromAdditionalArguments()
+        private void UpdateExtractorConfigFromAdditionalArguments()
         {
             var extractorConfigType = typeof(ExtractorConfig);
-            foreach (var option in this.Options.Where(o => o.HasValue()))
+            foreach (var option in Options.Where(o => o.HasValue()))
             {
-                extractorConfigType.GetProperty(option.LongName)?.SetValue(this.extractorConfig, option.Value());
+                extractorConfigType.GetProperty(option.LongName)?.SetValue(_extractorConfig, option.Value());
             }
         }
     }

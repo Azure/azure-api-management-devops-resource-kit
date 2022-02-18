@@ -1,6 +1,6 @@
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
 {
-    static class GlobalConstants
+    internal static class GlobalConstants
     {
         public static string CommandStartDateTime = "";
         public const string AppShortName = "apimtemplate";

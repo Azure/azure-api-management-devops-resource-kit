@@ -6,23 +6,23 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities
 {
-    class Executable
+    internal class Executable
     {
-        string _arguments;
-        string _exeName;
-        bool _shareConsole;
-        bool _streamOutput;
-        readonly bool _visibleProcess;
-        readonly string _workingDirectory;
+        private string _arguments;
+        private string _exeName;
+        private bool _shareConsole;
+        private bool _streamOutput;
+        private readonly bool _visibleProcess;
+        private readonly string _workingDirectory;
 
         public Executable(string exeName, string arguments = null, bool streamOutput = true, bool shareConsole = false, bool visibleProcess = false, string workingDirectory = null)
         {
-            this._exeName = exeName;
-            this._arguments = arguments;
-            this._streamOutput = streamOutput;
-            this._shareConsole = shareConsole;
-            this._visibleProcess = visibleProcess;
-            this._workingDirectory = workingDirectory;
+            _exeName = exeName;
+            _arguments = arguments;
+            _streamOutput = streamOutput;
+            _shareConsole = shareConsole;
+            _visibleProcess = visibleProcess;
+            _workingDirectory = workingDirectory;
         }
 
         public Process Process { get; private set; }
@@ -33,17 +33,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
             {
                 FileName = _exeName,
                 Arguments = _arguments,
-                CreateNoWindow = !this._visibleProcess,
+                CreateNoWindow = !_visibleProcess,
                 UseShellExecute = _shareConsole,
                 RedirectStandardError = _streamOutput,
                 RedirectStandardInput = _streamOutput,
                 RedirectStandardOutput = _streamOutput,
-                WorkingDirectory = this._workingDirectory ?? Environment.CurrentDirectory
+                WorkingDirectory = _workingDirectory ?? Environment.CurrentDirectory
             };
 
             try
             {
-                this.Process = Process.Start(processInfo);
+                Process = Process.Start(processInfo);
             }
             catch (Win32Exception ex)
             {
@@ -54,16 +54,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                 throw ex;
             }
 
-            if (this._streamOutput)
+            if (_streamOutput)
             {
-                this.Process.OutputDataReceived += (s, e) => outputCallback?.Invoke(e.Data);
-                this.Process.BeginOutputReadLine();
-                this.Process.ErrorDataReceived += (s, e) => errorCallback?.Invoke(e.Data);
-                this.Process.BeginErrorReadLine();
-                this.Process.EnableRaisingEvents = true;
+                Process.OutputDataReceived += (s, e) => outputCallback?.Invoke(e.Data);
+                Process.BeginOutputReadLine();
+                Process.ErrorDataReceived += (s, e) => errorCallback?.Invoke(e.Data);
+                Process.BeginErrorReadLine();
+                Process.EnableRaisingEvents = true;
             }
 
-            var exitCodeTask = this.Process.WaitForExitAsync();
+            var exitCodeTask = Process.WaitForExitAsync();
 
             if (timeout == null)
                 return await exitCodeTask;
@@ -75,7 +75,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                     return exitCodeTask.Result;
                 else
                 {
-                    this.Process.Kill();
+                    Process.Kill();
                     throw new Exception("Process didn't exit within specified timeout");
                 }
             }

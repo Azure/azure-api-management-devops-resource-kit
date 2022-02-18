@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities
 {
-    static class ProcessExtensions
+    internal static class ProcessExtensions
     {
         // http://stackoverflow.com/a/19104345
         public static Task<int> WaitForExitAsync(this Process process, CancellationToken cancellationToken = default)

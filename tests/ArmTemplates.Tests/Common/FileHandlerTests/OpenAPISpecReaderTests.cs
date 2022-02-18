@@ -6,11 +6,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common.Fil
 {
     public class OpenAPISpecReaderTests
     {
-        string openAPISpecFolder;
+        private string openAPISpecFolder;
 
         public OpenAPISpecReaderTests()
         {
-            this.openAPISpecFolder = string.Concat(
+            openAPISpecFolder = string.Concat(
                 "Resources", Path.DirectorySeparatorChar,
                "OpenAPISpecs", Path.DirectorySeparatorChar);
         }
@@ -21,8 +21,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common.Fil
             OpenAPISpecReader openAPISpecReader = new OpenAPISpecReader();
 
             // act
-            bool shouldOutputVersionTwo = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(string.Concat(this.openAPISpecFolder, "swaggerPetstore.json"));
-            bool shouldOutputVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(string.Concat(this.openAPISpecFolder, "swaggerPetstorev3.json"));
+            bool shouldOutputVersionTwo = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(string.Concat(openAPISpecFolder, "swaggerPetstore.json"));
+            bool shouldOutputVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(string.Concat(openAPISpecFolder, "swaggerPetstorev3.json"));
 
             // assert
             Assert.False(shouldOutputVersionTwo);

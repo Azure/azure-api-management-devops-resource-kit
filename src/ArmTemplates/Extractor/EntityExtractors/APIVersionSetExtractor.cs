@@ -15,29 +15,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         public async Task<string> GetAPIVersionSetsAsync(string ApiManagementName, string ResourceGroupName)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apiVersionSets?api-version={4}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, GlobalConstants.APIVersion);
 
-            return await this.CallApiManagementAsync(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<string> GetAPIVersionSetDetailsAsync(string ApiManagementName, string ResourceGroupName, string APIVersionSetName)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apiVersionSets/{4}?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, APIVersionSetName, GlobalConstants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, APIVersionSetName, GlobalConstants.APIVersion);
 
-            return await this.CallApiManagementAsync(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<Template> GenerateAPIVersionSetsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting API version sets from service");
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
             // isolate apis in the case of a single api extraction
             var apiResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.API);
@@ -45,13 +45,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all version sets for service
-            string versionSets = await this.GetAPIVersionSetsAsync(apimname, resourceGroup);
+            string versionSets = await GetAPIVersionSetsAsync(apimname, resourceGroup);
             JObject oVersionSets = JObject.Parse(versionSets);
 
             foreach (var item in oVersionSets["value"])
             {
                 string versionSetName = ((JValue)item["name"]).Value.ToString();
-                string versionSetDetails = await this.GetAPIVersionSetDetailsAsync(apimname, resourceGroup, versionSetName);
+                string versionSetDetails = await GetAPIVersionSetDetailsAsync(apimname, resourceGroup, versionSetName);
 
                 // convert returned product to template resource class
                 APIVersionSetTemplateResource versionSetTemplateResource = JsonConvert.DeserializeObject<APIVersionSetTemplateResource>(versionSetDetails);

@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             string[] tagIDs = api.tags.Split(", ");
             foreach (string tagID in tagIDs)
             {
-                TagAPITemplateResource tagAPITemplate = this.CreateTagAPITemplateResource(tagID, api.name, dependsOn);
+                TagAPITemplateResource tagAPITemplate = CreateTagAPITemplateResource(tagID, api.name, dependsOn);
                 tagAPITemplates.Add(tagAPITemplate);
             }
             return tagAPITemplates;
