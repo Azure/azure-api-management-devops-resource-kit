@@ -5,10 +5,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 {
-    /// <summary>
-    /// Parameters used for extractor flow. 
-    /// They are not changed in the process of extraction.
-    /// </summary>
     public record ExtractorParameters
     {
         public string SourceApimName { get; private set; }
@@ -23,22 +19,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
         public FileNames FileNames { get; private set; }
 
         /// <summary>
-        /// Not changeable root directory, where templates will be generated.
+        /// The root directory, where templates will be generated.
         /// </summary>
         public string FilesGenerationRootDirectory { get; private set; }
 
         /// <summary>
         /// Name of a single API that user wants to extract
         /// </summary>
-        public string SingleApiName { get; set; }
+        public string SingleApiName { get; private set; }
 
         /// <summary>
         /// Names of APIs that user wants to extract
         /// </summary>
-        public List<string> MultipleApiNames { get; set; }
+        public List<string> MultipleApiNames { get; private set; }
 
         /// <summary>
-        /// Create split api templates for every API in the source APIM instance
+        /// Create separate api templates for every API in the source APIM instance
         /// </summary>
         public bool SplitApis { get; private set; }
 
@@ -59,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public string ApiVersionSetName { get; private set; }
 
-        public ServiceUrlProperty[] ServiceUrlParameters { get; set; }
+        public ServiceUrlProperty[] ServiceUrlParameters { get; private set; }
 
         public bool ToParameterizeServiceUrl { get; private set; }
 
@@ -75,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public int OperationBatchSize { get; private set; }
 
-        public bool ToParameterizeBackend { get; set; }
+        public bool ToParameterizeBackend { get; private set; }
 
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
         {

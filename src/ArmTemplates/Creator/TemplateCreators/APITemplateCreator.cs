@@ -13,7 +13,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class APITemplateCreator : TemplateCreator
+    public class APITemplateCreator
     {
         FileReader fileReader;
         PolicyTemplateCreator policyTemplateCreator;
@@ -66,7 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
-            Template apiTemplate = GenerateEmptyTemplate();
+            Template apiTemplate = TemplateCreator.GenerateEmptyTemplate();
 
             // add parameters
             apiTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

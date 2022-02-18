@@ -6,12 +6,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class LoggerTemplateCreator : TemplateCreator
+    public class LoggerTemplateCreator
     {
         public Template CreateLoggerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template loggerTemplate = GenerateEmptyTemplate();
+            Template loggerTemplate = TemplateCreator.GenerateEmptyTemplate();
 
             // add parameters
             loggerTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

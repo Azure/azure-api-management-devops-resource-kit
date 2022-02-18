@@ -7,6 +7,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,30 +16,36 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public abstract class ApiClientBase
     {
-        public static string BaseUrl = "https://management.azure.com";
+        readonly IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        readonly HttpClient httpClient = new HttpClient();
 
-        protected Authentication Auth = new Authentication();
+        protected string BaseUrl { get; private set; } = GlobalConstants.BaseManagementAzureUrl;
 
-        static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
-        static readonly HttpClient HttpClient = new HttpClient();
+        protected Authentication Auth { get; private set; } = new Authentication();
+
+        public ApiClientBase(string baseUrl = null) 
+        {
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                this.BaseUrl = baseUrl;
+            }
+        }
 
         protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
         {
-            if (Cache.TryGetValue(requestUrl, out string cachedResponseBody))
+            if (this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {
                 return cachedResponseBody;
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
 
-            HttpResponseMessage response = await HttpClient.SendAsync(request);
-
+            HttpResponseMessage response = await this.httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            Cache.Set(requestUrl, responseBody);
+            this.cache.Set(requestUrl, responseBody);
 
             return responseBody;
         }

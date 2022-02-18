@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
@@ -6,12 +6,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class PropertyTemplateCreator : TemplateCreator
+    public class PropertyTemplateCreator
     {
         public Template CreatePropertyTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template propertyTemplate = GenerateEmptyTemplate();
+            Template propertyTemplate = TemplateCreator.GenerateEmptyTemplate();
 
             // add parameters
             propertyTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

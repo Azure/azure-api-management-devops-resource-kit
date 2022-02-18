@@ -9,18 +9,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 {
     public class Authentication
     {
-        internal static bool IsTokenValid = false;
-        public static DateTime Start = DateTime.Now;
-        internal static string InternalAzToken;
-        internal static string InternalAzSubscriptionId;
+        bool isTokenValid = false;
+        DateTime start = DateTime.Now;
+        string internalAzToken;
+        string internalAzSubscriptionId;
 
         public async Task<(string azToken, string azSubscriptionId)> GetAccessToken()
         {
             var tokenTimeout = DateTime.Now;
 
-            if ((tokenTimeout - Start).TotalMinutes <= 15 && IsTokenValid)
+            if ((tokenTimeout - this.start).TotalMinutes <= 15 && this.isTokenValid)
             {
-                return (InternalAzToken, InternalAzSubscriptionId);
+                return (this.internalAzToken, this.internalAzSubscriptionId);
             }
 
             (bool cliTokenSucceeded, string cliToken) = await this.TryGetAzCliToken();
@@ -28,10 +28,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 
             if (cliTokenSucceeded && cliSubscriptionIdSucceeded)
             {
-                Start = DateTime.Now;
-                InternalAzToken = cliToken;
-                InternalAzSubscriptionId = cliSubscriptionId;
-                IsTokenValid = true;
+                this.start = DateTime.Now;
+                this.internalAzToken = cliToken;
+                this.internalAzSubscriptionId = cliSubscriptionId;
+                this.isTokenValid = true;
                 return (cliToken, cliSubscriptionId);
             }
 

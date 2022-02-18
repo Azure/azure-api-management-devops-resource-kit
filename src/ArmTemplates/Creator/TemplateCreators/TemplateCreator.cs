@@ -5,7 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public abstract class TemplateCreator
+    public static class TemplateCreator
     {
         public static Template GenerateEmptyPropertyTemplateWithParameters()
         {

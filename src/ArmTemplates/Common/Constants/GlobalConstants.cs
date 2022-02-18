@@ -17,6 +17,8 @@
 
         public const string azAccessToken = "account get-access-token --query \"accessToken\" --output json";
         public const string azSubscriptionId = "account show --query id -o json";
+
+        public const string BaseManagementAzureUrl = "https://management.azure.com";
     }
 
     public static class ParameterNames

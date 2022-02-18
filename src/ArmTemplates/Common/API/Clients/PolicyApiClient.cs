@@ -13,12 +13,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public class PolicyApiClient : ApiClientBase, IPolicyApiClient
     {
+        public PolicyApiClient(string baseUrl = null) : base(baseUrl)
+        {
+        }
+
         public async Task<PolicyTemplateResource> GetGlobalServicePolicyAsync(string apiManagementName, string resourceGroupName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/policies/policy?api-version={4}&format=rawxml",
-               BaseUrl, azSubId, resourceGroupName, apiManagementName, GlobalConstants.ApiVersion);
+               this.BaseUrl, azSubId, resourceGroupName, apiManagementName, GlobalConstants.ApiVersion);
 
             return await this.CallApiManagementAsync<PolicyTemplateResource>(azToken, requestUrl);
         }

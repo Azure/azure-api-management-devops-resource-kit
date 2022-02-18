@@ -9,7 +9,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class MasterTemplateCreator : TemplateCreator
+    public class MasterTemplateCreator
     {
         public Template CreateLinkedMasterTemplate(CreatorConfig creatorConfig,
             Template globalServicePolicyTemplate,
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             string apimServiceName)
         {
             // create empty template
-            Template masterTemplate = GenerateEmptyTemplate();
+            Template masterTemplate = TemplateCreator.GenerateEmptyTemplate();
 
             // add parameters
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(creatorConfig);
@@ -338,7 +338,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = CreateEmptyParameters();
+            Template masterTemplate = TemplateCreator.CreateEmptyParameters();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();

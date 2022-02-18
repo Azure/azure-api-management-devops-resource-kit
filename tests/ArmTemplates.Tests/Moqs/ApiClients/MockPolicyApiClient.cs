@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
         public static IPolicyApiClient GetMockedApiClientWithDefaultValues()
         {
-            var mockPolicyApiClient = new Mock<IPolicyApiClient>();
+            var mockPolicyApiClient = new Mock<IPolicyApiClient>(MockBehavior.Strict);
 
             mockPolicyApiClient
                 .Setup(x => x.GetGlobalServicePolicyAsync(It.IsAny<string>(), It.IsAny<string>()))
