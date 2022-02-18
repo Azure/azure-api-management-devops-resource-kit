@@ -22,8 +22,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                 return (internalAzToken, internalAzSubscriptionId);
             }
 
-            (bool cliTokenSucceeded, string cliToken) = await this.TryGetAzCliToken();
-            (bool cliSubscriptionIdSucceeded, string cliSubscriptionId) = await this.TryGetAzSubscriptionId();
+            (bool cliTokenSucceeded, string cliToken) = await TryGetAzCliToken();
+            (bool cliSubscriptionIdSucceeded, string cliSubscriptionId) = await TryGetAzSubscriptionId();
 
             if (cliTokenSucceeded && cliSubscriptionIdSucceeded)
             {
@@ -37,17 +37,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
             throw new Exception("Unable to connect to Azure. Make sure you have the `az` CLI or Azure PowerShell installed and logged in and try again");
         }
 
-        async Task<(bool succeeded, string token)> TryGetAzCliToken()
+        private async Task<(bool succeeded, string token)> TryGetAzCliToken()
         {
             return await ExecuteCommand(GlobalConstants.azAccessToken);
         }
 
-        async Task<(bool succeeded, string token)> TryGetAzSubscriptionId()
+        private async Task<(bool succeeded, string token)> TryGetAzSubscriptionId()
         {
             return await ExecuteCommand(GlobalConstants.azSubscriptionId);
         }
 
-        static async Task<(bool succeeded, string token)> ExecuteCommand(string commandParameters)
+        private static async Task<(bool succeeded, string token)> ExecuteCommand(string commandParameters)
         {
             var az = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? new Executable("cmd", "/c az " + commandParameters)

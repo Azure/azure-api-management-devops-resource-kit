@@ -27,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             try
             {
                 // pull product api associations
-                string apiProducts = await this.GetAPIProductsAsync(apimname, resourceGroup, apiName);
+                string apiProducts = await GetAPIProductsAsync(apimname, resourceGroup, apiName);
                 JObject oApiProducts = JObject.Parse(apiProducts);
 
                 string lastProductAPIName = null;
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIProductsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
             // initialize arm template
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             // when extract single API
             if (singleApiName != null)
@@ -67,9 +67,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 // check if this api exist
                 try
                 {
-                    string apiDetails = await this.GetAPIDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName);
+                    string apiDetails = await GetAPIDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName);
                     Console.WriteLine("{0} API found ...", singleApiName);
-                    templateResources.AddRange(await this.GenerateSingleProductAPIResourceAsync(singleApiName, extractorParameters, new string[] { }));
+                    templateResources.AddRange(await GenerateSingleProductAPIResourceAsync(singleApiName, extractorParameters, new string[] { }));
                 }
                 catch (Exception)
                 {
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 string[] dependsOn = new string[] { };
                 foreach (string apiName in multipleApiNames)
                 {
-                    templateResources.AddRange(await this.GenerateSingleProductAPIResourceAsync(apiName, extractorParameters, dependsOn));
+                    templateResources.AddRange(await GenerateSingleProductAPIResourceAsync(apiName, extractorParameters, dependsOn));
                     string apiProductName = templateResources.Last().name.Split('/', 3)[1];
                     dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
                 }
@@ -92,14 +92,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // when extract all APIs and generate one master template
             else
             {
-                JToken[] oApis = await this.GetAllApiObjsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+                JToken[] oApis = await GetAllApiObjsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
                 Console.WriteLine("{0} APIs found ...", oApis.Count().ToString());
 
                 string[] dependsOn = new string[] { };
                 foreach (JToken oApi in oApis)
                 {
                     string apiName = ((JValue)oApi["name"]).Value.ToString();
-                    templateResources.AddRange(await this.GenerateSingleProductAPIResourceAsync(apiName, extractorParameters, dependsOn));
+                    templateResources.AddRange(await GenerateSingleProductAPIResourceAsync(apiName, extractorParameters, dependsOn));
 
                     if (templateResources.Count > 0)
                     {

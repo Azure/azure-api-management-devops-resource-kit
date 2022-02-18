@@ -27,26 +27,26 @@
 
         public ExtractorParameters(ExtractorConfig exc, string dirName)
         {
-            this.sourceApimName = exc.sourceApimName;
-            this.destinationApimName = exc.destinationApimName;
-            this.resourceGroup = exc.resourceGroup;
-            this.fileFolder = dirName;
-            this.linkedTemplatesBaseUrl = exc.linkedTemplatesBaseUrl;
-            this.linkedTemplatesSasToken = exc.linkedTemplatesSasToken;
-            this.linkedTemplatesUrlQueryString = exc.linkedTemplatesUrlQueryString;
-            this.policyXMLBaseUrl = exc.policyXMLBaseUrl;
-            this.policyXMLSasToken = exc.policyXMLSasToken;
-            this.apiVersionSetName = exc.apiVersionSetName;
-            this.includeAllRevisions = exc.includeAllRevisions != null && exc.includeAllRevisions.Equals("true");
-            this.serviceUrlParameters = exc.serviceUrlParameters;
-            this.paramServiceUrl = exc.paramServiceUrl != null && exc.paramServiceUrl.Equals("true") || exc.serviceUrlParameters != null;
-            this.paramNamedValue = exc.paramNamedValue != null && exc.paramNamedValue.Equals("true");
-            this.paramApiLoggerId = exc.paramApiLoggerId != null && exc.paramApiLoggerId.Equals("true");
-            this.paramLogResourceId = exc.paramLogResourceId != null && exc.paramLogResourceId.Equals("true");
-            this.notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
-            this.operationBatchSize = exc.operationBatchSize;
-            this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets != null && exc.paramNamedValuesKeyVaultSecrets.Equals("true");
-            this.paramBackend = exc.paramBackend != null && exc.paramBackend.Equals("true");
+            sourceApimName = exc.sourceApimName;
+            destinationApimName = exc.destinationApimName;
+            resourceGroup = exc.resourceGroup;
+            fileFolder = dirName;
+            linkedTemplatesBaseUrl = exc.linkedTemplatesBaseUrl;
+            linkedTemplatesSasToken = exc.linkedTemplatesSasToken;
+            linkedTemplatesUrlQueryString = exc.linkedTemplatesUrlQueryString;
+            policyXMLBaseUrl = exc.policyXMLBaseUrl;
+            policyXMLSasToken = exc.policyXMLSasToken;
+            apiVersionSetName = exc.apiVersionSetName;
+            includeAllRevisions = exc.includeAllRevisions != null && exc.includeAllRevisions.Equals("true");
+            serviceUrlParameters = exc.serviceUrlParameters;
+            paramServiceUrl = exc.paramServiceUrl != null && exc.paramServiceUrl.Equals("true") || exc.serviceUrlParameters != null;
+            paramNamedValue = exc.paramNamedValue != null && exc.paramNamedValue.Equals("true");
+            paramApiLoggerId = exc.paramApiLoggerId != null && exc.paramApiLoggerId.Equals("true");
+            paramLogResourceId = exc.paramLogResourceId != null && exc.paramLogResourceId.Equals("true");
+            notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
+            operationBatchSize = exc.operationBatchSize;
+            paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets != null && exc.paramNamedValuesKeyVaultSecrets.Equals("true");
+            paramBackend = exc.paramBackend != null && exc.paramBackend.Equals("true");
         }
 
         public ExtractorParameters(ExtractorConfig exc) : this(exc, exc.fileFolder)

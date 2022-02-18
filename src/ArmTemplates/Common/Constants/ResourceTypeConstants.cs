@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
 {
-    static class ResourceTypeConstants
+    internal static class ResourceTypeConstants
     {
         public const string API = "Microsoft.ApiManagement/service/apis";
         public const string APIVersionSet = "Microsoft.ApiManagement/service/apiVersionSets";

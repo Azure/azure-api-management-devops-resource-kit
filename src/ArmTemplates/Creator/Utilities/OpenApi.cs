@@ -6,39 +6,39 @@ using YamlDotNet.Serialization;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities
 {
-    class OpenApi
+    internal class OpenApi
     {
 
-        readonly string format_ = "openapi";
-        readonly IDictionary<string, object> definition_;
+        private readonly string format_ = "openapi";
+        private readonly IDictionary<string, object> definition_;
 
         public OpenApi(string definition, string format = null)
         {
-            this.format_ = format ?? "openapi";
+            format_ = format ?? "openapi";
 
-            if (this.format_ == "openapi")
+            if (format_ == "openapi")
             {
                 // TODO: find a way to have inner dictionaries
                 // TODO: be of type Dictionary<string, object> instead
                 // TODO: of Dictionary<object, object> as currently
 
-                this.definition_ = new Deserializer().Deserialize<Dictionary<string, object>>(definition);
+                definition_ = new Deserializer().Deserialize<Dictionary<string, object>>(definition);
             }
             else
             {
-                this.definition_ = JsonConvert.DeserializeObject<Dictionary<string, object>>(definition, new JsonDictionaryConverter());
+                definition_ = JsonConvert.DeserializeObject<Dictionary<string, object>>(definition, new JsonDictionaryConverter());
             }
         }
         public OpenApi SetTitle(string title)
         {
-            if (this.format_ == "openapi")
+            if (format_ == "openapi")
             {
-                var dict = this.definition_["info"] as Dictionary<object, object>;
+                var dict = definition_["info"] as Dictionary<object, object>;
                 dict["title"] = title;
             }
             else
             {
-                var dict = this.definition_["info"] as Dictionary<string, object>;
+                var dict = definition_["info"] as Dictionary<string, object>;
                 dict["title"] = title;
             }
             return this;
@@ -46,31 +46,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
 
         public string GetDefinition()
         {
-            if (this.format_ == "openapi")
+            if (format_ == "openapi")
             {
-                return new Serializer().Serialize(this.definition_);
+                return new Serializer().Serialize(definition_);
             }
             else
             {
                 // include StringEscaping to ensure single quotes are escaped
-                return JsonConvert.SerializeObject(this.definition_, settings: new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml });
+                return JsonConvert.SerializeObject(definition_, settings: new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml });
             }
         }
 
         public class JsonDictionaryConverter : JsonConverter
         {
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { this.WriteValue(writer, value); }
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { WriteValue(writer, value); }
 
-            void WriteValue(JsonWriter writer, object value)
+            private void WriteValue(JsonWriter writer, object value)
             {
                 var t = JToken.FromObject(value);
                 switch (t.Type)
                 {
                     case JTokenType.Object:
-                        this.WriteObject(writer, value);
+                        WriteObject(writer, value);
                         break;
                     case JTokenType.Array:
-                        this.WriteArray(writer, value);
+                        WriteArray(writer, value);
                         break;
                     default:
                         writer.WriteValue(value);
@@ -78,35 +78,35 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                 }
             }
 
-            void WriteObject(JsonWriter writer, object value)
+            private void WriteObject(JsonWriter writer, object value)
             {
                 writer.WriteStartObject();
                 var obj = value as IDictionary<string, object>;
                 foreach (var kvp in obj)
                 {
                     writer.WritePropertyName(kvp.Key);
-                    this.WriteValue(writer, kvp.Value);
+                    WriteValue(writer, kvp.Value);
                 }
                 writer.WriteEndObject();
             }
 
-            void WriteArray(JsonWriter writer, object value)
+            private void WriteArray(JsonWriter writer, object value)
             {
                 writer.WriteStartArray();
                 var array = value as IEnumerable<object>;
                 foreach (var o in array)
                 {
-                    this.WriteValue(writer, o);
+                    WriteValue(writer, o);
                 }
                 writer.WriteEndArray();
             }
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                return this.ReadValue(reader);
+                return ReadValue(reader);
             }
 
-            object ReadValue(JsonReader reader)
+            private object ReadValue(JsonReader reader)
             {
                 while (reader.TokenType == JsonToken.Comment)
                 {
@@ -116,9 +116,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                 switch (reader.TokenType)
                 {
                     case JsonToken.StartObject:
-                        return this.ReadObject(reader);
+                        return ReadObject(reader);
                     case JsonToken.StartArray:
-                        return this.ReadArray(reader);
+                        return ReadArray(reader);
                     case JsonToken.Integer:
                     case JsonToken.Float:
                     case JsonToken.String:
@@ -134,7 +134,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                 }
             }
 
-            object ReadArray(JsonReader reader)
+            private object ReadArray(JsonReader reader)
             {
                 IList<object> list = new List<object>();
 
@@ -145,7 +145,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                         case JsonToken.Comment:
                             break;
                         default:
-                            var v = this.ReadValue(reader);
+                            var v = ReadValue(reader);
 
                             list.Add(v);
                             break;
@@ -157,7 +157,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                 throw new JsonSerializationException("Unexpected end when reading IDictionary<string, object>");
             }
 
-            object ReadObject(JsonReader reader)
+            private object ReadObject(JsonReader reader)
             {
                 var obj = new Dictionary<string, object>();
 
@@ -173,7 +173,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                                 throw new JsonSerializationException("Unexpected end when reading IDictionary<string, object>");
                             }
 
-                            var v = this.ReadValue(reader);
+                            var v = ReadValue(reader);
 
                             obj[propertyName] = v;
                             break;

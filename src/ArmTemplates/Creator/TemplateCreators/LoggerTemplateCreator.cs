@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateLoggerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template loggerTemplate = this.CreateEmptyTemplate();
+            Template loggerTemplate = CreateEmptyTemplate();
 
             // add parameters
             loggerTemplate.parameters = new Dictionary<string, TemplateParameterProperties>

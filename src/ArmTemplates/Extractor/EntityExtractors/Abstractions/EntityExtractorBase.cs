@@ -11,16 +11,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public abstract class EntityExtractorBase
     {
-        public static string BaseUrl = "https://management.azure.com";
+        public static string baseUrl = "https://management.azure.com";
 
         protected Authentication Auth = new Authentication();
 
-        static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
-        static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+        private static readonly HttpClient _httpClient = new HttpClient();
 
         public async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
         {
-            if (Cache.TryGetValue(requestUrl, out string cachedResponseBody))
+            if (_cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {
                 return cachedResponseBody;
             }
@@ -29,12 +29,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
 
-            HttpResponseMessage response = await HttpClient.SendAsync(request);
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            Cache.Set(requestUrl, responseBody);
+            _cache.Set(requestUrl, responseBody);
 
             return responseBody;
         }
@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public Template GenerateEmptyPropertyTemplateWithParameters()
         {
-            var armTemplate = this.GenerateEmptyTemplate();
+            var armTemplate = GenerateEmptyTemplate();
             armTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 {

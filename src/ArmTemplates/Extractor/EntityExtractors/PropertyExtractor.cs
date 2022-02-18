@@ -24,13 +24,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<string> propertyObjs = new List<string>();
             do
             {
-                (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+                (string azToken, string azSubId) = await Auth.GetAccessToken();
                 string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues?$skip={4}&api-version={5}",
-                   BaseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfProperties, GlobalConstants.APIVersion);
+                   baseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfProperties, GlobalConstants.APIVersion);
 
                 numOfProperties += GlobalConstants.NumOfRecords;
 
-                string properties = await this.CallApiManagementAsync(azToken, requestUrl);
+                string properties = await CallApiManagementAsync(azToken, requestUrl);
 
                 oProperty = JObject.Parse(properties);
 
@@ -46,17 +46,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public async Task<string> GetPropertyDetailsAsync(string ApiManagementName, string ResourceGroupName, string propertyName)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues/{4}?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, propertyName, GlobalConstants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, propertyName, GlobalConstants.APIVersion);
 
-            return await this.CallApiManagementAsync(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, ExtractorParameters extractorParameters, IBackendExtractor backendExtractor, List<TemplateResource> loggerTemplateResources)
         {
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
             if (extractorParameters.paramNamedValue)
             {
@@ -87,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (properties) for service
-            string[] properties = await this.GetPropertiesAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+            string[] properties = await GetPropertiesAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
 
             // isolate api and operation policy resources in the case of a single api extraction, as they may reference named value
             var policyResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy);
@@ -96,7 +96,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 JToken oProperty = JObject.Parse(extractedProperty);
                 string propertyName = ((JValue)oProperty["name"]).Value.ToString();
-                string fullPropertyResource = await this.GetPropertyDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, propertyName);
+                string fullPropertyResource = await GetPropertyDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, propertyName);
 
                 // convert returned named value to template resource class
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
@@ -130,9 +130,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 else
                 {
                     // if the user is executing a single api, extract all the named values used in the template resources
-                    bool foundInPolicy = this.DoesPolicyReferenceNamedValue(extractorParameters, policyResources, propertyName, propertyTemplateResource);
+                    bool foundInPolicy = DoesPolicyReferenceNamedValue(extractorParameters, policyResources, propertyName, propertyTemplateResource);
                     bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName, apiTemplateResources, extractorParameters, propertyName, propertyTemplateResource.properties.displayName);
-                    bool foundInLogger = this.DoesLoggerReferenceNamedValue(loggerTemplateResources, propertyName, propertyTemplateResource);
+                    bool foundInLogger = DoesLoggerReferenceNamedValue(loggerTemplateResources, propertyName, propertyTemplateResource);
 
                     // check if named value is referenced in a backend
                     if (foundInPolicy || foundInBackEnd || foundInLogger)
@@ -148,7 +148,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return armTemplate;
         }
 
-        bool DoesPolicyReferenceNamedValue(ExtractorParameters extractorParameters, IEnumerable<TemplateResource> policyResources, string propertyName, PropertyTemplateResource propertyTemplateResource)
+        private bool DoesPolicyReferenceNamedValue(ExtractorParameters extractorParameters, IEnumerable<TemplateResource> policyResources, string propertyName, PropertyTemplateResource propertyTemplateResource)
         {
             // check if named value is referenced in a policy file
             foreach (PolicyTemplateResource policyTemplateResource in policyResources)
@@ -164,7 +164,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return false;
         }
 
-        bool DoesLoggerReferenceNamedValue(IEnumerable<TemplateResource> loggerTemplateResources, string propertyName, PropertyTemplateResource propertyTemplateResource)
+        private bool DoesLoggerReferenceNamedValue(IEnumerable<TemplateResource> loggerTemplateResources, string propertyName, PropertyTemplateResource propertyTemplateResource)
         {
             foreach (LoggerTemplateResource logger in loggerTemplateResources)
             {

@@ -5,8 +5,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 {
     public class ApiVersionSetIdComparer : IEqualityComparer<JToken>
     {
-        const string Properties = "properties";
-        const string ApiVersionSetId = "apiVersionSetId";
+        private const string Properties = "properties";
+        private const string ApiVersionSetId = "apiVersionSetId";
 
         public bool Equals(JToken x, JToken y)
         {

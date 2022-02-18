@@ -4,9 +4,9 @@ using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy
 {
-    static class PolicyTemplateUtils
+    internal static class PolicyTemplateUtils
     {
-        static readonly IMemoryCache _policyCache = new MemoryCache(new MemoryCacheOptions());
+        private static readonly IMemoryCache _policyCache = new MemoryCache(new MemoryCacheOptions());
 
         public static string GetPolicyContent(ExtractorParameters extractorParameters, PolicyTemplateResource policyTemplateResource)
         {

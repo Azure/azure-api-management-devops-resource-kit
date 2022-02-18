@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template productTemplate = this.CreateEmptyTemplate();
+            Template productTemplate = CreateEmptyTemplate();
 
             // add parameters
             productTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 if (api.products != null)
                 {
-                    List<ProductAPITemplateResource> apiResources = this.CreateProductAPITemplateResources(api, dependsOn);
+                    List<ProductAPITemplateResource> apiResources = CreateProductAPITemplateResources(api, dependsOn);
                     resources.AddRange(apiResources);
 
                     // Add previous product/API resource as a dependency for next product/API resource(s)
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
-                ProductAPITemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
+                ProductAPITemplateResource productAPITemplate = CreateProductAPITemplateResource(productID, api.name, allDependsOn);
                 // Add previous product/API resource as a dependency for next product/API resource
                 allDependsOn = new string[dependsOn.Length + 1];
                 dependsOn.CopyTo(allDependsOn, 1);

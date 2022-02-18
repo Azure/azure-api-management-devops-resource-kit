@@ -15,19 +15,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         public async Task<string> GetTagsAsync(string ApiManagementName, string ResourceGroupName, int skipNumOfRecords)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            (string azToken, string azSubId) = await Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/Tags?$skip={4}&api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, skipNumOfRecords, GlobalConstants.APIVersion);
+               baseUrl, azSubId, ResourceGroupName, ApiManagementName, skipNumOfRecords, GlobalConstants.APIVersion);
 
-            return await this.CallApiManagementAsync(azToken, requestUrl);
+            return await CallApiManagementAsync(azToken, requestUrl);
         }
 
         public async Task<Template> GenerateTagsTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources, string policyXMLBaseUrl, string policyXMLSasToken)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting tags from service");
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = GenerateEmptyPropertyTemplateWithParameters();
 
             // isolate tag and api operation associations in the case of a single api extraction
             var apiOperationTagResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIOperationTag);
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             do
             {
-                string Tags = await this.GetTagsAsync(apimname, resourceGroup, skipNumOfTags);
+                string Tags = await GetTagsAsync(apimname, resourceGroup, skipNumOfTags);
                 oTags = JObject.Parse(Tags);
 
                 foreach (var extractedTag in oTags["value"])

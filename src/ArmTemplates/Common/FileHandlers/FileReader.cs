@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             }
             else
             {
-                return this.RetrieveLocalFileContents(fileLocation);
+                return RetrieveLocalFileContents(fileLocation);
             }
         }
 

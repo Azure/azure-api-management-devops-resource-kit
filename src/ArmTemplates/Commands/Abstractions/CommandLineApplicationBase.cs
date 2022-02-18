@@ -7,11 +7,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Abstrac
     {
         protected CommandLineApplicationBase()
         {
-            this.SetupApplicationAndCommands();
+            SetupApplicationAndCommands();
 
             this.HelpOption();
 
-            this.OnExecute(async () => await this.ExecuteCommand());
+            OnExecute(async () => await ExecuteCommand());
         }
 
         protected abstract void SetupApplicationAndCommands();
