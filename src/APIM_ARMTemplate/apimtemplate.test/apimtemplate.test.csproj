@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <ProjectGuid>{7D0C17F8-C0F5-4678-A75F-EB1BE94E3A46}</ProjectGuid>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\apimtemplate\Creator\ExampleFiles\OpenAPISpecs\swaggerPetstorev3.json" Link="Resources\swaggerPetstorev3.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="2.5.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\apimtemplate\apimtemplate.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\apimtemplate\Creator\ExampleFiles\OpenAPISpecs\swaggerPetstore.yml" Link="Resources\swaggerPetstore.yml" />
+  </ItemGroup>
+
+</Project>
