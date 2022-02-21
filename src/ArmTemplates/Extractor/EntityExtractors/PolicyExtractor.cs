@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
@@ -9,7 +8,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Pol
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients;
 using System.IO;

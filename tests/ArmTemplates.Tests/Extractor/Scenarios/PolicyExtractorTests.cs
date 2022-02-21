@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;

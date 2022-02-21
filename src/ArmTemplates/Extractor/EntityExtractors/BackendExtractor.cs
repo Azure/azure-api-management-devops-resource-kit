@@ -11,7 +11,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {

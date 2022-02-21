@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions

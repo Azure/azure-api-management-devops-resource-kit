@@ -4,7 +4,6 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions

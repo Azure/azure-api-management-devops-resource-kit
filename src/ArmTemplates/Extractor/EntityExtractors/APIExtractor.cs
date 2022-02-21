@@ -8,11 +8,9 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
-using Microsoft.Azure.Management.Monitor.Fluent.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
