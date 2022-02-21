@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public class LoggerTemplateResource : TemplateResource
     {
-        public LoggerTemplateProperties properties { get; set; }
+        public LoggerTemplateProperties Properties { get; set; }
     }
 
     public class LoggerTemplateProperties

@@ -150,9 +150,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                         bool isServiceUrlParameterizeInYml = false;
                         if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
                         {
-                            isServiceUrlParameterizeInYml = creatorConfig.serviceUrlParameters.Any(s => s.apiName.Equals(api.name));
+                            isServiceUrlParameterizeInYml = creatorConfig.serviceUrlParameters.Any(s => s.ApiName.Equals(api.name));
                             api.serviceUrl = isServiceUrlParameterizeInYml ?
-                                creatorConfig.serviceUrlParameters.Where(s => s.apiName.Equals(api.name)).FirstOrDefault().serviceUrl : api.serviceUrl;
+                                creatorConfig.serviceUrlParameters.Where(s => s.ApiName.Equals(api.name)).FirstOrDefault().ServiceUrl : api.serviceUrl;
                         }
                         // create api templates from provided api config - if the api config contains a supplied apiVersion, split the templates into 2 for metadata and swagger content, otherwise create a unified template
                         List<Template> apiTemplateSet = await apiTemplateCreator.CreateAPITemplatesAsync(api);
@@ -168,7 +168,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                             dependsOnProducts = api.products != null,
                             dependsOnTags = api.tags != null,
                             dependsOnLoggers = await masterTemplateCreator.DetermineIfAPIDependsOnLoggerAsync(api, fileReader),
-                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.oAuth2 != null && api.authenticationSettings.oAuth2.authorizationServerId != null,
+                            dependsOnAuthorizationServers = api.authenticationSettings != null && api.authenticationSettings.OAuth2 != null && api.authenticationSettings.OAuth2.AuthorizationServerId != null,
                             dependsOnBackends = await masterTemplateCreator.DetermineIfAPIDependsOnBackendAsync(api, fileReader),
                             isServiceUrlParameterize = isServiceUrlParameterizeInYml
                         });
@@ -187,55 +187,55 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                 {
                     // create linked master template
                     Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productsTemplate, productAPIsTemplate, propertyTemplate, loggersTemplate, backendsTemplate, authorizationServersTemplate, tagTemplate, apiInformation, fileNames, creatorConfig.apimServiceName);
-                    FileWriter.WriteJSONToFile(masterTemplate, string.Concat(creatorConfig.outputLocation, fileNames.linkedMaster));
+                    FileWriter.WriteJSONToFile(masterTemplate, string.Concat(creatorConfig.outputLocation, fileNames.LinkedMaster));
                 }
                 foreach (Template apiTemplate in apiTemplates)
                 {
-                    APITemplateResource apiResource = apiTemplate.resources.FirstOrDefault(resource => resource.type == ResourceTypeConstants.API) as APITemplateResource;
-                    APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.name, APITemplateCreator.MakeResourceName(api), true) == 0);
+                    APITemplateResource apiResource = apiTemplate.Resources.FirstOrDefault(resource => resource.Type == ResourceTypeConstants.API) as APITemplateResource;
+                    APIConfig providedAPIConfiguration = creatorConfig.apis.FirstOrDefault(api => string.Compare(apiResource.Name, APITemplateCreator.MakeResourceName(api), true) == 0);
                     // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
-                    string apiFileName = FileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.IsSplitAPI(providedAPIConfiguration), apiResource.properties.value != null);
+                    string apiFileName = FileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.name, apiTemplateCreator.IsSplitAPI(providedAPIConfiguration), apiResource.Properties.Value != null);
                     FileWriter.WriteJSONToFile(apiTemplate, string.Concat(creatorConfig.outputLocation, apiFileName));
                 }
                 if (globalServicePolicyTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(globalServicePolicyTemplate, string.Concat(creatorConfig.outputLocation, fileNames.globalServicePolicy));
+                    FileWriter.WriteJSONToFile(globalServicePolicyTemplate, string.Concat(creatorConfig.outputLocation, fileNames.GlobalServicePolicy));
                 }
                 if (apiVersionSetsTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(apiVersionSetsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.apiVersionSets));
+                    FileWriter.WriteJSONToFile(apiVersionSetsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.ApiVersionSets));
                 }
                 if (productsTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(productsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.products));
+                    FileWriter.WriteJSONToFile(productsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.Products));
                 }
                 if (productAPIsTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(productAPIsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.productAPIs));
+                    FileWriter.WriteJSONToFile(productAPIsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.ProductAPIs));
                 }
                 if (propertyTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(propertyTemplate, string.Concat(creatorConfig.outputLocation, fileNames.namedValues));
+                    FileWriter.WriteJSONToFile(propertyTemplate, string.Concat(creatorConfig.outputLocation, fileNames.NamedValues));
                 }
                 if (loggersTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(loggersTemplate, string.Concat(creatorConfig.outputLocation, fileNames.loggers));
+                    FileWriter.WriteJSONToFile(loggersTemplate, string.Concat(creatorConfig.outputLocation, fileNames.Loggers));
                 }
                 if (backendsTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(backendsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.backends));
+                    FileWriter.WriteJSONToFile(backendsTemplate, string.Concat(creatorConfig.outputLocation, fileNames.Backends));
                 }
                 if (authorizationServersTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(authorizationServersTemplate, string.Concat(creatorConfig.outputLocation, fileNames.authorizationServers));
+                    FileWriter.WriteJSONToFile(authorizationServersTemplate, string.Concat(creatorConfig.outputLocation, fileNames.AuthorizationServers));
                 }
                 if (tagTemplate != null)
                 {
-                    FileWriter.WriteJSONToFile(tagTemplate, string.Concat(creatorConfig.outputLocation, fileNames.tags));
+                    FileWriter.WriteJSONToFile(tagTemplate, string.Concat(creatorConfig.outputLocation, fileNames.Tags));
                 }
 
                 // write parameters to outputLocation
-                FileWriter.WriteJSONToFile(templateParameters, string.Concat(creatorConfig.outputLocation, fileNames.parameters));
+                FileWriter.WriteJSONToFile(templateParameters, string.Concat(creatorConfig.outputLocation, fileNames.Parameters));
                 Console.WriteLine("Templates written to output location");
 
             }

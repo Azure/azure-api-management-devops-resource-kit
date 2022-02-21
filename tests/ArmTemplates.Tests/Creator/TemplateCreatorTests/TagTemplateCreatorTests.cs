@@ -21,10 +21,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             //act
             var tagTemplate = tagTemplateCreator.CreateTagTemplate(creatorConfig);
-            var tagTemplateResource = (TagTemplateResource)tagTemplate.resources[0];
+            var tagTemplateResource = (TagTemplateResource)tagTemplate.Resources[0];
 
             //assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{tag.displayName}')]", tagTemplateResource.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{tag.displayName}')]", tagTemplateResource.Name);
         }
     }
 }

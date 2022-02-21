@@ -23,12 +23,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             var propertyTemplate = propertyTemplateCreator.CreatePropertyTemplate(creatorConfig);
-            var propertyTemplateResource = (PropertyTemplateResource)propertyTemplate.resources[0];
+            var propertyTemplateResource = (PropertyTemplateResource)propertyTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{property.displayName}')]", propertyTemplateResource.name);
-            Assert.Equal(property.displayName, propertyTemplateResource.properties.displayName);
-            Assert.Equal(property.value, propertyTemplateResource.properties.value);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{property.displayName}')]", propertyTemplateResource.Name);
+            Assert.Equal(property.displayName, propertyTemplateResource.Properties.displayName);
+            Assert.Equal(property.value, propertyTemplateResource.Properties.value);
         }
     }
 }

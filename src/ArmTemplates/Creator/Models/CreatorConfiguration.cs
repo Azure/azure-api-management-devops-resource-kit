@@ -2,6 +2,7 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
 {
@@ -128,11 +129,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
     public class SubscriptionConfig : SubscriptionsTemplateProperties
     {
         public string name { get; set; }
-    }
-
-    public class ServiceUrlProperty
-    {
-        public string apiName { get; set; }
-        public string serviceUrl { get; set; }
     }
 }

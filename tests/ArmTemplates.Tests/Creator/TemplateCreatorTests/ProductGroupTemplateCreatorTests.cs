@@ -19,8 +19,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var productGroupTemplateResource = productgroupTemplateCreator.CreateProductGroupTemplateResource(groupName, productName, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{productName}/{groupName}')]", productGroupTemplateResource.name);
-            Assert.Equal(dependsOn, productGroupTemplateResource.dependsOn);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{productName}/{groupName}')]", productGroupTemplateResource.Name);
+            Assert.Equal(dependsOn, productGroupTemplateResource.DependsOn);
         }
 
         [Fact]

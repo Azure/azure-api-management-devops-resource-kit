@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 {
     public class ExtractApplicationCommand : CommandLineApplicationBase
     {
-        ExtractorConfig extractorConfig;
+        ExtractorConsoleAppConfiguration extractorConfig;
 
         public ExtractApplicationCommand() : base()
         {
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                 this.extractorConfig.Validate();
 
                 var extractorExecutor = new ExtractorExecutor(this.extractorConfig);
-                await extractorExecutor.ExecuteGenerationBasedOnExtractorConfiguration();
+                await extractorExecutor.ExecuteGenerationBasedOnConfiguration();
 
                 Logger.LogInformation("Templates written to output location");
                 Logger.LogInformation("Press any key to exit process:");
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 
         void AddExtractorConfigPropertiesToCommandLineOptions()
         {
-            foreach (var propertyInfo in typeof(ExtractorConfig).GetProperties())
+            foreach (var propertyInfo in typeof(ExtractorConsoleAppConfiguration).GetProperties())
             {
                 var description = Attribute.IsDefined(propertyInfo, typeof(DescriptionAttribute)) ? (Attribute.GetCustomAttribute(propertyInfo, typeof(DescriptionAttribute)) as DescriptionAttribute).Description : string.Empty;
 
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 
         void UpdateExtractorConfigFromAdditionalArguments()
         {
-            var extractorConfigType = typeof(ExtractorConfig);
+            var extractorConfigType = typeof(ExtractorConsoleAppConfiguration);
             foreach (var option in this.Options.Where(o => o.HasValue()))
             {
                 extractorConfigType.GetProperty(option.LongName)?.SetValue(this.extractorConfig, option.Value());

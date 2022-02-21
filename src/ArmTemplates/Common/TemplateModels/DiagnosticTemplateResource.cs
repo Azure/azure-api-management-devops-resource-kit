@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class DiagnosticTemplateResource : APITemplateSubResource
     {
-        public DiagnosticTemplateProperties properties { get; set; }
+        public DiagnosticTemplateProperties Properties { get; set; }
     }
 
     public class DiagnosticTemplateProperties

@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class ProductsTemplateResource : TemplateResource
     {
-        public ProductsTemplateProperties properties { get; set; }
+        public ProductsTemplateProperties Properties { get; set; }
     }
 
     public class ProductsTemplateProperties

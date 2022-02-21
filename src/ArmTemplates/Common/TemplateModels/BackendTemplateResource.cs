@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class BackendTemplateResource : TemplateResource
     {
-        public BackendTemplateProperties properties { get; set; }
+        public BackendTemplateProperties Properties { get; set; }
     }
 
     public class BackendTemplateProperties

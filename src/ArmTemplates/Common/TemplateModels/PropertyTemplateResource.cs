@@ -5,7 +5,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class PropertyTemplateResource : TemplateResource
     {
-        public PropertyResourceProperties properties { get; set; }
+        public PropertyResourceProperties Properties { get; set; }
     }
 
     public class PropertyResourceProperties

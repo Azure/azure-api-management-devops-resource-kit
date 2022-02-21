@@ -30,17 +30,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             var productTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);
-            var productsTemplateResource = (ProductsTemplateResource)productTemplate.resources[0];
+            var productsTemplateResource = (ProductsTemplateResource)productTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}')]", productsTemplateResource.name);
-            Assert.Equal(product.displayName, productsTemplateResource.properties.displayName);
-            Assert.Equal(product.description, productsTemplateResource.properties.description);
-            Assert.Equal(product.terms, productsTemplateResource.properties.terms);
-            Assert.Equal(product.subscriptionsLimit, productsTemplateResource.properties.subscriptionsLimit);
-            Assert.Equal(product.subscriptionRequired, productsTemplateResource.properties.subscriptionRequired);
-            Assert.Equal(product.approvalRequired, productsTemplateResource.properties.approvalRequired);
-            Assert.Equal(product.state, productsTemplateResource.properties.state);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}')]", productsTemplateResource.Name);
+            Assert.Equal(product.displayName, productsTemplateResource.Properties.displayName);
+            Assert.Equal(product.description, productsTemplateResource.Properties.description);
+            Assert.Equal(product.terms, productsTemplateResource.Properties.terms);
+            Assert.Equal(product.subscriptionsLimit, productsTemplateResource.Properties.subscriptionsLimit);
+            Assert.Equal(product.subscriptionRequired, productsTemplateResource.Properties.subscriptionRequired);
+            Assert.Equal(product.approvalRequired, productsTemplateResource.Properties.approvalRequired);
+            Assert.Equal(product.state, productsTemplateResource.Properties.state);
         }
 
         [Fact]
@@ -63,17 +63,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             var productTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);
-            ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)productTemplate.resources[0];
+            ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)productTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}')]", productsTemplateResource.name);
-            Assert.Equal(product.displayName, productsTemplateResource.properties.displayName);
-            Assert.Equal(product.description, productsTemplateResource.properties.description);
-            Assert.Equal(product.terms, productsTemplateResource.properties.terms);
-            Assert.Equal(product.subscriptionRequired, productsTemplateResource.properties.subscriptionRequired);
-            Assert.Null(productsTemplateResource.properties.subscriptionsLimit);
-            Assert.Null(productsTemplateResource.properties.approvalRequired);
-            Assert.Equal(product.state, productsTemplateResource.properties.state);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}')]", productsTemplateResource.Name);
+            Assert.Equal(product.displayName, productsTemplateResource.Properties.displayName);
+            Assert.Equal(product.description, productsTemplateResource.Properties.description);
+            Assert.Equal(product.terms, productsTemplateResource.Properties.terms);
+            Assert.Equal(product.subscriptionRequired, productsTemplateResource.Properties.subscriptionRequired);
+            Assert.Null(productsTemplateResource.Properties.subscriptionsLimit);
+            Assert.Null(productsTemplateResource.Properties.approvalRequired);
+            Assert.Equal(product.state, productsTemplateResource.Properties.state);
         }
     }
 }

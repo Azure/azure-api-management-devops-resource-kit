@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class ReleaseTemplateResource : APITemplateSubResource
     {
-        public ReleaseTemplateProperties properties { get; set; }
+        public ReleaseTemplateProperties Properties { get; set; }
     }
 
     public class ReleaseTemplateProperties

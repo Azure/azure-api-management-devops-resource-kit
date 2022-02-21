@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     /// </summary>
     public static class Logger
     {
-        static ILogger _logger;
+        static ILogger InternalLogger;
 
         /// <summary>
         /// Specify which logger to use for internal apimtemplate library messaging
@@ -17,32 +17,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
         /// <param name="logger">end-user logger</param>
         public static void SetupLogger(ILogger logger)
         {
-            _logger = logger;
+            InternalLogger = logger;
         }
 
         public static void LogInformation(string message, params object[] args)
         {
-            _logger.LogInformation(message, args);
+            InternalLogger?.LogInformation(message, args);
         }
 
         public static void LogWarning(Exception exception, string message, params object[] args)
         {
-            _logger.LogWarning(exception, message, args);
+            InternalLogger?.LogWarning(exception, message, args);
         }
 
         public static void LogWarning(string message, params object[] args)
         {
-            _logger.LogWarning(message, args);
+            InternalLogger?.LogWarning(message, args);
         }
 
         public static void LogError(string message, params object[] args)
         {
-            _logger.LogError(message, args);
+            InternalLogger?.LogError(message, args);
         }
 
         public static void LogError(Exception exception, string message, params object[] args)
         {
-            _logger.LogError(exception, message, args);
+            InternalLogger?.LogError(exception, message, args);
         }
     }
 }

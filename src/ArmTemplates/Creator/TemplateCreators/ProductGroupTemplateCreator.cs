@@ -1,22 +1,23 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductGroupTemplateCreator
+    public class ProductGroupTemplateCreator : TemplateGeneratorBase
     {
         public ProductGroupsValue CreateProductGroupTemplateResource(string groupName, string productName, string[] dependsOn)
         {
             // create products/apis resource with properties
             ProductGroupsValue productAPITemplateResource = new ProductGroupsValue()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{groupName}')]",
-                type = ResourceTypeConstants.ProductGroup,
-                apiVersion = GlobalConstants.APIVersion,
-                dependsOn = dependsOn,
-                properties = new ProductGroupTemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{groupName}')]",
+                Type = ResourceTypeConstants.ProductGroup,
+                ApiVersion = GlobalConstants.ApiVersion,
+                DependsOn = dependsOn,
+                Properties = new ProductGroupTemplateProperties()
             };
             return productAPITemplateResource;
         }

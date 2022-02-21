@@ -40,17 +40,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 subscriptionRequired = true,
                 authenticationSettings = new APITemplateAuthenticationSettings()
                 {
-                    oAuth2 = new APITemplateOAuth2()
+                    OAuth2 = new APITemplateOAuth2()
                     {
-                        authorizationServerId = "",
-                        scope = ""
+                        AuthorizationServerId = "",
+                        Scope = ""
                     },
-                    openid = new APITemplateOpenID()
+                    Openid = new APITemplateOpenID()
                     {
-                        openidProviderId = "",
-                        bearerTokenSendingMethods = new string[] { }
+                        OpenIdProviderId = "",
+                        BearerTokenSendingMethods = new string[] { }
                     },
-                    subscriptionKeyRequired = true
+                    SubscriptionKeyRequired = true
                 },
                 openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
                 protocols = "https",
@@ -61,10 +61,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             Template productAPITemplate = productAPITemplateCreator.CreateProductAPITemplate(creatorConfig);
-            ProductAPITemplateResource productAPITemplateResource = (ProductAPITemplateResource)productAPITemplate.resources[0];
+            ProductAPITemplateResource productAPITemplateResource = (ProductAPITemplateResource)productAPITemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name}')]", productAPITemplateResource.name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name}')]", productAPITemplateResource.Name);
         }
 
         [Fact]
@@ -81,8 +81,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             ProductAPITemplateResource productAPITemplateResource = productAPITemplateCreator.CreateProductAPITemplateResource(productId, apiName, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{productId}/{apiName}')]", productAPITemplateResource.name);
-            Assert.Equal(dependsOn, productAPITemplateResource.dependsOn);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{productId}/{apiName}')]", productAPITemplateResource.Name);
+            Assert.Equal(dependsOn, productAPITemplateResource.DependsOn);
         }
 
         [Fact]
