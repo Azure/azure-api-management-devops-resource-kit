@@ -1,10 +1,14 @@
-using System;
+﻿using System;
 using System.ComponentModel;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations
 {
     public class ExtractorConsoleAppConfiguration
     {
+        [Description("Config file of the extractor")]
+        public string ExtractorConfig { get; set; }
+
         [Description("Source API Management name")]
         public string SourceApimName { get; set; }
 
@@ -66,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         [Description("Specify the the base url for calling api management")]
         public string ServiceBaseUrl { get; set; }
-        
+
         [Description("Should not include named values template")]
         public string NotIncludeNamedValue { get; set; }
 

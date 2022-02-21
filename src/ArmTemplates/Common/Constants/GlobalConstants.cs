@@ -3,7 +3,7 @@
     public static class GlobalConstants
     {
         public static string CommandStartDateTime = "";
-        public const string AppShortName = "apimtemplate";
+        public const string AppShortName = "ArmTemplates";
         public const string AppLongName = "API Management DevOps Toolkit";
         public const string AppDescription = "API Management DevOps Toolkit is a tool to create API Management definitions from files and to extract existing API Management APIs to files.";
         public const string CreateName = "create";

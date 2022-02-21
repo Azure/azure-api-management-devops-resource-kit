@@ -1,4 +1,4 @@
-using McMaster.Extensions.CommandLineUtils;
+﻿using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Abstraction
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications
 {
-    public class CreateApplicationCommand : CommandLineApplicationBase
+    public class CreateApplicationCommand : CommandLineApplicationBase, ICommand
     {
         CommandOption appInsightsInstrumentationKey;
         CommandOption appInsightsName;

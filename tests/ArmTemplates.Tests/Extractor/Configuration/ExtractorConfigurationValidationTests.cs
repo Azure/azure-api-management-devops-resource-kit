@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using System;
 using Xunit;
 

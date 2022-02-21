@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models

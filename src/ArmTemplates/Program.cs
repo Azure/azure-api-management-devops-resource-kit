@@ -1,23 +1,25 @@
 ﻿using System;
 using McMaster.Extensions.CommandLineUtils;
-using Serilog;
-using Serilog.Extensions.Logging;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
-    class Program
+    public class Program
     {
         public static int Main(string[] args)
         {
+            var applicationLogger = SetupApplicationLoggingToConsole();
+            var serviceProvider = CreateServiceProvider(applicationLogger);
+
             try
             {
-                SetupApplicationLoggingToConsole();
-
-                var app = new CommandLineApplication()
+                var app = new RootCommandLineApplication(serviceProvider)
                 {
                     Name = GlobalConstants.AppShortName,
                     FullName = GlobalConstants.AppLongName,
@@ -25,12 +27,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 };
 
                 app.HelpOption(inherited: true);
-                app.Commands.Add(new CreateApplicationCommand());
-                app.Commands.Add(new ExtractApplicationCommand());
+                app.Conventions
+                    .UseConstructorInjection(serviceProvider);
 
                 app.OnExecute(() =>
                 {
-                    Logger.LogError("No commands specified, please specify a command");
+                    applicationLogger.LogInformation("No commands specified, please specify a command...");
                     app.ShowHelp();
                     return 1;
                 });
@@ -39,21 +41,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Azure API Management DevOps Resource toolkit finished with an error...");
+                applicationLogger.LogError(e, "Azure API Management DevOps Resource toolkit finished with an error...");
                 return 1;
             }
         }
 
-        static void SetupApplicationLoggingToConsole()
+        static IServiceProvider CreateServiceProvider(ILogger logger)
+        {
+            var services = new ServiceCollection();
+            services.AddArmTemplatesServices(logger);
+            return services.BuildServiceProvider();
+        }
+
+        static ILogger SetupApplicationLoggingToConsole()
         {
             var serilogConsoleLogger = new LoggerConfiguration()
                     .WriteTo.Console()
                     .CreateLogger();
 
-            var microsoftLogger = new SerilogLoggerFactory(serilogConsoleLogger)
-                .CreateLogger<Extensions.Logging.ILogger>();
-
-            Logger.SetupLogger(microsoftLogger);
+            return new SerilogLoggerFactory(serilogConsoleLogger)
+                .CreateLogger<ILogger>();
         }
     }
 }
