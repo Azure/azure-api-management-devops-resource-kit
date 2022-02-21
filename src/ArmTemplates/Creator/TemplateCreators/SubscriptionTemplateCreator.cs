@@ -1,19 +1,20 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class SubscriptionTemplateCreator : TemplateCreator
+    public class SubscriptionTemplateCreator : TemplateGeneratorBase
     {
         public SubscriptionsTemplateResource CreateSubscriptionsTemplateResource(SubscriptionConfig subscription, string[] dependsOn)
         {
             return new SubscriptionsTemplateResource
             {
-                name = $"[concat(parameters('ApimServiceName'), '/{subscription.name}')]",
-                type = "Microsoft.ApiManagement/service/subscriptions",
-                apiVersion = "2019-01-01",
-                properties = new SubscriptionsTemplateProperties
+                Name = $"[concat(parameters('ApimServiceName'), '/{subscription.name}')]",
+                Type = "Microsoft.ApiManagement/service/subscriptions",
+                ApiVersion = "2019-01-01",
+                Properties = new SubscriptionsTemplateProperties
                 {
                     ownerId = subscription.ownerId,
                     scope = subscription.scope,
@@ -23,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     state = subscription.state,
                     allowTracing = subscription.allowTracing,
                 },
-                dependsOn = dependsOn,
+                DependsOn = dependsOn,
             };
         }
 

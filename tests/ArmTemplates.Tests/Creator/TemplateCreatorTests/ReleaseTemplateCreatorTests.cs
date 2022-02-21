@@ -30,10 +30,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // assert
             string releaseName = $"";
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/release-revision-{api.apiRevision}')]", releaseTemplateResource.name);
-            Assert.Equal(dependsOn, releaseTemplateResource.dependsOn);
-            Assert.Equal($"Release created to make revision {api.apiRevision} current.", releaseTemplateResource.properties.notes);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{api.name}')]", releaseTemplateResource.properties.apiId);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/release-revision-{api.apiRevision}')]", releaseTemplateResource.Name);
+            Assert.Equal(dependsOn, releaseTemplateResource.DependsOn);
+            Assert.Equal($"Release created to make revision {api.apiRevision} current.", releaseTemplateResource.Properties.notes);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{api.name}')]", releaseTemplateResource.Properties.apiId);
         }
     }
 }

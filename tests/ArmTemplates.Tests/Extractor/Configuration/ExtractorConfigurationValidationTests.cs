@@ -5,12 +5,12 @@ using Xunit;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
 {
     [Trait("Category", "Unit")]
-    public class ExtractorConfigTests
+    public class ExtractorConfigurationValidationTests
     {
         [Fact]
         public void ExtractorConfigValidate_NoPropertiesSet_MissingParameterException()
         {
-            var extractorConfig = new ExtractorConfig();
+            var extractorConfig = new ExtractorConsoleAppConfiguration();
 
             var expectedException = Assert.Throws<ArgumentException>(() => extractorConfig.Validate());
 
@@ -20,12 +20,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
         [Fact]
         public void ExtractorConfigValidate_MinimumPropertiesSet_IsValid()
         {
-            var extractorConfig = new ExtractorConfig
+            var extractorConfig = new ExtractorConsoleAppConfiguration
             {
-                sourceApimName = "source-apim",
-                destinationApimName = "destination-apim",
-                resourceGroup = "resource-group",
-                fileFolder = "c:/my/folder"
+                SourceApimName = "source-apim",
+                DestinationApimName = "destination-apim",
+                ResourceGroup = "resource-group",
+                FileFolder = "c:/my/folder"
             };
 
             extractorConfig.Validate();
@@ -40,17 +40,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
         [InlineData(null, null, null, "true", null)]
         public void ExtractorConfigValidate_VerifyNotSupportedCases_ThrowsException(string splitApis, string apiVersionSetName, string apiName, string includeAllRevisions, string multipleApis)
         {
-            var extractorConfig = new ExtractorConfig
+            var extractorConfig = new ExtractorConsoleAppConfiguration
             {
-                sourceApimName = "source-apim",
-                destinationApimName = "destination-apim",
-                resourceGroup = "resource-group",
-                fileFolder = "c:/my/folder",
-                splitAPIs = splitApis,
-                apiName = apiName,
-                apiVersionSetName = apiVersionSetName,
-                includeAllRevisions = includeAllRevisions,
-                multipleAPIs = multipleApis
+                SourceApimName = "source-apim",
+                DestinationApimName = "destination-apim",
+                ResourceGroup = "resource-group",
+                FileFolder = "c:/my/folder",
+                SplitAPIs = splitApis,
+                ApiName = apiName,
+                ApiVersionSetName = apiVersionSetName,
+                IncludeAllRevisions = includeAllRevisions,
+                MultipleAPIs = multipleApis
             };
 
             Assert.Throws<NotSupportedException>(() => extractorConfig.Validate());

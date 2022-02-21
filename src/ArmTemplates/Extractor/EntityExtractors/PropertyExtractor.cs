@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public class PropertyExtractor : EntityExtractorBase, IPropertyExtractor
     {
-        public async Task<string[]> GetPropertiesAsync(string ApiManagementName, string ResourceGroupName)
+        public async Task<string[]> GetPropertiesAsync(string apiManagementName, string resourceGroupName)
         {
             JObject oProperty = new JObject();
             int numOfProperties = 0;
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 (string azToken, string azSubId) = await this.Auth.GetAccessToken();
                 string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues?$skip={4}&api-version={5}",
-                   BaseUrl, azSubId, ResourceGroupName, ApiManagementName, numOfProperties, GlobalConstants.APIVersion);
+                   BaseUrl, azSubId, resourceGroupName, apiManagementName, numOfProperties, GlobalConstants.ApiVersion);
 
                 numOfProperties += GlobalConstants.NumOfRecords;
 
@@ -44,12 +44,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return propertyObjs.ToArray();
         }
 
-        public async Task<string> GetPropertyDetailsAsync(string ApiManagementName, string ResourceGroupName, string propertyName)
+        public async Task<string> GetPropertyDetailsAsync(string apiManagementName, string resourceGroupName, string propertyName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues/{4}?api-version={5}",
-               BaseUrl, azSubId, ResourceGroupName, ApiManagementName, propertyName, GlobalConstants.APIVersion);
+               BaseUrl, azSubId, resourceGroupName, apiManagementName, propertyName, GlobalConstants.ApiVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
@@ -58,23 +58,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
-            if (extractorParameters.paramNamedValue)
+            if (extractorParameters.ParameterizeNamedValue)
             {
                 TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
                 {
                     type = "object"
                 };
-                armTemplate.parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
+                armTemplate.Parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
             }
-            if (extractorParameters.paramNamedValuesKeyVaultSecrets)
+            if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
             {
                 TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
                 {
                     type = "object"
                 };
-                armTemplate.parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
+                armTemplate.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
             }
-            if (extractorParameters.notIncludeNamedValue == true)
+            if (extractorParameters.NotIncludeNamedValue == true)
             {
                 Console.WriteLine("------------------------------------------");
                 Console.WriteLine("Skipping extracting named values from service");
@@ -87,38 +87,38 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             // pull all named values (properties) for service
-            string[] properties = await this.GetPropertiesAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup);
+            string[] properties = await this.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
 
             // isolate api and operation policy resources in the case of a single api extraction, as they may reference named value
-            var policyResources = apiTemplateResources.Where(resource => resource.type == ResourceTypeConstants.APIPolicy || resource.type == ResourceTypeConstants.APIOperationPolicy || resource.type == ResourceTypeConstants.ProductPolicy);
+            var policyResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.APIPolicy || resource.Type == ResourceTypeConstants.APIOperationPolicy || resource.Type == ResourceTypeConstants.ProductPolicy);
 
             foreach (var extractedProperty in properties)
             {
                 JToken oProperty = JObject.Parse(extractedProperty);
                 string propertyName = ((JValue)oProperty["name"]).Value.ToString();
-                string fullPropertyResource = await this.GetPropertyDetailsAsync(extractorParameters.sourceApimName, extractorParameters.resourceGroup, propertyName);
+                string fullPropertyResource = await this.GetPropertyDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, propertyName);
 
                 // convert returned named value to template resource class
                 PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
-                propertyTemplateResource.name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
-                propertyTemplateResource.type = ResourceTypeConstants.Property;
-                propertyTemplateResource.apiVersion = GlobalConstants.APIVersion;
-                propertyTemplateResource.scale = null;
+                propertyTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
+                propertyTemplateResource.Type = ResourceTypeConstants.Property;
+                propertyTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
+                propertyTemplateResource.Scale = null;
 
-                if (extractorParameters.paramNamedValue)
+                if (extractorParameters.ParameterizeNamedValue)
                 {
-                    propertyTemplateResource.properties.value = $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property)}]";
+                    propertyTemplateResource.Properties.value = $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property)}]";
                 }
 
                 //Hide the value field if it is a keyvault named value
-                if (propertyTemplateResource.properties.keyVault != null)
+                if (propertyTemplateResource.Properties.keyVault != null)
                 {
-                    propertyTemplateResource.properties.value = null;
+                    propertyTemplateResource.Properties.value = null;
                 }
 
-                if (propertyTemplateResource.properties.keyVault != null && extractorParameters.paramNamedValuesKeyVaultSecrets)
+                if (propertyTemplateResource.Properties.keyVault != null && extractorParameters.ParamNamedValuesKeyVaultSecrets)
                 {
-                    propertyTemplateResource.properties.keyVault.secretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property)}]";
+                    propertyTemplateResource.Properties.keyVault.secretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property)}]";
                 }
 
                 if (singleApiName == null)
@@ -131,7 +131,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     // if the user is executing a single api, extract all the named values used in the template resources
                     bool foundInPolicy = this.DoesPolicyReferenceNamedValue(extractorParameters, policyResources, propertyName, propertyTemplateResource);
-                    bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(extractorParameters.sourceApimName, extractorParameters.resourceGroup, singleApiName, apiTemplateResources, extractorParameters, propertyName, propertyTemplateResource.properties.displayName);
+                    bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, extractorParameters, propertyName, propertyTemplateResource.Properties.displayName);
                     bool foundInLogger = this.DoesLoggerReferenceNamedValue(loggerTemplateResources, propertyName, propertyTemplateResource);
 
                     // check if named value is referenced in a backend
@@ -144,7 +144,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
             }
 
-            armTemplate.resources = templateResources.ToArray();
+            armTemplate.Resources = templateResources.ToArray();
             return armTemplate;
         }
 
@@ -155,7 +155,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 string policyContent = PolicyTemplateUtils.GetPolicyContent(extractorParameters, policyTemplateResource);
 
-                if (policyContent.Contains(string.Concat("{{", propertyTemplateResource.properties.displayName, "}}")) || policyContent.Contains(string.Concat("{{", propertyName, "}}")))
+                if (policyContent.Contains(string.Concat("{{", propertyTemplateResource.Properties.displayName, "}}")) || policyContent.Contains(string.Concat("{{", propertyName, "}}")))
                 {
                     // dont need to go through all policies if the named value has already been found
                     return true;
@@ -168,12 +168,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             foreach (LoggerTemplateResource logger in loggerTemplateResources)
             {
-                if (logger.properties.credentials != null)
+                if (logger.Properties.credentials != null)
                 {
-                    if (!string.IsNullOrEmpty(logger.properties.credentials.connectionString) && logger.properties.credentials.connectionString.Contains(propertyName) ||
-                        !string.IsNullOrEmpty(logger.properties.credentials.instrumentationKey) && logger.properties.credentials.instrumentationKey.Contains(propertyName) ||
-                        !string.IsNullOrEmpty(logger.properties.credentials.connectionString) && logger.properties.credentials.connectionString.Contains(propertyTemplateResource.properties.displayName) ||
-                        !string.IsNullOrEmpty(logger.properties.credentials.instrumentationKey) && logger.properties.credentials.instrumentationKey.Contains(propertyTemplateResource.properties.displayName))
+                    if (!string.IsNullOrEmpty(logger.Properties.credentials.connectionString) && logger.Properties.credentials.connectionString.Contains(propertyName) ||
+                        !string.IsNullOrEmpty(logger.Properties.credentials.instrumentationKey) && logger.Properties.credentials.instrumentationKey.Contains(propertyName) ||
+                        !string.IsNullOrEmpty(logger.Properties.credentials.connectionString) && logger.Properties.credentials.connectionString.Contains(propertyTemplateResource.Properties.displayName) ||
+                        !string.IsNullOrEmpty(logger.Properties.credentials.instrumentationKey) && logger.Properties.credentials.instrumentationKey.Contains(propertyTemplateResource.Properties.displayName))
                     {
                         // dont need to go through all loggers if the named value has already been found
                         return true;

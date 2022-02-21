@@ -5,11 +5,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
 {
     static class ParameterNamingHelper
     {
-        static readonly Regex _excludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
+        static readonly Regex ExcludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
 
         public static string GenerateValidParameterName(string apiName, string prefix)
         {
-            var validApiName = _excludeOtherFromLettersAndDigitsRegex.Replace(apiName, string.Empty);
+            var validApiName = ExcludeOtherFromLettersAndDigitsRegex.Replace(apiName, string.Empty);
 
             if (char.IsDigit(validApiName.First()))
             {

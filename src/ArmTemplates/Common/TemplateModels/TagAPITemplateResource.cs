@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class TagAPITemplateResource : TemplateResource
     {
-        public TagAPITemplateProperties properties { get; set; }
+        public TagAPITemplateProperties Properties { get; set; }
     }
 
     public class TagAPITemplateProperties

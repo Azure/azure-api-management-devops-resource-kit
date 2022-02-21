@@ -14,8 +14,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             Dictionary<string, string> logResIds = new Dictionary<string, string>();
             foreach (LoggerTemplateResource resource in resources)
             {
-                string validLoggerName = GetValidLoggerParamName(resource.name);
-                string resourceId = resource.properties.resourceId;
+                string validLoggerName = GetValidLoggerParamName(resource.Name);
+                string resourceId = resource.Properties.resourceId;
                 logResIds.Add(validLoggerName, resourceId);
             }
             return logResIds;
@@ -23,15 +23,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public static Template SetLoggerResourceId(Template loggerTemplate)
         {
-            TemplateResource[] loggerResources = loggerTemplate.resources.ToArray();
+            TemplateResource[] loggerResources = loggerTemplate.Resources.ToArray();
             List<TemplateResource> nLoggerResource = new List<TemplateResource>();
             foreach (LoggerTemplateResource resource in loggerResources)
             {
-                string validLoggerName = GetValidLoggerParamName(resource.name);
-                resource.properties.resourceId = $"[parameters('{ParameterNames.LoggerResourceId}').{validLoggerName}]";
+                string validLoggerName = GetValidLoggerParamName(resource.Name);
+                resource.Properties.resourceId = $"[parameters('{ParameterNames.LoggerResourceId}').{validLoggerName}]";
                 nLoggerResource.Add(resource);
             }
-            loggerTemplate.resources = nLoggerResource.ToArray();
+            loggerTemplate.Resources = nLoggerResource.ToArray();
             return loggerTemplate;
         }
 

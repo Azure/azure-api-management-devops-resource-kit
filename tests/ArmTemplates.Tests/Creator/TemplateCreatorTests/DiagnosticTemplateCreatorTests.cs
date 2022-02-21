@@ -74,21 +74,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             DiagnosticTemplateResource diagnosticTemplateResource = diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/{api.diagnostic.name}')]", diagnosticTemplateResource.name);
-            Assert.Equal(dependsOn, diagnosticTemplateResource.dependsOn);
-            Assert.Equal(api.diagnostic.alwaysLog, diagnosticTemplateResource.properties.alwaysLog);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), '{api.diagnostic.loggerId}')]", diagnosticTemplateResource.properties.loggerId);
-            Assert.Equal(api.diagnostic.enableHttpCorrelationHeaders, diagnosticTemplateResource.properties.enableHttpCorrelationHeaders);
-            Assert.Equal(api.diagnostic.sampling.samplingType, diagnosticTemplateResource.properties.sampling.samplingType);
-            Assert.Equal(api.diagnostic.sampling.percentage, diagnosticTemplateResource.properties.sampling.percentage);
-            Assert.Equal(api.diagnostic.frontend.request.headers, diagnosticTemplateResource.properties.frontend.request.headers);
-            Assert.Equal(api.diagnostic.frontend.request.body.bytes, diagnosticTemplateResource.properties.frontend.request.body.bytes);
-            Assert.Equal(api.diagnostic.frontend.response.headers, diagnosticTemplateResource.properties.frontend.response.headers);
-            Assert.Equal(api.diagnostic.frontend.response.body.bytes, diagnosticTemplateResource.properties.frontend.response.body.bytes);
-            Assert.Equal(api.diagnostic.backend.request.headers, diagnosticTemplateResource.properties.backend.request.headers);
-            Assert.Equal(api.diagnostic.backend.request.body.bytes, diagnosticTemplateResource.properties.backend.request.body.bytes);
-            Assert.Equal(api.diagnostic.backend.response.headers, diagnosticTemplateResource.properties.backend.response.headers);
-            Assert.Equal(api.diagnostic.backend.response.body.bytes, diagnosticTemplateResource.properties.backend.response.body.bytes);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/{api.diagnostic.name}')]", diagnosticTemplateResource.Name);
+            Assert.Equal(dependsOn, diagnosticTemplateResource.DependsOn);
+            Assert.Equal(api.diagnostic.alwaysLog, diagnosticTemplateResource.Properties.alwaysLog);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), '{api.diagnostic.loggerId}')]", diagnosticTemplateResource.Properties.loggerId);
+            Assert.Equal(api.diagnostic.enableHttpCorrelationHeaders, diagnosticTemplateResource.Properties.enableHttpCorrelationHeaders);
+            Assert.Equal(api.diagnostic.sampling.samplingType, diagnosticTemplateResource.Properties.sampling.samplingType);
+            Assert.Equal(api.diagnostic.sampling.percentage, diagnosticTemplateResource.Properties.sampling.percentage);
+            Assert.Equal(api.diagnostic.frontend.request.headers, diagnosticTemplateResource.Properties.frontend.request.headers);
+            Assert.Equal(api.diagnostic.frontend.request.body.bytes, diagnosticTemplateResource.Properties.frontend.request.body.bytes);
+            Assert.Equal(api.diagnostic.frontend.response.headers, diagnosticTemplateResource.Properties.frontend.response.headers);
+            Assert.Equal(api.diagnostic.frontend.response.body.bytes, diagnosticTemplateResource.Properties.frontend.response.body.bytes);
+            Assert.Equal(api.diagnostic.backend.request.headers, diagnosticTemplateResource.Properties.backend.request.headers);
+            Assert.Equal(api.diagnostic.backend.request.body.bytes, diagnosticTemplateResource.Properties.backend.request.body.bytes);
+            Assert.Equal(api.diagnostic.backend.response.headers, diagnosticTemplateResource.Properties.backend.response.headers);
+            Assert.Equal(api.diagnostic.backend.response.body.bytes, diagnosticTemplateResource.Properties.backend.response.body.bytes);
         }
     }
 }

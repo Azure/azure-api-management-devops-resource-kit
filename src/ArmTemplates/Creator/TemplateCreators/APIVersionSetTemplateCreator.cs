@@ -6,15 +6,15 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class APIVersionSetTemplateCreator : TemplateCreator
+    public class APIVersionSetTemplateCreator : TemplateGeneratorBase
     {
         public Template CreateAPIVersionSetTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template apiVersionSetTemplate = this.CreateEmptyTemplate();
+            Template apiVersionSetTemplate = this.GenerateEmptyTemplate();
 
             // add parameters
-            apiVersionSetTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            apiVersionSetTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
@@ -27,10 +27,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 string versionSetId = apiVersionSet != null && apiVersionSet.id != null ? apiVersionSet.id : "versionset";
                 APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
                 {
-                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{versionSetId}')]",
-                    type = ResourceTypeConstants.APIVersionSet,
-                    apiVersion = GlobalConstants.APIVersion,
-                    properties = new APIVersionSetProperties()
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{versionSetId}')]",
+                    Type = ResourceTypeConstants.APIVersionSet,
+                    ApiVersion = GlobalConstants.ApiVersion,
+                    Properties = new APIVersionSetProperties()
                     {
                         displayName = apiVersionSet.displayName,
                         description = apiVersionSet.description,
@@ -38,12 +38,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                         versionQueryName = apiVersionSet.versionQueryName,
                         versioningScheme = apiVersionSet.versioningScheme,
                     },
-                    dependsOn = new string[] { }
+                    DependsOn = new string[] { }
                 };
                 resources.Add(apiVersionSetTemplateResource);
             }
 
-            apiVersionSetTemplate.resources = resources.ToArray();
+            apiVersionSetTemplate.Resources = resources.ToArray();
             return apiVersionSetTemplate;
         }
     }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions
@@ -6,11 +7,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
     public class Template
     {
         [JsonProperty(PropertyName = "$schema")]
-        public string schema { get; set; }
-        public string contentVersion { get; set; }
-        public Dictionary<string, TemplateParameterProperties> parameters { get; set; }
-        public object variables { get; set; }
-        public TemplateResource[] resources { get; set; }
-        public object outputs { get; set; }
+        public string Schema { get; set; }
+
+        public string ContentVersion { get; set; }
+
+        public Dictionary<string, TemplateParameterProperties> Parameters { get; set; }
+
+        public object Variables { get; set; }
+
+        public TemplateResource[] Resources { get; set; }
+
+        public object Outputs { get; set; }
+
+        /// <summary>
+        /// Returns true, if template contains any resource
+        /// </summary>
+        [JsonIgnore]
+        public bool HasResources => !this.Resources.IsNullOrEmpty();
     }
 }

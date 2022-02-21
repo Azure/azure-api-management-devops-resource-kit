@@ -6,15 +6,15 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class LoggerTemplateCreator : TemplateCreator
+    public class LoggerTemplateCreator : TemplateGeneratorBase
     {
         public Template CreateLoggerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template loggerTemplate = this.CreateEmptyTemplate();
+            Template loggerTemplate = this.GenerateEmptyTemplate();
 
             // add parameters
-            loggerTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
+            loggerTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
@@ -25,10 +25,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 // create logger resource with properties
                 LoggerTemplateResource loggerTemplateResource = new LoggerTemplateResource()
                 {
-                    name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.name}')]",
-                    type = ResourceTypeConstants.Logger,
-                    apiVersion = GlobalConstants.APIVersion,
-                    properties = new LoggerTemplateProperties()
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.name}')]",
+                    Type = ResourceTypeConstants.Logger,
+                    ApiVersion = GlobalConstants.ApiVersion,
+                    Properties = new LoggerTemplateProperties()
                     {
                         loggerType = logger.loggerType,
                         description = logger.description,
@@ -36,12 +36,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                         isBuffered = logger.isBuffered,
                         resourceId = logger.resourceId
                     },
-                    dependsOn = new string[] { }
+                    DependsOn = new string[] { }
                 };
                 resources.Add(loggerTemplateResource);
             }
 
-            loggerTemplate.resources = resources.ToArray();
+            loggerTemplate.Resources = resources.ToArray();
             return loggerTemplate;
         }
     }

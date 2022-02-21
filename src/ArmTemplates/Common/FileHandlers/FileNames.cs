@@ -2,24 +2,41 @@
 {
     public class FileNames
     {
-        public string apiVersionSets { get; set; }
-        public string authorizationServers { get; set; }
-        public string backends { get; set; }
-        public string globalServicePolicy { get; set; }
-        public string loggers { get; set; }
-        public string namedValues { get; set; }
-        public string tags { get; set; }
-        public string products { get; set; }
-        public string productAPIs { get; set; }
-        public string apiTags { get; set; }
-        public string parameters { get; set; }
+        public string ApiVersionSets { get; set; }
+
+        public string AuthorizationServers { get; set; }
+
+        public string Backends { get; set; }
+
+        public string GlobalServicePolicy { get; set; }
+
+        public string Loggers { get; set; }
+
+        public string NamedValues { get; set; }
+
+        public string Tags { get; set; }
+
+        public string Products { get; set; }
+
+        public string ProductAPIs { get; set; }
+
+        public string ApiTags { get; set; }
+        
+        public string Parameters { get; set; }
+        
         // linked property outputs 1 master template
-        public string linkedMaster { get; set; }
-        public string apis { get; set; }
-        public string splitAPIs { get; set; }
-        public string versionSetMasterFolder { get; set; }
-        public string revisionMasterFolder { get; set; }
-        public string groupAPIsMasterFolder { get; set; }
-        public string baseFileName { get; set; }
+        public string LinkedMaster { get; set; }
+
+        public string Apis { get; set; }
+
+        public string SplitAPIs { get; set; }
+
+        public string VersionSetMasterFolder { get; set; }
+
+        public string RevisionMasterFolder { get; set; }
+
+        public string GroupAPIsMasterFolder { get; set; }
+
+        public string BaseFileName { get; set; }
     }
 }

@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class APIVersionSetTemplateResource : TemplateResource
     {
-        public APIVersionSetProperties properties { get; set; }
+        public APIVersionSetProperties Properties { get; set; }
     }
 
     public class APIVersionSetProperties

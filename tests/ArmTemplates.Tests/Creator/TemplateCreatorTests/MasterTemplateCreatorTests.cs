@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName);
 
             // assert
-            Assert.Equal(count, masterTemplate.resources.Length);
+            Assert.Equal(count, masterTemplate.Resources.Length);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             Template masterTemplate = masterTemplateCreator.CreateMasterTemplateParameterValues(creatorConfig);
 
             // assert
-            Assert.Equal(count, masterTemplate.parameters.Count);
+            Assert.Equal(count, masterTemplate.Parameters.Count);
         }
 
         [Fact]
@@ -85,9 +85,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var masterTemplateResource = masterTemplateCreator.CreateLinkedMasterTemplateResource(name, uriLink, dependsOn, null, false);
 
             // assert
-            Assert.Equal(name, masterTemplateResource.name);
-            Assert.Equal(uriLink, masterTemplateResource.properties.templateLink.uri);
-            Assert.Equal(dependsOn, masterTemplateResource.dependsOn);
+            Assert.Equal(name, masterTemplateResource.Name);
+            Assert.Equal(uriLink, masterTemplateResource.Properties.templateLink.uri);
+            Assert.Equal(dependsOn, masterTemplateResource.DependsOn);
         }
 
         [Fact]

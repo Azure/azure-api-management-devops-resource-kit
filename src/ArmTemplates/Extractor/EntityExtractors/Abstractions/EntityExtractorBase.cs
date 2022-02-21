@@ -1,15 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions
 {
-    public abstract class EntityExtractorBase
+    // TODO delete this whole class. Extractors are not responsible for sending API requests - API Clients do it.
+    // Extractors are getting api client in constructor and use their exposed API.
+    // After getting the response, extractors are processing and generating templates.
+    // This whole stuff will be done in https://github.com/Azure/azure-api-management-devops-resource-kit/issues/617 or related issues.
+
+    // TODO also move TemplateGeneratorBase inheritance directly to Extractors implementation
+    public abstract class EntityExtractorBase : TemplateGeneratorBase
     {
         public static string BaseUrl = "https://management.azure.com";
 
@@ -18,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
         static readonly HttpClient HttpClient = new HttpClient();
 
-        public async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
+        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
         {
             if (Cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {
@@ -39,23 +44,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return responseBody;
         }
 
-        public Template GenerateEmptyTemplate()
+        protected async Task<TResponse> CallApiManagementAsync<TResponse>(string azToken, string requestUrl)
         {
-            var templateCreator = new TemplateCreator();
-            return templateCreator.CreateEmptyTemplate();
-        }
-
-        public Template GenerateEmptyPropertyTemplateWithParameters()
-        {
-            var armTemplate = this.GenerateEmptyTemplate();
-            armTemplate.parameters = new Dictionary<string, TemplateParameterProperties>
-            {
-                {
-                    ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" }
-                }
-            };
-
-            return armTemplate;
+            var stringResponse = await this.CallApiManagementAsync(azToken, requestUrl);
+            return stringResponse.Deserialize<TResponse>();
         }
     }
 }

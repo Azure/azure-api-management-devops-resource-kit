@@ -1,25 +1,26 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class TagAPITemplateCreator
+    public class TagAPITemplateCreator : TemplateGeneratorBase
     {
         public TagAPITemplateResource CreateTagAPITemplateResource(string tagName, string apiName, string[] dependsOn)
         {
             // create tags/apis resource with properties
             TagAPITemplateResource tagAPITemplateResource = new TagAPITemplateResource()
             {
-                name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{tagName}')]",
-                type = ResourceTypeConstants.APITag,
-                apiVersion = GlobalConstants.APIVersion,
-                properties = new TagAPITemplateProperties()
+                Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{tagName}')]",
+                Type = ResourceTypeConstants.APITag,
+                ApiVersion = GlobalConstants.ApiVersion,
+                Properties = new TagAPITemplateProperties()
                 {
                     displayName = tagName
                 },
-                dependsOn = dependsOn
+                DependsOn = dependsOn
             };
             return tagAPITemplateResource;
         }

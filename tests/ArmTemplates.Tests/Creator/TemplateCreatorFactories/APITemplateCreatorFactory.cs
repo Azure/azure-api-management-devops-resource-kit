@@ -8,7 +8,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public static APITemplateCreator GenerateAPITemplateCreator()
         {
             FileReader fileReader = new FileReader();
-            TemplateCreator templateCreator = new TemplateCreator();
             PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
             ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
             DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();

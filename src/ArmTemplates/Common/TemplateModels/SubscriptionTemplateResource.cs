@@ -4,7 +4,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 {
     public class SubscriptionsTemplateResource : TemplateResource
     {
-        public SubscriptionsTemplateProperties properties { get; set; }
+        public SubscriptionsTemplateProperties Properties { get; set; }
     }
 
     public class SubscriptionsTemplateProperties
