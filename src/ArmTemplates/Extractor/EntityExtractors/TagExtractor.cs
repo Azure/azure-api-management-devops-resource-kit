@@ -27,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting tags from service");
-            Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
             // isolate tag and api operation associations in the case of a single api extraction
             var apiOperationTagResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.APIOperationTag);

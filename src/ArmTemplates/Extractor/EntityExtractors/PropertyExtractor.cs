@@ -56,7 +56,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, ExtractorParameters extractorParameters, IBackendExtractor backendExtractor, List<TemplateResource> loggerTemplateResources)
         {
-            Template armTemplate = TemplateCreator.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
 
             if (extractorParameters.ParameterizeNamedValue)
             {

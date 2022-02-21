@@ -6,12 +6,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class APIVersionSetTemplateCreator
+    public class APIVersionSetTemplateCreator : TemplateGeneratorBase
     {
         public Template CreateAPIVersionSetTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template apiVersionSetTemplate = TemplateCreator.GenerateEmptyTemplate();
+            Template apiVersionSetTemplate = this.GenerateEmptyTemplate();
 
             // add parameters
             apiVersionSetTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

@@ -272,7 +272,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIRevisionTemplateAsync(ExtractorParameters extractorParameters, string currentRevision, List<string> revList, string baseFilesGenerationDirectory)
         {
             // generate apiTemplate
-            Template armTemplate = TemplateCreator.GenerateEmptyApiTemplateWithParameters(extractorParameters);
+            Template armTemplate = this.GenerateEmptyApiTemplateWithParameters(extractorParameters);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
@@ -358,7 +358,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIsARMTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory)
         {
             // initialize arm template
-            Template armTemplate = TemplateCreator.GenerateEmptyApiTemplateWithParameters(extractorParameters);
+            Template armTemplate = this.GenerateEmptyApiTemplateWithParameters(extractorParameters);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             
             // when extract single API

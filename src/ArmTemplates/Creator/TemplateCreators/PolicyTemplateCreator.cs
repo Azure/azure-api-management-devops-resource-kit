@@ -8,7 +8,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class PolicyTemplateCreator
+    public class PolicyTemplateCreator : TemplateGeneratorBase
     {
         FileReader fileReader;
 
@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateGlobalServicePolicyTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template policyTemplate = TemplateCreator.GenerateEmptyTemplate();
+            Template policyTemplate = this.GenerateEmptyTemplate();
 
             // add parameters
             policyTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

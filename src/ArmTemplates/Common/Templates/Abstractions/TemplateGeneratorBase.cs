@@ -4,11 +4,11 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions
 {
-    public static class TemplateCreator
+    public abstract class TemplateGeneratorBase
     {
-        public static Template GenerateEmptyPropertyTemplateWithParameters()
+        protected Template GenerateEmptyPropertyTemplateWithParameters()
         {
-            var armTemplate = GenerateEmptyTemplate();
+            var armTemplate = this.GenerateEmptyTemplate();
             armTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 {
@@ -19,9 +19,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return armTemplate;
         }
 
-        public static Template GenerateEmptyApiTemplateWithParameters(ExtractorParameters extractorParameters)
+        protected Template GenerateEmptyApiTemplateWithParameters(ExtractorParameters extractorParameters)
         {
-            Template armTemplate = GenerateEmptyTemplate();
+            Template armTemplate = this.GenerateEmptyTemplate();
             armTemplate.Parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
             if (extractorParameters.PolicyXMLBaseUrl != null && extractorParameters.PolicyXMLSasToken != null)
             {
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return armTemplate;
         }
 
-        public static Template GenerateEmptyTemplate()
+        protected Template GenerateEmptyTemplate()
         {
             // creates empty template for use in all other template creators
             Template template = new Template
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return template;
         }
 
-        public static Template CreateEmptyParameters()
+        protected Template GenerateTemplateWithEmptyParameters()
         {
             // creates empty parameters file for use in all other template creators
             Template template = new Template

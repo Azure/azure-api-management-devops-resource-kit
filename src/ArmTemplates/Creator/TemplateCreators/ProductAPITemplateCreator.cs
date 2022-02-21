@@ -6,12 +6,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductAPITemplateCreator
+    public class ProductAPITemplateCreator : TemplateGeneratorBase
     {
         public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template productTemplate = TemplateCreator.GenerateEmptyTemplate();
+            Template productTemplate = this.GenerateEmptyTemplate();
 
             // add parameters
             productTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

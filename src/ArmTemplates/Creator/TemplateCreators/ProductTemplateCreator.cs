@@ -7,7 +7,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductTemplateCreator
+    public class ProductTemplateCreator : TemplateGeneratorBase
     {
         PolicyTemplateCreator policyTemplateCreator;
         ProductGroupTemplateCreator productGroupTemplateCreator;
@@ -27,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateProductTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template productTemplate = TemplateCreator.GenerateEmptyTemplate();
+            Template productTemplate = this.GenerateEmptyTemplate();
 
             // add parameters
             productTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
