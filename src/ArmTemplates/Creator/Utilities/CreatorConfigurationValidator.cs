@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using System.Collections.Generic;
@@ -7,185 +7,186 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
 {
     public class CreatorConfigurationValidator
     {
-        CommandLineApplication commandLineApplication;
+        readonly CreatorConfig creatorConfig;
 
-        public CreatorConfigurationValidator(CommandLineApplication commandLineApplication)
+        public CreatorConfigurationValidator(CreatorConfig creatorConfig)
         {
-            this.commandLineApplication = commandLineApplication;
+            this.creatorConfig = creatorConfig;
         }
 
-        public bool ValidateCreatorConfig(CreatorConfig creatorConfig)
+        public bool ValidateCreatorConfig()
         {
             // ensure required parameters have been passed in
-            if (this.ValidateBaseProperties(creatorConfig) != true)
+            if (this.ValidateBaseProperties() != true)
             {
                 return false;
             }
-            if (this.ValidateAPIs(creatorConfig) != true)
+            if (this.ValidateAPIs() != true)
             {
                 return false;
             }
-            if (this.ValidateAPIVersionSets(creatorConfig) != true)
+            if (this.ValidateAPIVersionSets() != true)
             {
                 return false;
             }
-            if (this.ValidateProducts(creatorConfig) != true)
+            if (this.ValidateProducts() != true)
             {
                 return false;
             }
-            if (this.ValidateNamedValues(creatorConfig) != true)
+            if (this.ValidateNamedValues() != true)
             {
                 return false;
             }
-            if (this.ValidateLoggers(creatorConfig) != true)
+            if (this.ValidateLoggers() != true)
             {
                 return false;
             }
-            if (this.ValidateAuthorizationServers(creatorConfig) != true)
+            if (this.ValidateAuthorizationServers() != true)
             {
                 return false;
             }
-            if (this.ValidateBackends(creatorConfig) != true)
+            if (this.ValidateBackends() != true)
             {
                 return false;
             }
             return true;
         }
 
-        public bool ValidateNamedValues(CreatorConfig creatorConfig)
+        bool ValidateNamedValues()
         {
             bool isValid = true;
-            if (creatorConfig.namedValues != null)
+            if (this.creatorConfig.namedValues != null)
             {
-                foreach (PropertyResourceProperties property in creatorConfig.namedValues)
+                foreach (PropertyResourceProperties property in this.creatorConfig.namedValues)
                 {
                     if (property.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(this.commandLineApplication, "Display name is required is a Named Value is provided");
+                        throw new CreatorConfigurationIsInvalidException("Display name is required is a Named Value is provided");
                     }
                 }
             }
             return isValid;
         }
-        public bool ValidateProducts(CreatorConfig creatorConfig)
+
+        bool ValidateProducts()
         {
             bool isValid = true;
-            if (creatorConfig.products != null)
+            if (this.creatorConfig.products != null)
             {
-                foreach (ProductsTemplateProperties product in creatorConfig.products)
+                foreach (ProductsTemplateProperties product in this.creatorConfig.products)
                 {
                     if (product.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(this.commandLineApplication, "Display name is required if an Product is provided");
+                        throw new CreatorConfigurationIsInvalidException("Display name is required if an Product is provided");
                     }
                 }
             }
             return isValid;
         }
 
-        public bool ValidateLoggers(CreatorConfig creatorConfig)
+        bool ValidateLoggers()
         {
             bool isValid = true;
-            if (creatorConfig.loggers != null)
+            if (this.creatorConfig.loggers != null)
             {
-                foreach (LoggerConfig logger in creatorConfig.loggers)
+                foreach (LoggerConfig logger in this.creatorConfig.loggers)
                 {
                     if (logger.name == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(this.commandLineApplication, "Name is required if an Logger is provided");
+                        throw new CreatorConfigurationIsInvalidException("Name is required if an Logger is provided");
                     }
                 }
             }
             return isValid;
         }
 
-        public bool ValidateBackends(CreatorConfig creatorConfig)
+        bool ValidateBackends()
         {
             bool isValid = true;
-            if (creatorConfig.backends != null)
+            if (this.creatorConfig.backends != null)
             {
-                foreach (BackendTemplateProperties backend in creatorConfig.backends)
+                foreach (BackendTemplateProperties backend in this.creatorConfig.backends)
                 {
                     if (backend.title == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(this.commandLineApplication, "Title is required if a Backend is provided");
+                        throw new CreatorConfigurationIsInvalidException("Title is required if a Backend is provided");
                     }
                 }
             }
             return isValid;
         }
 
-        public bool ValidateAuthorizationServers(CreatorConfig creatorConfig)
+        bool ValidateAuthorizationServers()
         {
             bool isValid = true;
-            if (creatorConfig.authorizationServers != null)
+            if (this.creatorConfig.authorizationServers != null)
             {
-                foreach (AuthorizationServerTemplateProperties authorizationServer in creatorConfig.authorizationServers)
+                foreach (AuthorizationServerTemplateProperties authorizationServer in this.creatorConfig.authorizationServers)
                 {
                     if (authorizationServer.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(this.commandLineApplication, "Display name is required if an Authorization Server is provided");
+                        throw new CreatorConfigurationIsInvalidException("Display name is required if an Authorization Server is provided");
                     }
                 }
             }
             return isValid;
         }
 
-        public bool ValidateBaseProperties(CreatorConfig creatorConfig)
+        bool ValidateBaseProperties()
         {
             bool isValid = true;
-            if (creatorConfig.outputLocation == null)
+            if (this.creatorConfig.outputLocation == null)
             {
                 isValid = false;
-                throw new CommandParsingException(this.commandLineApplication, "Output location is required");
+                throw new CreatorConfigurationIsInvalidException("Output location is required");
             }
-            if (creatorConfig.version == null)
+            if (this.creatorConfig.version == null)
             {
                 isValid = false;
-                throw new CommandParsingException(this.commandLineApplication, "Version is required");
+                throw new CreatorConfigurationIsInvalidException("Version is required");
             }
-            if (creatorConfig.apimServiceName == null)
+            if (this.creatorConfig.apimServiceName == null)
             {
                 isValid = false;
-                throw new CommandParsingException(this.commandLineApplication, "APIM service name is required");
+                throw new CreatorConfigurationIsInvalidException("APIM service name is required");
             }
-            if (creatorConfig.linked == true && creatorConfig.linkedTemplatesBaseUrl == null)
+            if (this.creatorConfig.linked == true && this.creatorConfig.linkedTemplatesBaseUrl == null)
             {
                 isValid = false;
-                throw new CommandParsingException(this.commandLineApplication, "LinkTemplatesBaseUrl is required for linked templates");
+                throw new CreatorConfigurationIsInvalidException("LinkTemplatesBaseUrl is required for linked templates");
             }
             return isValid;
         }
 
-        public bool ValidateAPIs(CreatorConfig creatorConfig)
+        bool ValidateAPIs()
         {
             bool isValid = true;
-            if (creatorConfig.apis == null)
+            if (this.creatorConfig.apis == null)
             {
                 isValid = false;
-                throw new CommandParsingException(this.commandLineApplication, "API configuration is required");
+                throw new CreatorConfigurationIsInvalidException("API configuration is required");
             }
-            foreach (APIConfig api in creatorConfig.apis)
+            foreach (APIConfig api in this.creatorConfig.apis)
             {
                 if (api.name == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(this.commandLineApplication, "API name is required");
+                    throw new CreatorConfigurationIsInvalidException("API name is required");
                 }
                 if (api.openApiSpec == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(this.commandLineApplication, "Open API Spec is required");
+                    throw new CreatorConfigurationIsInvalidException("Open API Spec is required");
                 }
                 if (api.suffix == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(this.commandLineApplication, "API suffix is required");
+                    throw new CreatorConfigurationIsInvalidException("API suffix is required");
                 }
                 if (api.operations != null)
                 {
@@ -194,30 +195,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                         if (operation.Value == null || operation.Value.policy == null)
                         {
                             isValid = false;
-                            throw new CommandParsingException(this.commandLineApplication, "Policy XML is required if an API operation is provided");
+                            throw new CreatorConfigurationIsInvalidException("Policy XML is required if an API operation is provided");
                         }
                     }
                 }
                 if (api.diagnostic != null && api.diagnostic.loggerId == null)
                 {
                     isValid = false;
-                    throw new CommandParsingException(this.commandLineApplication, "LoggerId is required if an API diagnostic is provided");
+                    throw new CreatorConfigurationIsInvalidException("LoggerId is required if an API diagnostic is provided");
                 }
             }
             return isValid;
         }
 
-        public bool ValidateAPIVersionSets(CreatorConfig creatorConfig)
+        bool ValidateAPIVersionSets()
         {
             bool isValid = true;
-            if (creatorConfig.apiVersionSets != null)
+            if (this.creatorConfig.apiVersionSets != null)
             {
-                foreach (APIVersionSetConfig apiVersionSet in creatorConfig.apiVersionSets)
+                foreach (APIVersionSetConfig apiVersionSet in this.creatorConfig.apiVersionSets)
                 {
                     if (apiVersionSet != null && apiVersionSet.displayName == null)
                     {
                         isValid = false;
-                        throw new CommandParsingException(this.commandLineApplication, "Display name is required if an API Version Set is provided");
+                        throw new CreatorConfigurationIsInvalidException("Display name is required if an API Version Set is provided");
                     }
                 }
             }

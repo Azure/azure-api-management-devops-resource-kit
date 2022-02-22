@@ -57,3 +57,4 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+src/ArmTemplates/Properties/launchSettings.json

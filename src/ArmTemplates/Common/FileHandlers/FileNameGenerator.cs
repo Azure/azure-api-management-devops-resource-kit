@@ -2,11 +2,18 @@
 {
     public static class FileNameGenerator
     {
+        const string DefaultBaseFileName = "output-";
 
         public static FileNames GenerateFileNames(string baseFileName)
         {
-            if (baseFileName.Length > 0)
+            if (string.IsNullOrEmpty(baseFileName))
+            {
+                baseFileName = DefaultBaseFileName;
+            }
+            else
+            {
                 baseFileName += "-";
+            }
 
             // generate useable object with file names for consistency throughout project
             return new FileNames

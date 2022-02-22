@@ -1,5 +1,4 @@
 ﻿using System;
-using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
@@ -7,49 +6,68 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
+using CommandLine;
+using System.Threading.Tasks;
+using CommandLine.Text;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
     public class Program
     {
-        public static int Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var applicationLogger = SetupApplicationLoggingToConsole();
             var serviceProvider = CreateServiceProvider(applicationLogger);
 
-            try
+            var commandLineParser = new Parser(parserSettings =>
             {
-                var app = new RootCommandLineApplication(serviceProvider)
+                parserSettings.CaseSensitive = true;
+            });
+
+            var parserResult = commandLineParser.ParseArguments<ExtractorConsoleAppConfiguration, CreateConsoleAppConfiguration>(args);
+            
+            await parserResult.MapResult(
+                async (ExtractorConsoleAppConfiguration consoleAppConfiguration) =>
                 {
-                    Name = GlobalConstants.AppShortName,
-                    FullName = GlobalConstants.AppLongName,
-                    Description = GlobalConstants.AppDescription
-                };
+                    applicationLogger.LogInformation($"Recognized {GlobalConstants.ExtractName} command...");
+                    var extractorCommandApplication = serviceProvider.GetRequiredService<ExtractApplicationCommand>();
 
-                app.HelpOption(inherited: true);
-                app.Conventions
-                    .UseConstructorInjection(serviceProvider);
+                    var extractorParameters = await extractorCommandApplication.ParseInputConfigurationAsync(consoleAppConfiguration);
+                    await extractorCommandApplication.ExecuteCommandAsync(extractorParameters);
+                },
 
-                app.OnExecute(() =>
+                async (CreateConsoleAppConfiguration consoleAppConfiguration) =>
                 {
-                    applicationLogger.LogInformation("No commands specified, please specify a command...");
-                    app.ShowHelp();
-                    return 1;
-                });
+                    applicationLogger.LogInformation($"Recognized {GlobalConstants.CreateName} command...");
+                    var creatorCommandApplication = serviceProvider.GetRequiredService<CreateApplicationCommand>();
 
-                return app.Execute(args);
-            }
-            catch (Exception e)
-            {
-                applicationLogger.LogError(e, "Azure API Management DevOps Resource toolkit finished with an error...");
-                return 1;
-            }
+                    var creatorConfig = await creatorCommandApplication.ParseInputConfigurationAsync(consoleAppConfiguration);
+                    await creatorCommandApplication.ExecuteCommandAsync(creatorConfig);
+                },
+
+                async errors =>
+                {
+                    applicationLogger.LogError("Azure API Management DevOps Resource toolkit failed with parsing arguments errors.");
+                    applicationLogger.LogError("Below is full errors list. Please, check your input");
+
+                    var builder = SentenceBuilder.Create();
+                    var errorMessages = HelpText.RenderParsingErrorsTextAsLines(parserResult, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);
+
+                    foreach (var errorMessage in errorMessages)
+                    {
+                        applicationLogger.LogError(errorMessage);
+                    }
+                }
+            );
         }
 
         static IServiceProvider CreateServiceProvider(ILogger logger)
         {
             var services = new ServiceCollection();
-            services.AddArmTemplatesServices(logger);
+            var serilogLogger = logger as Serilog.ILogger;
+
+            services.AddArmTemplatesServices(serilogLogger);
             return services.BuildServiceProvider();
         }
 

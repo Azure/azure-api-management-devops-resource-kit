@@ -19,6 +19,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
 
     public class CreatorConfig
     {
+        public bool ConsiderAllApiForDeployments { get; set; } = true;
+
+        public string[] PreferredApis { get; set; }
+
         public string version { get; set; }
         public string apimServiceName { get; set; }
         // policy file location (local or url)

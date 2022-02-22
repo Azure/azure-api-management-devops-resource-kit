@@ -4,9 +4,14 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
+using System.Threading.Tasks;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Abstractions
 {
-    interface ICommand
+    interface IConsoleAppCommand<TConfiguration, TParameters>
     {
+        public Task<TParameters> ParseInputConfigurationAsync(TConfiguration configuration);
+
+        public Task ExecuteCommandAsync(TParameters parameters);
     }
 }

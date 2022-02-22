@@ -12,7 +12,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -22,27 +22,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         /// Registeres services for ARMTemplate in dependency injection container. Allows to use your own logger
         /// </summary>
         /// <param name="logger">end-user logger interface to log application traces to</param>
-        public static void AddArmTemplatesServices(this IServiceCollection services, ILogger logger)
+        public static void AddArmTemplatesServices(this IServiceCollection services, Serilog.ILogger logger)
         {
-            services.AddSingleton(logger);
+            services.AddLogging(builder =>
+            {
+                builder.AddSerilog(logger);
+            });
 
-            SetupCommandLineCommands(services);
+            SetupCommands(services);
             SetupExecutors(services);
-
-            SetupExtractors(services);
             SetupApiClients(services);
+
+            
+            SetupExtractors(services);
+        }
+
+        static void SetupCommands(IServiceCollection services)
+        {
+            services.AddScoped(typeof(CreateApplicationCommand));
+            services.AddScoped(typeof(ExtractApplicationCommand));
         }
 
         static void SetupExecutors(IServiceCollection services)
         {
             services.AddScoped(typeof(ExtractorExecutor));
             services.AddScoped(typeof(CreatorExecutor));
-        }
-
-        static void SetupCommandLineCommands(IServiceCollection services)
-        {
-            services.AddSingleton<ICommand, CreateApplicationCommand>();
-            services.AddSingleton<ICommand, ExtractApplicationCommand>();
         }
 
         static void SetupExtractors(IServiceCollection services)

@@ -12,7 +12,7 @@ using Serilog.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions
 {
-    public abstract class ExtractorMockerTestsBase
+    public abstract class ExtractorMockerTestsBase : TestsBase
     {
         protected const string TESTS_OUTPUT_DIRECTORY = "tests-output";
 
@@ -42,15 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const int MockOperationBatchSize = 32;
         protected const bool MockParameterizeBackend = true;
 
-        protected ILogger<T> GetTestLogger<T>()
-        {
-            var serilogConsoleLogger = new LoggerConfiguration()
-                .WriteTo.Console()
-                .CreateLogger();
 
-            return new SerilogLoggerFactory(serilogConsoleLogger)
-                .CreateLogger<T>();
-        }
 
         protected ExtractorConsoleAppConfiguration GetMockedExtractorConsoleAppConfiguration(
             bool splitApis = MockSplitApis,
