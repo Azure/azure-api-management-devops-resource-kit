@@ -22,7 +22,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
                 "InvalidConfigurations", Path.DirectorySeparatorChar);
         }
 
-        #region Unknown
         [Fact]
         public async Task ShouldFailWithUnknownCommand()
         {
@@ -31,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration());
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration());
             
             // assert
             await act.Should().ThrowAsync<ArgumentNullException>();
@@ -45,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidVersionSetDisplayName.yml")
             });
@@ -53,9 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
 
-        #region BaseProperties
         [Fact]
         public async Task ShouldFailWithInvalidOutputLocation()
         {
@@ -64,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidOutputLocation.yml")
             });
@@ -81,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidVersion.yml")
             });
@@ -98,7 +95,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidAPIMServiceName.yml")
             });
@@ -115,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidLinking.yml")
             });
@@ -123,9 +120,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
 
-        #region API
         [Fact]
         public async Task ShouldFailWithInvalidAPIConfiguration()
         {
@@ -134,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidAPI.yml")
             });
@@ -151,7 +146,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidOpenAPISpec.yml")
             });
@@ -168,7 +163,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidSuffix.yml")
             });
@@ -185,7 +180,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidAPIName.yml")
             });
@@ -202,7 +197,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidOperationPolicy.yml")
             });
@@ -219,7 +214,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidDiagnosticLoggerId.yml")
             });
@@ -227,9 +222,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
 
-        #region APIVersionSet
         [Fact]
         public async Task ShouldFailWithInvalidVersionSetDisplayName()
         {
@@ -238,7 +231,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidVersionSetDisplayName.yml")
             });
@@ -246,9 +239,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
 
-        #region Product
         [Fact]
         public async Task ShouldFailWithInvalidProductDisplayName()
         {
@@ -257,7 +248,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidProductDisplayName.yml")
             });
@@ -265,9 +256,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
 
-        #region Logger
         [Fact]
         public async Task ShouldFailWithInvalidLoggerDisplayName()
         {
@@ -276,7 +265,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidLoggerName.yml")
             });
@@ -284,9 +273,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
 
-        #region Backend
         [Fact]
         public async Task ShouldFailWithInvalidBackendDisplayName()
         {
@@ -295,7 +282,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidBackendTitle.yml")
             });
@@ -303,9 +290,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
 
-        #region AuthorizationServer
         [Fact]
         public async Task ShouldFailWithInvalidAuthorizationServerDisplayName()
         {
@@ -314,7 +299,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             var createApplicationCommand = new CreateApplicationCommand(logger, null);
 
             // act
-            var act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
+            Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
             {
                 ConfigFile = string.Concat(this.invalidConfigurationFolder, "invalidAuthorizationServerDisplayName.yml")
             });
@@ -322,6 +307,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
             // assert
             await act.Should().ThrowAsync<CreatorConfigurationIsInvalidException>();
         }
-        #endregion
     }
 }

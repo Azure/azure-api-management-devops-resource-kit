@@ -33,7 +33,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             SetupExecutors(services);
             SetupApiClients(services);
 
-            
             SetupExtractors(services);
         }
 
