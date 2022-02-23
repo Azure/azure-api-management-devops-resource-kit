@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class ApiTagExtractor : ApiExtractor, IApiTagExtractor
+    public class TagApiExtractor : ApiExtractor, ITagApiExtractor
     {
         public async Task<List<TemplateResource>> GenerateSingleAPITagResourceAsync(string apiName, ExtractorParameters extractorParameters, string[] dependsOn)
         {

@@ -9,7 +9,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients;
 using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
@@ -21,9 +20,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         readonly IPolicyApiClient policyApiClient;
 
-        public PolicyExtractor(IPolicyApiClient policyApiClient = null)
+        public PolicyExtractor(IPolicyApiClient policyApiClient)
         {
-            this.policyApiClient = policyApiClient ?? new PolicyApiClient();
+            this.policyApiClient = policyApiClient;
         }
 
         public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(ExtractorParameters extractorParameters, string baseFilesDirectory)
