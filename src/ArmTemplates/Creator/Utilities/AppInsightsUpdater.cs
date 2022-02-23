@@ -1,18 +1,17 @@
-﻿using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities
 {
     public class AppInsightsUpdater
     {
         public void UpdateAppInsightNameAndInstrumentationKey(
-            CreatorConfig creatorConfig, CommandOption appInsightsInstrumentationKey, CommandOption appInsightsName)
+            CreatorConfig creatorConfig, string appInsightsInstrumentationKey, string appInsightsName)
         {
             string appInsightNamePassed = string.Empty;
 
-            if (appInsightsName != null && !string.IsNullOrEmpty(appInsightsName.Value()))
+            if (appInsightsName != null && !string.IsNullOrEmpty(appInsightsName))
             {
-                appInsightNamePassed = appInsightsName.Value();
+                appInsightNamePassed = appInsightsName;
                 foreach (APIConfig aPIConfig in creatorConfig.apis)
                 {
                     if (aPIConfig.diagnostic != null)
@@ -22,9 +21,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                 }
             }
 
-            if (appInsightsInstrumentationKey != null && !string.IsNullOrEmpty(appInsightsInstrumentationKey.Value()))
+            if (appInsightsInstrumentationKey != null && !string.IsNullOrEmpty(appInsightsInstrumentationKey))
             {
-                string appInsightsInstrumentationKeyPassed = appInsightsInstrumentationKey.Value();
+                string appInsightsInstrumentationKeyPassed = appInsightsInstrumentationKey;
                 if (creatorConfig.loggers != null && creatorConfig.loggers.Count > 0)
                 {
                     if (!string.IsNullOrEmpty(appInsightNamePassed))

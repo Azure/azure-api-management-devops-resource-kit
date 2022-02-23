@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers
 {

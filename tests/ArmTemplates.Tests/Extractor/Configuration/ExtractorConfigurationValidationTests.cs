@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using System;
 using Xunit;
 
@@ -11,8 +12,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
         public void ExtractorConfigValidate_NoPropertiesSet_MissingParameterException()
         {
             var extractorConfig = new ExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            var expectedException = Assert.Throws<ArgumentException>(() => extractorConfig.Validate());
+            var expectedException = Assert.Throws<ArgumentException>(() => extractorParameters.Validate());
 
             Assert.Contains("Missing parameter", expectedException.Message);
         }
@@ -27,8 +29,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
                 ResourceGroup = "resource-group",
                 FileFolder = "c:/my/folder"
             };
+            var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            extractorConfig.Validate();
+            extractorParameters.Validate();
         }
 
         [Theory]
@@ -52,8 +55,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
                 IncludeAllRevisions = includeAllRevisions,
                 MultipleAPIs = multipleApis
             };
+            var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            Assert.Throws<NotSupportedException>(() => extractorConfig.Validate());
+            Assert.Throws<NotSupportedException>(() => extractorParameters.Validate());
         }
     }
 }

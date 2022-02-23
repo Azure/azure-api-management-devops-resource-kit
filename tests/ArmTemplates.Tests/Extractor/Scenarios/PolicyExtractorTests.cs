@@ -20,11 +20,11 @@ using Xunit;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
     [Trait("Category", "Policy Extraction")]
-    public class PolicyExtractorTests : ExtractorTestsBase
+    public class PolicyExtractorTests : ExtractorMockerTestsBase
     {
         static string OutputPoliciesDirectory;
 
-        public PolicyExtractorTests()
+        public PolicyExtractorTests() : base()
         {
             OutputPoliciesDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, "policy-tests");
 
@@ -36,19 +36,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         public async Task GeneratePolicyTemplates_ProperlyLaysTheInformation()
         {
             // arrange
+            var currentTestDirectory = Path.Combine(OutputPoliciesDirectory, nameof(GeneratePolicyTemplates_ProperlyLaysTheInformation));
+
             var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
                 splitApis: false,
                 apiVersionSetName: string.Empty,
                 multipleApiNames: string.Empty,
                 includeAllRevisions: false);
+            var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var mockedPolicyApiClient = MockPolicyApiClient.GetMockedApiClientWithDefaultValues();
+            var policyExtractor = new PolicyExtractor(mockedPolicyApiClient);
 
-            var extractorParameters = new ExtractorParameters(extractorConfig);
-            var extractorExecutor = new ExtractorExecutor(extractorParameters,
-                policyExtractor: new PolicyExtractor(mockedPolicyApiClient));
-
-            var currentTestDirectory = Path.Combine(OutputPoliciesDirectory, nameof(GeneratePolicyTemplates_ProperlyLaysTheInformation));
+            var extractorExecutor = new ExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                null, null, null, null, null, null, 
+                policyExtractor: policyExtractor,
+                null, null, null, null, null);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act
             var policyTemplate = await extractorExecutor.GeneratePolicyTemplateAsync(currentTestDirectory);
@@ -62,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             policyTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             policyTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
             policyTemplate.Resources.Count().Should().Be(1);
-            
+
             var policyResource = policyTemplate.Resources.First() as PolicyTemplateResource;
             policyResource.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             policyResource.Name.Should().NotBeNullOrEmpty();

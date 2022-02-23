@@ -1,13 +1,13 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 {
     public class ExtractorExecutor
     {
-        readonly ExtractorParameters extractorParameters;
+        ExtractorParameters extractorParameters;
+
+        readonly ILogger<ExtractorExecutor> logger;
 
         readonly IApiExtractor apiExtractor;
         readonly IApiVersionSetExtractor apiVersionSetExtractor;
@@ -31,46 +33,53 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IProductApiExtractor productApiExtractor;
         readonly IProductExtractor productExtractor;
         readonly IPropertyExtractor propertyExtractor;
-        readonly IApiTagExtractor apiTagExtractor;
+        readonly ITagApiExtractor apiTagExtractor;
         readonly ITagExtractor tagExtractor;
 
-        public ExtractorExecutor(ExtractorConsoleAppConfiguration extractorConfig)
-            : this(new ExtractorParameters(extractorConfig))
+        public ExtractorExecutor(
+            ILogger<ExtractorExecutor> logger,
+            IApiExtractor apiExtractor,
+            IApiVersionSetExtractor apiVersionSetExtractor,
+            IAuthorizationServerExtractor authorizationServerExtractor,
+            IBackendExtractor backendExtractor,
+            ILoggerExtractor loggerExtractor,
+            IMasterTemplateExtractor masterTemplateExtractor,
+            IPolicyExtractor policyExtractor,
+            IProductApiExtractor productApiExtractor,
+            IProductExtractor productExtractor,
+            IPropertyExtractor propertyExtractor,
+            ITagApiExtractor apiTagExtractor,
+            ITagExtractor tagExtractor)
         {
-            EntityExtractorBase.BaseUrl = string.IsNullOrEmpty(extractorConfig.ServiceBaseUrl)
-                ? EntityExtractorBase.BaseUrl
-                : extractorConfig.ServiceBaseUrl;
+            this.logger = logger;
+
+            this.apiExtractor = apiExtractor;
+            this.apiVersionSetExtractor = apiVersionSetExtractor;
+            this.authorizationServerExtractor = authorizationServerExtractor;
+            this.backendExtractor = backendExtractor;
+            this.loggerExtractor = loggerExtractor;
+            this.masterTemplateExtractor = masterTemplateExtractor;
+            this.policyExtractor = policyExtractor;
+            this.productApiExtractor = productApiExtractor;
+            this.propertyExtractor = propertyExtractor;
+            this.productExtractor = productExtractor;
+            this.apiTagExtractor = apiTagExtractor;
+            this.tagExtractor = tagExtractor;
         }
 
-        public ExtractorExecutor(
-            ExtractorParameters extractorParameters,
-            IApiExtractor apiExtractor = null,
-            IApiVersionSetExtractor apiVersionSetExtractor = null,
-            IAuthorizationServerExtractor authorizationServerExtractor = null,
-            IBackendExtractor backendExtractor = null,
-            ILoggerExtractor loggerExtractor = null,
-            IMasterTemplateExtractor masterTemplateExtractor = null,
-            IPolicyExtractor policyExtractor = null,
-            IProductApiExtractor productApiExtractor = null,
-            IProductExtractor productExtractor = null,
-            IPropertyExtractor propertyExtractor = null,
-            IApiTagExtractor apiTagExtractor = null,
-            ITagExtractor tagExtractor = null)
+        public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
             this.extractorParameters = extractorParameters;
+        }
 
-            this.apiExtractor = apiExtractor ?? new ApiExtractor();
-            this.apiVersionSetExtractor = apiVersionSetExtractor ?? new ApiVersionSetExtractor();
-            this.authorizationServerExtractor = authorizationServerExtractor ?? new AuthorizationServerExtractor();
-            this.backendExtractor = backendExtractor ?? new BackendExtractor();
-            this.loggerExtractor = loggerExtractor ?? new LoggerExtractor();
-            this.masterTemplateExtractor = masterTemplateExtractor ?? new MasterTemplateExtractor();
-            this.policyExtractor = policyExtractor ?? new PolicyExtractor();
-            this.productApiExtractor = productApiExtractor ?? new ProductApiExtractor();
-            this.propertyExtractor = propertyExtractor ?? new PropertyExtractor();
-            this.productExtractor = productExtractor ?? new ProductExtractor();
-            this.apiTagExtractor = apiTagExtractor ?? new ApiTagExtractor();
-            this.tagExtractor = tagExtractor ?? new TagExtractor();
+        public void SetExtractorParameters(ExtractorConsoleAppConfiguration extractorConfiguration)
+        {
+            this.extractorParameters = new ExtractorParameters(extractorConfiguration);
+
+            if (!string.IsNullOrEmpty(extractorConfiguration.ServiceBaseUrl))
+            {
+                EntityExtractorBase.BaseUrl = extractorConfiguration.ServiceBaseUrl;
+            }
         }
 
         /// <summary>
@@ -79,33 +88,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// </summary>
         public async Task ExecuteGenerationBasedOnConfiguration()
         {
-            Logger.LogInformation("API Management Template");
-            Logger.LogInformation("Connecting to {0} API Management Service on {1} Resource Group ...", this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup);
+            this.logger.LogInformation("API Management Template");
+            this.logger.LogInformation("Connecting to {0} API Management Service on {1} Resource Group ...", this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup);
 
             if (this.extractorParameters.SplitApis)
             {
-                Logger.LogInformation("Starting templates with splitting for each API extraction...");
+                this.logger.LogInformation("Starting templates with splitting for each API extraction...");
                 await this.GenerateSplitAPITemplates();
                 await this.GenerateTemplates(this.extractorParameters.FilesGenerationRootDirectory);
             }
             else if (!string.IsNullOrEmpty(this.extractorParameters.ApiVersionSetName))
             {
-                Logger.LogInformation("Starting API version set templates extraction...");
+                this.logger.LogInformation("Starting API version set templates extraction...");
                 await this.GenerateAPIVersionSetTemplates();
             }
             else if (!this.extractorParameters.MultipleApiNames.IsNullOrEmpty())
             {
-                Logger.LogInformation("Launching multiple APIs templates extraction...");
+                this.logger.LogInformation("Launching multiple APIs templates extraction...");
                 await this.GenerateMultipleAPIsTemplates();
             }
             else if (!string.IsNullOrEmpty(this.extractorParameters.SingleApiName) && this.extractorParameters.IncludeAllRevisions)
             {
-                Logger.LogInformation("Launching single API with revisions templates extraction...");
+                this.logger.LogInformation("Launching single API with revisions templates extraction...");
                 await this.GenerateSingleAPIWithRevisionsTemplates();
             }
             else
             {
-                Logger.LogInformation("No specific parameters are set for template generation...");
+                this.logger.LogInformation("No specific parameters are set for template generation...");
                 await this.GenerateTemplates(this.extractorParameters.FilesGenerationRootDirectory, singleApiName: this.extractorParameters.SingleApiName);
             }
         }
@@ -161,7 +170,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                     Directory.CreateDirectory(versionSetFolder);
                     await this.GenerateTemplates(versionSetFolder, multipleApiNames: versionSetEntry.Value);
 
-                    Logger.LogInformation($@"Finish extracting APIVersionSet {versionSetEntry.Key}");
+                    this.logger.LogInformation($@"Finish extracting APIVersionSet {versionSetEntry.Key}");
                 }
 
                 // Generate templates for each api 
@@ -173,7 +182,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                     // generate templates for each API
                     await this.GenerateTemplates(tempFileFolder, singleApiName: apiName);
 
-                    Logger.LogInformation($@"Finish extracting API {apiName}");
+                    this.logger.LogInformation($@"Finish extracting API {apiName}");
                 }
             }
         }
@@ -191,7 +200,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
             else
             {
-                Logger.LogInformation("Started extracting the API version set {0}", this.extractorParameters.ApiVersionSetName);
+                this.logger.LogInformation("Started extracting the API version set {0}", this.extractorParameters.ApiVersionSetName);
 
                 foreach (string apiName in apiDictionary[this.extractorParameters.ApiVersionSetName])
                 {
@@ -206,7 +215,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 Directory.CreateDirectory(versionSetFolder);
                 await this.GenerateTemplates(versionSetFolder, multipleApiNames: apiDictionary[this.extractorParameters.ApiVersionSetName]);
 
-                Logger.LogInformation($@"Finished extracting APIVersionSet {this.extractorParameters.ApiVersionSetName}");
+                this.logger.LogInformation($@"Finished extracting APIVersionSet {this.extractorParameters.ApiVersionSetName}");
             }
         }
 
@@ -220,7 +229,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 throw new Exception("MultipleAPIs parameter doesn't have any data");
             }
 
-            Logger.LogInformation("Started extracting multiple APIs (amount is {0} APIs)", this.extractorParameters.MultipleApiNames.Count);
+            this.logger.LogInformation("Started extracting multiple APIs (amount is {0} APIs)", this.extractorParameters.MultipleApiNames.Count);
 
             foreach (string apiName in this.extractorParameters.MultipleApiNames)
             {
@@ -235,12 +244,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             Directory.CreateDirectory(groupApiFolder);
             await this.GenerateTemplates(groupApiFolder, multipleApiNames: this.extractorParameters.MultipleApiNames);
 
-            Logger.LogInformation($@"Finished extracting mutiple APIs");
+            this.logger.LogInformation($@"Finished extracting mutiple APIs");
         }
 
         async Task GenerateSingleAPIWithRevisionsTemplates()
         {
-            Logger.LogInformation("Extracting singleAPI {0} with revisions", this.extractorParameters.SingleApiName);
+            this.logger.LogInformation("Extracting singleAPI {0} with revisions", this.extractorParameters.SingleApiName);
 
             // Get all revisions for this api
             string revisions = await this.apiExtractor.GetAPIRevisionsAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, this.extractorParameters.SingleApiName);
@@ -311,7 +320,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
             else
             {
-                Logger.LogInformation($"There were no `{nameof(singleApiName)}` or `{nameof(multipleApiNames)}` specified. Loading all API names from {nameof(ExtractorParameters.SourceApimName)} directly...");
+                this.logger.LogInformation($"There were no `{nameof(singleApiName)}` or `{nameof(multipleApiNames)}` specified. Loading all API names from {nameof(ExtractorParameters.SourceApimName)} directly...");
                 List<string> allApis = await this.apiExtractor.GetAllApiNamesAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup);
                 apisToExtract.AddRange(allApis);
             }

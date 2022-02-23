@@ -13,7 +13,7 @@ using Xunit;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Configuration
 {
     [Trait("Category", "Unit")]
-    public class ExtractorParametersCreationTests : ExtractorTestsBase
+    public class ExtractorParametersCreationTests : ExtractorMockerTestsBase
     {
         [Fact]
         public void ExtractorConfigValidate_NoPropertiesSet_MissingParameterException()

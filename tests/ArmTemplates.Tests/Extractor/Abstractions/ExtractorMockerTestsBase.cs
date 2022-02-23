@@ -4,11 +4,15 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions
 {
-    public abstract class ExtractorTestsBase
+    public abstract class ExtractorMockerTestsBase : TestsBase
     {
         protected const string TESTS_OUTPUT_DIRECTORY = "tests-output";
 
@@ -37,6 +41,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const bool MockToParameterizeNamedValuesKeyVaultSecrets = true;
         protected const int MockOperationBatchSize = 32;
         protected const bool MockParameterizeBackend = true;
+
+
 
         protected ExtractorConsoleAppConfiguration GetMockedExtractorConsoleAppConfiguration(
             bool splitApis = MockSplitApis,

@@ -1,5 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities
@@ -17,11 +16,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         public static readonly char KeyValueSeperator = '|';
 
         public void UpdateNamedValueInstances(
-            CreatorConfig creatorConfig, CommandOption namedValuesInstance)
+            CreatorConfig creatorConfig, string namedValuesInstance)
         {
-            if (namedValuesInstance.HasValue() && !string.IsNullOrEmpty(namedValuesInstance.Value()))
+            if (!string.IsNullOrEmpty(namedValuesInstance))
             {
-                string inputNamedInstances = namedValuesInstance.Value();
+                string inputNamedInstances = namedValuesInstance;
                 // Validation to see number of underscores match number of semicolons
                 if (inputNamedInstances.Count(f => f == MultiKeySeperator) == inputNamedInstances.Count(f => f == KeyValueSeperator))
                 {
