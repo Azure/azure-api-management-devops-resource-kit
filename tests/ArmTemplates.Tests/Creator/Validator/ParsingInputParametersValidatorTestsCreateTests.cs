@@ -1,15 +1,13 @@
 ﻿using Xunit;
 using System.IO;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using System;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Validator
 {
     public class ParsingInputParametersValidatorTests : TestsBase
     {
@@ -31,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.CmdLine
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration());
-            
+
             // assert
             await act.Should().ThrowAsync<ArgumentNullException>();
         }

@@ -4,11 +4,12 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Service;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<ILoggerExtractor, LoggerExtractor>();
             services.AddScoped<IMasterTemplateExtractor, MasterTemplateExtractor>();
             services.AddScoped<IPolicyExtractor, PolicyExtractor>();
-            services.AddScoped<IProductApiExtractor, ProductApiExtractor>();
+            services.AddScoped<IServiceApisProductsExtractor, ServiceApisProductsExtractor>();
             services.AddScoped<IProductExtractor, ProductExtractor>();
             services.AddScoped<IPropertyExtractor, PropertyExtractor>();
             services.AddScoped<ITagApiExtractor, TagApiExtractor>();
@@ -66,7 +67,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         static void SetupApiClients(IServiceCollection services)
         {
+            services.AddScoped<IServiceApisApiClient, ServiceApisApiClient>();
             services.AddScoped<IPolicyApiClient, PolicyApiClient>();
+            services.AddScoped<IServiceApiProductsApiClient, ServiceApisProductsApiClient>();
         }
     }
 }

@@ -9,7 +9,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy
 {
     public class PolicyApiClient : ApiClientBase, IPolicyApiClient
     {

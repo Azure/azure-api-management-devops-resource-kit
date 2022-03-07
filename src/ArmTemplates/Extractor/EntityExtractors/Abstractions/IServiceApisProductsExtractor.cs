@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions
 {
-    public interface IProductApiExtractor
+    public interface IServiceApisProductsExtractor
     {
-        Task<Template> GenerateAPIProductsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters);
+        Task<Template> GenerateServiceApisProductsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters);
     }
 }

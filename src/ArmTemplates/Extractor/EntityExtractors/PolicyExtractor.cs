@@ -13,7 +13,7 @@ using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class PolicyExtractor : EntityExtractorBase, IPolicyExtractor
+    public class PolicyExtractor : TemplateGeneratorBase, IPolicyExtractor
     {
         public const string PoliciesDirectoryName = "policies";
         public const string GlobalServicePolicyFileName = "globalServicePolicy.xml";
