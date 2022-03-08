@@ -16,7 +16,7 @@ stages:
   - stage: build
     displayName: Build Toolkit
     jobs:
-      - job: build-and-test
+      - job: build_and_test
         displayName: 'Build and Tests'
         steps:
           - task: UseDotNet@2
