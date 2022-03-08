@@ -7,22 +7,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 {
     public static class FileWriter
     {
-        public static async Task SaveAsJsonAsync<T>(T item, string fileName)
-        {
-            var serializedItem = item.Serialize();
-            await File.WriteAllTextAsync(fileName, serializedItem);
-        }
-
         public static async Task SaveAsJsonAsync<T>(T item, string directory, string fileName)
         {
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             var serializedItem = item.Serialize();
             await File.WriteAllTextAsync(Path.Combine(directory, fileName), serializedItem);
-        }
-
-        public static async Task SaveAsJsonAsync<T>(T item, params string[] pathsToFile)
-        {
-            var serializedItem = item.Serialize();
-            await File.WriteAllTextAsync(Path.Combine(pathsToFile), serializedItem);
         }
 
         public static async Task SaveTextToFileAsync(string xmlContent, params string[] pathsToFile)

@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly ILoggerExtractor loggerExtractor;
         readonly IMasterTemplateExtractor masterTemplateExtractor;
         readonly IPolicyExtractor policyExtractor;
-        readonly IProductApiExtractor productApiExtractor;
+        readonly IProductApisExtractor productApisExtractor;
         readonly IProductExtractor productExtractor;
         readonly IPropertyExtractor propertyExtractor;
         readonly ITagApiExtractor apiTagExtractor;
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ILoggerExtractor loggerExtractor,
             IMasterTemplateExtractor masterTemplateExtractor,
             IPolicyExtractor policyExtractor,
-            IProductApiExtractor productApiExtractor,
+            IProductApisExtractor productApisExtractor,
             IProductExtractor productExtractor,
             IPropertyExtractor propertyExtractor,
             ITagApiExtractor apiTagExtractor,
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.loggerExtractor = loggerExtractor;
             this.masterTemplateExtractor = masterTemplateExtractor;
             this.policyExtractor = policyExtractor;
-            this.productApiExtractor = productApiExtractor;
+            this.productApisExtractor = productApisExtractor;
             this.propertyExtractor = propertyExtractor;
             this.productExtractor = productExtractor;
             this.apiTagExtractor = apiTagExtractor;
@@ -130,7 +130,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 this.extractorParameters,
                 baseFilesGenerationDirectory);
 
-            if (globalServicePolicyTemplate.HasResources)
+            if (globalServicePolicyTemplate?.HasResources == true)
             {
                 await FileWriter.SaveAsJsonAsync(
                     globalServicePolicyTemplate,
@@ -139,6 +139,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
 
             return globalServicePolicyTemplate;
+        }
+
+        public async Task<Template> GenerateProductApisTemplateAsync(string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory)
+        {
+            var productApiTemplate = await this.productApisExtractor.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
+
+            if (productApiTemplate?.HasResources == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    productApiTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.ProductAPIs);
+            }
+
+            return productApiTemplate;
         }
 
         /// <summary>
@@ -339,13 +354,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             // generate different templates using extractors and write to output
 
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
+            var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
 
             List<TemplateResource> apiTemplateResources = apiTemplate.Resources.ToList();
             Template apiVersionSetTemplate = await this.apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);
             Template authorizationServerTemplate = await this.authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);
             Template loggerTemplate = await this.loggerExtractor.GenerateLoggerTemplateAsync(this.extractorParameters, singleApiName, apiTemplateResources, apiLoggerId);
             Template productTemplate = await this.productExtractor.GenerateProductsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, baseFilesGenerationDirectory, this.extractorParameters);
-            Template productAPITemplate = await this.productApiExtractor.GenerateAPIProductsARMTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
+            
             Template apiTagTemplate = await this.apiTagExtractor.GenerateAPITagsARMTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
             List<TemplateResource> productTemplateResources = productTemplate.Resources.ToList();
             List<TemplateResource> loggerResources = loggerTemplate.Resources.ToList();
@@ -390,10 +406,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             {
                 FileWriter.WriteJSONToFile(productTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Products));
             }
-            if (!productAPITemplate.Resources.IsNullOrEmpty())
-            {
-                FileWriter.WriteJSONToFile(productAPITemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ProductAPIs));
-            }
             if (!apiTagTemplate.Resources.IsNullOrEmpty())
             {
                 FileWriter.WriteJSONToFile(apiTagTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ApiTags));
@@ -411,7 +423,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             {
                 // create a master template that links to all other templates
                 Template masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
-                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productAPITemplate,
+                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productApiTemplate,
                     apiTagTemplate, loggerTemplate, backendResult.Item1, authorizationServerTemplate, namedValueTemplate,
                     tagTemplate, this.extractorParameters.FileNames, apiFileName, this.extractorParameters);
 
