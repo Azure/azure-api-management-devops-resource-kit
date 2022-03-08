@@ -46,12 +46,5 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: Publish Build Artifacts
             inputs:
-              pathToPublish: '$(basePath)/apimtemplate/bin/$(configuration)/**'
+              pathToPublish: '$(basePath)/apimtemplate/bin/$(configuration)'
               artifactName: build
-
-          - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
-            inputs:
-              testResultsFormat: xUnit
-              searchFolder: '$(Agent.TempDirectory)'
-              testResultsFiles: '**\*.xml'
