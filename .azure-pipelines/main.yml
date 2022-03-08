@@ -1,5 +1,6 @@
 trigger:
   - main
+  - major-repo-refactoring
   - refs/tags/*
 
 pr:
