@@ -1,0 +1,60 @@
+trigger:
+  - main
+  - refs/tags/*
+
+pr:
+  - main
+
+pool:
+  name: 'VSEngSS-MicroBuild2022-1ES'
+
+variables:
+  basePath: 'src/APIM_ARMTemplate'
+  configuration: 'Release'
+
+stages:
+  - stage: build
+    displayName: Build Toolkit
+    steps:
+      - task: UseDotNet@2
+        inputs:
+          version: '3.1.x'
+          performMultiLevelLookup: true
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Build Toolkit'
+        inputs:
+          command: 'build'
+          arguments: '--configuration $(configuration)'
+          projects: '$(basePath)/**/*.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Run Tests'
+        inputs:
+          command: 'test'
+          arguments: '--configuration $(configuration) --collect "Code coverage"'
+          publishTestResults: true
+          projects: '$(basePath)/**/*.test.csproj'
+
+      - pwsh: |
+          Get-ChildItem -Path '$()' -Directory -Recurse | Where-Object { $_.FullName -match '\\bin|obj\\$(configuration)$' } | Write-Host
+        displayName: Show Build Directories
+
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Build Artifacts
+        inputs:
+          pathToPublish: '$(basePath)/apimtemplate/bin/$(configuration)/**'
+          artifactName: build
+          
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results'
+        inputs:
+          testResultsFormat: xUnit
+          searchFolder: '$(Agent.TempDirectory)'
+          testResultsFiles: '**\*.xml'
+
+
+
+      
+
+
