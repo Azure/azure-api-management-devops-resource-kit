@@ -1,7 +1,7 @@
 jobs:
 - job: Build
   pool:
-    vmImage: Azure-Pipelines-EO-Windows2022-MSAzure
+    vmImage: 'VSEngSS-MicroBuild2022-1ES'
   
   steps:
   - template: common/build-and-test.yml
