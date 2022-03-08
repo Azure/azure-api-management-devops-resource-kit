@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
             // act
             var policyTemplate = await extractorExecutor.GeneratePolicyTemplateAsync(currentTestDirectory);
 
-            // policy template files exists
+            // assert
             var outputGlobalServicePolicyFilePath = Path.Combine(currentTestDirectory, extractorParameters.FileNames.GlobalServicePolicy);
             File.Exists(outputGlobalServicePolicyFilePath).Should().BeTrue();
 
