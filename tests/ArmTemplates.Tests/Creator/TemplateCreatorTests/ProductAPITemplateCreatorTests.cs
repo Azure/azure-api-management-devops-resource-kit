@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             Template productAPITemplate = productAPITemplateCreator.CreateProductAPITemplate(creatorConfig);
-            ProductApisTemplateResource productAPITemplateResource = (ProductApisTemplateResource)productAPITemplate.Resources[0];
+            ProductApiTemplateResource productAPITemplateResource = (ProductApiTemplateResource)productAPITemplate.Resources[0];
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name}')]", productAPITemplateResource.Name);
@@ -78,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             string[] dependsOn = new string[] { "dependsOn" };
 
             // act
-            ProductApisTemplateResource productAPITemplateResource = productAPITemplateCreator.CreateProductAPITemplateResource(productId, apiName, dependsOn);
+            ProductApiTemplateResource productAPITemplateResource = productAPITemplateCreator.CreateProductAPITemplateResource(productId, apiName, dependsOn);
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{productId}/{apiName}')]", productAPITemplateResource.Name);

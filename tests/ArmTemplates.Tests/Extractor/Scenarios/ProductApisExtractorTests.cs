@@ -77,14 +77,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             productApisTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
             productApisTemplate.Resources.Count().Should().Be(2);
 
-            var productApi1 = productApisTemplate.Resources.First() as ProductApisTemplateResource;
+            var productApi1 = productApisTemplate.Resources.First() as ProductApiTemplateResource;
             productApi1.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             productApi1.Name.Should().NotBeNullOrEmpty();
             productApi1.Type.Should().Be(MockServiceApisProductsApiClient.TemplateType);
             productApi1.Properties.DisplayName.Should().NotBeNullOrEmpty();
             productApi1.Properties.Description.Should().NotBeNullOrEmpty();
 
-            var productApi2 = productApisTemplate.Resources.Last() as ProductApisTemplateResource;
+            var productApi2 = productApisTemplate.Resources.Last() as ProductApiTemplateResource;
             productApi2.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             productApi2.Name.Should().NotBeNullOrEmpty();
             productApi2.Type.Should().Be(MockServiceApisProductsApiClient.TemplateType);

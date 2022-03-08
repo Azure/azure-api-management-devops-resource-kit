@@ -6,7 +6,7 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis
 {
-    public class ProductApisProperties
+    public class ProductApiProperties
     {
         public string DisplayName { get; set; }
 

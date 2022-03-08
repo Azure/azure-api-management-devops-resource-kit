@@ -10,10 +10,10 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product.Responses
 {
-    class GetAllProductsResponse
+    class GetAllProductsLinkedToApiResponse
     {
         [JsonProperty("value")]
-        public List<ProductApisTemplateResource> Products { get; set; }
+        public List<ProductApiTemplateResource> ProductApis { get; set; }
 
         public int Count { get; set; }
     }

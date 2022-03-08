@@ -22,13 +22,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
             mockServiceApiProductsApiClient
                 .Setup(x => x.GetAllLinkedToApiAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
-                .ReturnsAsync((ExtractorParameters extractorParameters, string serviceApiName) => new List<ProductApisTemplateResource>
+                .ReturnsAsync((ExtractorParameters extractorParameters, string serviceApiName) => new List<ProductApiTemplateResource>
                 {
-                    new ProductApisTemplateResource
+                    new ProductApiTemplateResource
                     {
                         Name = serviceApiName,
                         Type = TemplateType,
-                        Properties = new ProductApisProperties
+                        Properties = new ProductApiProperties
                         {
                             DisplayName = serviceApiName,
                             Description = serviceApiName
