@@ -6,7 +6,7 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Service
 {
-    public class ServiceApiProperties
+    public class ApiProperties
     {
         public string DisplayName { get; set; }
 

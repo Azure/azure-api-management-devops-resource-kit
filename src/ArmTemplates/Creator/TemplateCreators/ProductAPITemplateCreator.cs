@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 if (api.products != null)
                 {
-                    List<ServiceApisProductTemplateResource> apiResources = this.CreateProductAPITemplateResources(api, dependsOn);
+                    List<ProductApisTemplateResource> apiResources = this.CreateProductAPITemplateResources(api, dependsOn);
                     resources.AddRange(apiResources);
 
                     // Add previous product/API resource as a dependency for next product/API resource(s)
@@ -37,10 +37,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             productTemplate.Resources = resources.ToArray();
             return productTemplate;
         }
-        public ServiceApisProductTemplateResource CreateProductAPITemplateResource(string productID, string apiName, string[] dependsOn)
+        public ProductApisTemplateResource CreateProductAPITemplateResource(string productID, string apiName, string[] dependsOn)
         {
             // create products/apis resource with properties
-            ServiceApisProductTemplateResource productAPITemplateResource = new ServiceApisProductTemplateResource()
+            ProductApisTemplateResource productAPITemplateResource = new ProductApisTemplateResource()
             {
                 Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productID}/{apiName}')]",
                 Type = ResourceTypeConstants.ProductAPI,
@@ -49,16 +49,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             };
             return productAPITemplateResource;
         }
-        public List<ServiceApisProductTemplateResource> CreateProductAPITemplateResources(APIConfig api, string[] dependsOn)
+        public List<ProductApisTemplateResource> CreateProductAPITemplateResources(APIConfig api, string[] dependsOn)
         {
             // create a products/apis association resource for each product provided in the config file
-            List<ServiceApisProductTemplateResource> productAPITemplates = new List<ServiceApisProductTemplateResource>();
+            List<ProductApisTemplateResource> productAPITemplates = new List<ProductApisTemplateResource>();
             // products is comma separated list of productIds
             string[] productIDs = (api.products ?? "").Split(", ", System.StringSplitOptions.RemoveEmptyEntries);
             string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
-                ServiceApisProductTemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
+                ProductApisTemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
                 // Add previous product/API resource as a dependency for next product/API resource
                 allDependsOn = new string[dependsOn.Length + 1];
                 dependsOn.CopyTo(allDependsOn, 1);

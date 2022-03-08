@@ -11,12 +11,10 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions
 {
-    public interface IServiceApisApiClient
+    public interface IApisClient
     {
-        Task<ServiceApiTemplateResource> GetSingleServiceApiAsync(string apiManagementName, string resourceGroupName, string apiName);
+        Task<ApiTemplateResource> GetSingleAsync(string apiManagementName, string resourceGroupName, string apiName);
 
-        Task<List<ServiceApiTemplateResource>> GetAllServiceApisAsync(ExtractorParameters extractorParameters);
-
-        Task<List<ServiceApiTemplateResource>> GetAllServiceApisAsync(string apimInstanceName, string resourceGroupName);
+        Task<List<ApiTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
     }
 }

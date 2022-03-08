@@ -2,8 +2,8 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis
 {
-    public class ServiceApisProductTemplateResource : TemplateResource
+    public class ProductApisTemplateResource : TemplateResource
     {
-        public ServiceApiProductProperties Properties { get; set; }
+        public ProductApisProperties Properties { get; set; }
     }
 }

@@ -8,8 +8,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Service
 {
-    public class ServiceApiTemplateResource : TemplateResource
+    public class ApiTemplateResource : TemplateResource
     {
-        public ServiceApiProperties Properties { get; set; }
+        public ApiProperties Properties { get; set; }
     }
 }

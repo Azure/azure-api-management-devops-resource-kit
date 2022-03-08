@@ -8,12 +8,12 @@ using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ProductApis.Responses
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product.Responses
 {
-    class GetAllServiceApiProductsResponse
+    class GetAllProductsResponse
     {
         [JsonProperty("value")]
-        public List<ServiceApisProductTemplateResource> ServiceApisProducts { get; set; }
+        public List<ProductApisTemplateResource> Products { get; set; }
 
         public int Count { get; set; }
     }

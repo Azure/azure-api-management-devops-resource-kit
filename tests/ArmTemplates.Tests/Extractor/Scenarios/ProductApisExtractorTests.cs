@@ -31,7 +31,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             OutputDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, "product-apis-tests");
 
             // remember to clean up the output directory before each test
-            if (Directory.Exists(OutputDirectory)) Directory.Delete(OutputDirectory, true);
+            if (Directory.Exists(OutputDirectory))
+            {
+                Directory.Delete(OutputDirectory, true);
+            }
         }
 
         [Fact]
@@ -50,8 +53,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var mockedServiceApisApiClient = MockServiceApisApiClient.GetMockedApiClientWithDefaultValues();
             var mockedServiceApisProductsApiClient = MockServiceApisProductsApiClient.GetMockedApiClientWithDefaultValues();
 
-            var productApisExtractor = new ServiceApisProductsExtractor(
-                this.GetTestLogger<ServiceApisProductsExtractor>(), 
+            var productApisExtractor = new ProductApisExtractor(
+                this.GetTestLogger<ProductApisExtractor>(), 
                 mockedServiceApisProductsApiClient,
                 mockedServiceApisApiClient);
 
@@ -68,20 +71,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 multipleApiNames: It.IsAny<List<string>>(),
                 currentTestDirectory);
 
-            // product apis template exists
+            // assert
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ProductAPIs)).Should().BeTrue();
 
             productApisTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
             productApisTemplate.Resources.Count().Should().Be(2);
 
-            var productApi1 = productApisTemplate.Resources.First() as ServiceApisProductTemplateResource;
+            var productApi1 = productApisTemplate.Resources.First() as ProductApisTemplateResource;
             productApi1.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             productApi1.Name.Should().NotBeNullOrEmpty();
             productApi1.Type.Should().Be(MockServiceApisProductsApiClient.TemplateType);
             productApi1.Properties.DisplayName.Should().NotBeNullOrEmpty();
             productApi1.Properties.Description.Should().NotBeNullOrEmpty();
 
-            var productApi2 = productApisTemplate.Resources.Last() as ServiceApisProductTemplateResource;
+            var productApi2 = productApisTemplate.Resources.Last() as ProductApisTemplateResource;
             productApi2.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             productApi2.Name.Should().NotBeNullOrEmpty();
             productApi2.Type.Should().Be(MockServiceApisProductsApiClient.TemplateType);

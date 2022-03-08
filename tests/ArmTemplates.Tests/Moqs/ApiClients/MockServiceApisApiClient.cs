@@ -19,7 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         public const string ServiceApiName1 = "api-name-1";
         public const string ServiceApiName2 = "api-name-2";
 
-        public static ServiceApiProperties ServiceApiProperties1 = new ServiceApiProperties
+        public static ApiProperties ServiceApiProperties1 = new ApiProperties
         {
             DisplayName = "api-display-name-1",
             ApiRevision = "1",
@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             IsCurrent = true
         };
 
-        public static ServiceApiProperties ServiceApiProperties2 = new ServiceApiProperties
+        public static ApiProperties ServiceApiProperties2 = new ApiProperties
         {
             DisplayName = "api-display-name-2",
             ApiRevision = "2",
@@ -43,22 +43,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             IsCurrent = true
         };
 
-        public static IServiceApisApiClient GetMockedApiClientWithDefaultValues()
+        public static IApisClient GetMockedApiClientWithDefaultValues()
         {
-            var mockServiceApiProductsApiClient = new Mock<IServiceApisApiClient>(MockBehavior.Strict);
+            var mockServiceApiProductsApiClient = new Mock<IApisClient>(MockBehavior.Strict);
 
             mockServiceApiProductsApiClient
-                .Setup(x => x.GetAllServiceApisAsync(It.IsAny<ExtractorParameters>()))
-                .ReturnsAsync(new List<ServiceApiTemplateResource>
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<ApiTemplateResource>
                 {
-                    new ServiceApiTemplateResource
+                    new ApiTemplateResource
                     {
                         Name = ServiceApiName1,
                         Type = TemplateType,
                         Properties = ServiceApiProperties1
                     },
 
-                    new ServiceApiTemplateResource
+                    new ApiTemplateResource
                     {
                         Name = ServiceApiName2,
                         Type = TemplateType,
@@ -67,12 +67,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockServiceApiProductsApiClient
-                .Setup(x => x.GetSingleServiceApiAsync(
+                .Setup(x => x.GetSingleAsync(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>()
                 ))
-                .ReturnsAsync(new ServiceApiTemplateResource
+                .ReturnsAsync(new ApiTemplateResource
                 {
                     Name = ServiceApiName1,
                     Type = TemplateType,

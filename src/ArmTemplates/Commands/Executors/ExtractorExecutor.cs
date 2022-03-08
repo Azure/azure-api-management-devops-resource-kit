@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly ILoggerExtractor loggerExtractor;
         readonly IMasterTemplateExtractor masterTemplateExtractor;
         readonly IPolicyExtractor policyExtractor;
-        readonly IServiceApisProductsExtractor serviceApisProductsExtractor;
+        readonly IProductApisExtractor productApisExtractor;
         readonly IProductExtractor productExtractor;
         readonly IPropertyExtractor propertyExtractor;
         readonly ITagApiExtractor apiTagExtractor;
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ILoggerExtractor loggerExtractor,
             IMasterTemplateExtractor masterTemplateExtractor,
             IPolicyExtractor policyExtractor,
-            IServiceApisProductsExtractor productApisExtractor,
+            IProductApisExtractor productApisExtractor,
             IProductExtractor productExtractor,
             IPropertyExtractor propertyExtractor,
             ITagApiExtractor apiTagExtractor,
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.loggerExtractor = loggerExtractor;
             this.masterTemplateExtractor = masterTemplateExtractor;
             this.policyExtractor = policyExtractor;
-            this.serviceApisProductsExtractor = productApisExtractor;
+            this.productApisExtractor = productApisExtractor;
             this.propertyExtractor = propertyExtractor;
             this.productExtractor = productExtractor;
             this.apiTagExtractor = apiTagExtractor;
@@ -143,7 +143,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
         public async Task<Template> GenerateProductApisTemplateAsync(string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory)
         {
-            var productApiTemplate = await this.serviceApisProductsExtractor.GenerateServiceApisProductsARMTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
+            var productApiTemplate = await this.productApisExtractor.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
 
             if (productApiTemplate?.HasResources == true)
             {

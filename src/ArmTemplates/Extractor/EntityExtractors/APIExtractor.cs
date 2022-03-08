@@ -753,7 +753,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     Console.WriteLine("'{0}' Product association found", apiProductName);
 
                     // convert returned api product associations to template resource class
-                    ServiceApisProductTemplateResource productAPIResource = JsonConvert.DeserializeObject<ServiceApisProductTemplateResource>(item.ToString());
+                    ProductApisTemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductApisTemplateResource>(item.ToString());
                     productAPIResource.Type = ResourceTypeConstants.ProductAPI;
                     productAPIResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiProductName}/{apiName}')]";
                     productAPIResource.ApiVersion = GlobalConstants.ApiVersion;

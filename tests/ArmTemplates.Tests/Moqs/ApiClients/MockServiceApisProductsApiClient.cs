@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
@@ -15,23 +16,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
     {
         public const string TemplateType = "Microsoft.ApiManagement/service/products/apis";
        
-        public static IServiceApiProductsApiClient GetMockedApiClientWithDefaultValues()
+        public static IProductsClient GetMockedApiClientWithDefaultValues()
         {
-            var mockServiceApiProductsApiClient = new Mock<IServiceApiProductsApiClient>(MockBehavior.Strict);
+            var mockServiceApiProductsApiClient = new Mock<IProductsClient>(MockBehavior.Strict);
 
             mockServiceApiProductsApiClient
-                .Setup(x => x.GetServiceApiProductsAsync(
-                    It.IsAny<string>(), 
-                    It.IsAny<string>(),
-                    It.IsAny<string>()
-                ))
-                .ReturnsAsync((string apimInstanceName, string resourceGroup, string serviceApiName) => new List<ServiceApisProductTemplateResource>
+                .Setup(x => x.GetAllLinkedToApiAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
+                .ReturnsAsync((ExtractorParameters extractorParameters, string serviceApiName) => new List<ProductApisTemplateResource>
                 {
-                    new ServiceApisProductTemplateResource
+                    new ProductApisTemplateResource
                     {
                         Name = serviceApiName,
                         Type = TemplateType,
-                        Properties = new ServiceApiProductProperties
+                        Properties = new ProductApisProperties
                         {
                             DisplayName = serviceApiName,
                             Description = serviceApiName
