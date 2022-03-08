@@ -3,7 +3,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using System;
 using Xunit;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Configuration
 {
     [Trait("Category", "Unit")]
     public class ExtractorConfigurationValidationTests

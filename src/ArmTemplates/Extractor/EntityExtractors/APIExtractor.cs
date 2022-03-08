@@ -8,6 +8,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
@@ -752,7 +753,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     Console.WriteLine("'{0}' Product association found", apiProductName);
 
                     // convert returned api product associations to template resource class
-                    ProductAPITemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductAPITemplateResource>(item.ToString());
+                    ProductApiTemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductApiTemplateResource>(item.ToString());
                     productAPIResource.Type = ResourceTypeConstants.ProductAPI;
                     productAPIResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiProductName}/{apiName}')]";
                     productAPIResource.ApiVersion = GlobalConstants.ApiVersion;

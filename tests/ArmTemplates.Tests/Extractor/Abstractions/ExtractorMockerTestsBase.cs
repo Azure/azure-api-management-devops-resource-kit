@@ -6,9 +6,6 @@
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions
 {

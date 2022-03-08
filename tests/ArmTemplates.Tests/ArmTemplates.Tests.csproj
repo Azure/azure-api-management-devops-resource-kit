@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CmdLine\**" />
+    <EmbeddedResource Remove="CmdLine\**" />
+    <None Remove="CmdLine\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.5.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
@@ -36,9 +42,6 @@
     <None Update="Resources\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CmdLine\" />
   </ItemGroup>
   <!-- END copy configurations for tests -->
 
