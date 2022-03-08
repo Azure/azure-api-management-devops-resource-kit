@@ -1,7 +1,7 @@
 jobs:
 - job: Build
   pool:
-    vmImage: windows-latest
+    vmImage: Azure-Pipelines-windows-2022-Secure
   
   steps:
   - template: common/build-and-test.yml
