@@ -8,8 +8,10 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Application
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Apis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         /// Registeres services for ARMTemplate in dependency injection container. Allows to use your own logger
         /// </summary>
         /// <param name="logger">end-user logger interface to log application traces to</param>
-        public static void AddArmTemplatesServices(this IServiceCollection services, Serilog.ILogger logger)
+        public static void AddArmTemplatesServices(this IServiceCollection services, ILogger logger)
         {
             services.AddLogging(builder =>
             {
@@ -68,7 +70,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         static void SetupApiClients(IServiceCollection services)
         {
             services.AddScoped<IApisClient, ApisClient>();
-            services.AddScoped<IPolicyApiClient, PolicyApiClient>();
+            services.AddScoped<IGroupsClient, GroupsClient>();
+            services.AddScoped<ITagClient, TagClient>();
+            services.AddScoped<IPolicyClient, PolicyClient>();
             services.AddScoped<IProductsClient, ProductsClient>();
         }
     }

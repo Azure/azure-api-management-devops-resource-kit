@@ -4,7 +4,7 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Service
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis
 {
     public class ApiProperties
     {

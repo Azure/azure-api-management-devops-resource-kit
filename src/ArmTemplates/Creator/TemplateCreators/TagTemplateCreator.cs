@@ -2,7 +2,7 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
@@ -36,9 +36,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     }
                 }
             }
-            foreach (TagTemplateProperties tag in creatorConfig.tags)
+            foreach (TagProperties tag in creatorConfig.tags)
             {
-                tagHashset.Add(tag.displayName);
+                tagHashset.Add(tag.DisplayName);
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -50,9 +50,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag}')]",
                     Type = ResourceTypeConstants.Tag,
                     ApiVersion = GlobalConstants.ApiVersion,
-                    Properties = new TagTemplateProperties()
+                    Properties = new TagProperties()
                     {
-                        displayName = tag
+                        DisplayName = tag
                     },
                     DependsOn = new string[] { }
                 };

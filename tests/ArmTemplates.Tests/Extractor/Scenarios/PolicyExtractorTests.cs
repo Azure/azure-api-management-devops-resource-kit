@@ -48,8 +48,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 includeAllRevisions: false);
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            var mockedPolicyApiClient = MockPolicyApiClient.GetMockedApiClientWithDefaultValues();
-            var policyExtractor = new PolicyExtractor(mockedPolicyApiClient);
+            var mockedPolicyApiClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
+            var policyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyApiClient);
 
             var extractorExecutor = new ExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
@@ -74,9 +74,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var policyResource = policyTemplate.Resources.First() as PolicyTemplateResource;
             policyResource.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             policyResource.Name.Should().NotBeNullOrEmpty();
-            policyResource.Type.Should().Be(MockPolicyApiClient.TemplateType);
+            policyResource.Type.Should().Be(ResourceTypeConstants.GlobalServicePolicy);
             policyResource.Properties.Format.Should().NotBeNullOrEmpty();
-            policyResource.Properties.Value.Should().NotBeNullOrEmpty();
+            policyResource.Properties.PolicyContent.Should().NotBeNullOrEmpty();
         }
     }
 }

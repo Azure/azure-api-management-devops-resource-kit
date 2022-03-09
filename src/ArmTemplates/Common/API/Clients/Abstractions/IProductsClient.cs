@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions
@@ -14,5 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public interface IProductsClient
     {
         Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(ExtractorParameters extractorParameters, string apiName);
+
+        Task<List<ProductsTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
     }
 }

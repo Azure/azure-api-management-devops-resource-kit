@@ -17,14 +17,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>(), apis = new List<APIConfig>() };
             ProductConfig product = new ProductConfig()
             {
-                name = "productName",
-                displayName = "display name",
-                description = "description",
-                terms = "terms",
-                subscriptionRequired = true,
-                approvalRequired = true,
-                subscriptionsLimit = 1,
-                state = "state"
+                Name = "productName",
+                DisplayName = "display name",
+                Description = "description",
+                Terms = "terms",
+                SubscriptionRequired = true,
+                ApprovalRequired = true,
+                SubscriptionsLimit = 1,
+                State = "state"
             };
             creatorConfig.products.Add(product);
             APIConfig api = new APIConfig()
@@ -64,7 +64,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             ProductApiTemplateResource productAPITemplateResource = (ProductApiTemplateResource)productAPITemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.name}/{api.name}')]", productAPITemplateResource.Name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.Name}/{api.name}')]", productAPITemplateResource.Name);
         }
 
         [Fact]

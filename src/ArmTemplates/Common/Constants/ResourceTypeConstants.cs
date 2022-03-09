@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
 {
-    static class ResourceTypeConstants
+    public static class ResourceTypeConstants
     {
         public const string API = "Microsoft.ApiManagement/service/apis";
         public const string APIVersionSet = "Microsoft.ApiManagement/service/apiVersionSets";
@@ -17,7 +17,7 @@
         public const string Backend = "Microsoft.ApiManagement/service/backends";
         public const string GlobalServicePolicy = "Microsoft.ApiManagement/service/policies";
         public const string Logger = "Microsoft.ApiManagement/service/loggers";
-        public const string ProductAPI = "Microsoft.ApiManagement/service/products/apis";
+        public const string ProductApi = "Microsoft.ApiManagement/service/products/apis";
         public const string Product = "Microsoft.ApiManagement/service/products";
         public const string ProductGroup = "Microsoft.ApiManagement/service/products/groups";
         public const string ProductTag = "Microsoft.ApiManagement/service/products/tags";

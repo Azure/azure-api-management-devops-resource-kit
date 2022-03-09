@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         {
             // TODO: throw error if scope is not null
 
-            var scope = $"/products/{product.name}";
+            var scope = $"/products/{product.Name}";
 
             var resources = new List<SubscriptionsTemplateResource>(product.subscriptions.Count);
 

@@ -47,8 +47,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
                 includeAllRevisions: false);
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            var mockedPolicyApiClient = MockPolicyApiClient.GetMockedApiClientWithDefaultValues();
-            var policyExtractor = new PolicyExtractor(mockedPolicyApiClient);
+            var mockedPolicyApiClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
+            var policyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyApiClient);
 
             var extractorExecutor = new ExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),

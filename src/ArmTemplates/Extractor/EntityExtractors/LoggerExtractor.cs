@@ -40,7 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty();
 
             if (extractorParameters.ParameterizeLogResourceId)
             {
@@ -84,7 +84,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     bool isReferencedInDiagnostic = false;
                     foreach (PolicyTemplateResource policyTemplateResource in policyResources)
                     {
-                        if (policyTemplateResource.Properties.Value.Contains(loggerName))
+                        if (policyTemplateResource.Properties.PolicyContent.Contains(loggerName))
                         {
                             isReferencedInPolicy = true;
                         }

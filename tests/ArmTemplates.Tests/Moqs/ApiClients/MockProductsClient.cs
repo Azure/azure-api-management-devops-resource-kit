@@ -6,28 +6,30 @@
 
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
 {
-    public class MockServiceApisProductsApiClient
+    public class MockProductsClient
     {
-        public const string TemplateType = "Microsoft.ApiManagement/service/products/apis";
-       
+        public const string ProductName1 = "product-1";
+
         public static IProductsClient GetMockedApiClientWithDefaultValues()
         {
-            var mockServiceApiProductsApiClient = new Mock<IProductsClient>(MockBehavior.Strict);
+            var mockClient = new Mock<IProductsClient>(MockBehavior.Strict);
 
-            mockServiceApiProductsApiClient
+            mockClient
                 .Setup(x => x.GetAllLinkedToApiAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
                 .ReturnsAsync((ExtractorParameters extractorParameters, string serviceApiName) => new List<ProductApiTemplateResource>
                 {
                     new ProductApiTemplateResource
                     {
                         Name = serviceApiName,
-                        Type = TemplateType,
+                        Type = ResourceTypeConstants.ProductApi,
                         Properties = new ProductApiProperties
                         {
                             DisplayName = serviceApiName,
@@ -36,7 +38,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     }
                 });
 
-            return mockServiceApiProductsApiClient.Object;
+            mockClient
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<ProductsTemplateResource>
+                {
+                    new ProductsTemplateResource
+                    {
+                        Name = ProductName1,
+                        Type = ResourceTypeConstants.Product,
+                        Properties = new ProductsProperties
+                        {
+                            DisplayName = $"{ProductName1}-display",
+                            Description = $"{ProductName1}-description"
+                        }
+                    }
+                });
+
+            return mockClient.Object;
         }
     }
 }

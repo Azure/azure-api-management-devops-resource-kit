@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public async Task<Template> GenerateProductApisTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty();
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             if (!string.IsNullOrEmpty(singleApiName))
@@ -61,10 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             try
             {
-                var serviceApi = await this.apisClient.GetSingleAsync(
-                    extractorParameters.SourceApimName,
-                    extractorParameters.ResourceGroup,
-                    singleApiName);
+                var serviceApi = await this.apisClient.GetSingleAsync(extractorParameters, singleApiName);
 
                 if (serviceApi is null)
                 {
@@ -117,7 +114,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     this.logger.LogInformation("'{0}' Product association found", productApi.Name);
 
                     // convert returned api product associations to template resource class
-                    productApi.Type = ResourceTypeConstants.ProductAPI;
+                    productApi.Type = ResourceTypeConstants.ProductApi;
                     productApi.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productApi.Name}/{apiName}')]";
                     productApi.ApiVersion = GlobalConstants.ApiVersion;
                     productApi.Scale = null;

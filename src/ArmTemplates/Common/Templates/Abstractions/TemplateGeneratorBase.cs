@@ -1,63 +1,19 @@
-﻿using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions
 {
     public abstract class TemplateGeneratorBase
     {
-        protected Template GenerateEmptyPropertyTemplateWithParameters()
-        {
-            var armTemplate = this.GenerateEmptyTemplate();
-            armTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
-            {
-                {
-                    ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" }
-                }
-            };
+        protected Template GenerateTemplateWithApimServiceNameProperty() => TemplateBuilder.GenerateTemplateWithApimServiceNameProperty();
 
-            return armTemplate;
-        }
+        protected Template GenerateTemplateWithPresetProperties(ExtractorParameters extractorParameters) 
+            => TemplateBuilder.GenerateTemplateWithApimServiceNameProperty()
+                              .AddPolicyProperties(extractorParameters)
+                              .AddParameterizeServiceUrlProperty(extractorParameters)
+                              .AddParameterizeApiLoggerIdProperty(extractorParameters);
 
-        protected Template GenerateEmptyApiTemplateWithParameters(ExtractorParameters extractorParameters)
-        {
-            Template armTemplate = this.GenerateEmptyTemplate();
-            armTemplate.Parameters = new Dictionary<string, TemplateParameterProperties> { { ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" } } };
-            if (extractorParameters.PolicyXMLBaseUrl != null && extractorParameters.PolicyXMLSasToken != null)
-            {
-                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.Parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
-            }
-            if (extractorParameters.PolicyXMLBaseUrl != null)
-            {
-                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "string"
-                };
-                armTemplate.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
-            }
-            if (extractorParameters.ParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
-            {
-                TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.Parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
-            }
-            if (extractorParameters.ParameterizeApiLoggerId)
-            {
-                TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.Parameters.Add(ParameterNames.ApiLoggerId, apiLoggerProperty);
-            }
-            return armTemplate;
-        }
-
+        // TODO use TemplateBuilder for preset templates generation
+        // noted at https://github.com/Azure/azure-api-management-devops-resource-kit/issues/617
         protected Template GenerateEmptyTemplate()
         {
             // creates empty template for use in all other template creators
@@ -73,6 +29,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return template;
         }
 
+        // TODO use TemplateBuilder for preset templates generation
+        // noted at https://github.com/Azure/azure-api-management-devops-resource-kit/issues/617
         protected Template GenerateTemplateWithEmptyParameters()
         {
             // creates empty parameters file for use in all other template creators
