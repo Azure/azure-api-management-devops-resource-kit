@@ -11,11 +11,19 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class BackendExtractor : EntityExtractorBase, IBackendExtractor
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public BackendExtractor(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public async Task<string> GetBackendsAsync(string apiManagementName, string resourceGroupName, int skipNumOfRecords)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
@@ -52,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting backends from service");
-            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
 
             if (extractorParameters.ParameterizeBackend)
             {

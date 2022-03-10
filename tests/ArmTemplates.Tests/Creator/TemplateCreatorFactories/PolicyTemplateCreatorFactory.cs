@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorFactories
@@ -8,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public static PolicyTemplateCreator GeneratePolicyTemplateCreator()
         {
             FileReader fileReader = new FileReader();
-            PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
+            PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader, new TemplateBuilder());
             return policyTemplateCreator;
         }
     }

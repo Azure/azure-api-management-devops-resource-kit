@@ -2,6 +2,7 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
@@ -9,8 +10,9 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductTemplateCreator : TemplateGeneratorBase
+    public class ProductTemplateCreator
     {
+        readonly ITemplateBuilder templateBuilder;
         PolicyTemplateCreator policyTemplateCreator;
         ProductGroupTemplateCreator productGroupTemplateCreator;
         SubscriptionTemplateCreator subscriptionTemplateCreator;
@@ -18,18 +20,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public ProductTemplateCreator(
             PolicyTemplateCreator policyTemplateCreator,
             ProductGroupTemplateCreator productGroupTemplateCreator,
-            SubscriptionTemplateCreator subscriptionTemplateCreator
-            )
+            SubscriptionTemplateCreator subscriptionTemplateCreator,
+            ITemplateBuilder templateBuilder)
         {
             this.policyTemplateCreator = policyTemplateCreator;
             this.productGroupTemplateCreator = productGroupTemplateCreator;
             this.subscriptionTemplateCreator = subscriptionTemplateCreator;
+            this.templateBuilder = templateBuilder;
         }
 
         public Template CreateProductTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template productTemplate = this.GenerateEmptyTemplate();
+            Template productTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters
             productTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

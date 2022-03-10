@@ -12,10 +12,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using System.IO;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class PolicyExtractor : TemplateGeneratorBase, IPolicyExtractor
+    public class PolicyExtractor : IPolicyExtractor
     {
         public const string PoliciesDirectoryName = "policies";
         public const string GlobalServicePolicyFileName = "globalServicePolicy.xml";
@@ -24,13 +26,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         readonly ILogger<PolicyExtractor> logger;
         readonly IPolicyClient policyClient;
+        readonly ITemplateBuilder templateBuilder;
 
         public PolicyExtractor(
             ILogger<PolicyExtractor> logger,
-            IPolicyClient policyApiClient)
+            IPolicyClient policyApiClient,
+            ITemplateBuilder templateBuilder)
         {
             this.logger = logger;
             this.policyClient = policyApiClient;
+            this.templateBuilder = templateBuilder;
         }
 
         public async Task<PolicyTemplateResource> GenerateProductPolicyTemplateAsync(
@@ -69,8 +74,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(ExtractorParameters extractorParameters, string baseFilesDirectory)
         {
             // extract global service policy in both full and single api extraction cases
-            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty()
-                                       .AddPolicyProperties(extractorParameters);
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty()
+                                                       .AddPolicyProperties(extractorParameters);
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

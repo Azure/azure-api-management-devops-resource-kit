@@ -7,6 +7,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
@@ -274,7 +275,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIRevisionTemplateAsync(ExtractorParameters extractorParameters, string currentRevision, List<string> revList, string baseFilesGenerationDirectory)
         {
             // generate apiTemplate
-            Template armTemplate = this.GenerateTemplateWithPresetProperties(extractorParameters);
+            var templateBuilder = new TemplateBuilder();
+            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
@@ -360,7 +362,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIsARMTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory)
         {
             // initialize arm template
-            Template armTemplate = this.GenerateTemplateWithPresetProperties(extractorParameters);
+            var templateBuilder = new TemplateBuilder();
+            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters);
             List<TemplateResource> templateResources = new List<TemplateResource>();
             
             // when extract single API

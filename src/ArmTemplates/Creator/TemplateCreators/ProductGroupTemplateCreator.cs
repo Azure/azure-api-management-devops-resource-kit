@@ -6,7 +6,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductGroupTemplateCreator : TemplateGeneratorBase
+    public class ProductGroupTemplateCreator
     {
         public GroupTemplateResource CreateProductGroupTemplateResource(string groupName, string productName, string[] dependsOn)
         {

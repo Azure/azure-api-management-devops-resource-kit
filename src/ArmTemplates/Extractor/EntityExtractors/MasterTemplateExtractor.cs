@@ -11,11 +11,19 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class MasterTemplateExtractor : ApiExtractor, IMasterTemplateExtractor
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public MasterTemplateExtractor(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public Template GenerateLinkedMasterTemplate(Template apiTemplate,
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
@@ -34,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Generating master template");
             // create empty template
-            Template masterTemplate = this.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(true, extractorParameters);
@@ -410,7 +418,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public Template CreateSingleAPIRevisionsMasterTemplate(List<string> revList, string currentRev, ExtractorParameters extractorParameters, FileNames fileNames)
         {
             // create empty template
-            Template masterTemplate = this.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(true, extractorParameters);
@@ -455,7 +463,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = this.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
@@ -526,7 +534,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (extractorParameters.ParameterizeNamedValue)
             {
                 Dictionary<string, string> namedValues = new Dictionary<string, string>();
-                PropertyExtractor pExc = new PropertyExtractor();
+                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder);
                 string[] properties = await pExc.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
 
                 foreach (var extractedProperty in properties)
@@ -558,7 +566,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
             {
                 Dictionary<string, string> keyVaultNamedValues = new Dictionary<string, string>();
-                PropertyExtractor pExc = new PropertyExtractor();
+                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder);
                 string[] properties = await pExc.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
 
                 foreach (var extractedProperty in properties)

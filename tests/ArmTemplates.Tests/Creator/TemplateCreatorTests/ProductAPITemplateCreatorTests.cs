@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
@@ -13,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateProductAPIFromCreatorConfig()
         {
             // arrange
-            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
+            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>(), apis = new List<APIConfig>() };
             ProductConfig product = new ProductConfig()
             {
@@ -72,7 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
 
             // arrange
-            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
+            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(new TemplateBuilder());
             string productId = "productId";
             string apiName = "apiName";
             string[] dependsOn = new string[] { "dependsOn" };
@@ -89,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateCorrectNumberOfProductAPITemplateResourcesFromCreatorConfig()
         {
             // arrange
-            var productAPITemplateCreator = new ProductAPITemplateCreator();
+            var productAPITemplateCreator = new ProductAPITemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig();
             var api = new APIConfig()
             {

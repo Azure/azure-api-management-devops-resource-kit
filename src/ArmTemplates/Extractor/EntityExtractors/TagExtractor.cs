@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -18,20 +19,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         readonly ILogger<TagExtractor> logger;
         readonly ITagClient tagClient;
+        readonly ITemplateBuilder templateBuilder;
 
         public TagExtractor(
             ILogger<TagExtractor> logger,
-            ITagClient tagClient)
+            ITagClient tagClient,
+            ITemplateBuilder templateBuilder)
         {
             this.logger = logger;
             this.tagClient = tagClient;
+            this.templateBuilder = templateBuilder;
         }
 
         public async Task<Template> GenerateTagsTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting tags from service");
-            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
 
             // isolate tag and api operation associations in the case of a single api extraction
             var apiOperationTagResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.APIOperationTag);

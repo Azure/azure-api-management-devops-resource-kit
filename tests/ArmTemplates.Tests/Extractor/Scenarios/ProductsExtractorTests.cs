@@ -12,6 +12,7 @@ using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
@@ -51,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
-            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient);
+            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
 
             var mockedApisClient = MockApisClient.GetMockedApiClientWithDefaultValues();
             var mockedProductsClient = MockProductsClient.GetMockedApiClientWithDefaultValues();
@@ -63,7 +64,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 mockedPolicyExtractor,
                 mockedProductsClient,
                 mockedGroupsClient,
-                mockedTagClient);
+                mockedTagClient,
+                new TemplateBuilder());
 
             var extractorExecutor = new ExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -15,6 +16,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public class TagApiExtractor : ApiExtractor, ITagApiExtractor
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public TagApiExtractor(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public async Task<List<TemplateResource>> GenerateSingleAPITagResourceAsync(string apiName, ExtractorParameters extractorParameters, string[] dependsOn)
         {
             List<TemplateResource> templateResources = new List<TemplateResource>();
@@ -98,7 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPITagsARMTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
             // initialize arm template
-            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             // when extract single API
             if (singleApiName != null)

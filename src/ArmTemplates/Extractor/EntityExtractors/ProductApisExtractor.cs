@@ -7,33 +7,37 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class ProductApisExtractor : TemplateGeneratorBase, IProductApisExtractor
+    public class ProductApisExtractor : IProductApisExtractor
     {
         readonly ILogger<ProductApisExtractor> logger;
         
         readonly IProductsClient productsClient;
         readonly IApisClient apisClient;
+        readonly ITemplateBuilder templateBuilder;
 
         public ProductApisExtractor(
             ILogger<ProductApisExtractor> logger,
             IProductsClient productClient,
-            IApisClient apisClient)
+            IApisClient apisClient,
+            ITemplateBuilder templateBuilder)
         {
             this.logger = logger;
             
             this.productsClient = productClient;
             this.apisClient = apisClient;
+            this.templateBuilder = templateBuilder;
         }
 
         public async Task<Template> GenerateProductApisTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
-            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             if (!string.IsNullOrEmpty(singleApiName))

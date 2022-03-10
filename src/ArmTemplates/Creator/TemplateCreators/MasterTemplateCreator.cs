@@ -6,11 +6,19 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class MasterTemplateCreator : TemplateGeneratorBase
+    public class MasterTemplateCreator
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public MasterTemplateCreator(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public Template CreateLinkedMasterTemplate(CreatorConfig creatorConfig,
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
@@ -26,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             string apimServiceName)
         {
             // create empty template
-            Template masterTemplate = this.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(creatorConfig);
@@ -338,7 +346,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = this.GenerateTemplateWithEmptyParameters();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();

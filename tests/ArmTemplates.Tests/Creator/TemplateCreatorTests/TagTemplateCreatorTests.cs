@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -11,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         [Fact]
         public void ShouldCreateTagFromCreatorConfig()
         {
-            TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
+            TagTemplateCreator tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig() { tags = new List<TagProperties>() };
             TagProperties tag = new TagProperties()
             {

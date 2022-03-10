@@ -9,12 +9,14 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class ProductExtractor : TemplateGeneratorBase, IProductExtractor
+    public class ProductExtractor : IProductExtractor
     {
         readonly ILogger<ProductExtractor> logger;
+        readonly ITemplateBuilder templateBuilder;
 
         readonly IGroupsClient groupsClient;
         readonly IProductsClient productsClient;
@@ -27,15 +29,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             IPolicyExtractor policyExtractor,
             IProductsClient productsClient,
             IGroupsClient groupsClient,
-            ITagClient tagClient)
+            ITagClient tagClient, 
+            ITemplateBuilder templateBuilder)
         {
             this.logger = logger;
+            this.templateBuilder = templateBuilder;
 
             this.productsClient = productsClient;
             this.groupsClient = groupsClient;
             this.tagClient = tagClient;
 
             this.policyExtractor = policyExtractor;
+            this.templateBuilder = templateBuilder;
         }
 
         public async Task<Template> GenerateProductsARMTemplateAsync(
@@ -44,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string baseFilesGenerationDirectory,
             ExtractorParameters extractorParameters)
         {
-            var armTemplate = this.GenerateTemplateWithPresetProperties(extractorParameters);
+            var armTemplate = this.templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters);
 
             // isolate product api associations in the case of a single api extraction
             var productAPIResources = armTemplateResources?.Where(resource => resource.Type == ResourceTypeConstants.ProductApi);

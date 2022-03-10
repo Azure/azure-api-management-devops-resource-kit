@@ -3,24 +3,29 @@ using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class PolicyTemplateCreator : TemplateGeneratorBase
+    public class PolicyTemplateCreator
     {
+        readonly ITemplateBuilder templateBuilder;
         FileReader fileReader;
 
-        public PolicyTemplateCreator(FileReader fileReader)
+        public PolicyTemplateCreator(
+            FileReader fileReader,
+            ITemplateBuilder templateBuilder)
         {
             this.fileReader = fileReader;
+            this.templateBuilder = templateBuilder;
         }
 
         public Template CreateGlobalServicePolicyTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template policyTemplate = this.GenerateEmptyTemplate();
+            Template policyTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters
             policyTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

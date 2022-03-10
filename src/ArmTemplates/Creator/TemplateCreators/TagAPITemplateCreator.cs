@@ -6,7 +6,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class TagAPITemplateCreator : TemplateGeneratorBase
+    public class TagAPITemplateCreator
     {
         public TagAPITemplateResource CreateTagAPITemplateResource(string tagName, string apiName, string[] dependsOn)
         {

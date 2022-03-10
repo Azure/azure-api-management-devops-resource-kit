@@ -11,11 +11,20 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class LoggerExtractor : EntityExtractorBase, ILoggerExtractor
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public LoggerExtractor(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public async Task<string> GetLoggersAsync(string apiManagementName, string resourceGroupName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
@@ -40,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting loggers from service");
-            Template armTemplate = this.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
 
             if (extractorParameters.ParameterizeLogResourceId)
             {

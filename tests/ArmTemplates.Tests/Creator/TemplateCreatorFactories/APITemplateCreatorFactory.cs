@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorFactories
@@ -8,12 +9,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public static APITemplateCreator GenerateAPITemplateCreator()
         {
             FileReader fileReader = new FileReader();
-            PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
-            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
+            PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader, new TemplateBuilder());
+            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(new TemplateBuilder());
             DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
             ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
             TagAPITemplateCreator tagAPITemplateCreator = new TagAPITemplateCreator();
-            APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
+            APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator, new TemplateBuilder());
             return apiTemplateCreator;
         }
     }

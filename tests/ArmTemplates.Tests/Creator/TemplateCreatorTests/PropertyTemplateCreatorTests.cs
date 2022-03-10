@@ -1,8 +1,9 @@
-using Xunit;
+﻿using Xunit;
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -12,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreatePropertyFromCreatorConfig()
         {
             // arrange
-            var propertyTemplateCreator = new PropertyTemplateCreator();
+            var propertyTemplateCreator = new PropertyTemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig() { namedValues = new List<PropertyConfig>() };
             PropertyConfig property = new PropertyConfig()
             {

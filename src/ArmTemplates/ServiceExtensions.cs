@@ -12,6 +12,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.G
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             SetupCommands(services);
             SetupExecutors(services);
             SetupApiClients(services);
-
+            SetupBuilders(services);
             SetupExtractors(services);
         }
 
@@ -43,6 +45,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             services.AddScoped(typeof(CreateApplicationCommand));
             services.AddScoped(typeof(ExtractApplicationCommand));
+        }
+
+        static void SetupBuilders(IServiceCollection services)
+        {
+            services.AddSingleton<ITemplateBuilder, TemplateBuilder>();
         }
 
         static void SetupExecutors(IServiceCollection services)

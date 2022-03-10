@@ -1,17 +1,26 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductAPITemplateCreator : TemplateGeneratorBase
+    public class ProductAPITemplateCreator
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public ProductAPITemplateCreator(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template productTemplate = this.GenerateEmptyTemplate();
+            Template productTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters
             productTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

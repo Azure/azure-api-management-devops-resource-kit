@@ -2,16 +2,24 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class AuthorizationServerTemplateCreator : TemplateGeneratorBase
+    public class AuthorizationServerTemplateCreator
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public AuthorizationServerTemplateCreator(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public Template CreateAuthorizationServerTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template authorizationTemplate = this.GenerateEmptyTemplate();
+            Template authorizationTemplate = this.templateBuilder.GenerateEmptyTemplate();
 
             // add parameters
             authorizationTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

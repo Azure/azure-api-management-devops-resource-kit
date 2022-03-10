@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -56,7 +57,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var productApisExtractor = new ProductApisExtractor(
                 this.GetTestLogger<ProductApisExtractor>(), 
                 mockedServiceApisProductsApiClient,
-                mockedServiceApisApiClient);
+                mockedServiceApisApiClient,
+                new TemplateBuilder());
 
             var extractorExecutor = new ExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
