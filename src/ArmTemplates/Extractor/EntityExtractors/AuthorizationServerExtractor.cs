@@ -8,11 +8,19 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class AuthorizationServerExtractor : EntityExtractorBase, IAuthorizationServerExtractor
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public AuthorizationServerExtractor(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public async Task<string> GetAuthorizationServersAsync(string apiManagementName, string resourceGroupName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
@@ -37,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting authorization servers from service");
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

@@ -4,6 +4,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -13,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateLoggerTemplateFromCreatorConfig()
         {
             // arrange
-            LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator();
+            LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig() { loggers = new List<LoggerConfig>() };
             LoggerConfig logger = new LoggerConfig()
             {

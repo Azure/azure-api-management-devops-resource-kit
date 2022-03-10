@@ -1,8 +1,9 @@
-using Xunit;
+﻿using Xunit;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -11,11 +12,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         [Fact]
         public void ShouldCreateTagFromCreatorConfig()
         {
-            TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { tags = new List<TagTemplateProperties>() };
-            TagTemplateProperties tag = new TagTemplateProperties()
+            TagTemplateCreator tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
+            CreatorConfig creatorConfig = new CreatorConfig() { tags = new List<TagProperties>() };
+            TagProperties tag = new TagProperties()
             {
-                displayName = "displayName"
+                DisplayName = "displayName"
             };
             creatorConfig.tags.Add(tag);
 
@@ -24,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var tagTemplateResource = (TagTemplateResource)tagTemplate.Resources[0];
 
             //assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{tag.displayName}')]", tagTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{tag.DisplayName}')]", tagTemplateResource.Name);
         }
     }
 }

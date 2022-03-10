@@ -1,4 +1,4 @@
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using System.Collections.Generic;
 using Xunit;
@@ -56,14 +56,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
             ProductConfig product = new ProductConfig()
             {
-                name = "productName",
-                displayName = "displayName",
-                description = "description",
-                terms = "terms",
-                subscriptionRequired = true,
-                approvalRequired = true,
-                subscriptionsLimit = 1,
-                state = "state",
+                Name = "productName",
+                DisplayName = "displayName",
+                Description = "description",
+                Terms = "terms",
+                SubscriptionRequired = true,
+                ApprovalRequired = true,
+                SubscriptionsLimit = 1,
+                State = "state",
             };
 
             SubscriptionConfig subscription = new SubscriptionConfig()
@@ -82,7 +82,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             creatorConfig.products.Add(product);
 
-            var dependsOn = new[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{product.name}')]" };
+            var dependsOn = new[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{product.Name}')]" };
 
             // act
             var subscriptionsTemplateResources = subscriptionTemplateCreator.CreateSubscriptionsTemplateResources(product, dependsOn);
@@ -91,7 +91,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             var subscriptionsTemplateResource = subscriptionsTemplateResources[0];
 
-            Assert.Equal($"/products/{product.name}", subscriptionsTemplateResource.Properties.scope);
+            Assert.Equal($"/products/{product.Name}", subscriptionsTemplateResource.Properties.scope);
             Assert.Equal(subscription.displayName, subscriptionsTemplateResource.Properties.displayName);
             Assert.Equal(subscription.primaryKey, subscriptionsTemplateResource.Properties.primaryKey);
             Assert.Equal(subscription.secondaryKey, subscriptionsTemplateResource.Properties.secondaryKey);

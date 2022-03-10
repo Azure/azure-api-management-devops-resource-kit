@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public static string GetPolicyContent(ExtractorParameters extractorParameters, PolicyTemplateResource policyTemplateResource)
         {
             // the backend is used in a policy if the xml contains a set-backend-service policy, which will reference the backend's url or id
-            string policyContent = policyTemplateResource.Properties.Value;
+            string policyContent = policyTemplateResource.Properties.PolicyContent;
 
             // check if this is a file or is it the raw policy content
             if (policyContent.Contains(".xml"))

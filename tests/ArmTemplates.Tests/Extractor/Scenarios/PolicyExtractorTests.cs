@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -48,8 +49,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 includeAllRevisions: false);
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            var mockedPolicyApiClient = MockPolicyApiClient.GetMockedApiClientWithDefaultValues();
-            var policyExtractor = new PolicyExtractor(mockedPolicyApiClient);
+            var mockedPolicyApiClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
+            var policyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyApiClient, new TemplateBuilder());
 
             var extractorExecutor = new ExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
@@ -74,9 +75,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var policyResource = policyTemplate.Resources.First() as PolicyTemplateResource;
             policyResource.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             policyResource.Name.Should().NotBeNullOrEmpty();
-            policyResource.Type.Should().Be(MockPolicyApiClient.TemplateType);
+            policyResource.Type.Should().Be(ResourceTypeConstants.GlobalServicePolicy);
             policyResource.Properties.Format.Should().NotBeNullOrEmpty();
-            policyResource.Properties.Value.Should().NotBeNullOrEmpty();
+            policyResource.Properties.PolicyContent.Should().NotBeNullOrEmpty();
         }
     }
 }

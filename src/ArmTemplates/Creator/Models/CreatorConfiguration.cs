@@ -2,6 +2,8 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
@@ -34,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
         public List<LoggerConfig> loggers { get; set; }
         public List<AuthorizationServerTemplateProperties> authorizationServers { get; set; }
         public List<BackendTemplateProperties> backends { get; set; }
-        public List<TagTemplateProperties> tags { get; set; }
+        public List<TagProperties> tags { get; set; }
         public List<SubscriptionConfig> subscriptions { get; set; }
         public string outputLocation { get; set; }
         public bool linked { get; set; }
@@ -116,7 +118,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
         public string name { get; set; }
     }
 
-    public class ProductConfig : ProductsTemplateProperties
+    public class ProductConfig : ProductsProperties
     {
         // policy file location (local or url)
         public string policy { get; set; }

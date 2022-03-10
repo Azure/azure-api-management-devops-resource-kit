@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using System.Collections.Generic;
 
@@ -74,9 +75,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             bool isValid = true;
             if (this.creatorConfig.products != null)
             {
-                foreach (ProductsTemplateProperties product in this.creatorConfig.products)
+                foreach (ProductsProperties product in this.creatorConfig.products)
                 {
-                    if (product.displayName == null)
+                    if (product.DisplayName == null)
                     {
                         isValid = false;
                         throw new CreatorConfigurationIsInvalidException("Display name is required if an Product is provided");

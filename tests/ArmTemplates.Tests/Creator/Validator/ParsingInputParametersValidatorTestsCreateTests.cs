@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using System;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Validator
 {
@@ -25,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration());
@@ -39,7 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -56,7 +57,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -73,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -90,7 +91,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -107,7 +108,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -124,7 +125,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -141,7 +142,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -158,7 +159,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -175,7 +176,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -192,7 +193,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -209,7 +210,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -226,7 +227,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -243,7 +244,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -260,7 +261,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -277,7 +278,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -294,7 +295,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         {
             // arrange
             var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null);
+            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration

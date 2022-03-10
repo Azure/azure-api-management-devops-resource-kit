@@ -7,27 +7,35 @@ using System.Linq;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class TagExtractor : EntityExtractorBase, ITagExtractor
     {
-        public async Task<string> GetTagsAsync(string apiManagementName, string resourceGroupName, int skipNumOfRecords)
+        readonly ILogger<TagExtractor> logger;
+        readonly ITagClient tagClient;
+        readonly ITemplateBuilder templateBuilder;
+
+        public TagExtractor(
+            ILogger<TagExtractor> logger,
+            ITagClient tagClient,
+            ITemplateBuilder templateBuilder)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/Tags?$skip={4}&api-version={5}",
-               BaseUrl, azSubId, resourceGroupName, apiManagementName, skipNumOfRecords, GlobalConstants.ApiVersion);
-
-            return await this.CallApiManagementAsync(azToken, requestUrl);
+            this.logger = logger;
+            this.tagClient = tagClient;
+            this.templateBuilder = templateBuilder;
         }
 
-        public async Task<Template> GenerateTagsTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources, string policyXMLBaseUrl, string policyXMLSasToken)
+        public async Task<Template> GenerateTagsTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> productTemplateResources)
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting tags from service");
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
 
             // isolate tag and api operation associations in the case of a single api extraction
             var apiOperationTagResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.APIOperationTag);
@@ -36,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var apiTagResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.APITag);
 
             // isolate product api associations in the case of a single api extraction
-            var productAPIResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.ProductAPI);
+            var productAPIResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.ProductApi);
 
             // isolate tag and product associations in the case of a single api extraction
             var productTagResources = productTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.ProductTag);
@@ -49,7 +57,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             do
             {
-                string tags = await this.GetTagsAsync(apimname, resourceGroup, skipNumOfTags);
+                string tags = await this.tagClient.GetAllAsync(extractorParameters, skipNumOfTags);
                 oTags = JObject.Parse(tags);
 
                 foreach (var extractedTag in oTags["value"])

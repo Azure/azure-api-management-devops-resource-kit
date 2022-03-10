@@ -6,11 +6,14 @@
 
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions
 {
-    public interface IPolicyApiClient
+    public interface IPolicyClient
     {
-        Task<PolicyTemplateResource> GetGlobalServicePolicyAsync(string apiManagementName, string resourceGroupName);
+        Task<PolicyTemplateResource> GetGlobalServicePolicyAsync(ExtractorParameters extractorParameters);
+
+        Task<PolicyTemplateResource> GetPolicyLinkedToProductAsync(string productName, ExtractorParameters extractorParameters);
     }
 }

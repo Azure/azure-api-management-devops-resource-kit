@@ -2,16 +2,24 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class TagTemplateCreator : TemplateGeneratorBase
+    public class TagTemplateCreator
     {
+        readonly ITemplateBuilder templateBuilder;
+
+        public TagTemplateCreator(ITemplateBuilder templateBuilder)
+        {
+            this.templateBuilder = templateBuilder;
+        }
+
         public Template CreateTagTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template tagTemplate = this.GenerateEmptyTemplate();
+            Template tagTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             tagTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
@@ -36,9 +44,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     }
                 }
             }
-            foreach (TagTemplateProperties tag in creatorConfig.tags)
+            foreach (TagProperties tag in creatorConfig.tags)
             {
-                tagHashset.Add(tag.displayName);
+                tagHashset.Add(tag.DisplayName);
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -50,9 +58,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag}')]",
                     Type = ResourceTypeConstants.Tag,
                     ApiVersion = GlobalConstants.ApiVersion,
-                    Properties = new TagTemplateProperties()
+                    Properties = new TagProperties()
                     {
-                        displayName = tag
+                        DisplayName = tag
                     },
                     DependsOn = new string[] { }
                 };

@@ -11,11 +11,14 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Pol
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class APITemplateCreator : TemplateGeneratorBase
+    public class APITemplateCreator
     {
+        readonly ITemplateBuilder templateBuilder;
+
         FileReader fileReader;
         PolicyTemplateCreator policyTemplateCreator;
         ProductAPITemplateCreator productAPITemplateCreator;
@@ -23,7 +26,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         DiagnosticTemplateCreator diagnosticTemplateCreator;
         ReleaseTemplateCreator releaseTemplateCreator;
 
-        public APITemplateCreator(FileReader fileReader, PolicyTemplateCreator policyTemplateCreator, ProductAPITemplateCreator productAPITemplateCreator, TagAPITemplateCreator tagAPITemplateCreator, DiagnosticTemplateCreator diagnosticTemplateCreator, ReleaseTemplateCreator releaseTemplateCreator)
+        public APITemplateCreator(
+            FileReader fileReader, 
+            PolicyTemplateCreator policyTemplateCreator, 
+            ProductAPITemplateCreator productAPITemplateCreator, 
+            TagAPITemplateCreator tagAPITemplateCreator, 
+            DiagnosticTemplateCreator diagnosticTemplateCreator, 
+            ReleaseTemplateCreator releaseTemplateCreator,
+            ITemplateBuilder templateBuilder)
         {
             this.fileReader = fileReader;
             this.policyTemplateCreator = policyTemplateCreator;
@@ -31,6 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.tagAPITemplateCreator = tagAPITemplateCreator;
             this.diagnosticTemplateCreator = diagnosticTemplateCreator;
             this.releaseTemplateCreator = releaseTemplateCreator;
+            this.templateBuilder = templateBuilder;
         }
 
         public async Task<List<Template>> CreateAPITemplatesAsync(APIConfig api)
@@ -67,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
-            Template apiTemplate = this.GenerateEmptyTemplate();
+            Template apiTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             apiTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
