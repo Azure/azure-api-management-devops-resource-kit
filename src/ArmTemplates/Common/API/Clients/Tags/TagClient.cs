@@ -27,12 +27,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             this.apisClient = apisClient;
         }
 
-        public async Task<string> GetAllAsync(ExtractorParameters extractorParameters, int skipNumOfRecords = 0)
+        public async Task<string> GetAllAsync(ExtractorParameters extractorParameters, int skipAmountOfRecords = 0)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
             var requestUrl = string.Format(GetAllTagsRequest,
-               this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, skipNumOfRecords, GlobalConstants.ApiVersion);
+               this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, skipAmountOfRecords, GlobalConstants.ApiVersion);
 
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
