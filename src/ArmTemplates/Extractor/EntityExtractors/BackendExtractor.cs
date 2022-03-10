@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting backends from service");
-            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
 
             if (extractorParameters.ParameterizeBackend)
             {

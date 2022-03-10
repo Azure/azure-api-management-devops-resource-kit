@@ -11,10 +11,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public interface ITemplateBuilder
     {
-        Template GenerateTemplateWithApimServiceNameProperty();
+        Template Build();
 
-        Template GenerateTemplateWithPresetProperties(ExtractorParameters extractorParameters);
+        TemplateBuilder GenerateTemplateWithApimServiceNameProperty();
 
-        Template GenerateEmptyTemplate();
+        TemplateBuilder GenerateTemplateWithPresetProperties(ExtractorParameters extractorParameters);
+
+        TemplateBuilder GenerateEmptyTemplate();
+
+        TemplateBuilder AddPolicyProperties(ExtractorParameters extractorParameters);
+
+        TemplateBuilder AddParameterizeServiceUrlProperty(ExtractorParameters extractorParameters);
+
+        TemplateBuilder AddParameterizeApiLoggerIdProperty(ExtractorParameters extractorParameters);
     }
 }

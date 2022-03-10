@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Generating master template");
             // create empty template
-            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(true, extractorParameters);
@@ -418,7 +418,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public Template CreateSingleAPIRevisionsMasterTemplate(List<string> revList, string currentRev, ExtractorParameters extractorParameters, FileNames fileNames)
         {
             // create empty template
-            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(true, extractorParameters);
@@ -463,7 +463,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();

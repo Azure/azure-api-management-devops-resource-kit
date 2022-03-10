@@ -34,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             string apimServiceName)
         {
             // create empty template
-            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(creatorConfig);
@@ -346,7 +346,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         {
             // used to create the parameter values for use in parameters file
             // create empty template
-            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template masterTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters with value property
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();

@@ -49,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string baseFilesGenerationDirectory,
             ExtractorParameters extractorParameters)
         {
-            var armTemplate = this.templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters);
+            var armTemplate = this.templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters).Build();
 
             // isolate product api associations in the case of a single api extraction
             var productAPIResources = armTemplateResources?.Where(resource => resource.Type == ResourceTypeConstants.ProductApi);

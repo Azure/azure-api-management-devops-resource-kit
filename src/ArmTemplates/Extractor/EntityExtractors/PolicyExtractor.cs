@@ -75,7 +75,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             // extract global service policy in both full and single api extraction cases
             Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty()
-                                                       .AddPolicyProperties(extractorParameters);
+                                                       .AddPolicyProperties(extractorParameters)
+                                                       .Build();
 
             List<TemplateResource> templateResources = new List<TemplateResource>();
 

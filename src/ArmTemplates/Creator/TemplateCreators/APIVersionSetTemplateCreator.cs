@@ -19,7 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateAPIVersionSetTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template apiVersionSetTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template apiVersionSetTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             apiVersionSetTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

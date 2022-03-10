@@ -276,7 +276,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             // generate apiTemplate
             var templateBuilder = new TemplateBuilder();
-            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters);
+            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters).Build();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
@@ -363,7 +363,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             // initialize arm template
             var templateBuilder = new TemplateBuilder();
-            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters);
+            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters).Build();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             
             // when extract single API

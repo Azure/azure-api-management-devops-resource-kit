@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template productTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template productTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             productTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

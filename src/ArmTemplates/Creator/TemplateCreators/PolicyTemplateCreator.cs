@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateGlobalServicePolicyTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template policyTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template policyTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             policyTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

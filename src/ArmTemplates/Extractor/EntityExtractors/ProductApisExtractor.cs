@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public async Task<Template> GenerateProductApisTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
-            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             if (!string.IsNullOrEmpty(singleApiName))

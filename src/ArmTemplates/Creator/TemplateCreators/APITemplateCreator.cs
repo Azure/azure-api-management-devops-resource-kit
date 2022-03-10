@@ -78,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
-            Template apiTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template apiTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             apiTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>

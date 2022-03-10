@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Extracting API version sets from service");
-            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
 
             // isolate apis in the case of a single api extraction
             var apiResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.API);

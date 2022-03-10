@@ -19,7 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         public Template CreateBackendTemplate(CreatorConfig creatorConfig)
         {
             // create empty template
-            Template backendTemplate = this.templateBuilder.GenerateEmptyTemplate();
+            Template backendTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
 
             // add parameters
             backendTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
