@@ -165,7 +165,7 @@ The following is a full config.yml file with each property listed:
 ```
 version: 0.0.1
 apimServiceName: myAPIMService
-policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\globalServicePolicy.xml
+policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\globalServicePolicy.xml
 apiVersionSets:
     - id: myAPIVersionSetID
       displayName: swaggerPetstoreVersionSetLinked
@@ -185,9 +185,9 @@ apis:
       displayName: My API
       description: myFirstAPI
       serviceUrl: http://myApiBackendUrl.com
-      openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\OpenApiSpecs\swaggerPetstore.json
+      openApiSpec: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\OpenApiSpecs\swaggerPetstore.json
       openApiSpecFormat: swagger
-      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\apiPolicyHeaders.xml
       suffix: conf
       subscriptionRequired: true
       isCurrent: true
@@ -200,9 +200,9 @@ apis:
       tags: Universe, myTag
       operations:
         addPet:
-          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
+          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
         deletePet:
-          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\operationRateLimit.xml
+          policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
       products: starter, platinum
       authenticationSettings:
         oAuth2:
@@ -243,7 +243,7 @@ products:
       approvalRequired: true
       subscriptionsLimit: 1
       state: notPublished
-      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\APIM_ARMTemplate\apimtemplate\Creator\ExampleFile\XMLPolicies\productSetBodyBasic.xml
+      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\productSetBodyBasic.xml
       subscriptions:
           - name: platinum
             primaryKey: a240691f-03fd-4557-a5cb-6e0f65cd976a
