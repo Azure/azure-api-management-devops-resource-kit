@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public TemplateBuilder GenerateTemplateWithApimServiceNameProperty()
         {
-            _ = this.GenerateEmptyTemplate();
+            this.GenerateEmptyTemplate();
             this.template.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 {
