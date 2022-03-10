@@ -17,15 +17,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public class GroupsClient : ApiClientBase, IGroupsClient
     {
         const string GetAllGroupsLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/groups?api-version={5}";
+        const string GetAllRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/groups?api-version={4}";
+
+        public async Task<List<GroupTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
+        {
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
+
+            var requestUrl = string.Format(GetAllRequest,
+                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
+
+            var response = await this.CallApiManagementAsync<GetGroupsResponse>(azToken, requestUrl);
+            return response.Groups;
+        }
 
         public async Task<List<GroupTemplateResource>> GetAllLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
             var requestUrl = string.Format(GetAllGroupsLinkedToProductRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
-            var response = await this.CallApiManagementAsync<GetAllGroupsLinkedToProductResponse>(azToken, requestUrl);
+            var response = await this.CallApiManagementAsync<GetGroupsResponse>(azToken, requestUrl);
             return response.Groups;
         }
     }

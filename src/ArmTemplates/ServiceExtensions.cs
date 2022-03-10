@@ -72,6 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IPropertyExtractor, PropertyExtractor>();
             services.AddScoped<ITagApiExtractor, TagApiExtractor>();
             services.AddScoped<ITagExtractor, TagExtractor>();
+            services.AddScoped<IGroupExtractor, GroupExtractor>();
         }
 
         static void SetupApiClients(IServiceCollection services)

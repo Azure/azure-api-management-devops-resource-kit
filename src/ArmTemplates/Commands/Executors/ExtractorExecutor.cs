@@ -35,6 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IPropertyExtractor propertyExtractor;
         readonly ITagApiExtractor apiTagExtractor;
         readonly ITagExtractor tagExtractor;
+        readonly IGroupExtractor groupExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -49,7 +50,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IProductExtractor productExtractor,
             IPropertyExtractor propertyExtractor,
             ITagApiExtractor apiTagExtractor,
-            ITagExtractor tagExtractor)
+            ITagExtractor tagExtractor,
+            IGroupExtractor groupExtractor)
         {
             this.logger = logger;
 
@@ -65,6 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.productExtractor = productExtractor;
             this.apiTagExtractor = apiTagExtractor;
             this.tagExtractor = tagExtractor;
+            this.groupExtractor = groupExtractor;
         }
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
@@ -166,6 +169,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
 
             this.logger.LogInformation("Finished generation of productApis template...");
+            return productApiTemplate;
+        }
+
+        /// <summary>
+        /// Generates group templates in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated group template</returns>
+        public async Task<Template> GenerateGroupsTemplateAsync(string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of groups template...");
+
+            var productApiTemplate = await this.groupExtractor.GenerateGroupsTemplateAsync(this.extractorParameters);
+
+            if (productApiTemplate?.HasResources == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    productApiTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.Groups);
+            }
+
+            this.logger.LogInformation("Finished generation of groups template...");
             return productApiTemplate;
         }
 
@@ -401,6 +427,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory, apiTemplateResources);
+            await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
 
             Template apiVersionSetTemplate = await this.apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);
             Template authorizationServerTemplate = await this.authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);

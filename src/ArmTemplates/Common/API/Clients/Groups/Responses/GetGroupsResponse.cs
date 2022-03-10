@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Groups.Responses
 {
-    public class GetAllGroupsLinkedToProductResponse
+    public class GetGroupsResponse
     {
         [JsonProperty("value")]
         public List<GroupTemplateResource> Groups { get; set; }

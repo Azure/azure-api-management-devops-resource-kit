@@ -14,5 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public interface IGroupsClient
     {
         Task<List<GroupTemplateResource>> GetAllLinkedToProductAsync(string productName, ExtractorParameters extractorParameters);
+
+        Task<List<GroupTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
     }
 }

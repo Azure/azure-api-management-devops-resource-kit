@@ -56,7 +56,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 this.GetTestLogger<ExtractorExecutor>(),
                 null, null, null, null, null, null, 
                 policyExtractor: policyExtractor,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act

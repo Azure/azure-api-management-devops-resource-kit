@@ -53,6 +53,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     }
                 });
 
+            mockGroupsClient
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<GroupTemplateResource>
+                {
+                    new GroupTemplateResource
+                    {
+                        Name = GroupName1,
+                        Type = ResourceTypeConstants.ProductGroup,
+                        Properties = new GroupProperties
+                        {
+                            DisplayName = $"{GroupName1}-display-name",
+                            Description = $"{GroupName1}-description",
+                            BuiltIn = true,
+                            Type = "system"
+                        }
+                    },
+
+                    new GroupTemplateResource
+                    {
+                        Name = GroupName2,
+                        Type = ResourceTypeConstants.ProductGroup,
+                        Properties = new GroupProperties
+                        {
+                            DisplayName = $"{GroupName2}-display-name",
+                            Description = $"{GroupName2}-description",
+                            BuiltIn = true,
+                            Type = "system"
+                        }
+                    }
+                });
+
             return mockGroupsClient.Object;
         }
     }
