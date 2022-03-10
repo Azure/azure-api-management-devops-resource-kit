@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return await this.CallApiManagementAsync<PolicyTemplateResource>(azToken, requestUrl);
         }
 
-        public async Task<PolicyTemplateResource> GetPolicyLinkedToProductAsync(ExtractorParameters extractorParameters, string productName)
+        public async Task<PolicyTemplateResource> GetPolicyLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 

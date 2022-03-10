@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public interface IProductsClient
     {
-        Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(ExtractorParameters extractorParameters, string apiName);
+        Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters);
 
         Task<List<ProductsTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
     }

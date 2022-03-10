@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return response.Products;
         }
 
-        public async Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(ExtractorParameters extractorParameters, string apiName)
+        public async Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
 

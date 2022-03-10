@@ -15,8 +15,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         Task<string> GetAllAsync(ExtractorParameters extractorParameters, int skipAmountOfRecords = 0);
 
-        Task<List<TagTemplateResource>> GetAllTagsLinkedToApiAsync(ExtractorParameters extractorParameters, string apiName);
+        Task<List<TagTemplateResource>> GetAllTagsLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters);
 
-        Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(ExtractorParameters extractorParameters, string productName);
+        Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(string productName, ExtractorParameters extractorParameters);
     }
 }

@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetAllApisRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?api-version={4}";
         const string GetAllApisLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/apis?api-version={5}";
 
-        public async Task<ApiTemplateResource> GetSingleAsync(ExtractorParameters extractorParameters, string apiName)
+        public async Task<ApiTemplateResource> GetSingleAsync(string apiName, ExtractorParameters extractorParameters)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
             string requestUrl = string.Format(GetSingleApiRequest,
@@ -39,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return response.Apis;
         }
 
-        public async Task<List<ApiTemplateResource>> GetAllLinkedToProductAsync(ExtractorParameters extractorParameters, string productName)
+        public async Task<List<ApiTemplateResource>> GetAllLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
             string requestUrl = string.Format(GetAllApisLinkedToProductRequest,

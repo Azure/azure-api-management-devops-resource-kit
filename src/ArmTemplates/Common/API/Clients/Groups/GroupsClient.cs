@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllGroupsLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/groups?api-version={5}";
 
-        public async Task<List<GroupTemplateResource>> GetAllLinkedToProductAsync(ExtractorParameters extractorParameters, string productName)
+        public async Task<List<GroupTemplateResource>> GetAllLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 

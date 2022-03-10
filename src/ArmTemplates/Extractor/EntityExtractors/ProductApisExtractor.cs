@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             try
             {
-                var serviceApi = await this.apisClient.GetSingleAsync(extractorParameters, singleApiName);
+                var serviceApi = await this.apisClient.GetSingleAsync(singleApiName, extractorParameters);
 
                 if (serviceApi is null)
                 {
@@ -88,9 +88,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 var productApiTemplateResources = await this.GenerateProductApiTemplateResourcesAsync(apiName, extractorParameters, dependsOn);
                 
-                templateResources.AddRange(productApiTemplateResources);
-                string apiProductName = templateResources.Last().Name.Split('/', 3)[1];
-                dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+                if (!productApiTemplateResources.IsNullOrEmpty())
+                {
+                    templateResources.AddRange(productApiTemplateResources);
+                    string apiProductName = templateResources.Last().Name.Split('/', 3)[1];
+                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+                }
             }
 
             return templateResources;
@@ -106,7 +109,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             try
             {
-                var productApis = await this.productsClient.GetAllLinkedToApiAsync(extractorParameters, apiName);
+                var productApis = await this.productsClient.GetAllLinkedToApiAsync(apiName, extractorParameters);
 
                 string lastProductAPIName = null;
                 foreach (var productApi in productApis)

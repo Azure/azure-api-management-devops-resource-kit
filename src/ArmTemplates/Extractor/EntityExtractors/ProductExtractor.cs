@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             try
             {
-                var productTags = await this.tagClient.GetAllTagsLinkedToProductAsync(extractorParameters, productName);
+                var productTags = await this.tagClient.GetAllTagsLinkedToProductAsync(productName, extractorParameters);
 
                 if (productTags.IsNullOrEmpty())
                 {
@@ -120,7 +120,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             try
             {
-                var groupsLinkedToProduct = await this.groupsClient.GetAllLinkedToProductAsync(extractorParameters, productName);
+                var groupsLinkedToProduct = await this.groupsClient.GetAllLinkedToProductAsync(productName, extractorParameters);
 
                 foreach (var productGroup in groupsLinkedToProduct)
                 {

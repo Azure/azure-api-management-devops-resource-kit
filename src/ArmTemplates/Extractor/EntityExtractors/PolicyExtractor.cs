@@ -39,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string[] productResourceId,
             string baseFilesGenerationDirectory)
         {
-            var productPolicy = await this.policyClient.GetPolicyLinkedToProductAsync(extractorParameters, productName);
+            var productPolicy = await this.policyClient.GetPolicyLinkedToProductAsync(productName, extractorParameters);
 
             if (productPolicy is null)
             {
@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             productPolicy.DependsOn = productResourceId;
 
             // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-            if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLBaseUrl))
+            if (!string.IsNullOrWhiteSpace(extractorParameters.PolicyXMLBaseUrl))
             {
                 var policyFileName = string.Format(ProductPolicyFileNameFormat, productName);
                 await this.SavePolicyXmlAsync(productPolicy, baseFilesGenerationDirectory, policyFileName);
@@ -87,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 globalServicePolicyResource.Scale = null;
 
                 // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-                if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLBaseUrl))
+                if (!string.IsNullOrWhiteSpace(extractorParameters.PolicyXMLBaseUrl))
                 {
                     // writing to globalServicePolicy.xml (<files-root>/policies/globalServicePolicy.xml)
                     await this.SavePolicyXmlAsync(globalServicePolicyResource, baseFilesDirectory, GlobalServicePolicyFileName);

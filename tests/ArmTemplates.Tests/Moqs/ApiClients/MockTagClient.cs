@@ -20,10 +20,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
         public static ITagClient GetMockedApiClientWithDefaultValues()
         {
-            var mockGroupsClient = new Mock<ITagClient>();
+            var mockGroupsClient = new Mock<ITagClient>(MockBehavior.Strict);
 
             mockGroupsClient
-                .Setup(x => x.GetAllTagsLinkedToApiAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
+                .Setup(x => x.GetAllTagsLinkedToApiAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new List<TagTemplateResource>
                 {
                     new TagTemplateResource
@@ -40,7 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockGroupsClient
-                .Setup(x => x.GetAllTagsLinkedToProductAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
+                .Setup(x => x.GetAllTagsLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new List<TagTemplateResource>
                 {
                     new TagTemplateResource

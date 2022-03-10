@@ -36,8 +36,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockPolicyApiClient
-                .Setup(x => x.GetPolicyLinkedToProductAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
-                .ReturnsAsync((ExtractorParameters _, string productName) => new PolicyTemplateResource
+                .Setup(x => x.GetPolicyLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string productName, ExtractorParameters _) => new PolicyTemplateResource
                 {
                     Name = $"{productName}-{TemplateName}",
                     Type = ResourceTypeConstants.ProductPolicy,

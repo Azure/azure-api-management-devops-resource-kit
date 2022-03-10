@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             var mockGroupsClient = new Mock<IGroupsClient>(MockBehavior.Strict);
 
             mockGroupsClient
-                .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
+                .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new List<GroupTemplateResource>
                 {
                     new GroupTemplateResource

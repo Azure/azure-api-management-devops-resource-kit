@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockServiceApiProductsApiClient
-                .Setup(x => x.GetSingleAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
+                .Setup(x => x.GetSingleAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new ApiTemplateResource
                 {
                     Name = ServiceApiName1,
@@ -76,8 +76,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockServiceApiProductsApiClient
-                .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
-                .ReturnsAsync((ExtractorParameters _, string productName) => new List<ApiTemplateResource>
+                .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string productName, ExtractorParameters _) => new List<ApiTemplateResource>
                 {
                     new ApiTemplateResource
                     {

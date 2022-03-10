@@ -23,8 +23,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             var mockClient = new Mock<IProductsClient>(MockBehavior.Strict);
 
             mockClient
-                .Setup(x => x.GetAllLinkedToApiAsync(It.IsAny<ExtractorParameters>(), It.IsAny<string>()))
-                .ReturnsAsync((ExtractorParameters extractorParameters, string serviceApiName) => new List<ProductApiTemplateResource>
+                .Setup(x => x.GetAllLinkedToApiAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string serviceApiName, ExtractorParameters extractorParameters) => new List<ProductApiTemplateResource>
                 {
                     new ProductApiTemplateResource
                     {

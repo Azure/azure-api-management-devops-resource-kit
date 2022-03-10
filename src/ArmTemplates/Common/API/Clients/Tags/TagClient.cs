@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<List<TagTemplateResource>> GetAllTagsLinkedToApiAsync(ExtractorParameters extractorParameters, string apiName)
+        public async Task<List<TagTemplateResource>> GetAllTagsLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
@@ -48,14 +48,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return response.Tags;
         }
 
-        public async Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(ExtractorParameters extractorParameters, string productName)
+        public async Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
         {
-            var apisLinkedToProduct = await this.apisClient.GetAllLinkedToProductAsync(extractorParameters, productName);
+            var apisLinkedToProduct = await this.apisClient.GetAllLinkedToProductAsync(productName, extractorParameters);
 
             var tagTemplateResources = new List<TagTemplateResource>();
             foreach (var productApi in apisLinkedToProduct)
             {
-                var apiTags = await this.GetAllTagsLinkedToApiAsync(extractorParameters, productApi.Name);
+                var apiTags = await this.GetAllTagsLinkedToApiAsync(productApi.Name, extractorParameters);
 
                 if (!apiTags.IsNullOrEmpty())
                 {

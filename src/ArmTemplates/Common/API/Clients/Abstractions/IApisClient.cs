@@ -13,10 +13,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public interface IApisClient
     {
-        Task<ApiTemplateResource> GetSingleAsync(ExtractorParameters extractorParameters, string apiName);
+        Task<ApiTemplateResource> GetSingleAsync(string apiName, ExtractorParameters extractorParameters);
 
         Task<List<ApiTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
 
-        Task<List<ApiTemplateResource>> GetAllLinkedToProductAsync(ExtractorParameters extractorParameters, string productName);
+        Task<List<ApiTemplateResource>> GetAllLinkedToProductAsync(string productName, ExtractorParameters extractorParameters);
     }
 }
