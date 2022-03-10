@@ -1,11 +1,8 @@
 ﻿using System;
-using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using CommandLine;
 using System.Threading.Tasks;
@@ -30,7 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             await parserResult.MapResult(
                 async (ExtractorConsoleAppConfiguration consoleAppConfiguration) =>
                 {
-                    applicationLogger.LogInformation($"Recognized {GlobalConstants.ExtractName} command...");
+                    applicationLogger.Information($"Recognized {GlobalConstants.ExtractName} command...");
                     var extractorCommandApplication = serviceProvider.GetRequiredService<ExtractApplicationCommand>();
 
                     var extractorParameters = await extractorCommandApplication.ParseInputConfigurationAsync(consoleAppConfiguration);
@@ -39,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
                 async (CreateConsoleAppConfiguration consoleAppConfiguration) =>
                 {
-                    applicationLogger.LogInformation($"Recognized {GlobalConstants.CreateName} command...");
+                    applicationLogger.Information($"Recognized {GlobalConstants.CreateName} command...");
                     var creatorCommandApplication = serviceProvider.GetRequiredService<CreateApplicationCommand>();
 
                     var creatorConfig = await creatorCommandApplication.ParseInputConfigurationAsync(consoleAppConfiguration);
@@ -48,15 +45,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
                 async errors =>
                 {
-                    applicationLogger.LogError("Azure API Management DevOps Resource toolkit failed with parsing arguments errors.");
-                    applicationLogger.LogError("Below is full errors list. Please, check your input");
+                    applicationLogger.Error("Azure API Management DevOps Resource toolkit failed with parsing arguments errors.");
+                    applicationLogger.Error("Below is full errors list. Please, check your input");
 
                     var builder = SentenceBuilder.Create();
                     var errorMessages = HelpText.RenderParsingErrorsTextAsLines(parserResult, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);
 
                     foreach (var errorMessage in errorMessages)
                     {
-                        applicationLogger.LogError(errorMessage);
+                        applicationLogger.Error(errorMessage);
                     }
                 }
             );
@@ -65,20 +62,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         static IServiceProvider CreateServiceProvider(ILogger logger)
         {
             var services = new ServiceCollection();
-            var serilogLogger = logger as Serilog.ILogger;
 
-            services.AddArmTemplatesServices(serilogLogger);
+            services.AddArmTemplatesServices(logger);
             return services.BuildServiceProvider();
         }
 
-        static ILogger SetupApplicationLoggingToConsole()
-        {
-            var serilogConsoleLogger = new LoggerConfiguration()
-                    .WriteTo.Console()
-                    .CreateLogger();
-
-            return new SerilogLoggerFactory(serilogConsoleLogger)
-                .CreateLogger<ILogger>();
-        }
+        static ILogger SetupApplicationLoggingToConsole() 
+            => new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .CreateLogger();
     }
 }

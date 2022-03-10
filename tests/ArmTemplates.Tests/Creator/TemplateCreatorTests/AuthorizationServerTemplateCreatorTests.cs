@@ -4,6 +4,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModel
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -13,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateAuthorizationServerTemplateFromCreatorConfig()
         {
             // arrange
-            AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator();
+            AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig() { authorizationServers = new List<AuthorizationServerTemplateProperties>() };
             AuthorizationServerTemplateProperties authorizationServer = new AuthorizationServerTemplateProperties()
             {

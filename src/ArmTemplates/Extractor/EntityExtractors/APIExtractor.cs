@@ -7,8 +7,10 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
@@ -273,7 +275,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIRevisionTemplateAsync(ExtractorParameters extractorParameters, string currentRevision, List<string> revList, string baseFilesGenerationDirectory)
         {
             // generate apiTemplate
-            Template armTemplate = this.GenerateEmptyApiTemplateWithParameters(extractorParameters);
+            var templateBuilder = new TemplateBuilder();
+            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters).Build();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             Console.WriteLine("{0} APIs found ...", revList.Count().ToString());
 
@@ -359,7 +362,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public async Task<Template> GenerateAPIsARMTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory)
         {
             // initialize arm template
-            Template armTemplate = this.GenerateEmptyApiTemplateWithParameters(extractorParameters);
+            var templateBuilder = new TemplateBuilder();
+            Template armTemplate = templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters).Build();
             List<TemplateResource> templateResources = new List<TemplateResource>();
             
             // when extract single API
@@ -632,7 +636,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     // write policy xml content to file and point to it if policyXMLBaseUrl is provided
                     if (policyXMLBaseUrl != null)
                     {
-                        string policyXMLContent = operationPolicyResource.Properties.Value;
+                        string policyXMLContent = operationPolicyResource.Properties.PolicyContent;
                         string policyFolder = string.Concat(fileFolder, $@"/policies");
                         string operationPolicyFileName = $@"/{apiName}-{operationName}-operationPolicy.xml";
                         FileWriter.CreateFolderIfNotExists(policyFolder);
@@ -640,11 +644,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         operationPolicyResource.Properties.Format = "rawxml-link";
                         if (policyXMLSasToken != null)
                         {
-                            operationPolicyResource.Properties.Value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{operationPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
+                            operationPolicyResource.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{operationPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                         }
                         else
                         {
-                            operationPolicyResource.Properties.Value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{operationPolicyFileName}')]";
+                            operationPolicyResource.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{operationPolicyFileName}')]";
                         }
                     }
 
@@ -693,7 +697,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 // write policy xml content to file and point to it if policyXMLBaseUrl is provided
                 if (policyXMLBaseUrl != null)
                 {
-                    string policyXMLContent = apiPoliciesResource.Properties.Value;
+                    string policyXMLContent = apiPoliciesResource.Properties.PolicyContent;
                     string policyFolder = string.Concat(fileFolder, $@"/policies");
                     string apiPolicyFileName = $@"/{apiName}-apiPolicy.xml";
                     FileWriter.CreateFolderIfNotExists(policyFolder);
@@ -701,11 +705,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     apiPoliciesResource.Properties.Format = "rawxml-link";
                     if (policyXMLSasToken != null)
                     {
-                        apiPoliciesResource.Properties.Value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{apiPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
+                        apiPoliciesResource.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{apiPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
                     }
                     else
                     {
-                        apiPoliciesResource.Properties.Value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{apiPolicyFileName}')]";
+                        apiPoliciesResource.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{apiPolicyFileName}')]";
                     }
                 }
                 templateResources.Add(apiPoliciesResource);
@@ -754,7 +758,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                     // convert returned api product associations to template resource class
                     ProductApiTemplateResource productAPIResource = JsonConvert.DeserializeObject<ProductApiTemplateResource>(item.ToString());
-                    productAPIResource.Type = ResourceTypeConstants.ProductAPI;
+                    productAPIResource.Type = ResourceTypeConstants.ProductApi;
                     productAPIResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiProductName}/{apiName}')]";
                     productAPIResource.ApiVersion = GlobalConstants.ApiVersion;
                     productAPIResource.Scale = null;

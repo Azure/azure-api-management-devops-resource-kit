@@ -7,6 +7,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IProductExtractor
     {
-        Task<Template> GenerateProductsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, string fileFolder, ExtractorParameters extractorParameters);
+        Task<Template> GenerateProductsARMTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, string fileFolder, ExtractorParameters extractorParameters);
     }
 }

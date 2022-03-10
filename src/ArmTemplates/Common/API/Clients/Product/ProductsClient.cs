@@ -10,19 +10,32 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product.Responses;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product
 {
     public class ProductsClient : ApiClientBase, IProductsClient
     {
-        const string GetAllApiProductsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/products?api-version={5}";
+        const string GetAllProductsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/products?api-version={5}";
+        const string GetAllProductsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}";
 
-        public async Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(ExtractorParameters extractorParameters, string apiName)
+        public async Task<List<ProductsTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
+        {
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+
+            string requestUrl = string.Format(GetAllProductsRequest,
+                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
+
+            var response = await this.CallApiManagementAsync<GetAllProductsResponse>(azToken, requestUrl);
+            return response.Products;
+        }
+
+        public async Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
-            string requestUrl = string.Format(GetAllApiProductsRequest,
+            string requestUrl = string.Format(GetAllProductsLinkedToApiRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
             var response = await this.CallApiManagementAsync<GetAllProductsLinkedToApiResponse>(azToken, requestUrl);

@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     // This whole stuff will be done in https://github.com/Azure/azure-api-management-devops-resource-kit/issues/617 or related issues.
 
     // TODO also move TemplateGeneratorBase inheritance directly to Extractors implementation
-    public abstract class EntityExtractorBase : TemplateGeneratorBase
+    public abstract class EntityExtractorBase
     {
         public static string BaseUrl = "https://management.azure.com";
 

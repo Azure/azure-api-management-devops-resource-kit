@@ -12,6 +12,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Abstraction
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications
 {
@@ -19,11 +20,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
     {
         readonly ILogger<CreateApplicationCommand> logger;
         readonly CreatorExecutor creatorExecutor;
+        readonly ITemplateBuilder templateBuilder;
 
-        public CreateApplicationCommand(ILogger<CreateApplicationCommand> logger, CreatorExecutor creatorExecutor)
+        public CreateApplicationCommand(
+            ILogger<CreateApplicationCommand> logger, 
+            CreatorExecutor creatorExecutor,
+            ITemplateBuilder templateBuilder)
         {
             this.logger = logger;
             this.creatorExecutor = creatorExecutor;
+            this.templateBuilder = templateBuilder;
         }
 
         public async Task<CreatorConfig> ParseInputConfigurationAsync(CreateConsoleAppConfiguration configuration)
@@ -87,22 +93,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                 : FileNameGenerator.GenerateFileNames(creatorConfig.baseFileName);
 
             // initialize template creator classes
-            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator();
-            LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator();
-            BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator();
-            AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator();
-            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator();
+            APIVersionSetTemplateCreator apiVersionSetTemplateCreator = new APIVersionSetTemplateCreator(this.templateBuilder);
+            LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator(this.templateBuilder);
+            BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator(this.templateBuilder);
+            AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator(this.templateBuilder);
+            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(this.templateBuilder);
             TagAPITemplateCreator tagAPITemplateCreator = new TagAPITemplateCreator();
-            PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader);
+            PolicyTemplateCreator policyTemplateCreator = new PolicyTemplateCreator(fileReader, this.templateBuilder);
             ProductGroupTemplateCreator productGroupTemplateCreator = new ProductGroupTemplateCreator();
             SubscriptionTemplateCreator productSubscriptionsTemplateCreator = new SubscriptionTemplateCreator();
             DiagnosticTemplateCreator diagnosticTemplateCreator = new DiagnosticTemplateCreator();
             ReleaseTemplateCreator releaseTemplateCreator = new ReleaseTemplateCreator();
-            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator, productSubscriptionsTemplateCreator);
-            PropertyTemplateCreator propertyTemplateCreator = new PropertyTemplateCreator();
-            TagTemplateCreator tagTemplateCreator = new TagTemplateCreator();
-            APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator);
-            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            ProductTemplateCreator productTemplateCreator = new ProductTemplateCreator(policyTemplateCreator, productGroupTemplateCreator, productSubscriptionsTemplateCreator, this.templateBuilder);
+            PropertyTemplateCreator propertyTemplateCreator = new PropertyTemplateCreator(this.templateBuilder);
+            TagTemplateCreator tagTemplateCreator = new TagTemplateCreator(this.templateBuilder);
+            APITemplateCreator apiTemplateCreator = new APITemplateCreator(fileReader, policyTemplateCreator, productAPITemplateCreator, tagAPITemplateCreator, diagnosticTemplateCreator, releaseTemplateCreator, this.templateBuilder);
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(this.templateBuilder);
 
             // create templates from provided configuration
             Console.WriteLine("Creating global service policy template");

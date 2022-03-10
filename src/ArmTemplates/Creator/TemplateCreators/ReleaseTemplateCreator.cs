@@ -5,7 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ReleaseTemplateCreator : TemplateGeneratorBase
+    public class ReleaseTemplateCreator
     {
         public ReleaseTemplateResource CreateAPIReleaseTemplateResource(APIConfig api, string[] dependsOn)
         {

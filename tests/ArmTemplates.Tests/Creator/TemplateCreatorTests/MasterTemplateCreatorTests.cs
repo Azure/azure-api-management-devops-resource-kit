@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
-            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
             Template apiVersionSetsTemplate = new Template();
             Template globalServicePolicyTemplate = new Template();
             Template productsTemplate = new Template();
@@ -39,7 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateCorrectNumberOfParameterValuesWhenLinked()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig()
             {
                 apimServiceName = "apimServiceName",
@@ -61,7 +62,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = false };
-            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
             // unlinked templates result in 1 value
             int count = 1;
 
@@ -76,7 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateLinkedMasterTemplateResourceFromValues()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
             string name = "name";
             string uriLink = "uriLink";
             string[] dependsOn = new string[] { "dependsOn" };
@@ -94,7 +95,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateCorrectLinkedUri()
         {
             // arrange
-            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator();
+            MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
             CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true, linkedTemplatesBaseUrl = "http://someurl.com", linkedTemplatesUrlQueryString = "?param=1" };
             string apiVersionSetFileName = "/versionSet1-apiVersionSets.template.json";
 

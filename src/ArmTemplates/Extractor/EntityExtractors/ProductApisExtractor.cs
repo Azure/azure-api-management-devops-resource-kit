@@ -7,33 +7,37 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class ProductApisExtractor : TemplateGeneratorBase, IProductApisExtractor
+    public class ProductApisExtractor : IProductApisExtractor
     {
         readonly ILogger<ProductApisExtractor> logger;
         
         readonly IProductsClient productsClient;
         readonly IApisClient apisClient;
+        readonly ITemplateBuilder templateBuilder;
 
         public ProductApisExtractor(
             ILogger<ProductApisExtractor> logger,
             IProductsClient productClient,
-            IApisClient apisClient)
+            IApisClient apisClient,
+            ITemplateBuilder templateBuilder)
         {
             this.logger = logger;
             
             this.productsClient = productClient;
             this.apisClient = apisClient;
+            this.templateBuilder = templateBuilder;
         }
 
         public async Task<Template> GenerateProductApisTemplateAsync(string singleApiName, List<string> multipleApiNames, ExtractorParameters extractorParameters)
         {
-            Template armTemplate = this.GenerateEmptyPropertyTemplateWithParameters();
+            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
             List<TemplateResource> templateResources = new List<TemplateResource>();
 
             if (!string.IsNullOrEmpty(singleApiName))
@@ -61,10 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             try
             {
-                var serviceApi = await this.apisClient.GetSingleAsync(
-                    extractorParameters.SourceApimName,
-                    extractorParameters.ResourceGroup,
-                    singleApiName);
+                var serviceApi = await this.apisClient.GetSingleAsync(singleApiName, extractorParameters);
 
                 if (serviceApi is null)
                 {
@@ -91,9 +92,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 var productApiTemplateResources = await this.GenerateProductApiTemplateResourcesAsync(apiName, extractorParameters, dependsOn);
                 
-                templateResources.AddRange(productApiTemplateResources);
-                string apiProductName = templateResources.Last().Name.Split('/', 3)[1];
-                dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+                if (!productApiTemplateResources.IsNullOrEmpty())
+                {
+                    templateResources.AddRange(productApiTemplateResources);
+                    string apiProductName = templateResources.Last().Name.Split('/', 3)[1];
+                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
+                }
             }
 
             return templateResources;
@@ -109,7 +113,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             try
             {
-                var productApis = await this.productsClient.GetAllLinkedToApiAsync(extractorParameters, apiName);
+                var productApis = await this.productsClient.GetAllLinkedToApiAsync(apiName, extractorParameters);
 
                 string lastProductAPIName = null;
                 foreach (var productApi in productApis)
@@ -117,7 +121,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     this.logger.LogInformation("'{0}' Product association found", productApi.Name);
 
                     // convert returned api product associations to template resource class
-                    productApi.Type = ResourceTypeConstants.ProductAPI;
+                    productApi.Type = ResourceTypeConstants.ProductApi;
                     productApi.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productApi.Name}/{apiName}')]";
                     productApi.ApiVersion = GlobalConstants.ApiVersion;
                     productApi.Scale = null;

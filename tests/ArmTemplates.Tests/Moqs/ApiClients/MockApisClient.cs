@@ -6,13 +6,13 @@
 
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Service;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
 {
-    public class MockServiceApisApiClient
+    public class MockApisClient
     {
         public const string TemplateType = "Microsoft.ApiManagement/service/apis";
         
@@ -67,16 +67,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockServiceApiProductsApiClient
-                .Setup(x => x.GetSingleAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>()
-                ))
+                .Setup(x => x.GetSingleAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new ApiTemplateResource
                 {
                     Name = ServiceApiName1,
                     Type = TemplateType,
                     Properties = ServiceApiProperties1
+                });
+
+            mockServiceApiProductsApiClient
+                .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string productName, ExtractorParameters _) => new List<ApiTemplateResource>
+                {
+                    new ApiTemplateResource
+                    {
+                        Name = ServiceApiName1,
+                        Type = TemplateType,
+                        Properties = ServiceApiProperties1
+                    },
+
+                    new ApiTemplateResource
+                    {
+                        Name = ServiceApiName2,
+                        Type = TemplateType,
+                        Properties = ServiceApiProperties2
+                    }
                 });
 
             return mockServiceApiProductsApiClient.Object;

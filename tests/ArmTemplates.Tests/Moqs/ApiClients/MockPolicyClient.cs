@@ -5,32 +5,42 @@
 // --------------------------------------------------------------------------
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
 {
-    class MockPolicyApiClient
+    class MockPolicyClient
     {
-        public const string TemplateType = "Microsoft.ApiManagement/service/policies";
         public const string TemplateName = "name";
 
         public static PolicyTemplateProperties TemplateProperties = new PolicyTemplateProperties
         {
             Format = "rawxml",
-            Value = @"<policies> my mocked policies </policies>"
+            PolicyContent = @"<policies> my mocked policies </policies>"
         };
 
-        public static IPolicyApiClient GetMockedApiClientWithDefaultValues()
+        public static IPolicyClient GetMockedApiClientWithDefaultValues()
         {
-            var mockPolicyApiClient = new Mock<IPolicyApiClient>(MockBehavior.Strict);
+            var mockPolicyApiClient = new Mock<IPolicyClient>(MockBehavior.Strict);
 
             mockPolicyApiClient
-                .Setup(x => x.GetGlobalServicePolicyAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(x => x.GetGlobalServicePolicyAsync(It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new PolicyTemplateResource
                 {
                     Name = TemplateName,
-                    Type = TemplateType,
+                    Type = ResourceTypeConstants.GlobalServicePolicy,
+                    Properties = TemplateProperties
+                });
+
+            mockPolicyApiClient
+                .Setup(x => x.GetPolicyLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string productName, ExtractorParameters _) => new PolicyTemplateResource
+                {
+                    Name = $"{productName}-{TemplateName}",
+                    Type = ResourceTypeConstants.ProductPolicy,
                     Properties = TemplateProperties
                 });
 

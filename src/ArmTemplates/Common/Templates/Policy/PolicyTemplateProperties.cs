@@ -4,11 +4,14 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
+using Newtonsoft.Json;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy
 {
     public class PolicyTemplateProperties
     {
-        public string Value { get; set; }
+        [JsonProperty("value")]
+        public string PolicyContent { get; set; }
 
         public string Format { get; set; }
     }

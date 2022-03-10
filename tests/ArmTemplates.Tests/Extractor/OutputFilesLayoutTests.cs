@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
@@ -47,8 +48,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor
                 includeAllRevisions: false);
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            var mockedPolicyApiClient = MockPolicyApiClient.GetMockedApiClientWithDefaultValues();
-            var policyExtractor = new PolicyExtractor(mockedPolicyApiClient);
+            var mockedPolicyApiClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
+            var policyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyApiClient, new TemplateBuilder());
 
             var extractorExecutor = new ExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
