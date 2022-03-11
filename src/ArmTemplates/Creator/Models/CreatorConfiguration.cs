@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
@@ -46,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
         public List<ServiceUrlProperty> serviceUrlParameters { get; set; }
     }
 
-    public class APIVersionSetConfig : APIVersionSetProperties
+    public class APIVersionSetConfig : ApiVersionSetProperties
     {
         public string id { get; set; }
     }

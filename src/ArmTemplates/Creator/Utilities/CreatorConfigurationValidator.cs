@@ -216,7 +216,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             {
                 foreach (APIVersionSetConfig apiVersionSet in this.creatorConfig.apiVersionSets)
                 {
-                    if (apiVersionSet != null && apiVersionSet.displayName == null)
+                    if (apiVersionSet != null && apiVersionSet.DisplayName == null)
                     {
                         isValid = false;
                         throw new CreatorConfigurationIsInvalidException("Display name is required if an API Version Set is provided");
