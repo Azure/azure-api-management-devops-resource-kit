@@ -21,26 +21,17 @@ using Xunit;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
     [Trait("Category", "Policy Extraction")]
-    public class PolicyExtractorTests : ExtractorMockerTestsBase
+    public class PolicyExtractorTests : ExtractorMockerWithOutputTestsBase
     {
-        static string OutputPoliciesDirectory;
-
-        public PolicyExtractorTests() : base()
+        public PolicyExtractorTests() : base("policy-tests")
         {
-            OutputPoliciesDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, "policy-tests");
-
-            // remember to clean up the output directory before each test
-            if (Directory.Exists(OutputPoliciesDirectory)) 
-            {
-                Directory.Delete(OutputPoliciesDirectory, true);
-            }
         }
 
         [Fact]
         public async Task GeneratePolicyTemplates_ProperlyLaysTheInformation()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(OutputPoliciesDirectory, nameof(GeneratePolicyTemplates_ProperlyLaysTheInformation));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GeneratePolicyTemplates_ProperlyLaysTheInformation));
 
             var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
                 splitApis: false,
@@ -52,11 +43,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var mockedPolicyApiClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
             var policyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyApiClient, new TemplateBuilder());
 
-            var extractorExecutor = new ExtractorExecutor(
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
-                null, null, null, null, null, null, 
-                policyExtractor: policyExtractor,
-                null, null, null, null, null, null);
+                policyExtractor: policyExtractor);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act

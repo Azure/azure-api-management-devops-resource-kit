@@ -70,6 +70,41 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.groupExtractor = groupExtractor;
         }
 
+        /// <summary>
+        /// Allows to build ExtractorExecutor with only desired speficic extractors passed
+        /// </summary>
+        /// <returns>new ExtractorExecutor instance</returns>
+        public static ExtractorExecutor BuildExtractorExecutor(
+            ILogger<ExtractorExecutor> logger,
+            IApiExtractor apiExtractor = null,
+            IApiVersionSetExtractor apiVersionSetExtractor = null,
+            IAuthorizationServerExtractor authorizationServerExtractor = null,
+            IBackendExtractor backendExtractor = null,
+            ILoggerExtractor loggerExtractor = null,
+            IMasterTemplateExtractor masterTemplateExtractor = null,
+            IPolicyExtractor policyExtractor = null,
+            IProductApisExtractor productApisExtractor = null,
+            IProductExtractor productExtractor = null,
+            IPropertyExtractor propertyExtractor = null,
+            ITagApiExtractor apiTagExtractor = null,
+            ITagExtractor tagExtractor = null,
+            IGroupExtractor groupExtractor = null)
+        => new ExtractorExecutor(
+                logger,
+                apiExtractor,
+                apiVersionSetExtractor,
+                authorizationServerExtractor,
+                backendExtractor,
+                loggerExtractor,
+                masterTemplateExtractor,
+                policyExtractor,
+                productApisExtractor,
+                productExtractor,
+                propertyExtractor,
+                apiTagExtractor,
+                tagExtractor,
+                groupExtractor);
+
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
             this.extractorParameters = extractorParameters;
@@ -181,18 +216,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         {
             this.logger.LogInformation("Started generation of groups template...");
 
-            var productApiTemplate = await this.groupExtractor.GenerateGroupsTemplateAsync(this.extractorParameters);
+            var groupsTemplate = await this.groupExtractor.GenerateGroupsTemplateAsync(this.extractorParameters);
 
-            if (productApiTemplate?.HasResources == true)
+            if (groupsTemplate?.HasResources == true)
             {
                 await FileWriter.SaveAsJsonAsync(
-                    productApiTemplate,
+                    groupsTemplate,
                     directory: baseFilesGenerationDirectory,
                     fileName: this.extractorParameters.FileNames.Groups);
             }
 
             this.logger.LogInformation("Finished generation of groups template...");
-            return productApiTemplate;
+            return groupsTemplate;
         }
 
         /// <summary>

@@ -21,26 +21,17 @@ using Xunit;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
     [Trait("Category", "Groups Extraction")]
-    public class GroupExtractorTests : ExtractorMockerTestsBase
-    {
-        static string OutputDirectory;
-
-        public GroupExtractorTests() : base()
+    public class GroupExtractorTests : ExtractorMockerWithOutputTestsBase
+    {        
+        public GroupExtractorTests() : base("groups-tests")
         {
-            OutputDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, "groups-tests");
-
-            // remember to clean up the output directory before each test
-            if (Directory.Exists(OutputDirectory))
-            {
-                Directory.Delete(OutputDirectory, true);
-            }
         }
 
         [Fact]
         public async Task GenerateGroupsTemplates_ProperlyLaysTheInformation()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(OutputDirectory, nameof(GenerateGroupsTemplates_ProperlyLaysTheInformation));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGroupsTemplates_ProperlyLaysTheInformation));
 
             var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
                 splitApis: false,
@@ -52,9 +43,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var mockedGroupsClient = MockGroupsClient.GetMockedApiClientWithDefaultValues();
             var groupExtractor = new GroupExtractor(this.GetTestLogger<GroupExtractor>(), new TemplateBuilder(), mockedGroupsClient);
 
-            var extractorExecutor = new ExtractorExecutor(
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
-                null, null, null, null, null, null, null, null, null, null, null, null, 
                 groupExtractor: groupExtractor);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 

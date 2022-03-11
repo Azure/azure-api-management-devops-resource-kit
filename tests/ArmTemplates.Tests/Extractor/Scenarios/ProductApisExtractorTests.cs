@@ -23,26 +23,17 @@ using Xunit;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
     [Trait("Category", "Product Apis Extraction")]
-    public class ProductApisExtractorTests : ExtractorMockerTestsBase
+    public class ProductApisExtractorTests : ExtractorMockerWithOutputTestsBase
     {
-        static string OutputDirectory;
-
-        public ProductApisExtractorTests() : base()
+        public ProductApisExtractorTests() : base("product-apis-tests")
         {
-            OutputDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, "product-apis-tests");
-
-            // remember to clean up the output directory before each test
-            if (Directory.Exists(OutputDirectory))
-            {
-                Directory.Delete(OutputDirectory, true);
-            }
         }
 
         [Fact]
         public async Task GenerateProductApisTemplates_ProperlyLaysTheInformation()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(OutputDirectory, nameof(GenerateProductApisTemplates_ProperlyLaysTheInformation));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateProductApisTemplates_ProperlyLaysTheInformation));
 
             var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
                 splitApis: false,
@@ -60,11 +51,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 mockedServiceApisApiClient,
                 new TemplateBuilder());
 
-            var extractorExecutor = new ExtractorExecutor(
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
-                null, null, null, null, null, null, null,
-                productApisExtractor: productApisExtractor,
-                null, null, null, null, null);
+                productApisExtractor: productApisExtractor);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act
