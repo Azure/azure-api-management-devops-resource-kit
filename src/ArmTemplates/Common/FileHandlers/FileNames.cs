@@ -20,6 +20,8 @@
 
         public string ProductAPIs { get; set; }
 
+        public string Groups { get; set; }
+
         public string ApiTags { get; set; }
         
         public string Parameters { get; set; }

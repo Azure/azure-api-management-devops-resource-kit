@@ -11,8 +11,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 {
     public abstract class ExtractorMockerTestsBase : TestsBase
     {
-        protected const string TESTS_OUTPUT_DIRECTORY = "tests-output";
-
         protected const string MockSourceApimName = "dmkorolev-APIM-test";
         protected const string MockDestinationApimName = "test-destination-apim-name";
         protected const string MockResourceGroup = "dmkorolev-test";
@@ -38,8 +36,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const bool MockToParameterizeNamedValuesKeyVaultSecrets = true;
         protected const int MockOperationBatchSize = 32;
         protected const bool MockParameterizeBackend = true;
-
-
 
         protected ExtractorConsoleAppConfiguration GetMockedExtractorConsoleAppConfiguration(
             bool splitApis = MockSplitApis,

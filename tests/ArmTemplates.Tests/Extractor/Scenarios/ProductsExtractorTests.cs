@@ -23,26 +23,17 @@ using Xunit;
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
     [Trait("Category", "Products Extraction")]
-    public class ProductsExtractorTests : ExtractorMockerTestsBase
+    public class ProductsExtractorTests : ExtractorMockerWithOutputTestsBase
     {
-        static string OutputDirectory;
-
-        public ProductsExtractorTests() : base()
+        public ProductsExtractorTests() : base("products-tests")
         {
-            OutputDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, "products-tests");
-
-            // remember to clean up the output directory before each test
-            if (Directory.Exists(OutputDirectory)) 
-            {
-                Directory.Delete(OutputDirectory, true);
-            }
         }
 
         [Fact]
         public async Task GenerateProductsTemplates_ProperlyLaysTheInformation()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(OutputDirectory, nameof(GenerateProductsTemplates_ProperlyLaysTheInformation));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateProductsTemplates_ProperlyLaysTheInformation));
 
             var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
                 splitApis: false,
@@ -67,11 +58,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 mockedTagClient,
                 new TemplateBuilder());
 
-            var extractorExecutor = new ExtractorExecutor(
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
-                null, null, null, null, null, null, null, null,
-                productExtractor: productExtractor,
-                null, null, null);
+                productExtractor: productExtractor);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act
