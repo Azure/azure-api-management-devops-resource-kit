@@ -11,7 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class ApiVersionSetExtractor : EntityExtractorBase, IApiVersionSetExtractor
+    public class ApiVersionSetExtractor : IApiVersionSetExtractor
     {
         readonly ILogger<ApiVersionSetExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
