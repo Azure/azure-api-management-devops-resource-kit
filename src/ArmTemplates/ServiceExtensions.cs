@@ -8,6 +8,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Application
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Apis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product;
@@ -77,6 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
         static void SetupApiClients(IServiceCollection services)
         {
+            services.AddScoped<IApiVersionSetClient, ApiVersionSetClient>();
             services.AddScoped<IApisClient, ApisClient>();
             services.AddScoped<IGroupsClient, GroupsClient>();
             services.AddScoped<ITagClient, TagClient>();

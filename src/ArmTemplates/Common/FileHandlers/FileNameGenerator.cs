@@ -18,8 +18,8 @@
             // generate useable object with file names for consistency throughout project
             return new FileNames
             {
-                ApiVersionSets = $@"\{baseFileName}apiVersionSets.template.json",
-                AuthorizationServers = $@"\{baseFileName}authorizationServers.template.json",
+                ApiVersionSets = $@"{baseFileName}apiVersionSets.template.json",
+                AuthorizationServers = $@"{baseFileName}authorizationServers.template.json",
                 Backends = $@"\{baseFileName}backends.template.json",
                 GlobalServicePolicy = $@"{baseFileName}globalServicePolicy.template.json",
                 Loggers = $@"\{baseFileName}loggers.template.json",

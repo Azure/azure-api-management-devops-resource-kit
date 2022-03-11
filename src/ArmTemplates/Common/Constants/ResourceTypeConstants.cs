@@ -3,7 +3,7 @@
     public static class ResourceTypeConstants
     {
         public const string API = "Microsoft.ApiManagement/service/apis";
-        public const string APIVersionSet = "Microsoft.ApiManagement/service/apiVersionSets";
+        public const string ApiVersionSet = "Microsoft.ApiManagement/service/apiVersionSets";
         public const string APIDiagnostic = "Microsoft.ApiManagement/service/apis/diagnostics";
         public const string APIServiceDiagnostic = "Microsoft.ApiManagement/service/diagnostics";
         public const string APIOperation = "Microsoft.ApiManagement/service/apis/operations";
