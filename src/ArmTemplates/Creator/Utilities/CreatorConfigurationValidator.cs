@@ -126,9 +126,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             bool isValid = true;
             if (this.creatorConfig.authorizationServers != null)
             {
-                foreach (AuthorizationServerTemplateProperties authorizationServer in this.creatorConfig.authorizationServers)
+                foreach (var authorizationServer in this.creatorConfig.authorizationServers)
                 {
-                    if (authorizationServer.displayName == null)
+                    if (authorizationServer.DisplayName == null)
                     {
                         isValid = false;
                         throw new CreatorConfigurationIsInvalidException("Display name is required if an Authorization Server is provided");

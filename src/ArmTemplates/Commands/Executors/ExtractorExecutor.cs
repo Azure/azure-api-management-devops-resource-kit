@@ -264,7 +264,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// Generates api-version-set templates in the desired folder
         /// </summary>
         /// <param name="singleApiName">name of API to load api-version-set from</param>
-        /// <param name="multipleApiNames">multiple API names to load api-version-set from</param>
         /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
         /// <returns>generated api-version-set template</returns>
         public async Task<Template> GenerateApiVersionSetTemplateAsync(
@@ -286,6 +285,34 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
 
             this.logger.LogInformation("Finished generation of api-version-set template...");
+            return apiVersionSetTemplate;
+        }
+
+        /// <summary>
+        /// Generates authorization-server templates in the desired folder
+        /// </summary>
+        /// <param name="singleApiName">name of API to load authorization-server from</param>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated authorization-server template</returns>
+        public async Task<Template> GenerateAuthorizationServerTemplateAsync(
+            string singleApiName,
+            string baseFilesGenerationDirectory,
+            List<TemplateResource> armTemplateResources)
+        {
+            this.logger.LogInformation("Started generation of authorization-server template...");
+
+            var apiVersionSetTemplate = await this.authorizationServerExtractor.GenerateAuthorizationServersTemplateAsync(
+                singleApiName, armTemplateResources, this.extractorParameters);
+
+            if (apiVersionSetTemplate?.HasResources == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    apiVersionSetTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.AuthorizationServers);
+            }
+
+            this.logger.LogInformation("Finished generation of authorization-server template...");
             return apiVersionSetTemplate;
         }
 
@@ -492,9 +519,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory, apiTemplateResources);
             var apiVersionSetTemplate = await this.GenerateApiVersionSetTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplateResources);
+            var authorizationServerTemplate = await this.GenerateAuthorizationServerTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplateResources);
             await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
 
-            Template authorizationServerTemplate = await this.authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);
             Template loggerTemplate = await this.loggerExtractor.GenerateLoggerTemplateAsync(this.extractorParameters, singleApiName, apiTemplateResources, apiLoggerId);
             
             Template apiTagTemplate = await this.apiTagExtractor.GenerateAPITagsARMTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
