@@ -5,6 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCrea
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -19,24 +20,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APIVersionSetConfig apiVersionSet = new APIVersionSetConfig()
             {
                 id = "id",
-                description = "description",
-                displayName = "displayName",
-                versionHeaderName = "versionHeaderName",
-                versioningScheme = "versioningScheme",
-                versionQueryName = "versionQueryName"
+                Description = "description",
+                DisplayName = "displayName",
+                VersionHeaderName = "versionHeaderName",
+                VersioningScheme = "versioningScheme",
+                VersionQueryName = "versionQueryName"
             };
             creatorConfig.apiVersionSets.Add(apiVersionSet);
 
             // act
             Template versionSetTemplate = apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig);
-            APIVersionSetTemplateResource apiVersionSetTemplateResource = (APIVersionSetTemplateResource)versionSetTemplate.Resources[0];
+            var apiVersionSetTemplateResource = (ApiVersionSetTemplateResource)versionSetTemplate.Resources[0];
 
             // assert
-            Assert.Equal(apiVersionSet.description, apiVersionSetTemplateResource.Properties.description);
-            Assert.Equal(apiVersionSet.displayName, apiVersionSetTemplateResource.Properties.displayName);
-            Assert.Equal(apiVersionSet.versionHeaderName, apiVersionSetTemplateResource.Properties.versionHeaderName);
-            Assert.Equal(apiVersionSet.versioningScheme, apiVersionSetTemplateResource.Properties.versioningScheme);
-            Assert.Equal(apiVersionSet.versionQueryName, apiVersionSetTemplateResource.Properties.versionQueryName);
+            Assert.Equal(apiVersionSet.Description, apiVersionSetTemplateResource.Properties.Description);
+            Assert.Equal(apiVersionSet.DisplayName, apiVersionSetTemplateResource.Properties.DisplayName);
+            Assert.Equal(apiVersionSet.VersionHeaderName, apiVersionSetTemplateResource.Properties.VersionHeaderName);
+            Assert.Equal(apiVersionSet.VersioningScheme, apiVersionSetTemplateResource.Properties.VersioningScheme);
+            Assert.Equal(apiVersionSet.VersionQueryName, apiVersionSetTemplateResource.Properties.VersionQueryName);
         }
 
         [Fact]
@@ -50,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             Template versionSetTemplate = apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig);
-            APIVersionSetTemplateResource apiVersionSetTemplateResource = (APIVersionSetTemplateResource)versionSetTemplate.Resources[0];
+            var apiVersionSetTemplateResource = (ApiVersionSetTemplateResource)versionSetTemplate.Resources[0];
 
             // assert
             Assert.Equal("[concat(parameters('ApimServiceName'), '/versionset')]", apiVersionSetTemplateResource.Name);
@@ -70,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // act
             Template versionSetTemplate = apiVersionSetTemplateCreator.CreateAPIVersionSetTemplate(creatorConfig);
-            APIVersionSetTemplateResource apiVersionSetTemplateResource = (APIVersionSetTemplateResource)versionSetTemplate.Resources[0];
+            var apiVersionSetTemplateResource = (ApiVersionSetTemplateResource)versionSetTemplate.Resources[0];
 
             // assert
             Assert.Equal($"[concat(parameters('ApimServiceName'), '/{apiVersionSet.id}')]", apiVersionSetTemplateResource.Name);

@@ -1,10 +1,10 @@
 ﻿using Xunit;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -15,28 +15,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             AuthorizationServerTemplateCreator authorizationServerTemplateCreator = new AuthorizationServerTemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig() { authorizationServers = new List<AuthorizationServerTemplateProperties>() };
-            AuthorizationServerTemplateProperties authorizationServer = new AuthorizationServerTemplateProperties()
+            CreatorConfig creatorConfig = new CreatorConfig() { authorizationServers = new List<AuthorizationServerProperties>() };
+            AuthorizationServerProperties authorizationServer = new AuthorizationServerProperties()
             {
-                description = "description",
-                displayName = "displayName",
-                authorizationEndpoint = "endpoint.com",
-                authorizationMethods = new string[] { "GET" },
-                tokenBodyParameters = new AuthorizationServerTokenBodyParameter[] { new AuthorizationServerTokenBodyParameter() {
-                    name = "name",
-                    value = "value"
+                Description = "description",
+                DisplayName = "displayName",
+                AuthorizationEndpoint = "endpoint.com",
+                AuthorizationMethods = new string[] { "GET" },
+                TokenBodyParameters = new AuthorizationServerTokenBodyParameter[] { new AuthorizationServerTokenBodyParameter() {
+                    Name = "name",
+                    Value = "value"
                 } },
-                clientAuthenticationMethod = new string[] { "GET" },
-                tokenEndpoint = "endpoint.com",
-                supportState = true,
-                defaultScope = "defaultScope",
-                bearerTokenSendingMethods = new string[] { "GET" },
-                clientId = "id",
-                clientSecret = "secret",
-                clientRegistrationEndpoint = "endpoint.com",
-                resourceOwnerPassword = "pass",
-                resourceOwnerUsername = "user",
-                grantTypes = new string[] { }
+                ClientAuthenticationMethod = new string[] { "GET" },
+                TokenEndpoint = "endpoint.com",
+                SupportState = true,
+                DefaultScope = "defaultScope",
+                BearerTokenSendingMethods = new string[] { "GET" },
+                ClientId = "id",
+                ClientSecret = "secret",
+                ClientRegistrationEndpoint = "endpoint.com",
+                ResourceOwnerPassword = "pass",
+                ResourceOwnerUsername = "user",
+                GrantTypes = new string[] { }
             };
             creatorConfig.authorizationServers.Add(authorizationServer);
 
@@ -45,23 +45,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             AuthorizationServerTemplateResource authorizationServerTemplateResource = (AuthorizationServerTemplateResource)authorizationServerTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{authorizationServer.displayName}')]", authorizationServerTemplateResource.Name);
-            Assert.Equal(authorizationServer.description, authorizationServerTemplateResource.Properties.description);
-            Assert.Equal(authorizationServer.displayName, authorizationServerTemplateResource.Properties.displayName);
-            Assert.Equal(authorizationServer.authorizationEndpoint, authorizationServerTemplateResource.Properties.authorizationEndpoint);
-            Assert.Equal(authorizationServer.authorizationMethods, authorizationServerTemplateResource.Properties.authorizationMethods);
-            Assert.Equal(authorizationServer.clientAuthenticationMethod, authorizationServerTemplateResource.Properties.clientAuthenticationMethod);
-            Assert.Equal(authorizationServer.clientId, authorizationServerTemplateResource.Properties.clientId);
-            Assert.Equal(authorizationServer.clientRegistrationEndpoint, authorizationServerTemplateResource.Properties.clientRegistrationEndpoint);
-            Assert.Equal(authorizationServer.clientSecret, authorizationServerTemplateResource.Properties.clientSecret);
-            Assert.Equal(authorizationServer.bearerTokenSendingMethods, authorizationServerTemplateResource.Properties.bearerTokenSendingMethods);
-            Assert.Equal(authorizationServer.grantTypes, authorizationServerTemplateResource.Properties.grantTypes);
-            Assert.Equal(authorizationServer.resourceOwnerPassword, authorizationServerTemplateResource.Properties.resourceOwnerPassword);
-            Assert.Equal(authorizationServer.resourceOwnerUsername, authorizationServerTemplateResource.Properties.resourceOwnerUsername);
-            Assert.Equal(authorizationServer.defaultScope, authorizationServerTemplateResource.Properties.defaultScope);
-            Assert.Equal(authorizationServer.supportState, authorizationServerTemplateResource.Properties.supportState);
-            Assert.Equal(authorizationServer.tokenBodyParameters[0].name, authorizationServerTemplateResource.Properties.tokenBodyParameters[0].name);
-            Assert.Equal(authorizationServer.tokenBodyParameters[0].value, authorizationServerTemplateResource.Properties.tokenBodyParameters[0].value);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{authorizationServer.DisplayName}')]", authorizationServerTemplateResource.Name);
+            Assert.Equal(authorizationServer.Description, authorizationServerTemplateResource.Properties.Description);
+            Assert.Equal(authorizationServer.DisplayName, authorizationServerTemplateResource.Properties.DisplayName);
+            Assert.Equal(authorizationServer.AuthorizationEndpoint, authorizationServerTemplateResource.Properties.AuthorizationEndpoint);
+            Assert.Equal(authorizationServer.AuthorizationMethods, authorizationServerTemplateResource.Properties.AuthorizationMethods);
+            Assert.Equal(authorizationServer.ClientAuthenticationMethod, authorizationServerTemplateResource.Properties.ClientAuthenticationMethod);
+            Assert.Equal(authorizationServer.ClientId, authorizationServerTemplateResource.Properties.ClientId);
+            Assert.Equal(authorizationServer.ClientRegistrationEndpoint, authorizationServerTemplateResource.Properties.ClientRegistrationEndpoint);
+            Assert.Equal(authorizationServer.ClientSecret, authorizationServerTemplateResource.Properties.ClientSecret);
+            Assert.Equal(authorizationServer.BearerTokenSendingMethods, authorizationServerTemplateResource.Properties.BearerTokenSendingMethods);
+            Assert.Equal(authorizationServer.GrantTypes, authorizationServerTemplateResource.Properties.GrantTypes);
+            Assert.Equal(authorizationServer.ResourceOwnerPassword, authorizationServerTemplateResource.Properties.ResourceOwnerPassword);
+            Assert.Equal(authorizationServer.ResourceOwnerUsername, authorizationServerTemplateResource.Properties.ResourceOwnerUsername);
+            Assert.Equal(authorizationServer.DefaultScope, authorizationServerTemplateResource.Properties.DefaultScope);
+            Assert.Equal(authorizationServer.SupportState, authorizationServerTemplateResource.Properties.SupportState);
+            Assert.Equal(authorizationServer.TokenBodyParameters[0].Name, authorizationServerTemplateResource.Properties.TokenBodyParameters[0].Name);
+            Assert.Equal(authorizationServer.TokenBodyParameters[0].Value, authorizationServerTemplateResource.Properties.TokenBodyParameters[0].Value);
         }
     }
 }

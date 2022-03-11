@@ -2,6 +2,7 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
@@ -33,18 +34,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 // create apiVersionSet resource with properties
                 // default version set id to version set if id is not provided
                 string versionSetId = apiVersionSet != null && apiVersionSet.id != null ? apiVersionSet.id : "versionset";
-                APIVersionSetTemplateResource apiVersionSetTemplateResource = new APIVersionSetTemplateResource()
+                var apiVersionSetTemplateResource = new ApiVersionSetTemplateResource()
                 {
                     Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{versionSetId}')]",
-                    Type = ResourceTypeConstants.APIVersionSet,
+                    Type = ResourceTypeConstants.ApiVersionSet,
                     ApiVersion = GlobalConstants.ApiVersion,
-                    Properties = new APIVersionSetProperties()
+                    Properties = new ApiVersionSetProperties()
                     {
-                        displayName = apiVersionSet.displayName,
-                        description = apiVersionSet.description,
-                        versionHeaderName = apiVersionSet.versionHeaderName,
-                        versionQueryName = apiVersionSet.versionQueryName,
-                        versioningScheme = apiVersionSet.versioningScheme,
+                        DisplayName = apiVersionSet.DisplayName,
+                        Description = apiVersionSet.Description,
+                        VersionHeaderName = apiVersionSet.VersionHeaderName,
+                        VersionQueryName = apiVersionSet.VersionQueryName,
+                        VersioningScheme = apiVersionSet.VersioningScheme,
                     },
                     DependsOn = new string[] { }
                 };
