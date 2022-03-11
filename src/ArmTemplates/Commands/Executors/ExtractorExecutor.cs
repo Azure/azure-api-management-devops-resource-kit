@@ -35,6 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IPropertyExtractor propertyExtractor;
         readonly ITagApiExtractor apiTagExtractor;
         readonly ITagExtractor tagExtractor;
+        readonly IGroupExtractor groupExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -49,7 +50,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IProductExtractor productExtractor,
             IPropertyExtractor propertyExtractor,
             ITagApiExtractor apiTagExtractor,
-            ITagExtractor tagExtractor)
+            ITagExtractor tagExtractor,
+            IGroupExtractor groupExtractor)
         {
             this.logger = logger;
 
@@ -65,7 +67,43 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.productExtractor = productExtractor;
             this.apiTagExtractor = apiTagExtractor;
             this.tagExtractor = tagExtractor;
+            this.groupExtractor = groupExtractor;
         }
+
+        /// <summary>
+        /// Allows to build ExtractorExecutor with only desired speficic extractors passed
+        /// </summary>
+        /// <returns>new ExtractorExecutor instance</returns>
+        public static ExtractorExecutor BuildExtractorExecutor(
+            ILogger<ExtractorExecutor> logger,
+            IApiExtractor apiExtractor = null,
+            IApiVersionSetExtractor apiVersionSetExtractor = null,
+            IAuthorizationServerExtractor authorizationServerExtractor = null,
+            IBackendExtractor backendExtractor = null,
+            ILoggerExtractor loggerExtractor = null,
+            IMasterTemplateExtractor masterTemplateExtractor = null,
+            IPolicyExtractor policyExtractor = null,
+            IProductApisExtractor productApisExtractor = null,
+            IProductExtractor productExtractor = null,
+            IPropertyExtractor propertyExtractor = null,
+            ITagApiExtractor apiTagExtractor = null,
+            ITagExtractor tagExtractor = null,
+            IGroupExtractor groupExtractor = null)
+        => new ExtractorExecutor(
+                logger,
+                apiExtractor,
+                apiVersionSetExtractor,
+                authorizationServerExtractor,
+                backendExtractor,
+                loggerExtractor,
+                masterTemplateExtractor,
+                policyExtractor,
+                productApisExtractor,
+                productExtractor,
+                propertyExtractor,
+                apiTagExtractor,
+                tagExtractor,
+                groupExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -167,6 +205,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             this.logger.LogInformation("Finished generation of productApis template...");
             return productApiTemplate;
+        }
+
+        /// <summary>
+        /// Generates group templates in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated group template</returns>
+        public async Task<Template> GenerateGroupsTemplateAsync(string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of groups template...");
+
+            var groupsTemplate = await this.groupExtractor.GenerateGroupsTemplateAsync(this.extractorParameters);
+
+            if (groupsTemplate?.HasResources == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    groupsTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.Groups);
+            }
+
+            this.logger.LogInformation("Finished generation of groups template...");
+            return groupsTemplate;
         }
 
         /// <summary>
@@ -401,6 +462,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory, apiTemplateResources);
+            await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
 
             Template apiVersionSetTemplate = await this.apiVersionSetExtractor.GenerateAPIVersionSetsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);
             Template authorizationServerTemplate = await this.authorizationServerExtractor.GenerateAuthorizationServersARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources);

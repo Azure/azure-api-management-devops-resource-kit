@@ -20,6 +20,7 @@
         public const string ProductApi = "Microsoft.ApiManagement/service/products/apis";
         public const string Product = "Microsoft.ApiManagement/service/products";
         public const string ProductGroup = "Microsoft.ApiManagement/service/products/groups";
+        public const string Group = "Microsoft.ApiManagement/service/groups";
         public const string ProductTag = "Microsoft.ApiManagement/service/products/tags";
         public const string ProductPolicy = "Microsoft.ApiManagement/service/products/policies";
         public const string Property = "Microsoft.ApiManagement/service/namedValues";
