@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,7 +16,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Dictionary<string, BackendApiParameters> backendParams,
              List<TemplateResource> propertyResources);
 
-        Template GenerateLinkedMasterTemplate(Template apiTemplate,
+        Template GenerateLinkedMasterTemplate(
+            Template<ApiTemplateResources> apiTemplate,
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
@@ -27,7 +29,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Template namedValuesTemplate,
             Template tagTemplate,
             FileNames fileNames,
-            string apiFileName,
             ExtractorParameters extractorParameters);
     }
 }

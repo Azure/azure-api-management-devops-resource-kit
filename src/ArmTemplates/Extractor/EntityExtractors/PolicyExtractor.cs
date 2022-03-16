@@ -10,10 +10,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using System.IO;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -22,7 +20,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         public const string PoliciesDirectoryName = "policies";
         public const string GlobalServicePolicyFileName = "globalServicePolicy.xml";
 
-        public static string ProductPolicyFileNameFormat = "{0}-productPolicy.xml";
+        public const string ProductPolicyFileNameFormat = "{0}-productPolicy.xml";
+        public const string ApiPolicyFileNameFormat = "{0}-apiPolicy.xml";
+        public const string ApiOperationPolicyFileNameFormat = "{0}-{1}-operationPolicy.xml";
 
         readonly ILogger<PolicyExtractor> logger;
         readonly IPolicyClient policyClient;
@@ -38,8 +38,72 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.templateBuilder = templateBuilder;
         }
 
+        public async Task<PolicyTemplateResource> GenerateApiOperationPolicyResourceAsync(
+            string apiName,
+            string operationName,
+            string baseFilesGenerationDirectory,
+            ExtractorParameters extractorParameters)
+        {
+            var apiOperationPolicy = await this.policyClient.GetPolicyLinkedToApiOperationAsync(apiName, operationName, extractorParameters);
+
+            if (apiOperationPolicy is null)
+            {
+                this.logger.LogWarning("Policy for api '{0}' and operation '{1}' not found", apiName, operationName);
+                return apiOperationPolicy;
+            }
+
+            var apiOperationPolicyOriginalName = apiOperationPolicy.Name;
+
+            apiOperationPolicy.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiOperationPolicyOriginalName}/policy')]";
+            apiOperationPolicy.ApiVersion = GlobalConstants.ApiVersion;
+            apiOperationPolicy.Scale = null;
+            apiOperationPolicy.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{apiOperationPolicyOriginalName}')]" };
+
+            // write policy xml content to file and point to it if policyXMLBaseUrl is provided
+            if (extractorParameters.PolicyXMLBaseUrl is not null)
+            {
+                var policyFileName = string.Format(ApiOperationPolicyFileNameFormat, apiName, operationName);
+                await this.SavePolicyXmlAsync(apiOperationPolicy, baseFilesGenerationDirectory, policyFileName);
+
+                this.SetPolicyTemplateResourcePolicyContentWithArmPresetValues(extractorParameters, apiOperationPolicy, policyFileName);
+            }
+
+            return apiOperationPolicy;
+        }
+
+        public async Task<PolicyTemplateResource> GenerateApiPolicyResourceAsync(
+            string apiName, 
+            string baseFilesGenerationDirectory,
+            ExtractorParameters extractorParameters)
+        {
+            var apiPolicy = await this.policyClient.GetPolicyLinkedToApiAsync(apiName, extractorParameters);
+
+            if (apiPolicy is null)
+            {
+                this.logger.LogWarning("Policy for api {0} not found", apiName);
+                return apiPolicy;
+            }
+
+            var apiPolicyOriginalName = apiPolicy.Name;
+
+            apiPolicy.ApiVersion = GlobalConstants.ApiVersion;
+            apiPolicy.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiPolicyOriginalName}')]";
+            apiPolicy.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
+
+            // write policy xml content to file and point to it if policyXMLBaseUrl is provided
+            if (extractorParameters.PolicyXMLBaseUrl is not null)
+            {
+                var policyFileName = string.Format(ApiPolicyFileNameFormat, apiName);
+                await this.SavePolicyXmlAsync(apiPolicy, baseFilesGenerationDirectory, policyFileName);
+
+                this.SetPolicyTemplateResourcePolicyContentWithArmPresetValues(extractorParameters, apiPolicy, policyFileName);
+            }
+
+            return apiPolicy;
+        }
+
         public async Task<PolicyTemplateResource> GenerateProductPolicyTemplateAsync(
-            ExtractorParameters extractorParameters, 
+            ExtractorParameters extractorParameters,
             string productName,
             string[] productResourceId,
             string baseFilesGenerationDirectory)
@@ -71,14 +135,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return productPolicy;
         }
 
-        public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(ExtractorParameters extractorParameters, string baseFilesDirectory)
+        public async Task<Template<PolicyTemplateResources>> GenerateGlobalServicePolicyTemplateAsync(ExtractorParameters extractorParameters, string baseFilesDirectory)
         {
             // extract global service policy in both full and single api extraction cases
-            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty()
+            var policyTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty()
                                                        .AddPolicyProperties(extractorParameters)
-                                                       .Build();
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
+                                                       .Build<PolicyTemplateResources>();
 
             // add global service policy resource to template
             try
@@ -101,19 +163,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     this.SetPolicyTemplateResourcePolicyContentWithArmPresetValues(extractorParameters, globalServicePolicyResource, GlobalServicePolicyFileName);
                 }
 
-                templateResources.Add(globalServicePolicyResource);
+                policyTemplate.SpecificResources.GlobalServicePolicy = globalServicePolicyResource;
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Exception occured while global apim service policy generation");
             }
 
-            armTemplate.Resources = templateResources.ToArray();
-            return armTemplate;
+            return policyTemplate;
         }
 
         void SetPolicyTemplateResourcePolicyContentWithArmPresetValues(
-            ExtractorParameters extractorParameters, 
+            ExtractorParameters extractorParameters,
             PolicyTemplateResource policyTemplate,
             string policyFileName)
         {
@@ -129,7 +190,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         }
 
         async Task SavePolicyXmlAsync(
-            PolicyTemplateResource policyTemplateResource, 
+            PolicyTemplateResource policyTemplateResource,
             string baseFilesDirectory,
             string policyFileName)
         {

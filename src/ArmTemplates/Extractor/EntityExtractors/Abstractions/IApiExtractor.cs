@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -10,16 +11,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         Task<JToken[]> GetAllApiObjsAsync(string apiManagementName, string resourceGroupName);
 
-        Task<List<string>> GetAllApiNamesAsync(string apiManagementName, string resourceGroupName);
-
         Task<string> GetServiceDiagnosticsAsync(string apiManagementName, string resourceGroupName);
 
         Task<string> GetApiDiagnosticsAsync(string apiManagementName, string resourceGroupName, string apiName);
 
-        Task<Template> GenerateAPIsARMTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory);
+        Task<Template<ApiTemplateResources>> GenerateApiTemplateAsync(string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);
 
-        Task<string> GetAPIRevisionsAsync(string apiManagementName, string resourceGroupName, string apiName);
+        Task<ApiTemplateResources> GenerateSingleApiTemplateResourcesAsync(string singleApiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);
 
-        Task<Template> GenerateAPIRevisionTemplateAsync(ExtractorParameters extractorParameters, string currentRevision, List<string> revList, string baseFilesGenerationDirectory);
+        Task<ApiTemplateResources> GetApiRelatedTemplateResourcesAsync(string apiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);
     }
 }

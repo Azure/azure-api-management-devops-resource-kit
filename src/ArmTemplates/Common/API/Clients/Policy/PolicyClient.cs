@@ -18,6 +18,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetGlobalServicePolicyRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/policies/policy?api-version={4}&format=rawxml";
         const string GetPolicyLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies?api-version={5}&format=rawxml";
+        const string GetPolicyLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/policies/policy?api-version={5}&format=rawxml";
+        const string GetPolicyLinkedToApiOperationRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/policies/policy?api-version={6}&format=rawxml";
 
         public async Task<PolicyTemplateResource> GetGlobalServicePolicyAsync(ExtractorParameters extractorParameters)
         {
@@ -35,6 +37,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
             string requestUrl = string.Format(GetPolicyLinkedToProductRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
+
+            var response = await this.CallApiManagementAsync<GetPoliciesResponse>(azToken, requestUrl);
+            return response.Policies.FirstOrDefault();
+        }
+
+        public async Task<PolicyTemplateResource> GetPolicyLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
+        {
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
+
+            string requestUrl = string.Format(GetPolicyLinkedToApiRequest,
+                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
+
+            var response = await this.CallApiManagementAsync<GetPoliciesResponse>(azToken, requestUrl);
+            return response.Policies.FirstOrDefault();
+        }
+
+        public async Task<PolicyTemplateResource> GetPolicyLinkedToApiOperationAsync(string apiName, string operationName, ExtractorParameters extractorParameters)
+        {
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
+
+            string requestUrl = string.Format(GetPolicyLinkedToApiOperationRequest,
+               this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, operationName, GlobalConstants.ApiVersion);
 
             var response = await this.CallApiManagementAsync<GetPoliciesResponse>(azToken, requestUrl);
             return response.Policies.FirstOrDefault();

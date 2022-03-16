@@ -13,10 +13,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public interface ITagClient
     {
-        Task<string> GetAllAsync(ExtractorParameters extractorParameters, int skipAmountOfRecords = 0);
+        Task<List<TagTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters, int skipAmountOfRecords = 0);
 
         Task<List<TagTemplateResource>> GetAllTagsLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters);
 
         Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(string productName, ExtractorParameters extractorParameters);
+
+        Task<List<TagTemplateResource>> GetTagsLinkedToApiOperationAsync(string apiName, string operationName, ExtractorParameters extractorParameters);
     }
 }

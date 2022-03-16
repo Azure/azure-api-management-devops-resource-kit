@@ -13,6 +13,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string[] productResourceId,
             string baseFilesGenerationDirectory);
 
-        Task<Template> GenerateGlobalServicePolicyTemplateAsync(ExtractorParameters extractorParameters, string baseFilesGenerationDirectory);
+        Task<PolicyTemplateResource> GenerateApiPolicyResourceAsync(
+            string apiName,
+            string baseFilesGenerationDirectory,
+            ExtractorParameters extractorParameters);
+
+        Task<PolicyTemplateResource> GenerateApiOperationPolicyResourceAsync(
+            string apiName,
+            string operationName,
+            string baseFilesGenerationDirectory,
+            ExtractorParameters extractorParameters);
+
+        Task<Template<PolicyTemplateResources>> GenerateGlobalServicePolicyTemplateAsync(ExtractorParameters extractorParameters, string baseFilesGenerationDirectory);
     }
 }

@@ -14,6 +14,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
@@ -60,12 +61,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var apiVersionSetTemplate = await extractorExecutor.GenerateApiVersionSetTemplateAsync(
                 singleApiName: It.IsAny<string>(),
                 currentTestDirectory,
-                armTemplateResources: It.IsAny<List<TemplateResource>>());
+                apiTemplateResources: It.IsAny<List<ApiTemplateResource>>());
 
             // assert
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ApiVersionSets)).Should().BeTrue();
 
             apiVersionSetTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+
+            apiVersionSetTemplate.SpecificResources.ApiVersionSets.Count().Should().Be(2);
             apiVersionSetTemplate.Resources.Count().Should().Be(2);
 
             (apiVersionSetTemplate.Resources[0].Name.Contains(MockApiVersionSetClient.ApiVersionSetName1) ||
@@ -73,19 +76,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             (apiVersionSetTemplate.Resources[0].Name.Contains(MockApiVersionSetClient.ApiVersionSetName2) ||
                 apiVersionSetTemplate.Resources[1].Name.Contains(MockApiVersionSetClient.ApiVersionSetName2)).Should().BeTrue();
 
-            foreach (var templateResource in apiVersionSetTemplate.Resources)
+            foreach (var templateResource in apiVersionSetTemplate.SpecificResources.ApiVersionSets)
             {
-                var apiVersionSetResource = templateResource as ApiVersionSetTemplateResource;
-                apiVersionSetResource.Should().NotBeNull();
+                templateResource.Type.Should().Be(ResourceTypeConstants.ApiVersionSet);
+                templateResource.Properties.Should().NotBeNull();
 
-                apiVersionSetResource.Type.Should().Be(ResourceTypeConstants.ApiVersionSet);
-                apiVersionSetResource.Properties.Should().NotBeNull();
-
-                apiVersionSetResource.Properties.DisplayName.Should().NotBeNullOrEmpty();
-                apiVersionSetResource.Properties.Description.Should().NotBeNullOrEmpty();
-                apiVersionSetResource.Properties.VersionHeaderName.Should().NotBeNullOrEmpty();
-                apiVersionSetResource.Properties.VersioningScheme.Should().NotBeNullOrEmpty();
-                apiVersionSetResource.Properties.VersionQueryName.Should().NotBeNullOrEmpty();
+                templateResource.Properties.DisplayName.Should().NotBeNullOrEmpty();
+                templateResource.Properties.Description.Should().NotBeNullOrEmpty();
+                templateResource.Properties.VersionHeaderName.Should().NotBeNullOrEmpty();
+                templateResource.Properties.VersioningScheme.Should().NotBeNullOrEmpty();
+                templateResource.Properties.VersionQueryName.Should().NotBeNullOrEmpty();
             }
         }
     }

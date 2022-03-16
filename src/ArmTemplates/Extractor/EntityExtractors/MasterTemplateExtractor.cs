@@ -12,6 +12,9 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
+using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -19,12 +22,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         readonly ITemplateBuilder templateBuilder;
 
-        public MasterTemplateExtractor(ITemplateBuilder templateBuilder)
+        public MasterTemplateExtractor(
+            ILogger<ApiExtractor> logger,
+            ITemplateBuilder templateBuilder,
+            IApisClient apisClient,
+            IDiagnosticExtractor diagnosticExtractor,
+            IApiSchemaExtractor apiSchemaExtractor,
+            IPolicyExtractor policyExtractor,
+            IProductApisExtractor productApisExtractor,
+            ITagExtractor tagExtractor,
+            IApiOperationExtractor apiOperationExtractor)
+            : base(logger, templateBuilder, apisClient, diagnosticExtractor, apiSchemaExtractor, policyExtractor, productApisExtractor, tagExtractor, apiOperationExtractor)
         {
             this.templateBuilder = templateBuilder;
         }
 
-        public Template GenerateLinkedMasterTemplate(Template apiTemplate,
+        public Template GenerateLinkedMasterTemplate(
+            Template<ApiTemplateResources> apiTemplate,
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
@@ -36,7 +50,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             Template namedValuesTemplate,
             Template tagTemplate,
             FileNames fileNames,
-            string apiFileName,
             ExtractorParameters extractorParameters)
         {
             Console.WriteLine("------------------------------------------");
@@ -146,7 +159,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 apiTagDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
                 productAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
-                string apisUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, apiFileName);
+                string apisUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, apiTemplate.SpecificResources.FileName);
                 resources.Add(this.CreateLinkedMasterTemplateResourceForApiTemplate("apisTemplate", apisUri, apiDependsOn.ToArray(), extractorParameters));
             }
 
