@@ -15,6 +15,13 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.TagApi;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -39,16 +46,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public Template GenerateLinkedMasterTemplate(
             Template<ApiTemplateResources> apiTemplate,
-            Template globalServicePolicyTemplate,
-            Template apiVersionSetTemplate,
-            Template productsTemplate,
-            Template productAPIsTemplate,
-            Template apiTagsTemplate,
+            Template<PolicyTemplateResources> globalServicePolicyTemplate,
+            Template<ApiVersionSetTemplateResources> apiVersionSetTemplate,
+            Template<ProductTemplateResources> productsTemplate,
+            Template<ProductApiTemplateResources> productAPIsTemplate,
+            Template<TagApiTemplateResources> apiTagsTemplate,
             Template loggersTemplate,
             Template backendsTemplate,
-            Template authorizationServersTemplate,
+            Template<AuthorizationServerTemplateResources> authorizationServersTemplate,
             Template namedValuesTemplate,
-            Template tagTemplate,
+            Template<TagTemplateResources> tagTemplate,
             FileNames fileNames,
             ExtractorParameters extractorParameters)
         {

@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public class ApiOperationClient : ApiClientBase, IApiOperationClient
     {
-        const string GetOperationsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations?api-version={6}";
+        const string GetOperationsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations?api-version={5}";
 
         public async Task<List<ApiOperationTemplateResource>> GetOperationsLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
         {

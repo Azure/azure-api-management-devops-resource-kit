@@ -228,10 +228,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var apiTemplateResources = new ApiTemplateResources();
 
             var apiSchemaResources = await this.apiSchemaExtractor.GenerateApiSchemaResourcesAsync(apiName, extractorParameters);
-            apiTemplateResources.ApiSchemas = apiSchemaResources.ApiSchemas;
+            if (apiSchemaResources?.ApiSchemas.IsNullOrEmpty() == false)
+            {
+                apiTemplateResources.ApiSchemas = apiSchemaResources.ApiSchemas;
+            }
 
             var apiDiagnosticResources = await this.diagnosticExtractor.GetApiDiagnosticsResourcesAsync(apiName, extractorParameters);
-            apiTemplateResources.Diagnostics = apiDiagnosticResources;
+            if (!apiDiagnosticResources.IsNullOrEmpty())
+            {
+                apiTemplateResources.Diagnostics = apiDiagnosticResources;
+            }
 
             var apiPolicyResource = await this.policyExtractor.GenerateApiPolicyResourceAsync(apiName, baseFilesGenerationDirectory, extractorParameters);
             if (apiPolicyResource is not null)
@@ -240,13 +246,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             var apiProducts = await this.productApisExtractor.GenerateSingleApiTemplateAsync(apiName, extractorParameters, addDependsOnParameter: true);
-            apiTemplateResources.ApiProducts = apiProducts;
+            if (!apiProducts.IsNullOrEmpty())
+            {
+                apiTemplateResources.ApiProducts = apiProducts;
+            }
 
             var apiTags = await this.tagExtractor.GenerateTagResourcesLinkedToApiAsync(apiName, extractorParameters);
-            apiTemplateResources.Tags = apiTags;
+            if (!apiTags.IsNullOrEmpty())
+            {
+                apiTemplateResources.Tags = apiTags;
+            }
 
             var apiOperations = await this.apiOperationExtractor.GenerateApiOperationsResourcesAsync(apiName, extractorParameters);
-            apiTemplateResources.ApiOperations = apiOperations;
+            if (!apiOperations.IsNullOrEmpty())
+            {
+                apiTemplateResources.ApiOperations = apiOperations;
+            }
 
             foreach (var apiOperation in apiOperations)
             {
