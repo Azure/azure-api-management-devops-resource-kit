@@ -8,6 +8,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -29,24 +31,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.apiVersionSetClient = apiVersionSetClient;
         }
 
-        public async Task<Template> GenerateApiVersionSetTemplateAsync(
-            string singleApiName, 
-            List<TemplateResource> apiTemplateResources, 
+        public async Task<Template<ApiVersionSetTemplateResources>> GenerateApiVersionSetTemplateAsync(
+            string singleApiName,
+            List<ApiTemplateResource> apiTemplateResources,
             ExtractorParameters extractorParameters)
         {
-            var armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
-
-            // isolate api version set associations in the case of a single api extraction
-            var apiResources = apiTemplateResources?.Where(resource => resource.Type == ResourceTypeConstants.API);
-            var templateResources = new List<TemplateResource>();
-
+            var apiVersionSetTemplate = this.templateBuilder
+                                            .GenerateTemplateWithApimServiceNameProperty()
+                                            .Build<ApiVersionSetTemplateResources>();
+            
             var apiVersionSets = await this.apiVersionSetClient.GetAllAsync(extractorParameters);
             foreach (var apiVersionSet in apiVersionSets)
             {
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (singleApiName == null || apiResources.SingleOrDefault(api => 
-                        (api as APITemplateResource).Properties.ApiVersionSetId != null && 
-                        (api as APITemplateResource).Properties.ApiVersionSetId.Contains(apiVersionSet.Name)) != null)
+                if (string.IsNullOrEmpty(singleApiName) || apiTemplateResources.SingleOrDefault(api => 
+                        api.Properties.ApiVersionSetId != null && 
+                        api.Properties.ApiVersionSetId.Contains(apiVersionSet.Name)) != null)
                 {
                     this.logger.LogDebug("Found '{0}' api-version-set", apiVersionSet.Name);
 
@@ -54,12 +54,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     apiVersionSet.Type = ResourceTypeConstants.ApiVersionSet;
                     apiVersionSet.ApiVersion = GlobalConstants.ApiVersion;
 
-                    templateResources.Add(apiVersionSet);
+                    apiVersionSetTemplate.TypedResources.ApiVersionSets.Add(apiVersionSet);
                 }
             }
 
-            armTemplate.Resources = templateResources.ToArray();
-            return armTemplate;
+            return apiVersionSetTemplate;
         }
     }
 }

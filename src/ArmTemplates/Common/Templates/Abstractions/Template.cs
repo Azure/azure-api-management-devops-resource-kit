@@ -6,18 +6,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public class Template
     {
-        [JsonProperty(PropertyName = "$schema")]
+        [JsonProperty(PropertyName = "$schema", Order = -10)]
         public string Schema { get; set; }
 
+        [JsonProperty(Order = -8)]
         public string ContentVersion { get; set; }
-
-        public Dictionary<string, TemplateParameterProperties> Parameters { get; set; }
 
         public object Variables { get; set; }
 
-        public TemplateResource[] Resources { get; set; }
-
         public object Outputs { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public Dictionary<string, TemplateParameterProperties> Parameters { get; set; }
+
+        [JsonProperty(Order = 10)]
+        public virtual TemplateResource[] Resources { get; set; }
 
         /// <summary>
         /// Returns true, if template contains any resource

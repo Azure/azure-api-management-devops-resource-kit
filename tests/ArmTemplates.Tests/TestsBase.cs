@@ -15,6 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests
         protected ILogger<T> GetTestLogger<T>()
         {
             var serilogConsoleLogger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
                 .WriteTo.Console()
                 .CreateLogger();
 

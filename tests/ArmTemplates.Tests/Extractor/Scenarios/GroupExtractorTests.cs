@@ -55,18 +55,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Groups)).Should().BeTrue();
 
             groupTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            groupTemplate.TypedResources.Groups.Count().Should().Be(2);
             groupTemplate.Resources.Count().Should().Be(2);
 
             (groupTemplate.Resources[0].Name.Contains(MockGroupsClient.GroupName1) || groupTemplate.Resources[1].Name.Contains(MockGroupsClient.GroupName1)).Should().BeTrue();
             (groupTemplate.Resources[0].Name.Contains(MockGroupsClient.GroupName2) || groupTemplate.Resources[1].Name.Contains(MockGroupsClient.GroupName2)).Should().BeTrue();
 
-            foreach (var templateResource in groupTemplate.Resources)
+            foreach (var templateResource in groupTemplate.TypedResources.Groups)
             {
                 templateResource.Type.Should().Be(ResourceTypeConstants.Group);
-
-                var groupResource = templateResource as GroupTemplateResource;
-                groupResource.Should().NotBeNull();
-                groupResource.Properties.Should().NotBeNull();
+                templateResource.Should().NotBeNull();
+                templateResource.Properties.Should().NotBeNull();
             }
         }
     }

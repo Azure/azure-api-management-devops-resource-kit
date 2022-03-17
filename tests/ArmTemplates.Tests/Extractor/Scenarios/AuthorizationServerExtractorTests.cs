@@ -14,6 +14,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
@@ -60,15 +61,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var authorizationServerTemplate = await extractorExecutor.GenerateAuthorizationServerTemplateAsync(
                 singleApiName: It.IsAny<string>(),
                 currentTestDirectory,
-                armTemplateResources: It.IsAny<List<TemplateResource>>());
+                apiTemplateResources: It.IsAny<List<ApiTemplateResource>>());
 
             // assert
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.AuthorizationServers)).Should().BeTrue();
 
             authorizationServerTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            authorizationServerTemplate.TypedResources.AuthorizationServers.Count().Should().Be(1);
             authorizationServerTemplate.Resources.Count().Should().Be(1);
 
-            var authorizationResource = authorizationServerTemplate.Resources[0] as AuthorizationServerTemplateResource;
+            var authorizationResource = authorizationServerTemplate.TypedResources.AuthorizationServers.First();
             authorizationResource.Name.Should().Contain(MockAuthorizationServerClient.AuthorizationServerName1);
             authorizationResource.Type.Should().Contain(ResourceTypeConstants.AuthorizationServer);
             authorizationResource.Properties.Should().NotBeNull();

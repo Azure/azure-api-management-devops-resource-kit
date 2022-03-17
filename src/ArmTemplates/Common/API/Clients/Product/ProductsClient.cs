@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         public async Task<List<ProductsTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format(GetAllProductsRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);

@@ -44,6 +44,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     Properties = TemplateProperties
                 });
 
+            mockPolicyApiClient
+                .Setup(x => x.GetPolicyLinkedToApiAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string apiName, ExtractorParameters _) => new PolicyTemplateResource
+                {
+                    Name = $"{apiName}-{TemplateName}",
+                    Type = ResourceTypeConstants.ProductPolicy,
+                    Properties = TemplateProperties
+                });
+
+            mockPolicyApiClient
+                .Setup(x => x.GetPolicyLinkedToApiOperationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string apiName, string apiOperation, ExtractorParameters _) => new PolicyTemplateResource
+                {
+                    Name = $"{apiName}-{apiOperation}-{TemplateName}",
+                    Type = ResourceTypeConstants.ProductPolicy,
+                    Properties = TemplateProperties
+                });
+
             return mockPolicyApiClient.Object;
         }
     }

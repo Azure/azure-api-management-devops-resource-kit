@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -29,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             IPolicyExtractor policyExtractor,
             IProductsClient productsClient,
             IGroupsClient groupsClient,
-            ITagClient tagClient, 
+            ITagClient tagClient,
             ITemplateBuilder templateBuilder)
         {
             this.logger = logger;
@@ -43,17 +45,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.templateBuilder = templateBuilder;
         }
 
-        public async Task<Template> GenerateProductsARMTemplateAsync(
+        public async Task<Template<ProductTemplateResources>> GenerateProductsTemplateAsync(
             string singleApiName,
-            List<TemplateResource> armTemplateResources,
+            List<ProductApiTemplateResource> productApiTemplateResources,
             string baseFilesGenerationDirectory,
             ExtractorParameters extractorParameters)
         {
-            var armTemplate = this.templateBuilder.GenerateTemplateWithPresetProperties(extractorParameters).Build();
-
-            // isolate product api associations in the case of a single api extraction
-            var productAPIResources = armTemplateResources?.Where(resource => resource.Type == ResourceTypeConstants.ProductApi);
-            List<TemplateResource> templateResources = new List<TemplateResource>();
+            var productsTemplate = this.templateBuilder
+                                        .GenerateTemplateWithPresetProperties(extractorParameters)
+                                        .Build<ProductTemplateResources>();
 
             var products = await this.productsClient.GetAllAsync(extractorParameters);
 
@@ -65,24 +65,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 productTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (singleApiName == null || productAPIResources.SingleOrDefault(p => p.Name.Contains($"/{productOriginalName}/")) != null)
+                if (singleApiName == null || productApiTemplateResources.SingleOrDefault(p => p.Name.Contains($"/{productOriginalName}/")) != null)
                 {
                     this.logger.LogDebug("'{0}' product found", productOriginalName);
-                    templateResources.Add(productTemplateResource);
+                    productsTemplate.TypedResources.Products.Add(productTemplateResource);
 
-                    await this.AddProductPolicyToTemplateResources(extractorParameters, productOriginalName, templateResources, baseFilesGenerationDirectory);
-                    await this.AddProductTagsToTemplateResources(extractorParameters, productOriginalName, templateResources);
+                    await this.AddProductPolicyToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources, baseFilesGenerationDirectory);
+                    await this.AddProductTagsToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources);
                 }
             }
 
-            armTemplate.Resources = templateResources.ToArray();
-            return armTemplate;
+            return productsTemplate;
         }
 
         async Task AddProductTagsToTemplateResources(
             ExtractorParameters extractorParameters,
             string productName,
-            List<TemplateResource> templateResources)
+            ProductTemplateResources productTemplateResources)
         {
             try
             {
@@ -104,8 +103,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     productTag.ApiVersion = GlobalConstants.ApiVersion;
                     productTag.Scale = null;
                     productTag.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productName}')]" };
-                    
-                    templateResources.Add(productTag);
+
+                    productTemplateResources.Tags.Add(productTag);
                 }
             }
             catch (Exception ex)
@@ -118,7 +117,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         async Task AddProductPolicyToTemplateResources(
             ExtractorParameters extractorParameters,
             string productName,
-            List<TemplateResource> templateResources,
+            ProductTemplateResources productTemplateResources,
             string filesGenerationDirectory)
         {
             var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productName}')]" };
@@ -133,7 +132,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     productGroup.Type = ResourceTypeConstants.ProductGroup;
                     productGroup.ApiVersion = GlobalConstants.ApiVersion;
                     productGroup.DependsOn = productResourceId;
-                    templateResources.Add(productGroup);
+                    productTemplateResources.Groups.Add(productGroup);
                 }
 
                 var productPolicyResource = await this.policyExtractor.GenerateProductPolicyTemplateAsync(
@@ -144,10 +143,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (productPolicyResource is not null)
                 {
-                    templateResources.Add(productPolicyResource);
+                    productTemplateResources.Policies.Add(productPolicyResource);
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 this.logger.LogError(ex, "Exception occured while product policy template generation");
                 throw;

@@ -24,10 +24,10 @@
                 GlobalServicePolicy = $@"{baseFileName}globalServicePolicy.template.json",
                 Loggers = $@"\{baseFileName}loggers.template.json",
                 NamedValues = $@"\{baseFileName}namedValues.template.json",
-                Tags = $@"\{baseFileName}tags.template.json",
+                Tags = $@"{baseFileName}tags.template.json",
                 Products = $@"{baseFileName}products.template.json",
                 ProductAPIs = $@"{baseFileName}productAPIs.template.json",
-                ApiTags = $@"\{baseFileName}apiTags.template.json",
+                ApiTags = $@"{baseFileName}apiTags.template.json",
                 Parameters = $@"\{baseFileName}parameters.json",
                 LinkedMaster = $@"\{baseFileName}master.template.json",
                 Apis = "/Apis",
@@ -57,7 +57,7 @@
 
         public static string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
-            return singleAPIName == null ? $@"/{baseFileName}apis.template.json" : $@"/{baseFileName}{singleAPIName}-api.template.json";
+            return singleAPIName == null ? $@"{baseFileName}apis.template.json" : $@"{baseFileName}{singleAPIName}-api.template.json";
         }
 
         public static string GenerateOriginalAPIName(string apiName)

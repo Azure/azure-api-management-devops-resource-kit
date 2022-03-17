@@ -15,5 +15,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         Task<PolicyTemplateResource> GetGlobalServicePolicyAsync(ExtractorParameters extractorParameters);
 
         Task<PolicyTemplateResource> GetPolicyLinkedToProductAsync(string productName, ExtractorParameters extractorParameters);
+
+        Task<PolicyTemplateResource> GetPolicyLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters);
+
+        Task<PolicyTemplateResource> GetPolicyLinkedToApiOperationAsync(string apiName, string operationName, ExtractorParameters extractorParameters);
     }
 }

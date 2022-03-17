@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
@@ -17,7 +16,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
     {
         Template template;
 
+        /// <inheritdoc/>
         public Template Build() => this.template;
+
+        /// <inheritdoc/>
+        public Template<TTemplateResources> Build<TTemplateResources>()
+            where TTemplateResources : ITemplateResources, new()
+        {
+            // left Template.NotGeneric variant for backward compatibility
+            // for refactored code please use Template.Generic and use explicit TTemplateResources type
+            var genericTemplate = new Template<TTemplateResources>();
+
+            genericTemplate.Schema = this.template.Schema;
+            genericTemplate.ContentVersion = this.template.ContentVersion;
+            genericTemplate.Parameters = this.template.Parameters;
+            genericTemplate.Variables = this.template.Variables;
+            genericTemplate.TypedResources = new TTemplateResources(); // creating empty resources
+            genericTemplate.Outputs = this.template.Outputs;
+
+            return genericTemplate;
+        }
 
         public TemplateBuilder GenerateTemplateWithApimServiceNameProperty()
         {
