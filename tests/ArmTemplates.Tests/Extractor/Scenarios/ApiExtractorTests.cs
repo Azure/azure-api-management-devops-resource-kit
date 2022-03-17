@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 currentTestDirectory);
 
             // assert
-            File.Exists(Path.Combine(currentTestDirectory, apiTemplate.SpecificResources.FileName)).Should().BeTrue();
+            File.Exists(Path.Combine(currentTestDirectory, apiTemplate.TypedResources.FileName)).Should().BeTrue();
             Directory.GetFiles(Path.Combine(currentTestDirectory, PolicyExtractor.PoliciesDirectoryName)).Count().Should().Be(4);
 
             apiTemplate.Parameters.Should().NotBeNull();
@@ -93,45 +93,45 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiTemplate.Resources.Count().Should().Be(23);
 
             // apis
-            apiTemplate.SpecificResources.Apis.Count().Should().Be(2);
-            apiTemplate.SpecificResources.Apis.All(x => x.Type == ResourceTypeConstants.API).Should().BeTrue();
-            apiTemplate.SpecificResources.Apis.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.Apis.Count().Should().Be(2);
+            apiTemplate.TypedResources.Apis.All(x => x.Type == ResourceTypeConstants.API).Should().BeTrue();
+            apiTemplate.TypedResources.Apis.All(x => x.Properties is not null).Should().BeTrue();
 
             // api schemas
-            apiTemplate.SpecificResources.ApiSchemas.Count().Should().Be(2);
-            apiTemplate.SpecificResources.ApiSchemas.All(x => x.Type == ResourceTypeConstants.APISchema).Should().BeTrue();
-            apiTemplate.SpecificResources.ApiSchemas.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiSchemas.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiSchemas.All(x => x.Type == ResourceTypeConstants.APISchema).Should().BeTrue();
+            apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties is not null).Should().BeTrue();
 
             // diagnostics
-            apiTemplate.SpecificResources.Diagnostics.Count().Should().Be(3);
-            apiTemplate.SpecificResources.Diagnostics.All(x => x.Type == ResourceTypeConstants.APIServiceDiagnostic || x.Type == ResourceTypeConstants.APIDiagnostic).Should().BeTrue();
-            apiTemplate.SpecificResources.Diagnostics.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.Diagnostics.Count().Should().Be(3);
+            apiTemplate.TypedResources.Diagnostics.All(x => x.Type == ResourceTypeConstants.APIServiceDiagnostic || x.Type == ResourceTypeConstants.APIDiagnostic).Should().BeTrue();
+            apiTemplate.TypedResources.Diagnostics.All(x => x.Properties is not null).Should().BeTrue();
 
             // tags
-            apiTemplate.SpecificResources.Tags.Count().Should().Be(4);
-            apiTemplate.SpecificResources.Tags.All(x => x.Type == ResourceTypeConstants.ProductTag).Should().BeTrue();
+            apiTemplate.TypedResources.Tags.Count().Should().Be(4);
+            apiTemplate.TypedResources.Tags.All(x => x.Type == ResourceTypeConstants.ProductTag).Should().BeTrue();
 
             // api products
-            apiTemplate.SpecificResources.ApiProducts.Count().Should().Be(2);
-            apiTemplate.SpecificResources.ApiProducts.All(x => x.Type == ResourceTypeConstants.ProductApi).Should().BeTrue();
-            apiTemplate.SpecificResources.ApiProducts.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiProducts.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiProducts.All(x => x.Type == ResourceTypeConstants.ProductApi).Should().BeTrue();
+            apiTemplate.TypedResources.ApiProducts.All(x => x.Properties is not null).Should().BeTrue();
 
             // api policies
-            apiTemplate.SpecificResources.ApiPolicies.Count().Should().Be(2);
-            apiTemplate.SpecificResources.ApiPolicies.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiPolicies.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiPolicies.All(x => x.Properties is not null).Should().BeTrue();
 
             // api operations
-            apiTemplate.SpecificResources.ApiOperations.Count().Should().Be(2);
-            apiTemplate.SpecificResources.ApiOperations.All(x => x.Type == ResourceTypeConstants.APIOperation).Should().BeTrue();
-            apiTemplate.SpecificResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperations.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Type == ResourceTypeConstants.APIOperation).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
 
             // api operations policies
-            apiTemplate.SpecificResources.ApiOperationsPolicies.Count().Should().Be(2);
-            apiTemplate.SpecificResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
 
             // api operations tags
-            apiTemplate.SpecificResources.ApiOperationsPolicies.Count().Should().Be(2);
-            apiTemplate.SpecificResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
         }
     }
 }

@@ -32,7 +32,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         ExtractorParameters extractorParameters;
 
         readonly ILogger<ExtractorExecutor> logger;
-
         readonly IApisClient apisClient;
 
         readonly IApiExtractor apiExtractor;
@@ -69,9 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IApiRevisionExtractor apiRevisionExtractor)
         {
             this.logger = logger;
-
             this.apisClient = apisClient;
-
             this.apiExtractor = apiExtractor;
             this.apiVersionSetExtractor = apiVersionSetExtractor;
             this.authorizationServerExtractor = authorizationServerExtractor;
@@ -358,12 +355,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             if (apiTemplate?.HasResources() == true)
             {
-                apiTemplate.SpecificResources.FileName = FileNameGenerator.GenerateExtractorAPIFileName(singleApiName, this.extractorParameters.FileNames.BaseFileName);
+                apiTemplate.TypedResources.FileName = FileNameGenerator.GenerateExtractorAPIFileName(singleApiName, this.extractorParameters.FileNames.BaseFileName);
 
                 await FileWriter.SaveAsJsonAsync(
                     apiTemplate,
                     directory: baseFilesGenerationDirectory,
-                    fileName: apiTemplate.SpecificResources.FileName);
+                    fileName: apiTemplate.TypedResources.FileName);
             }
 
             this.logger.LogInformation("Finished generation of api template...");
@@ -626,10 +623,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             // refactored
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
-            var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.SpecificResources.ApiProducts);
-            var apiVersionSetTemplate = await this.GenerateApiVersionSetTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.SpecificResources.Apis);
-            var authorizationServerTemplate = await this.GenerateAuthorizationServerTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.SpecificResources.Apis);
-            var tagTemplate = await this.GenerateTagTemplateAsync(singleApiName, apiTemplate.SpecificResources, productTemplate.SpecificResources, baseFilesGenerationDirectory);
+            var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.ApiProducts);
+            var apiVersionSetTemplate = await this.GenerateApiVersionSetTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
+            var authorizationServerTemplate = await this.GenerateAuthorizationServerTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
+            var tagTemplate = await this.GenerateTagTemplateAsync(singleApiName, apiTemplate.TypedResources, productTemplate.TypedResources, baseFilesGenerationDirectory);
             var apiTagTemplate = await this.GenerateApiTagTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
 

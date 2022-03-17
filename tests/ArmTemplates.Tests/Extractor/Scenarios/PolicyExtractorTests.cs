@@ -59,10 +59,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             policyTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
             policyTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             policyTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
-            policyTemplate.SpecificResources.Should().NotBeNull();
+            policyTemplate.TypedResources.Should().NotBeNull();
             policyTemplate.Resources.Count().Should().Be(1);
 
-            var policyResource = policyTemplate.SpecificResources.GlobalServicePolicy;
+            var policyResource = policyTemplate.TypedResources.GlobalServicePolicy;
             policyResource.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             policyResource.Name.Should().NotBeNullOrEmpty();
             policyResource.Type.Should().Be(ResourceTypeConstants.GlobalServicePolicy);

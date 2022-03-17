@@ -163,7 +163,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     this.SetPolicyTemplateResourcePolicyContentWithArmPresetValues(extractorParameters, globalServicePolicyResource, GlobalServicePolicyFileName);
                 }
 
-                policyTemplate.SpecificResources.GlobalServicePolicy = globalServicePolicyResource;
+                policyTemplate.TypedResources.GlobalServicePolicy = globalServicePolicyResource;
             }
             catch (Exception ex)
             {

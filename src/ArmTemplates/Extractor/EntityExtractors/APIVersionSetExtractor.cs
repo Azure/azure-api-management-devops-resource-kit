@@ -54,7 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     apiVersionSet.Type = ResourceTypeConstants.ApiVersionSet;
                     apiVersionSet.ApiVersion = GlobalConstants.ApiVersion;
 
-                    apiVersionSetTemplate.SpecificResources.ApiVersionSets.Add(apiVersionSet);
+                    apiVersionSetTemplate.TypedResources.ApiVersionSets.Add(apiVersionSet);
                 }
             }
 

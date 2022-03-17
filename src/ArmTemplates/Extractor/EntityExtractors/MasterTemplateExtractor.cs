@@ -73,7 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // namedValue
             string namedValueDeploymentResourceName = "namedValuesTemplate";
             // all other deployment resources will depend on named values
-            string[] dependsOnNamedValues = new string[] { };
+            string[] dependsOnNamedValues = Array.Empty<string>();
 
             // api dependsOn
             List<string> apiDependsOn = new List<string>();
@@ -85,7 +85,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 dependsOnNamedValues = new string[] { $"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]" };
                 apiDependsOn.Add($"[resourceId('Microsoft.Resources/deployments', '{namedValueDeploymentResourceName}')]");
                 string namedValuesUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, fileNames.NamedValues);
-                resources.Add(this.CreateLinkedMasterTemplateResourceForPropertyTemplate(namedValueDeploymentResourceName, namedValuesUri, new string[] { }, extractorParameters));
+                resources.Add(this.CreateLinkedMasterTemplateResourceForPropertyTemplate(namedValueDeploymentResourceName, namedValuesUri, Array.Empty<string>(), extractorParameters));
             }
 
             // globalServicePolicy
@@ -166,7 +166,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 apiTagDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
                 productAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'apisTemplate')]");
-                string apisUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, apiTemplate.SpecificResources.FileName);
+                string apisUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, apiTemplate.TypedResources.FileName);
                 resources.Add(this.CreateLinkedMasterTemplateResourceForApiTemplate("apisTemplate", apisUri, apiDependsOn.ToArray(), extractorParameters));
             }
 
@@ -460,7 +460,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
                 else
                 {
-                    resources.Add(this.CreateLinkedMasterTemplateResource(templatename, revUri, new string[] { }));
+                    resources.Add(this.CreateLinkedMasterTemplateResource(templatename, revUri, Array.Empty<string>()));
                 }
             }
 

@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             genericTemplate.ContentVersion = this.template.ContentVersion;
             genericTemplate.Parameters = this.template.Parameters;
             genericTemplate.Variables = this.template.Variables;
-            genericTemplate.SpecificResources = new TTemplateResources(); // creating empty resources
+            genericTemplate.TypedResources = new TTemplateResources(); // creating empty resources
             genericTemplate.Outputs = this.template.Outputs;
 
             return genericTemplate;

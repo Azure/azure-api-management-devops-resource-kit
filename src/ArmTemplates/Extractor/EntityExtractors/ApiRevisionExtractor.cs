@@ -4,6 +4,7 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -78,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 if (curApi.Equals(currentRevision))
                 {
                     var apiResources = await this.apiExtractor.GenerateSingleApiTemplateResourcesAsync(currentRevision, baseFilesGenerationDirectory, extractorParameters);
-                    apiRevisionTemplate.SpecificResources.AddResourcesData(apiResources);
+                    apiRevisionTemplate.TypedResources.AddResourcesData(apiResources);
                 }
                 else
                 {
@@ -86,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     var apiResource = apiResources.Apis.FirstOrDefault();
                     apiResource.DependsOn = new[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{extractorParameters.SingleApiName}')]" };
 
-                    apiRevisionTemplate.SpecificResources.AddResourcesData(apiResources);
+                    apiRevisionTemplate.TypedResources.AddResourcesData(apiResources);
                 }
             }
 
@@ -123,7 +124,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (apiDetails.Properties.ApiVersionSetId != null)
             {
-                apiDetails.DependsOn = new string[] { };
+                apiDetails.DependsOn = Array.Empty<string>();
 
                 string versionSetName = apiDetails.Properties.ApiVersionSetId;
                 int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
@@ -133,7 +134,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
             else
             {
-                apiDetails.DependsOn = new string[] { };
+                apiDetails.DependsOn = Array.Empty<string>();
             }
 
             return apiDetails;

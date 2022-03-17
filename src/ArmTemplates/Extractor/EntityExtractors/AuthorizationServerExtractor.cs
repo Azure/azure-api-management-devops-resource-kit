@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 if (string.IsNullOrEmpty(singleApiName) || isReferencedByApi)
                 {
                     this.logger.LogDebug("'{0}' Authorization server found", originalAuthServerName);
-                    authorizationServerTemplate.SpecificResources.AuthorizationServers.Add(authorizationServer);
+                    authorizationServerTemplate.TypedResources.AuthorizationServers.Add(authorizationServer);
                 }
             }
 

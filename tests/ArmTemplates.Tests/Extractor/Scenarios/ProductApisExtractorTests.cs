@@ -66,17 +66,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ProductAPIs)).Should().BeTrue();
 
             productApisTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
-            productApisTemplate.SpecificResources.ProductApis.Count().Should().Be(2);
+            productApisTemplate.TypedResources.ProductApis.Count().Should().Be(2);
             productApisTemplate.Resources.Count().Should().Be(2);
 
-            var productApi1 = productApisTemplate.SpecificResources.ProductApis.First();
+            var productApi1 = productApisTemplate.TypedResources.ProductApis.First();
             productApi1.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             productApi1.Name.Should().NotBeNullOrEmpty();
             productApi1.Type.Should().Be(ResourceTypeConstants.ProductApi);
             productApi1.Properties.DisplayName.Should().NotBeNullOrEmpty();
             productApi1.Properties.Description.Should().NotBeNullOrEmpty();
 
-            var productApi2 = productApisTemplate.SpecificResources.ProductApis.Last();
+            var productApi2 = productApisTemplate.TypedResources.ProductApis.Last();
             productApi2.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
             productApi2.Name.Should().NotBeNullOrEmpty();
             productApi2.Type.Should().Be(ResourceTypeConstants.ProductApi);

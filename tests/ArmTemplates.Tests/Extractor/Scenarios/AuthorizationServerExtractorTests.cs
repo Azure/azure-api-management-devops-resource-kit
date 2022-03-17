@@ -67,10 +67,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.AuthorizationServers)).Should().BeTrue();
 
             authorizationServerTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
-            authorizationServerTemplate.SpecificResources.AuthorizationServers.Count().Should().Be(1);
+            authorizationServerTemplate.TypedResources.AuthorizationServers.Count().Should().Be(1);
             authorizationServerTemplate.Resources.Count().Should().Be(1);
 
-            var authorizationResource = authorizationServerTemplate.SpecificResources.AuthorizationServers.First();
+            var authorizationResource = authorizationServerTemplate.TypedResources.AuthorizationServers.First();
             authorizationResource.Name.Should().Contain(MockAuthorizationServerClient.AuthorizationServerName1);
             authorizationResource.Type.Should().Contain(ResourceTypeConstants.AuthorizationServer);
             authorizationResource.Properties.Should().NotBeNull();

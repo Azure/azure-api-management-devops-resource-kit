@@ -68,10 +68,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 if (singleApiName == null || productApiTemplateResources.SingleOrDefault(p => p.Name.Contains($"/{productOriginalName}/")) != null)
                 {
                     this.logger.LogDebug("'{0}' product found", productOriginalName);
-                    productsTemplate.SpecificResources.Products.Add(productTemplateResource);
+                    productsTemplate.TypedResources.Products.Add(productTemplateResource);
 
-                    await this.AddProductPolicyToTemplateResources(extractorParameters, productOriginalName, productsTemplate.SpecificResources, baseFilesGenerationDirectory);
-                    await this.AddProductTagsToTemplateResources(extractorParameters, productOriginalName, productsTemplate.SpecificResources);
+                    await this.AddProductPolicyToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources, baseFilesGenerationDirectory);
+                    await this.AddProductTagsToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources);
                 }
             }
 

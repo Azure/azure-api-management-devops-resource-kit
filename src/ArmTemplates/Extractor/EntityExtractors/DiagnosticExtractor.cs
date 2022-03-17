@@ -4,6 +4,7 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
@@ -91,7 +92,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 serviceDiagnostic.Type = ResourceTypeConstants.APIServiceDiagnostic;
                 serviceDiagnostic.ApiVersion = GlobalConstants.ApiVersion;
                 serviceDiagnostic.Scale = null;
-                serviceDiagnostic.DependsOn = new string[] { };
+                serviceDiagnostic.DependsOn = Array.Empty<string>();
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {

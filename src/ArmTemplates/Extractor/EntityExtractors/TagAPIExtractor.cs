@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
@@ -43,11 +44,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (!string.IsNullOrEmpty(singleApiName))
             {
-                tagApiTemplate.SpecificResources = await this.GenerateSingleApiTagResourceAsync(singleApiName, extractorParameters, new string[] { });
+                tagApiTemplate.TypedResources = await this.GenerateSingleApiTagResourceAsync(singleApiName, extractorParameters, Array.Empty<string>());
             }
             else if (!multipleApiNames.IsNullOrEmpty())
             {
-                tagApiTemplate.SpecificResources = await this.GenerateMultipleApisTemplateAsync(multipleApiNames, extractorParameters);
+                tagApiTemplate.TypedResources = await this.GenerateMultipleApisTemplateAsync(multipleApiNames, extractorParameters);
             }
             else
             {
@@ -55,7 +56,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 this.logger.LogDebug("{0} APIs found ...", serviceApis.Count);
 
                 var serviceApiNames = serviceApis.Select(api => api.Name).ToList();
-                tagApiTemplate.SpecificResources = await this.GenerateMultipleApisTemplateAsync(serviceApiNames, extractorParameters);
+                tagApiTemplate.TypedResources = await this.GenerateMultipleApisTemplateAsync(serviceApiNames, extractorParameters);
             }
 
             return tagApiTemplate;
@@ -66,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.logger.LogDebug("Processing {0} api-names...", multipleApiNames.Count);
 
             var overallResources = new TagApiTemplateResources();
-            string[] dependsOn = new string[] { };
+            string[] dependsOn = Array.Empty<string>();
             foreach (string apiName in multipleApiNames)
             {
                 var tagApiResources = await this.GenerateSingleApiTagResourceAsync(apiName, extractorParameters, dependsOn);

@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public Dictionary<string, TemplateParameterProperties> Parameters { get; set; }
 
         [JsonProperty(Order = 10)]
-        public TemplateResource[] Resources { get; set; }
+        public virtual TemplateResource[] Resources { get; set; }
 
         /// <summary>
         /// Returns true, if template contains any resource

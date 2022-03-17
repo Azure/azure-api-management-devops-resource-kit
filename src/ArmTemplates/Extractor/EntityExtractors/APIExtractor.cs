@@ -67,11 +67,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (!string.IsNullOrEmpty(singleApiName))
             {
-                apiTemplate.SpecificResources = await this.GenerateSingleApiTemplateResourcesAsync(singleApiName, baseFilesGenerationDirectory, extractorParameters);
+                apiTemplate.TypedResources = await this.GenerateSingleApiTemplateResourcesAsync(singleApiName, baseFilesGenerationDirectory, extractorParameters);
             }
             else if (!multipleApiNames.IsNullOrEmpty())
             {
-                apiTemplate.SpecificResources = await this.GenerateMultipleApisTemplateAsync(multipleApiNames, baseFilesGenerationDirectory, extractorParameters);
+                apiTemplate.TypedResources = await this.GenerateMultipleApisTemplateAsync(multipleApiNames, baseFilesGenerationDirectory, extractorParameters);
             }
             else
             {
@@ -79,13 +79,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 this.logger.LogInformation("{0} APIs found ...", serviceApis.Count);
 
                 var serviceApiNames = serviceApis.Select(api => api.Name).ToList();
-                apiTemplate.SpecificResources = await this.GenerateMultipleApisTemplateAsync(serviceApiNames, baseFilesGenerationDirectory, extractorParameters);
+                apiTemplate.TypedResources = await this.GenerateMultipleApisTemplateAsync(serviceApiNames, baseFilesGenerationDirectory, extractorParameters);
             }
 
             var serviceDiagnosticTemplateResources = await this.diagnosticExtractor.GetServiceDiagnosticsTemplateResourcesAsync(extractorParameters);
             if (!serviceDiagnosticTemplateResources.IsNullOrEmpty())
             {
-                apiTemplate.SpecificResources.Diagnostics.AddRange(serviceDiagnosticTemplateResources);
+                apiTemplate.TypedResources.Diagnostics.AddRange(serviceDiagnosticTemplateResources);
             }
 
             return apiTemplate;
@@ -144,7 +144,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (apiResource.Properties.ApiVersionSetId != null)
             {
-                apiResource.DependsOn = new string[] { };
+                apiResource.DependsOn = Array.Empty<string>();
 
                 string versionSetName = apiResource.Properties.ApiVersionSetId;
                 int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
@@ -154,7 +154,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
             else
             {
-                apiResource.DependsOn = new string[] { };
+                apiResource.DependsOn = Array.Empty<string>();
             }
         }
 

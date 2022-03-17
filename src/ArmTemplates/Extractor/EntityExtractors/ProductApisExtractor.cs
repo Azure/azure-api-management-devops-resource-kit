@@ -44,11 +44,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (!string.IsNullOrEmpty(singleApiName))
             {
-                productApiTemplate.SpecificResources.ProductApis = await this.GenerateSingleApiTemplateAsync(singleApiName, extractorParameters);
+                productApiTemplate.TypedResources.ProductApis = await this.GenerateSingleApiTemplateAsync(singleApiName, extractorParameters);
             }
             else if (!multipleApiNames.IsNullOrEmpty())
             {
-                productApiTemplate.SpecificResources.ProductApis = await this.GenerateMultipleApisTemplateAsync(multipleApiNames, extractorParameters);
+                productApiTemplate.TypedResources.ProductApis = await this.GenerateMultipleApisTemplateAsync(multipleApiNames, extractorParameters);
             }
             else
             {
@@ -56,7 +56,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 this.logger.LogInformation("{0} APIs found ...", serviceApis.Count);
 
                 var serviceApiNames = serviceApis.Select(api => api.Name).ToList();
-                productApiTemplate.SpecificResources.ProductApis = await this.GenerateMultipleApisTemplateAsync(serviceApiNames, extractorParameters);
+                productApiTemplate.TypedResources.ProductApis = await this.GenerateMultipleApisTemplateAsync(serviceApiNames, extractorParameters);
             }
 
             return productApiTemplate;
@@ -79,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 this.logger.LogInformation("{0} Product API found ...", singleApiName);
                 var dependsOnParameter = addDependsOnParameter
                     ? new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{singleApiName}')]" }
-                    : new string[] { };
+                    : Array.Empty<string>();
 
                 return await this.GenerateProductApiTemplateResourcesAsync(singleApiName, extractorParameters, dependsOnParameter);
             }
@@ -94,7 +94,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             this.logger.LogInformation("Processing {0} api-names...", multipleApiNames.Count);
 
-            string[] dependsOn = new string[] { };
+            string[] dependsOn = Array.Empty<string>();
             var templateResources = new List<ProductApiTemplateResource>();
             foreach (string apiName in multipleApiNames)
             {

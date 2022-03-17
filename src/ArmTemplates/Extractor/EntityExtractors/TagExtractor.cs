@@ -126,8 +126,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         || productAPIResources.Any(t => t.Name.Contains($"/{singleApiName}"))
                             && productTagResources.Any(t => t.Name.Contains($"/{tagOriginalName}'")))
                 {
-                    
-                    tagTemplate.SpecificResources.Tags.Add(tag);
+                    tagTemplate.TypedResources.Tags.Add(tag);
                 }
             }
 

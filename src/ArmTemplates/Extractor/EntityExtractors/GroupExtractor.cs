@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 extractedGroup.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{extractedGroup.Name}')]";
                 extractedGroup.ApiVersion = GlobalConstants.ApiVersion;
 
-                groupsTemplate.SpecificResources.Groups.Add(extractedGroup);
+                groupsTemplate.TypedResources.Groups.Add(extractedGroup);
             }
 
             return groupsTemplate;

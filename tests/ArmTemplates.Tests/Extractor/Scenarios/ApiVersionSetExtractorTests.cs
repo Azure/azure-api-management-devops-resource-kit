@@ -68,7 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             apiVersionSetTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
 
-            apiVersionSetTemplate.SpecificResources.ApiVersionSets.Count().Should().Be(2);
+            apiVersionSetTemplate.TypedResources.ApiVersionSets.Count().Should().Be(2);
             apiVersionSetTemplate.Resources.Count().Should().Be(2);
 
             (apiVersionSetTemplate.Resources[0].Name.Contains(MockApiVersionSetClient.ApiVersionSetName1) ||
@@ -76,7 +76,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             (apiVersionSetTemplate.Resources[0].Name.Contains(MockApiVersionSetClient.ApiVersionSetName2) ||
                 apiVersionSetTemplate.Resources[1].Name.Contains(MockApiVersionSetClient.ApiVersionSetName2)).Should().BeTrue();
 
-            foreach (var templateResource in apiVersionSetTemplate.SpecificResources.ApiVersionSets)
+            foreach (var templateResource in apiVersionSetTemplate.TypedResources.ApiVersionSets)
             {
                 templateResource.Type.Should().Be(ResourceTypeConstants.ApiVersionSet);
                 templateResource.Properties.Should().NotBeNull();

@@ -17,25 +17,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         /// It will not be serialized
         /// </summary>
         [JsonIgnore]
-        public TTemplateResources SpecificResources { get; set; }
+        public TTemplateResources TypedResources { get; set; }
 
         /// <summary>
         /// Returns TemplateResources collection by building specific resources of current template
         /// </summary>
         [JsonProperty(Order = 10)]
-        public new TemplateResource[] Resources => this.SpecificResources.BuildTemplateResources();
+        public override TemplateResource[] Resources => this.TypedResources.BuildTemplateResources();
 
         /// <summary>
         /// Returns true, if template resources contains some data
         /// </summary>
         public new bool HasResources()
         {
-            if (this.SpecificResources is null)
+            if (this.TypedResources is null)
             {
                 return false;
             }
 
-            return this.SpecificResources.HasContent();
+            return this.TypedResources.HasContent();
         }
     }
 }
