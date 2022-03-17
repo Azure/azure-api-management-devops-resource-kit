@@ -23,6 +23,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             var mockGroupsClient = new Mock<ITagClient>(MockBehavior.Strict);
 
             mockGroupsClient
+                .Setup(x => x.GetTagsLinkedToApiOperationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<TagTemplateResource>
+                {
+                    new TagTemplateResource
+                    {
+                        Name = TagName1,
+                        Type = ResourceTypeConstants.ProductTag
+                    },
+
+                    new TagTemplateResource
+                    {
+                        Name = TagName2,
+                        Type = ResourceTypeConstants.ProductTag
+                    }
+                });
+
+            mockGroupsClient
                 .Setup(x => x.GetAllTagsLinkedToApiAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new List<TagTemplateResource>
                 {

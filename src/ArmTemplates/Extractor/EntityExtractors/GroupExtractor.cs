@@ -31,16 +31,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.groupsClient = groupsClient;
         }
 
-        public async Task<Template> GenerateGroupsTemplateAsync(ExtractorParameters extractorParameters)
+        public async Task<Template<GroupTemplateResources>> GenerateGroupsTemplateAsync(ExtractorParameters extractorParameters)
         {
-            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
-            var templateResources = new List<GroupTemplateResource>();
+            var groupsTemplate = this.templateBuilder
+                                        .GenerateTemplateWithApimServiceNameProperty()
+                                        .Build<GroupTemplateResources>();
 
             var allGroups = await this.groupsClient.GetAllAsync(extractorParameters);
             if (allGroups.IsNullOrEmpty())
             {
                 this.logger.LogWarning($"No groups were found for '{extractorParameters.SourceApimName}' at '{extractorParameters.ResourceGroup}'");
-                return armTemplate;
+                return groupsTemplate;
             }
 
             foreach (var extractedGroup in allGroups)
@@ -49,11 +50,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 extractedGroup.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{extractedGroup.Name}')]";
                 extractedGroup.ApiVersion = GlobalConstants.ApiVersion;
 
-                templateResources.Add(extractedGroup);
+                groupsTemplate.TypedResources.Groups.Add(extractedGroup);
             }
 
-            armTemplate.Resources = templateResources.ToArray();
-            return armTemplate;
+            return groupsTemplate;
         }
     }
 }

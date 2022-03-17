@@ -7,8 +7,13 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiOperations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Apis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiSchemas;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiRevision;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiVersionSet;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.AuthorizationServer;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Diagnostics;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product;
@@ -74,16 +79,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<ITagApiExtractor, TagApiExtractor>();
             services.AddScoped<ITagExtractor, TagExtractor>();
             services.AddScoped<IGroupExtractor, GroupExtractor>();
+            services.AddScoped<IApiSchemaExtractor, ApiSchemaExtractor>();
+            services.AddScoped<IApiOperationExtractor, ApiOperationExtractor>();
+            services.AddScoped<IDiagnosticExtractor, DiagnosticExtractor>();
+            services.AddScoped<IAuthorizationServerExtractor, AuthorizationServerExtractor>();
+            services.AddScoped<IApiRevisionExtractor, ApiRevisionExtractor>();
         }
 
         static void SetupApiClients(IServiceCollection services)
         {
+            services.AddScoped<IApiOperationClient, ApiOperationClient>();
+            services.AddScoped<IApiSchemaClient, ApiSchemaClient>();
+            services.AddScoped<IApiRevisionClient, ApiRevisionClient>();
+            services.AddScoped<IAuthorizationServerClient, AuthorizationServerClient>();
             services.AddScoped<IApiVersionSetClient, ApiVersionSetClient>();
             services.AddScoped<IApisClient, ApisClient>();
             services.AddScoped<IGroupsClient, GroupsClient>();
             services.AddScoped<ITagClient, TagClient>();
             services.AddScoped<IPolicyClient, PolicyClient>();
             services.AddScoped<IProductsClient, ProductsClient>();
+            services.AddScoped<IDiagnosticClient, DiagnosticClient>();
         }
     }
 }
