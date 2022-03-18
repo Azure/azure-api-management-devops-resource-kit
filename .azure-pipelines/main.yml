@@ -67,10 +67,14 @@ stages:
               Get-ChildItem -Path '$()' -Directory -Recurse | Where-Object { $_.FullName -match '\\bin|obj\\$(configuration)$' } | Write-Host
             displayName: Show Build Directories
 
+          - pwsh: |
+              New-Item -Path '$(Build.Repository.LocalPath)\\src\\binaries\\$(configuration)' -ItemType Directory
+            displayName: Create binaries folder for Release Artifacts
+
           - task: PublishBuildArtifacts@1
             displayName: Publish Build Artifacts
             inputs:
-              pathToPublish: 'src/$(configuration)'
+              pathToPublish: 'src/binaries/$(configuration)'
               artifactName: build
 
   - stage: postbuild
