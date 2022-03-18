@@ -12,6 +12,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
     [Verb(GlobalConstants.CreateName, HelpText = GlobalConstants.CreateDescription)]
     public class CreateConsoleAppConfiguration
     {
+        [Option(longName: "configFile", HelpText = "Config YAML file location", Required = true)]
+        public string ConfigFile { get; set; }
+
         [Option(longName: "appInsightsInstrumentationKey", HelpText = "AppInsights intrumentationkey")]
         public string AppInsightsInstrumentationKey { get; set; }
 
@@ -23,9 +26,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
 
         [Option(longName: "apimNameValue", HelpText = "Apim Name Value")]
         public string ApimNameValue { get; set; }
-
-        [Option(longName: "configFile", HelpText = "Config YAML file location")]
-        public string ConfigFile { get; set; }
 
         [Option(longName: "backendUrlConfigFile", HelpText = "Backend url json file location")]
         public string BackendUrlConfigFile { get; set; }

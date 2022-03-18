@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers
 {
@@ -32,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                         StringWriter writer = new StringWriter();
                         jsonSerializer.Serialize(writer, deserializedYaml);
                         string jsonText = writer.ToString();
-                        CreatorConfig yamlObject = JsonConvert.DeserializeObject<CreatorConfig>(jsonText);
+                        CreatorConfig yamlObject = jsonText.Deserialize<CreatorConfig>();
                         return yamlObject;
                     }
                 }
@@ -54,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                     jsonSerializer.Serialize(writer, deserializedYaml);
                     string jsonText = writer.ToString();
                     // deserialize CreatorConfig from json string
-                    CreatorConfig yamlObject = JsonConvert.DeserializeObject<CreatorConfig>(jsonText);
+                    CreatorConfig yamlObject = jsonText.Deserialize<CreatorConfig>();
                     return yamlObject;
                 }
             }
@@ -70,7 +71,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             using (StreamReader r = new StreamReader(extractorJsonPath))
             {
                 string extractorJson = r.ReadToEnd();
-                ExtractorConsoleAppConfiguration extractorConfig = JsonConvert.DeserializeObject<ExtractorConsoleAppConfiguration>(extractorJson);
+                ExtractorConsoleAppConfiguration extractorConfig = extractorJson.Deserialize<ExtractorConsoleAppConfiguration>();
                 return extractorConfig;
             }
         }
@@ -110,7 +111,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
         {
             try
             {
-                object deserializedFileContents = JsonConvert.DeserializeObject<object>(fileContents);
+                object deserializedFileContents = fileContents.Deserialize<object>();
                 return true;
             }
             catch (Exception)

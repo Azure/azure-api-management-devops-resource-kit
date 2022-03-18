@@ -93,7 +93,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     string backend = await this.GetBackendDetailsAsync(apimname, resourceGroup, backendName);
 
                     // convert returned backend to template resource class
-                    BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
+                    BackendTemplateResource backendTemplateResource = backend.Deserialize<BackendTemplateResource>();
                     backendTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendName}')]";
                     backendTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
 
@@ -232,7 +232,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                             string backend = await this.GetBackendDetailsAsync(apimname, resourceGroup, backendName);
 
                             // convert returned backend to template resource class
-                            BackendTemplateResource backendTemplateResource = JsonConvert.DeserializeObject<BackendTemplateResource>(backend);
+                            BackendTemplateResource backendTemplateResource = backend.Deserialize<BackendTemplateResource>();
 
                             // we have already checked if the named value is used in a policy, we just need to confirm if the backend is referenced by this single api within the policy file
                             // this is why an empty named values must be passed to this method for validation
