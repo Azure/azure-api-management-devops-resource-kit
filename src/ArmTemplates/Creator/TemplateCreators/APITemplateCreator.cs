@@ -214,7 +214,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     if (isJSON == true)
                     {
                         var openAPISpecReader = new OpenAPISpecReader();
-                        isVersionThree = await openAPISpecReader.isJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
+                        isVersionThree = await openAPISpecReader.IsJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
                     }
                     format = GetOpenApiSpecFormat(isUrl, isJSON, isVersionThree);
                 }

@@ -1,10 +1,21 @@
 # Table of Contents
 
-1. [ Creator ](#Creator)
+1. [Running ArmTemplates Application](#running-armTemplates-application)
+2. [ Creator ](#Creator)
     * [Create the Config File](#creator1)
     * [Running the Creator](#creator2)
-2. [ Extractor ](#Extractor)
+3. [ Extractor ](#Extractor)
     * [Running the Extractor](#running-the-extractor)
+
+# Running ArmTemplates Application
+
+Follow this guide for manually building and running the application
+1. git clone repository
+2. navigate to repo root
+3. build application using `dotnet build src/ArmTemplates/ArmTemplates.csproj` (netcore3.1 must be installed)
+4. navigate to built binaries using `cd .\src\ArmTemplates\bin\Debug\netcoreapp3.1\`
+5. run ` dotnet .\ArmTemplates.dll --help` to view all available commands
+6. Investigate possible commands to run and choose desired
 
 # Creator
 
@@ -318,7 +329,7 @@ serviceUrlParameters:
 Below are the steps to run the Creator from the source code:
 
 - Clone this repository and restore its packages using ```dotnet restore```
-- Navigate to {path_to_folder}/src/ARMTemplates directory
+- Navigate to {repo root}/src/ARMTemplates directory
 - Run the following command:
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION ```
 - Run the following command to pass apim Name as a parameter:
@@ -363,7 +374,7 @@ To be able to run the Extractor, you would first need to [install the Azure CLI]
 
 ## Running the Extractor
 Below are the steps to run the Extractor from the source code:
-- Clone this repository and navigate to {path_to_folder}/src/ARMTemplates
+- Clone this repository and navigate to {repo root}/src/ARMTemplates
 - Restore its packages using ```dotnet restore```
 - Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted. 
 ```

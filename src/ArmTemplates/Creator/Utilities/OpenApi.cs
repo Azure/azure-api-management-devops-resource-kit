@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using YamlDotNet.Serialization;
@@ -26,9 +28,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             }
             else
             {
-                this.definition_ = JsonConvert.DeserializeObject<Dictionary<string, object>>(definition, new JsonDictionaryConverter());
+                this.definition_ = definition.Deserialize<Dictionary<string, object>>(new JsonDictionaryConverter());
             }
         }
+
         public OpenApi SetTitle(string title)
         {
             if (this.format_ == "openapi")
@@ -53,7 +56,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             else
             {
                 // include StringEscaping to ensure single quotes are escaped
-                return JsonConvert.SerializeObject(this.definition_, settings: new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml });
+                return JsonConvert.SerializeObject(this.definition_, settings: new JsonSerializerSettings { 
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    StringEscapeHandling = StringEscapeHandling.EscapeHtml 
+                });
             }
         }
 

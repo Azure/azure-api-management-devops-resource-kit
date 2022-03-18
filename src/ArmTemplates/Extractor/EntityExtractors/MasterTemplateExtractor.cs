@@ -566,7 +566,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     if (propertyResources.Count(item => item.Name.Contains(propertyName)) > 0)
                     {
                         string fullPropertyResource = await pExc.GetPropertyDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, propertyName);
-                        PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+                        PropertyTemplateResource propertyTemplateResource = fullPropertyResource.Deserialize<PropertyTemplateResource>();
 
                         //Only add the property if it is not controlled by keyvault
                         if (propertyTemplateResource?.Properties.keyVault == null)
@@ -598,7 +598,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     if (propertyResources.Count(item => item.Name.Contains(propertyName)) > 0)
                     {
                         string fullPropertyResource = await pExc.GetPropertyDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, propertyName);
-                        PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+                        PropertyTemplateResource propertyTemplateResource = fullPropertyResource.Deserialize<PropertyTemplateResource>();
                         if (propertyTemplateResource?.Properties.keyVault != null)
                         {
                             string propertyValue = propertyTemplateResource.Properties.keyVault.secretIdentifier;

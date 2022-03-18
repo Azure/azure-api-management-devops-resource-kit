@@ -107,7 +107,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 string fullPropertyResource = await this.GetPropertyDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, propertyName);
 
                 // convert returned named value to template resource class
-                PropertyTemplateResource propertyTemplateResource = JsonConvert.DeserializeObject<PropertyTemplateResource>(fullPropertyResource);
+                PropertyTemplateResource propertyTemplateResource = fullPropertyResource.Deserialize<PropertyTemplateResource>();
                 propertyTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{propertyName}')]";
                 propertyTemplateResource.Type = ResourceTypeConstants.Property;
                 propertyTemplateResource.ApiVersion = GlobalConstants.ApiVersion;

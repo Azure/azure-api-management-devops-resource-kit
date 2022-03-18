@@ -165,9 +165,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
                BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.ApiVersion);
 
-            string apiDetails = await this.CallApiManagementAsync(azToken, requestUrl);
-            JObject oApiDetails = JObject.Parse(apiDetails);
-            APITemplateResource apiResource = JsonConvert.DeserializeObject<APITemplateResource>(apiDetails);
+            string apiDetails = await this.CallApiManagementAsync(azToken, requestUrl);            
+            APITemplateResource apiResource = apiDetails.Deserialize<APITemplateResource>();
             return apiResource.Properties.ServiceUrl;
         }
 

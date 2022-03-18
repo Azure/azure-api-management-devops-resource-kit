@@ -21,5 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
         public static string Serialize<T>(this T item) => JsonConvert.SerializeObject(item, DefaultJsonSerializationSettings);
 
         public static T Deserialize<T>(this string serializedItem) => JsonConvert.DeserializeObject<T>(serializedItem, DefaultJsonSerializationSettings);
+
+        public static T Deserialize<T>(this string serializedItem, JsonConverter jsonConverter) => JsonConvert.DeserializeObject<T>(serializedItem, converters: jsonConverter);
     }
 }

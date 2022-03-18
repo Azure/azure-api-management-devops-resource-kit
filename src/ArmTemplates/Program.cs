@@ -7,6 +7,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurati
 using CommandLine;
 using System.Threading.Tasks;
 using CommandLine.Text;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -19,6 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
             var commandLineParser = new Parser(parserSettings =>
             {
+                parserSettings.HelpWriter = Console.Out;
                 parserSettings.CaseSensitive = true;
             });
 
@@ -45,15 +48,43 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 
                 async errors =>
                 {
-                    applicationLogger.Error("Azure API Management DevOps Resource toolkit failed with parsing arguments errors.");
-                    applicationLogger.Error("Below is full errors list. Please, check your input");
+                    applicationLogger.Information("Azure API Management DevOps Resource toolkit finished.");
 
-                    var builder = SentenceBuilder.Create();
-                    var errorMessages = HelpText.RenderParsingErrorsTextAsLines(parserResult, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);
-
-                    foreach (var errorMessage in errorMessages)
+                    if (!errors.IsNullOrEmpty())
                     {
-                        applicationLogger.Error(errorMessage);
+                        var errorList = errors.ToList();
+
+                        // write descriptive message for specific error-tags
+                        if (errorList.Count == 1)
+                        {
+                            var singleError = errorList.First();
+
+                            switch (singleError.Tag)
+                            {
+                                case ErrorType.VersionRequestedError:
+                                case ErrorType.HelpRequestedError:
+                                    return;
+
+                                case ErrorType.HelpVerbRequestedError:
+                                    applicationLogger.Error("No verb found. Use \"help\" command to view all supported commands.");
+                                    break;
+
+                                default:
+                                    applicationLogger.Error("Azure API Management DevOps Resource toolkit non-expected error occured.");
+                                    break;
+                            }
+                        }
+
+                        var builder = SentenceBuilder.Create();
+                        var errorMessages = HelpText.RenderParsingErrorsTextAsLines(parserResult, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 0).ToList();
+
+                        for (var i = 0; i < errorList.Count; i++)
+                        {
+                            var errorTag = errorList[i].Tag;
+                            var errorMessage = (i < errorMessages.Count) ? errorMessages[i] : string.Empty;
+
+                            applicationLogger.Error("[{0}] {1}", errorList[i].Tag, errorMessage);
+                        }                        
                     }
                 }
             );
