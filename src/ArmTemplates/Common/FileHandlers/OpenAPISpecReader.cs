@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -8,7 +9,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 {
     public class OpenAPISpecReader
     {
-        public async Task<bool> isJSONOpenAPISpecVersionThreeAsync(string openApiSpecFileLocation)
+        public async Task<bool> IsJSONOpenAPISpecVersionThreeAsync(string openApiSpecFileLocation)
         {
             // determine whether file location is local file path or remote url and read content
             Uri uriResult;
@@ -21,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 if (response.IsSuccessStatusCode)
                 {
                     string fileContents = await response.Content.ReadAsStringAsync();
-                    OpenAPISpecWithVersion openAPISpecWithVersion = JsonConvert.DeserializeObject<OpenAPISpecWithVersion>(fileContents);
+                    OpenAPISpecWithVersion openAPISpecWithVersion = fileContents.Deserialize<OpenAPISpecWithVersion>();
                     // OASv3 has the property 'openapi' but not the property 'swagger'
                     return openAPISpecWithVersion.Swagger != null ? false : true;
                 }
@@ -33,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             else
             {
                 string fileContents = File.ReadAllText(openApiSpecFileLocation);
-                OpenAPISpecWithVersion openAPISpecWithVersion = JsonConvert.DeserializeObject<OpenAPISpecWithVersion>(fileContents);
+                OpenAPISpecWithVersion openAPISpecWithVersion = fileContents.Deserialize<OpenAPISpecWithVersion>();
                 // OASv3 has the property 'openapi' but not the property 'swagger'
                 return openAPISpecWithVersion.Swagger != null ? false : true;
             }

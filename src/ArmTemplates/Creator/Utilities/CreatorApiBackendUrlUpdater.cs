@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             //if the file is json file
             if (fileReader.IsJSON(backendurlConfigContent))
             {
-                List<BackendUrlsConfig> backendUrls = JsonConvert.DeserializeObject<List<BackendUrlsConfig>>(backendurlConfigContent);
+                List<BackendUrlsConfig> backendUrls = backendurlConfigContent.Deserialize<List<BackendUrlsConfig>>();
 
                 foreach (APIConfig aPIConfig in creatorConfig.apis)
                 {

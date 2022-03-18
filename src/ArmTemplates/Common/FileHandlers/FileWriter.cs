@@ -27,13 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 
         public static void WriteJSONToFile(object template, string location)
         {
-            // writes json object to provided location
-            string jsonString = JsonConvert.SerializeObject(template,
-                            Formatting.Indented,
-                            new JsonSerializerSettings
-                            {
-                                NullValueHandling = NullValueHandling.Ignore
-                            });
+            var jsonString = template.Serialize();
             File.WriteAllText(location, jsonString);
         }
 

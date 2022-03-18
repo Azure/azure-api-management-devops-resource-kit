@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 string fullLoggerResource = await this.GetLoggerDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, loggerName);
 
                 // convert returned logger to template resource class
-                LoggerTemplateResource loggerResource = JsonConvert.DeserializeObject<LoggerTemplateResource>(fullLoggerResource);
+                LoggerTemplateResource loggerResource = fullLoggerResource.Deserialize<LoggerTemplateResource>();
                 loggerResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{loggerName}')]";
                 loggerResource.Type = ResourceTypeConstants.Logger;
                 loggerResource.ApiVersion = GlobalConstants.ApiVersion;
