@@ -70,7 +70,7 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: Publish Build Artifacts
             inputs:
-              pathToPublish: 'src/ArmTemplates/bin/$(configuration)'
+              pathToPublish: 'src/$(configuration)'
               artifactName: build
 
   - stage: postbuild
