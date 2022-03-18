@@ -10,16 +10,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "extractorConfig", HelpText = "Config file of the extractor")]
         public string ExtractorConfig { get; set; }
 
-        [Option(longName: "sourceApimName", HelpText = "Source API Management name", Required = true)]
+        [Option(longName: "sourceApimName", HelpText = "Source API Management name")]
         public string SourceApimName { get; set; }
 
-        [Option(longName: "destinationApimName", HelpText = "Destination API Management name", Required = true)]
+        [Option(longName: "destinationApimName", HelpText = "Destination API Management name")]
         public string DestinationApimName { get; set; }
 
-        [Option(longName: "resourceGroup", HelpText = "Resource Group name", Required = true)]
+        [Option(longName: "resourceGroup", HelpText = "Resource Group name")]
         public string ResourceGroup { get; set; }
 
-        [Option(longName: "fileFolder", HelpText = "ARM Template files folder", Required = true)]
+        [Option(longName: "fileFolder", HelpText = "ARM Template files folder")]
         public string FileFolder { get; set; }
 
         [Option(longName: "apiName", HelpText = "Single API name")]
