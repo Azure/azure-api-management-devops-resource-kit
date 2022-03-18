@@ -30,7 +30,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             {
                 this.definition_ = definition.Deserialize<Dictionary<string, object>>(new JsonDictionaryConverter());
             }
-        }   
+        }
+
         public OpenApi SetTitle(string title)
         {
             if (this.format_ == "openapi")
