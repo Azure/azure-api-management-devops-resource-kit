@@ -1,6 +1,5 @@
 trigger:
   - main
-  - major-repo-refactoring
   - refs/tags/*
 
 pr:
@@ -10,7 +9,6 @@ pool:
   name: 'VSEngSS-MicroBuild2022-1ES'
 
 variables:
-  basePath: 'src/APIM_ARMTemplate'
   configuration: 'Release'
   BASE_VERSION: '0.0.1'
   PREVIEW_LABEL: 'preview'
@@ -55,7 +53,7 @@ stages:
             inputs:
               command: 'build'
               arguments: '--configuration $(configuration)'
-              projects: '$(basePath)/**/*.csproj'
+              projects: '**/*.csproj'
 
           - task: DotNetCoreCLI@2
             displayName: 'Run Tests'
@@ -63,7 +61,7 @@ stages:
               command: 'test'
               arguments: '--configuration $(configuration) --collect "Code coverage"'
               publishTestResults: true
-              projects: '$(basePath)/**/*.test.csproj'
+              projects: 'tests/**/*.test.csproj'
 
           - pwsh: |
               Get-ChildItem -Path '$()' -Directory -Recurse | Where-Object { $_.FullName -match '\\bin|obj\\$(configuration)$' } | Write-Host
@@ -72,7 +70,7 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: Publish Build Artifacts
             inputs:
-              pathToPublish: '$(basePath)/apimtemplate/bin/$(configuration)'
+              pathToPublish: 'src/ArmTemplates/bin/$(configuration)'
               artifactName: build
 
   - stage: postbuild
