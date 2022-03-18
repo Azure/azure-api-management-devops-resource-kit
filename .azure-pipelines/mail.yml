@@ -1,0 +1,122 @@
+trigger:
+  - main  
+  - refs/tags/*
+
+pr:
+  - *
+
+pool:
+  name: 'VSEngSS-MicroBuild2022-1ES'
+
+variables:
+  basePath: 'src/APIM_ARMTemplate'
+  configuration: 'Release'
+  BASE_VERSION: '0.0.1'
+  PREVIEW_LABEL: 'preview'
+  BUILD_NUMBER: $[counter(format('{0}_{1}_{2}', variables['BASE_VERSION'], variables['PREVIEW_LABEL'], variables['Build.SourceBranch']), 1)]
+  APP_VERSION: $[format('{0}-{1}.{2}', variables['BASE_VERSION'], variables['PREVIEW_LABEL'], variables['BUILD_NUMBER'])]
+
+stages:
+  - stage: build
+    displayName: Build Toolkit
+    jobs:
+      - job: build_and_test
+        displayName: 'Build and Tests'
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              version: '3.1.x'
+              performMultiLevelLookup: true
+
+          - pwsh: |
+              $pr = "pr." + $env:SYSTEM_PULLREQUEST_PULLREQUESTNUMBER
+              $version = $env:BASE_VERSION + "-" + $pr + "." + $env:BUILD_NUMBER
+              Write-Host "Preview label: $pr"
+              Write-Host "NuGet version: $nuget"
+              Write-Host "##vso[task.setvariable variable=PREVIEW_LABEL]$pr"
+              Write-Host "##vso[task.setvariable variable=APP_VERSION]$version"
+            displayName: Override version for PRs
+            condition: eq(variables['Build.Reason'], 'PullRequest')
+
+          - pwsh: |
+              $tagVersion = $env:BUILD_SOURCEBRANCHNAME
+              Write-Host "Tag version: $tagVersion"
+              Write-Host "##vso[task.setvariable variable=APP_VERSION]$tagVersion"
+            displayName: Override version for tags
+            condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')  
+
+          - pwsh: |
+              Write-Host "##vso[build.updatebuildnumber]$env:APP_VERSION"
+            displayName: Update the build number with a more readable one
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build Toolkit'
+            inputs:
+              command: 'build'
+              arguments: '--configuration $(configuration)'
+              projects: '$(basePath)/**/*.csproj'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Run Tests'
+            inputs:
+              command: 'test'
+              arguments: '--configuration $(configuration) --collect "Code coverage"'
+              publishTestResults: true
+              projects: '$(basePath)/**/*.test.csproj'
+
+          - pwsh: |
+              Get-ChildItem -Path '$()' -Directory -Recurse | Where-Object { $_.FullName -match '\\bin|obj\\$(configuration)$' } | Write-Host
+            displayName: Show Build Directories
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish Build Artifacts
+            inputs:
+              pathToPublish: '$(basePath)/apimtemplate/bin/$(configuration)'
+              artifactName: build
+
+  - stage: postbuild
+    displayName: 'Post Build Checks'
+    condition: eq('ref/heads/main', variables['Build.SourceBranch'])
+    dependsOn: ['build']
+    jobs:
+      - job: required_checks
+        displayName: 'Run required code checks'
+        steps:
+          - pwsh: |
+              $repo = "$(Build.Repository.Id)"
+              $repo = $repo.Substring($repo.IndexOf("/") + 1)
+              $branch = "main"
+              $CODEBASE_NAME = $repo + "_" + $branch
+              echo "Using codebase: $CODEBASE_NAME"
+              Write-Host "##vso[task.setvariable variable=CODEBASE_NAME]$CODEBASENAME"
+              
+          - task: CredScan@2
+            inputs:
+              toolMajorVersion: 'V2'
+
+          - task: PoliCheck@1
+            inputs:
+              inputType: 'Basic'
+              targetType: 'F'
+
+          - task: SdtReport@1
+            displayName: 'Create security analysis report'
+            inputs:
+              AllTools: false
+              APIScan: false
+              BinSkim: false
+              CodesignValidation: false
+              CredScan: true
+              FortifySCA: false
+              FxCop: false
+              ModernCop: false
+              MSRD: false
+              PoliCheck: true
+              RoslynAnalyzers: false
+              SDLNativeRules: false
+              Semmle: false
+              TSLint: false
+              ToolLogsNotFoundAction: 'Standard'
+
+          - task: PublishSecurityAnalysisLogs@3
+            displayName: 'Publish security analysis logs'
