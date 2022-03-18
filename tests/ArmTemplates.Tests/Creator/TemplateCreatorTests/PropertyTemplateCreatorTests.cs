@@ -4,6 +4,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -27,7 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var propertyTemplateResource = (PropertyTemplateResource)propertyTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{property.displayName}')]", propertyTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{property.displayName}')]", propertyTemplateResource.Name);
             Assert.Equal(property.displayName, propertyTemplateResource.Properties.displayName);
             Assert.Equal(property.value, propertyTemplateResource.Properties.value);
         }

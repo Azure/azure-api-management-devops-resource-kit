@@ -4,6 +4,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Templa
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -33,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var productsTemplateResource = (ProductsTemplateResource)productTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.Name}')]", productsTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.Name}')]", productsTemplateResource.Name);
             Assert.Equal(product.DisplayName, productsTemplateResource.Properties.DisplayName);
             Assert.Equal(product.Description, productsTemplateResource.Properties.Description);
             Assert.Equal(product.Terms, productsTemplateResource.Properties.Terms);
@@ -66,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             ProductsTemplateResource productsTemplateResource = (ProductsTemplateResource)productTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.Name}')]", productsTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.Name}')]", productsTemplateResource.Name);
             Assert.Equal(product.DisplayName, productsTemplateResource.Properties.DisplayName);
             Assert.Equal(product.Description, productsTemplateResource.Properties.Description);
             Assert.Equal(product.Terms, productsTemplateResource.Properties.Terms);

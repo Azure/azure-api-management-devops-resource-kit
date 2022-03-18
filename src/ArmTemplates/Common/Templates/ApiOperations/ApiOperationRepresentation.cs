@@ -13,5 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public string SchemaId { get; set; }
 
         public string TypeName { get; set; }
+
+        public string Sample { get; set; }
     }
 }

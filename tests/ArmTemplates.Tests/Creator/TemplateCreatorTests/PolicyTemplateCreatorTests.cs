@@ -4,6 +4,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Templa
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -21,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var policyTemplateResource = policyTemplate.Resources[0] as PolicyTemplateResource;
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/policy')]", policyTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/policy')]", policyTemplateResource.Name);
             Assert.Equal("rawxml-link", policyTemplateResource.Properties.Format);
             Assert.Equal(creatorConfig.policy, policyTemplateResource.Properties.PolicyContent);
         }
@@ -44,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             PolicyTemplateResource policyTemplateResource = policyTemplateCreator.CreateAPIPolicyTemplateResource(api, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/policy')]", policyTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/policy')]", policyTemplateResource.Name);
             Assert.Equal("rawxml-link", policyTemplateResource.Properties.Format);
             Assert.Equal(api.policy, policyTemplateResource.Properties.PolicyContent);
             Assert.Equal(dependsOn, policyTemplateResource.DependsOn);
@@ -75,7 +76,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             PolicyTemplateResource policyTemplateResource = policyTemplateCreator.CreateProductPolicyTemplateResource(product, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{product.DisplayName}/policy')]", policyTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.DisplayName}/policy')]", policyTemplateResource.Name);
             Assert.Equal("rawxml-link", policyTemplateResource.Properties.Format);
             Assert.Equal(product.policy, policyTemplateResource.Properties.PolicyContent);
             Assert.Equal(dependsOn, policyTemplateResource.DependsOn);
@@ -94,7 +95,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             PolicyTemplateResource policyTemplateResource = policyTemplateCreator.CreateOperationPolicyTemplateResource(policyPair, apiName, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{apiName}/{policyPair.Key}/policy')]", policyTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{policyPair.Key}/policy')]", policyTemplateResource.Name);
             Assert.Equal("rawxml-link", policyTemplateResource.Properties.Format);
             Assert.Equal(policyPair.Value.policy, policyTemplateResource.Properties.PolicyContent);
             Assert.Equal(dependsOn, policyTemplateResource.DependsOn);

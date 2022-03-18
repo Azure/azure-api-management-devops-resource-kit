@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -74,10 +75,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             DiagnosticTemplateResource diagnosticTemplateResource = diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/{api.diagnostic.name}')]", diagnosticTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/{api.diagnostic.name}')]", diagnosticTemplateResource.Name);
             Assert.Equal(dependsOn, diagnosticTemplateResource.DependsOn);
             Assert.Equal(api.diagnostic.alwaysLog, diagnosticTemplateResource.Properties.alwaysLog);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('ApimServiceName'), '{api.diagnostic.loggerId}')]", diagnosticTemplateResource.Properties.loggerId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('{ParameterNames.ApimServiceName}'), '{api.diagnostic.loggerId}')]", diagnosticTemplateResource.Properties.loggerId);
             Assert.Equal(api.diagnostic.enableHttpCorrelationHeaders, diagnosticTemplateResource.Properties.enableHttpCorrelationHeaders);
             Assert.Equal(api.diagnostic.sampling.samplingType, diagnosticTemplateResource.Properties.sampling.samplingType);
             Assert.Equal(api.diagnostic.sampling.percentage, diagnosticTemplateResource.Properties.sampling.percentage);

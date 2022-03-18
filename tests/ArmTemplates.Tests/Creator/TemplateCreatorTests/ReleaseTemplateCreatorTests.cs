@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -30,10 +31,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // assert
             string releaseName = $"";
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}/release-revision-{api.apiRevision}')]", releaseTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/release-revision-{api.apiRevision}')]", releaseTemplateResource.Name);
             Assert.Equal(dependsOn, releaseTemplateResource.DependsOn);
             Assert.Equal($"Release created to make revision {api.apiRevision} current.", releaseTemplateResource.Properties.notes);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('ApimServiceName'), '{api.name}')]", releaseTemplateResource.Properties.apiId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{api.name}')]", releaseTemplateResource.Properties.apiId);
         }
     }
 }

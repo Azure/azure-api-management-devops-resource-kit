@@ -16,6 +16,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public string Description { get; set; }
 
+        public ApiOperationTemplateParameter[] TemplateParameters { get; set; }
+
         public ApiOperationRequest Request { get; set; }
 
         public ApiOperationResponse[] Responses { get; set; }

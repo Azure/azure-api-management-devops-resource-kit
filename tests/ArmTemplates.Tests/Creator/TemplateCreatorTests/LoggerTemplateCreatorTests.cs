@@ -5,6 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCrea
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -38,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             LoggerTemplateResource loggerTemplateResource = (LoggerTemplateResource)loggerTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{logger.name}')]", loggerTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.name}')]", loggerTemplateResource.Name);
             Assert.Equal(logger.loggerType, loggerTemplateResource.Properties.loggerType);
             Assert.Equal(logger.description, loggerTemplateResource.Properties.description);
             Assert.Equal(logger.isBuffered, loggerTemplateResource.Properties.isBuffered);

@@ -5,6 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -69,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             BackendTemplateResource backendTemplateResource = (BackendTemplateResource)backendTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{backend.title}')]", backendTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backend.title}')]", backendTemplateResource.Name);
             Assert.Equal(backend.title, backendTemplateResource.Properties.title);
             Assert.Equal(backend.description, backendTemplateResource.Properties.description);
             Assert.Equal(backend.resourceId, backendTemplateResource.Properties.resourceId);

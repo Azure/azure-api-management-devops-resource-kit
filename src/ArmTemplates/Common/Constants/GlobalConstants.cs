@@ -23,18 +23,18 @@
 
     public static class ParameterNames
     {
-        public const string ApiLoggerId = "ApiLoggerId";
-        public const string NamedValues = "NamedValues";
-        public const string LoggerResourceId = "LoggerResourceId";
+        public const string ApiLoggerId = "apiLoggerId";
+        public const string NamedValues = "namedValues";
+        public const string LoggerResourceId = "loggerResourceId";
         public const string ServiceUrl = "serviceUrl";
-        public const string PolicyXMLSasToken = "PolicyXMLSasToken";
-        public const string PolicyXMLBaseUrl = "PolicyXMLBaseUrl";
-        public const string LinkedTemplatesUrlQueryString = "LinkedTemplatesUrlQueryString";
-        public const string LinkedTemplatesSasToken = "LinkedTemplatesSasToken";
-        public const string ApimServiceName = "ApimServiceName";
-        public const string LinkedTemplatesBaseUrl = "LinkedTemplatesBaseUrl";
-        public const string NamedValueKeyVaultSecrets = "NamedValueKeyVaultSecrets";
-        public const string BackendSettings = "BackendSettings";
+        public const string PolicyXMLSasToken = "policyXMLSasToken";
+        public const string PolicyXMLBaseUrl = "policyXMLBaseUrl";
+        public const string LinkedTemplatesUrlQueryString = "linkedTemplatesUrlQueryString";
+        public const string LinkedTemplatesSasToken = "linkedTemplatesSasToken";
+        public const string ApimServiceName = "apimServiceName";
+        public const string LinkedTemplatesBaseUrl = "linkedTemplatesBaseUrl";
+        public const string NamedValueKeyVaultSecrets = "namedValueKeyVaultSecrets";
+        public const string BackendSettings = "backendSettings";
     }
 
     public static class ParameterPrefix

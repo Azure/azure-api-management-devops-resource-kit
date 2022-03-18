@@ -20,8 +20,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const string MockLinkedTemplatesBaseUrl = "test-linked-templates-base-url";
         protected const string MockLinkedTemplatesSasToken = "test-linked-templates-sas-token";
         protected const string MockLinkedTemplatesUrlQueryString = "test-linked-templates-url-query-string";
-        protected const string MockPolicyXMLBaseUrl = "test-policy-xml-base-url";
-        protected const string MockPolicyXMLSasToken = "test-policy-xml-sas-token";
+        protected const string MockPolicyXMLBaseUrl = "";
+        protected const string MockPolicyXMLSasToken = "";
         protected const bool MockSplitApis = true;
         protected const string MockApiVersionSetName = "test-api-version-set-name";
         protected const bool MockIncludeAllRevisions = true;

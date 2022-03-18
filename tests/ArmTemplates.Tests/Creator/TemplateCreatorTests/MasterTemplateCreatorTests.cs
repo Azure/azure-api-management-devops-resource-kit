@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
@@ -103,7 +104,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             string linkedResourceUri = masterTemplateCreator.GenerateLinkedTemplateUri(creatorConfig, apiVersionSetFileName);
 
             // assert
-            Assert.Equal($"[concat(parameters('LinkedTemplatesBaseUrl'), '{apiVersionSetFileName}', parameters('LinkedTemplatesUrlQueryString'))]", linkedResourceUri);
+            Assert.Equal($"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{apiVersionSetFileName}', parameters('{ParameterNames.LinkedTemplatesUrlQueryString}'))]", linkedResourceUri);
         }
     }
 }

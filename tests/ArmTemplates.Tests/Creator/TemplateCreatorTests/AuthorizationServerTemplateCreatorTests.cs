@@ -5,6 +5,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCrea
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -45,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             AuthorizationServerTemplateResource authorizationServerTemplateResource = (AuthorizationServerTemplateResource)authorizationServerTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{authorizationServer.DisplayName}')]", authorizationServerTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServer.DisplayName}')]", authorizationServerTemplateResource.Name);
             Assert.Equal(authorizationServer.Description, authorizationServerTemplateResource.Properties.Description);
             Assert.Equal(authorizationServer.DisplayName, authorizationServerTemplateResource.Properties.DisplayName);
             Assert.Equal(authorizationServer.AuthorizationEndpoint, authorizationServerTemplateResource.Properties.AuthorizationEndpoint);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Xunit;
 
@@ -19,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var productGroupTemplateResource = productgroupTemplateCreator.CreateProductGroupTemplateResource(groupName, productName, dependsOn);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{productName}/{groupName}')]", productGroupTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{groupName}')]", productGroupTemplateResource.Name);
             Assert.Equal(dependsOn, productGroupTemplateResource.DependsOn);
         }
 

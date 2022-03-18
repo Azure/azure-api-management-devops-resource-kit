@@ -52,12 +52,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 return apiOperationPolicy;
             }
 
-            var apiOperationPolicyOriginalName = apiOperationPolicy.Name;
-
-            apiOperationPolicy.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiOperationPolicyOriginalName}/policy')]";
+            apiOperationPolicy.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{operationName}/policy')]";
             apiOperationPolicy.ApiVersion = GlobalConstants.ApiVersion;
             apiOperationPolicy.Scale = null;
-            apiOperationPolicy.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{apiOperationPolicyOriginalName}')]" };
+            apiOperationPolicy.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{operationName}')]" };
 
             // write policy xml content to file and point to it if policyXMLBaseUrl is provided
             if (extractorParameters.PolicyXMLBaseUrl is not null)
@@ -122,9 +120,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             productPolicy.ApiVersion = GlobalConstants.ApiVersion;
             productPolicy.Scale = null;
             productPolicy.DependsOn = productResourceId;
-
-            // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-            if (!string.IsNullOrWhiteSpace(extractorParameters.PolicyXMLBaseUrl))
+            
+            // due to legacy reasons, providing empty `policyXmlBaseUrl = ""` is recognized as a boolean parameter 
+            // telling that it is needed to provide a policy Xml file
+            if (extractorParameters.PolicyXMLBaseUrl is not null)
             {
                 var policyFileName = string.Format(ProductPolicyFileNameFormat, productName);
                 await this.SavePolicyXmlAsync(productPolicy, baseFilesGenerationDirectory, policyFileName);
@@ -154,8 +153,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 globalServicePolicyResource.ApiVersion = GlobalConstants.ApiVersion;
                 globalServicePolicyResource.Scale = null;
 
-                // write policy xml content to file and point to it if policyXMLBaseUrl is provided
-                if (!string.IsNullOrWhiteSpace(extractorParameters.PolicyXMLBaseUrl))
+                // due to legacy reasons, providing empty `policyXmlBaseUrl = ""` is recognized as a boolean parameter 
+                // telling that it is needed to provide a policy Xml file
+                if (extractorParameters.PolicyXMLBaseUrl is not null)
                 {
                     // writing to globalServicePolicy.xml (<files-root>/policies/globalServicePolicy.xml)
                     await this.SavePolicyXmlAsync(globalServicePolicyResource, baseFilesDirectory, GlobalServicePolicyFileName);

@@ -6,6 +6,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Templa
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -53,7 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, false);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]", apiTemplateResource.Name);
             Assert.Equal($"[parameters('{api.name}-ServiceUrl')]", apiTemplateResource.Properties.ServiceUrl);
             Assert.Equal(api.name, apiTemplateResource.Properties.DisplayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.Properties.ApiVersion);
@@ -62,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             Assert.Equal(api.type, apiTemplateResource.Properties.ApiType);
             Assert.Equal(api.isCurrent, apiTemplateResource.Properties.IsCurrent);
             Assert.Equal(new string[] { api.protocols }, apiTemplateResource.Properties.Protocols);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.Properties.ApiVersionSetId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]", apiTemplateResource.Properties.ApiVersionSetId);
             Assert.Equal(api.apiRevision, apiTemplateResource.Properties.ApiRevision);
             Assert.Equal(api.apiRevisionDescription, apiTemplateResource.Properties.ApiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.Properties.Path);
@@ -91,7 +92,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]", apiTemplateResource.Name);
             Assert.Equal("swagger-link-json", apiTemplateResource.Properties.Format);
             Assert.Equal(api.openApiSpec, apiTemplateResource.Properties.Value);
         }
@@ -114,7 +115,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]", apiTemplateResource.Name);
             Assert.Equal("swagger-json", apiTemplateResource.Properties.Format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
@@ -155,7 +156,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]", apiTemplateResource.Name);
             Assert.Equal("openapi+json", apiTemplateResource.Properties.Format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
@@ -196,7 +197,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, true, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]", apiTemplateResource.Name);
             Assert.Equal("openapi", apiTemplateResource.Properties.Format);
 
             // check alternate title has been specified in the embedded YAML or JSON definition
@@ -250,7 +251,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             APITemplateResource apiTemplateResource = await apiTemplateCreator.CreateAPITemplateResourceAsync(api, false, true);
 
             // assert
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{api.name}')]", apiTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]", apiTemplateResource.Name);
             Assert.Equal(api.name, apiTemplateResource.Properties.DisplayName);
             Assert.Equal(api.apiVersion, apiTemplateResource.Properties.ApiVersion);
             Assert.Equal(api.type, apiTemplateResource.Properties.Type);
@@ -258,7 +259,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             Assert.Equal(api.isCurrent, apiTemplateResource.Properties.IsCurrent);
             Assert.Equal(new string[] { api.protocols }, apiTemplateResource.Properties.Protocols);
             Assert.Equal(api.apiVersionDescription, apiTemplateResource.Properties.ApiVersionDescription);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('ApimServiceName'), '{api.apiVersionSetId}')]", apiTemplateResource.Properties.ApiVersionSetId);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]", apiTemplateResource.Properties.ApiVersionSetId);
             Assert.Equal(api.apiRevision, apiTemplateResource.Properties.ApiRevision);
             Assert.Equal(api.apiRevisionDescription, apiTemplateResource.Properties.ApiRevisionDescription);
             Assert.Equal(api.suffix, apiTemplateResource.Properties.Path);
