@@ -353,7 +353,7 @@ Additionaly, the Creator can also be made available as a global [dotnet CLI tool
 
 ```
 dotnet pack -c Release
-dotnet tool install -g --add-source .\bin\Release apimtemplate
+dotnet tool install -g --add-source .\bin\Release ArmTemplates
 ```
 
 The Creator tool is now available anywhere on the command-line:
