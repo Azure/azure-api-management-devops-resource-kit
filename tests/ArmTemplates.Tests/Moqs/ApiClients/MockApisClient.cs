@@ -67,6 +67,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockServiceApiProductsApiClient
+                .Setup(x => x.GetAllLinkedToGatewayAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string gatewayName, ExtractorParameters _) => new List<ApiTemplateResource>
+                {
+                    new ApiTemplateResource
+                    {
+                        Name = $"{gatewayName}-{ServiceApiName1}",
+                        Type = TemplateType,
+                        Properties = ServiceApiProperties1
+                    },
+
+                    new ApiTemplateResource
+                    {
+                        Name = $"{gatewayName}-{ServiceApiName2}",
+                        Type = TemplateType,
+                        Properties = ServiceApiProperties2
+                    },
+                });
+
+            mockServiceApiProductsApiClient
                 .Setup(x => x.GetSingleAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new ApiTemplateResource
                 {
@@ -74,6 +93,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     Type = TemplateType,
                     Properties = ServiceApiProperties1
                 });
+
+
 
             mockServiceApiProductsApiClient
                 .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))

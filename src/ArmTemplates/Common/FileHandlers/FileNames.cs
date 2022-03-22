@@ -23,7 +23,11 @@
         public string Groups { get; set; }
 
         public string ApiTags { get; set; }
-        
+
+        public string Gateway { get; set; }
+
+        public string GatewayApi { get; set; }
+
         public string Parameters { get; set; }
         
         // linked property outputs 1 master template

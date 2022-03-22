@@ -84,5 +84,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
 
         [Option(longName: "paramBackend", HelpText = "Parameterize environment specific values from backend")]
         public string ParamBackend { get; set; }
+
+        [Option(longName: "extractGateways", HelpText = "Attempt to extract information about Self-Hosted gateways")]
+        public string ExtractGateways { get; set; }
     }
 }

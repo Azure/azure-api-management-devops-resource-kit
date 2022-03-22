@@ -74,6 +74,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool ParameterizeBackend { get; private set; }
 
+        public bool ExtractGateways { get; set; }
+
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
         {
             this.SourceApimName = extractorConfig.SourceApimName;
@@ -101,6 +103,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.IncludeAllRevisions = !string.IsNullOrEmpty(extractorConfig.IncludeAllRevisions) && extractorConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.FileNames = this.GenerateFileNames(extractorConfig.BaseFileName, extractorConfig.SourceApimName);
             this.MultipleApiNames = this.ParseMultipleApiNames(extractorConfig.MultipleAPIs);
+            this.ExtractGateways = extractorConfig.ExtractGateways != null && extractorConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
 
         internal ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)
@@ -133,6 +136,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ParameterizeBackend = overridingConfig.ParamBackend != null && overridingConfig.ParamBackend.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.SplitApis = !string.IsNullOrEmpty(overridingConfig.SplitAPIs) && overridingConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.IncludeAllRevisions = !string.IsNullOrEmpty(overridingConfig.IncludeAllRevisions) && overridingConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ExtractGateways = string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? this.ExtractGateways : overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase);
 
             if (!string.IsNullOrEmpty(overridingConfig.BaseFileName) && !string.IsNullOrEmpty(overridingConfig.BaseFileName))
             {
