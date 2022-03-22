@@ -22,7 +22,7 @@
 
         public string Groups { get; set; }
 
-        public string ApiTags { get; set; }
+        public string TagApi { get; set; }
 
         public string Gateway { get; set; }
 

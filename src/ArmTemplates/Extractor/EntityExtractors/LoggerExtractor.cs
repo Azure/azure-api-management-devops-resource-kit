@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Linq;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
@@ -11,17 +10,21 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
-using Microsoft.Azure.Management.ApiManagement.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class LoggerExtractor : EntityExtractorBase, ILoggerExtractor
     {
+        readonly ILogger<LoggerExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
 
-        public LoggerExtractor(ITemplateBuilder templateBuilder)
+        public LoggerExtractor(
+            ILogger<LoggerExtractor> logger,
+            ITemplateBuilder templateBuilder)
         {
+            this.logger = logger;
             this.templateBuilder = templateBuilder;
         }
 
@@ -98,7 +101,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                             isReferencedInPolicy = true;
                         }
                     }
-                    string validApiName = ParameterNamingHelper.GenerateValidParameterName(singleApiName, ParameterPrefix.Api);
+
+                    string validApiName = ParameterNamingHelper.GenerateValidParameterName(loggerName, ParameterPrefix.Api);
                     if (extractorParameters.ParameterizeApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {
                         object diagnosticObj = apiLoggerId[validApiName];

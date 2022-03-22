@@ -31,6 +31,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.templateBuilder = templateBuilder;
 
             this.tagClient = tagClient;
+            this.apisClient = apisClient;
         }
 
         public async Task<Template<TagApiTemplateResources>> GenerateApiTagsTemplateAsync(

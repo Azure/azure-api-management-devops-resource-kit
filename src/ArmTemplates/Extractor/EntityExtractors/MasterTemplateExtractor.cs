@@ -181,7 +181,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // apiTags
             if (apiTagsTemplate != null && apiTagsTemplate.Resources.Count() != 0)
             {
-                string apiTagsUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, fileNames.ApiTags);
+                string apiTagsUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, fileNames.TagApi);
                 resources.Add(this.CreateLinkedMasterTemplateResource("apiTagsTemplate", apiTagsUri, apiTagDependsOn.ToArray()));
             }
             Console.WriteLine("Master template generated");
