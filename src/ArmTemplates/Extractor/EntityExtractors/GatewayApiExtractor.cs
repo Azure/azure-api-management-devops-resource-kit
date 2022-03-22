@@ -109,7 +109,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 gatewayApiTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{gatewayName}/{api.Name}')]";
                 gatewayApiTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
                 gatewayApiTemplateResource.Scale = null;
-                gatewayApiTemplateResource.DependsOn = string.IsNullOrEmpty(dependsOn) ? new string[0] : new[] { dependsOn };
+                gatewayApiTemplateResource.DependsOn = string.IsNullOrEmpty(dependsOn) ? Array.Empty<string>() : new[] { dependsOn };
                 gatewayApiTemplateResource.Properties = new GatewayApiProperties 
                 {
                     ProvisioningState = "created" 
