@@ -8,6 +8,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gateway;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.GatewayApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
@@ -48,6 +50,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly ITagExtractor tagExtractor;
         readonly IGroupExtractor groupExtractor;
         readonly IApiRevisionExtractor apiRevisionExtractor;
+        readonly IGatewayExtractor gatewayExtractor;
+        readonly IGatewayApiExtractor gatewayApiExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -65,7 +69,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ITagApiExtractor apiTagExtractor,
             ITagExtractor tagExtractor,
             IGroupExtractor groupExtractor,
-            IApiRevisionExtractor apiRevisionExtractor)
+            IApiRevisionExtractor apiRevisionExtractor,
+            IGatewayExtractor gatewayExtractor,
+            IGatewayApiExtractor gatewayApiExtractor)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -83,6 +89,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.tagExtractor = tagExtractor;
             this.groupExtractor = groupExtractor;
             this.apiRevisionExtractor = apiRevisionExtractor;
+            this.gatewayExtractor = gatewayExtractor;
+            this.gatewayApiExtractor = gatewayApiExtractor;
         }
 
         /// <summary>
@@ -105,7 +113,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ITagApiExtractor apiTagExtractor = null,
             ITagExtractor tagExtractor = null,
             IGroupExtractor groupExtractor = null,
-            IApiRevisionExtractor apiRevisionExtractor = null)
+            IApiRevisionExtractor apiRevisionExtractor = null,
+            IGatewayExtractor gatewayExtractor = null,
+            IGatewayApiExtractor gatewayApiExtractor = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -122,7 +132,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 apiTagExtractor,
                 tagExtractor,
                 groupExtractor,
-                apiRevisionExtractor);
+                apiRevisionExtractor,
+                gatewayExtractor,
+                gatewayApiExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -429,6 +441,70 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         }
 
         /// <summary>
+        /// Generates gateway template in the desired folder
+        /// </summary>
+        /// <param name="singleApiName">name of API to load gateway from</param>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated gateway template</returns>
+        public async Task<Template<GatewayTemplateResources>> GenerateGatewayTemplateAsync(
+            string singleApiName,
+            string baseFilesGenerationDirectory)
+        {
+            if (!this.extractorParameters.ExtractGateways)
+            {
+                this.logger.LogInformation("Skipping GatewayTemplate generation because of configuration parameter");
+                return null;
+            }
+
+            this.logger.LogInformation("Started generation of gateway template...");
+            var gatewayTemplate = await this.gatewayExtractor.GenerateGatewayTemplateAsync(singleApiName, this.extractorParameters);
+
+            if (gatewayTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    gatewayTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.Gateway);
+            }
+
+            this.logger.LogInformation("Finished generation of gateway template...");
+            return gatewayTemplate;
+        }
+
+        /// <summary>
+        /// Generates gateway-api template in the desired folder
+        /// </summary>
+        /// <param name="singleApiName">name of API to load gateway-api from</param>
+        /// /// <param name="multipleApiNames">multiple API names to load gateway-api from</param>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated gateway-api template</returns>
+        public async Task<Template<GatewayApiTemplateResources>> GenerateGatewayApiTemplateAsync(
+            string singleApiName,
+            List<string> multipleApiNames,
+            string baseFilesGenerationDirectory)
+        {
+            if (!this.extractorParameters.ExtractGateways)
+            {
+                this.logger.LogInformation("Skipping gateway-api template generation because of configuration parameter");
+                return null;
+            }
+
+            this.logger.LogInformation("Started generation of gateway-api template...");
+            var gatewayApiTemplate = await this.gatewayApiExtractor.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
+
+            if (gatewayApiTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    gatewayApiTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.GatewayApi);
+            }
+
+            this.logger.LogInformation("Finished generation of gateway-api template...");
+            return gatewayApiTemplate;
+        }
+
+        /// <summary>
         /// Generates split api templates / folders for each api in this sourceApim 
         /// </summary>
         /// <returns></returns>
@@ -629,6 +705,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var tagTemplate = await this.GenerateTagTemplateAsync(singleApiName, apiTemplate.TypedResources, productTemplate.TypedResources, baseFilesGenerationDirectory);
             var apiTagTemplate = await this.GenerateApiTagTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
+            await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
 
             // not refactored
             Dictionary<string, object> apiLoggerId = null;

@@ -4,6 +4,8 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
@@ -22,8 +24,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Gateway;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -84,6 +85,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IDiagnosticExtractor, DiagnosticExtractor>();
             services.AddScoped<IAuthorizationServerExtractor, AuthorizationServerExtractor>();
             services.AddScoped<IApiRevisionExtractor, ApiRevisionExtractor>();
+            services.AddScoped<IGatewayExtractor, GatewayExtractor>();
+            services.AddScoped<IGatewayApiExtractor, GatewayApiExtractor>();
         }
 
         static void SetupApiClients(IServiceCollection services)
@@ -99,6 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IPolicyClient, PolicyClient>();
             services.AddScoped<IProductsClient, ProductsClient>();
             services.AddScoped<IDiagnosticClient, DiagnosticClient>();
+            services.AddScoped<IGatewayClient, GatewayClient>();
         }
     }
 }

@@ -90,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             );
         }
 
-        static IServiceProvider CreateServiceProvider(ILogger logger)
+        public static IServiceProvider CreateServiceProvider(ILogger logger)
         {
             var services = new ServiceCollection();
 
@@ -98,7 +98,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             return services.BuildServiceProvider();
         }
 
-        static ILogger SetupApplicationLoggingToConsole() 
+        public static ILogger SetupApplicationLoggingToConsole() 
             => new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()

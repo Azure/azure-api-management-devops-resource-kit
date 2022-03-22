@@ -36,6 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const bool MockToParameterizeNamedValuesKeyVaultSecrets = true;
         protected const int MockOperationBatchSize = 32;
         protected const bool MockParameterizeBackend = true;
+        protected const bool MockExtractGateways = true;
 
         protected ExtractorConsoleAppConfiguration GetMockedExtractorConsoleAppConfiguration(
             bool splitApis = MockSplitApis,
@@ -70,7 +71,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 NotIncludeNamedValue = MockNotIncludeNamedValue.ToString(),
                 ParamNamedValuesKeyVaultSecrets = MockToParameterizeNamedValuesKeyVaultSecrets.ToString(),
                 OperationBatchSize = MockOperationBatchSize,
-                ParamBackend = MockParameterizeBackend.ToString()
+                ParamBackend = MockParameterizeBackend.ToString(),
+                ExtractGateways = MockExtractGateways.ToString()
             };
         }  
     }
