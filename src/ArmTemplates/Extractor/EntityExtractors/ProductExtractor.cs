@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var productOriginalName = productTemplateResource.Name;
 
                 productTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productOriginalName}')]";
-                productTemplateResource.ApiVersion = GlobalConstants.ApiVersion;                
+                productTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
                 if (singleApiName == null || productApiTemplateResources.FirstOrDefault(p => p.Name.Contains($"/{productOriginalName}/")) is not null)

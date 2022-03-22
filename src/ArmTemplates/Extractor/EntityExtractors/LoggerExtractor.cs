@@ -17,14 +17,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public class LoggerExtractor : EntityExtractorBase, ILoggerExtractor
     {
-        readonly ILogger<LoggerExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
 
-        public LoggerExtractor(
-            ILogger<LoggerExtractor> logger,
-            ITemplateBuilder templateBuilder)
+        public LoggerExtractor(ITemplateBuilder templateBuilder)
         {
-            this.logger = logger;
             this.templateBuilder = templateBuilder;
         }
 
@@ -83,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 loggerResource.ApiVersion = GlobalConstants.ApiVersion;
                 loggerResource.Scale = null;
 
-                if (singleApiName == null)
+                if (string.IsNullOrEmpty(singleApiName))
                 {
                     // if the user is extracting all apis, extract all the loggers
                     Console.WriteLine("'{0}' Logger found", loggerName);
@@ -102,7 +98,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         }
                     }
 
-                    string validApiName = ParameterNamingHelper.GenerateValidParameterName(loggerName, ParameterPrefix.Api);
+                    string validApiName = ParameterNamingHelper.GenerateValidParameterName(singleApiName, ParameterPrefix.Api);
                     if (extractorParameters.ParameterizeApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {
                         object diagnosticObj = apiLoggerId[validApiName];
