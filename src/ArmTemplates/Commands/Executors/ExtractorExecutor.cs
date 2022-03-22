@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IProductApisExtractor productApisExtractor;
         readonly IProductExtractor productExtractor;
         readonly IPropertyExtractor propertyExtractor;
-        readonly ITagApiExtractor apiTagExtractor;
+        readonly ITagApiExtractor tagApiExtractor;
         readonly ITagExtractor tagExtractor;
         readonly IGroupExtractor groupExtractor;
         readonly IApiRevisionExtractor apiRevisionExtractor;
@@ -66,7 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IProductApisExtractor productApisExtractor,
             IProductExtractor productExtractor,
             IPropertyExtractor propertyExtractor,
-            ITagApiExtractor apiTagExtractor,
+            ITagApiExtractor tagApiExtractor,
             ITagExtractor tagExtractor,
             IGroupExtractor groupExtractor,
             IApiRevisionExtractor apiRevisionExtractor,
@@ -85,7 +85,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.productApisExtractor = productApisExtractor;
             this.propertyExtractor = propertyExtractor;
             this.productExtractor = productExtractor;
-            this.apiTagExtractor = apiTagExtractor;
+            this.tagApiExtractor = tagApiExtractor;
             this.tagExtractor = tagExtractor;
             this.groupExtractor = groupExtractor;
             this.apiRevisionExtractor = apiRevisionExtractor;
@@ -110,7 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IProductApisExtractor productApisExtractor = null,
             IProductExtractor productExtractor = null,
             IPropertyExtractor propertyExtractor = null,
-            ITagApiExtractor apiTagExtractor = null,
+            ITagApiExtractor tagApiExtractor = null,
             ITagExtractor tagExtractor = null,
             IGroupExtractor groupExtractor = null,
             IApiRevisionExtractor apiRevisionExtractor = null,
@@ -129,7 +129,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 productApisExtractor,
                 productExtractor,
                 propertyExtractor,
-                apiTagExtractor,
+                tagApiExtractor,
                 tagExtractor,
                 groupExtractor,
                 apiRevisionExtractor,
@@ -413,30 +413,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         }
 
         /// <summary>
-        /// Generates api-tag templates in the desired folder
+        /// Generates tag-api templates in the desired folder
         /// </summary>
-        /// <param name="singleApiName">name of API to load api-tag from</param>
-        /// <param name="multipleApiNames">multiple API names to load api-tag from</param>
+        /// <param name="singleApiName">name of API to load tag-api from</param>
+        /// <param name="multipleApiNames">multiple API names to load tag-api from</param>
         /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
-        /// <returns>generated api-tag template</returns>
-        public async Task<Template<TagApiTemplateResources>> GenerateApiTagTemplateAsync(
+        /// <returns>generated tag-api template</returns>
+        public async Task<Template<TagApiTemplateResources>> GenerateTagApiTemplateAsync(
             string singleApiName,
             List<string> multipleApiNames,
             string baseFilesGenerationDirectory)
         {
-            this.logger.LogInformation("Started generation of api-tag template...");
+            this.logger.LogInformation("Started generation of tag-api template...");
 
-            var apiTagTemplate = await this.apiTagExtractor.GenerateApiTagsTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
+            var apiTagTemplate = await this.tagApiExtractor.GenerateApiTagsTemplateAsync(singleApiName, multipleApiNames, this.extractorParameters);
 
             if (apiTagTemplate?.HasResources() == true)
             {
                 await FileWriter.SaveAsJsonAsync(
                     apiTagTemplate,
                     directory: baseFilesGenerationDirectory,
-                    fileName: this.extractorParameters.FileNames.ApiTags);
+                    fileName: this.extractorParameters.FileNames.TagApi);
             }
 
-            this.logger.LogInformation("Finished generation of api-tag template...");
+            this.logger.LogInformation("Finished generation of tag-api template...");
             return apiTagTemplate;
         }
 
@@ -703,7 +703,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var apiVersionSetTemplate = await this.GenerateApiVersionSetTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
             var authorizationServerTemplate = await this.GenerateAuthorizationServerTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
             var tagTemplate = await this.GenerateTagTemplateAsync(singleApiName, apiTemplate.TypedResources, productTemplate.TypedResources, baseFilesGenerationDirectory);
-            var apiTagTemplate = await this.GenerateApiTagTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
+            var apiTagTemplate = await this.GenerateTagApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
 

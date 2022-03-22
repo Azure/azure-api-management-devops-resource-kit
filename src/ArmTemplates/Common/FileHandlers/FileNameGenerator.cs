@@ -29,7 +29,7 @@
                 ProductAPIs = $@"{baseFileName}productAPIs.template.json",
                 Gateway = $@"{baseFileName}gateways.template.json",
                 GatewayApi = $@"{baseFileName}gateways-apis.template.json",
-                ApiTags = $@"{baseFileName}apiTags.template.json",
+                TagApi = $@"{baseFileName}apiTags.template.json",
                 Parameters = $@"\{baseFileName}parameters.json",
                 LinkedMaster = $@"\{baseFileName}master.template.json",
                 Apis = "/Apis",

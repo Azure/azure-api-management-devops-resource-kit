@@ -44,9 +44,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             foreach (var apiVersionSet in apiVersionSets)
             {
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (string.IsNullOrEmpty(singleApiName) || apiTemplateResources.SingleOrDefault(api => 
+                if (string.IsNullOrEmpty(singleApiName) || apiTemplateResources.Any(api => 
                         api.Properties.ApiVersionSetId != null && 
-                        api.Properties.ApiVersionSetId.Contains(apiVersionSet.Name)) != null)
+                        api.Properties.ApiVersionSetId.Contains(apiVersionSet.Name)))
                 {
                     this.logger.LogDebug("Found '{0}' api-version-set", apiVersionSet.Name);
 

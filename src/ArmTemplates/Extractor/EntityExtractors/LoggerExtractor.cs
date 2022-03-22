@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Linq;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
@@ -11,8 +10,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
-using Microsoft.Azure.Management.ApiManagement.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -80,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 loggerResource.ApiVersion = GlobalConstants.ApiVersion;
                 loggerResource.Scale = null;
 
-                if (singleApiName == null)
+                if (string.IsNullOrEmpty(singleApiName))
                 {
                     // if the user is extracting all apis, extract all the loggers
                     Console.WriteLine("'{0}' Logger found", loggerName);
@@ -98,6 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                             isReferencedInPolicy = true;
                         }
                     }
+
                     string validApiName = ParameterNamingHelper.GenerateValidParameterName(singleApiName, ParameterPrefix.Api);
                     if (extractorParameters.ParameterizeApiLoggerId && apiLoggerId.ContainsKey(validApiName))
                     {

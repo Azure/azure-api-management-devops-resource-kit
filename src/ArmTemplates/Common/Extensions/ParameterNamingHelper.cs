@@ -9,7 +9,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
 
         public static string GenerateValidParameterName(string apiName, string prefix)
         {
+            if (string.IsNullOrEmpty(apiName))
+            {
+                return string.Empty;
+            }
+
             var validApiName = ExcludeOtherFromLettersAndDigitsRegex.Replace(apiName, string.Empty);
+
+            if (string.IsNullOrEmpty(validApiName))
+            {
+                return string.Empty;
+            }
 
             if (char.IsDigit(validApiName.First()))
             {
