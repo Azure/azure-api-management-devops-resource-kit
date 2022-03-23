@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly IPolicyClient policyClient;
         readonly ITemplateBuilder templateBuilder;
 
-        readonly IDictionary<string, string> policyPathContentCache = new Dictionary<string, string>();
+        readonly IDictionary<string, string> policyPathToContentCache = new Dictionary<string, string>();
 
         public PolicyExtractor(
             ILogger<PolicyExtractor> logger,
@@ -52,9 +52,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // easy code flow, if we already have a policy-content-file-full-path to use as a key for policy content caches
             if (!string.IsNullOrEmpty(policyTemplateResource.Properties.PolicyContentFileFullPath))
             {
-                if (this.policyPathContentCache.ContainsKey(policyTemplateResource.Properties.PolicyContentFileFullPath))
+                if (this.policyPathToContentCache.ContainsKey(policyTemplateResource.Properties.PolicyContentFileFullPath))
                 {
-                    return this.policyPathContentCache[policyTemplateResource.Properties.PolicyContentFileFullPath];
+                    return this.policyPathToContentCache[policyTemplateResource.Properties.PolicyContentFileFullPath];
                 }
                 else
                 {
@@ -76,7 +76,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     var policyContentFromFile = File.ReadAllText(policyFileFullPath);
 
                     policyTemplateResource.Properties.PolicyContentFileFullPath = policyFileFullPath;
-                    this.policyPathContentCache[policyFileFullPath] = policyContentFromFile;
+                    this.policyPathToContentCache[policyFileFullPath] = policyContentFromFile;
 
                     return policyContentFromFile;
                 }
@@ -247,13 +247,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             var policyXMLContent = policyTemplateResource.Properties.PolicyContent;
 
-            if (this.policyPathContentCache.ContainsKey(fullPolicyPathWithName))
+            if (this.policyPathToContentCache.ContainsKey(fullPolicyPathWithName))
             {
-                this.logger.LogError("Policy content already exists at {0}. Possibly, policy will be overwritten!", fullPolicyPathWithName);
+                this.logger.LogError("Policy content already exists in {0} and will be overwritten!", fullPolicyPathWithName);
             }
 
             // saving to cache + saving path for easily extraction
-            this.policyPathContentCache[fullPolicyPathWithName] = policyXMLContent;
+            this.policyPathToContentCache[fullPolicyPathWithName] = policyXMLContent;
             policyTemplateResource.Properties.PolicyContentFileFullPath = fullPolicyPathWithName;
 
             // writing <files-root>/policies/<policyFileName>.xml
