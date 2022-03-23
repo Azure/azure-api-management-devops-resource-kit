@@ -7,6 +7,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IPolicyExtractor
     {
+        string GetCachedPolicyContent(PolicyTemplateResource policyTemplateResource, string baseFilesGenerationDirectory);
+
         Task<PolicyTemplateResource> GenerateProductPolicyTemplateAsync(
             ExtractorParameters extractorParameters,
             string productName,

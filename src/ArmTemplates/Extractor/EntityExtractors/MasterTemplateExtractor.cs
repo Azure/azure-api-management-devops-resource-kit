@@ -28,6 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     public class MasterTemplateExtractor : ApiExtractor, IMasterTemplateExtractor
     {
         readonly ITemplateBuilder templateBuilder;
+        readonly IPolicyExtractor policyExtractor;
 
         public MasterTemplateExtractor(
             ILogger<ApiExtractor> logger,
@@ -42,6 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             : base(logger, templateBuilder, apisClient, diagnosticExtractor, apiSchemaExtractor, policyExtractor, productApisExtractor, tagExtractor, apiOperationExtractor)
         {
             this.templateBuilder = templateBuilder;
+            this.policyExtractor = policyExtractor;
         }
 
         public Template GenerateLinkedMasterTemplate(
@@ -554,7 +556,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (extractorParameters.ParameterizeNamedValue)
             {
                 Dictionary<string, string> namedValues = new Dictionary<string, string>();
-                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder);
+                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder, this.policyExtractor);
                 string[] properties = await pExc.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
 
                 foreach (var extractedProperty in properties)
@@ -586,7 +588,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
             {
                 Dictionary<string, string> keyVaultNamedValues = new Dictionary<string, string>();
-                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder);
+                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder, this.policyExtractor);
                 string[] properties = await pExc.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
 
                 foreach (var extractedProperty in properties)

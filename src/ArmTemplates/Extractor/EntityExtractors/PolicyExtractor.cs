@@ -12,6 +12,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -28,6 +29,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly IPolicyClient policyClient;
         readonly ITemplateBuilder templateBuilder;
 
+        readonly IDictionary<string, string> policyPathToContentCache = new Dictionary<string, string>();
+
         public PolicyExtractor(
             ILogger<PolicyExtractor> logger,
             IPolicyClient policyApiClient,
@@ -36,6 +39,50 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.logger = logger;
             this.policyClient = policyApiClient;
             this.templateBuilder = templateBuilder;
+        }
+
+        public string GetCachedPolicyContent(PolicyTemplateResource policyTemplateResource, string baseFilesGenerationDirectory)
+        {
+            if (policyTemplateResource?.Properties is null)
+            {
+                this.logger.LogWarning("Policy was not initialized correctly {0}", policyTemplateResource.Name);
+                return string.Empty;
+            }
+
+            // easy code flow, if we already have a policy-content-file-full-path to use as a key for policy content caches
+            if (!string.IsNullOrEmpty(policyTemplateResource.Properties.PolicyContentFileFullPath))
+            {
+                if (this.policyPathToContentCache.ContainsKey(policyTemplateResource.Properties.PolicyContentFileFullPath))
+                {
+                    return this.policyPathToContentCache[policyTemplateResource.Properties.PolicyContentFileFullPath];
+                }
+                else
+                {
+                    this.logger.LogWarning("Policy content at '{0}' was initialized, but wasn't cached properly", policyTemplateResource.Properties.PolicyContentFileFullPath);
+                }
+            }
+
+            // if no path found already, trying to get one from policy content
+            // check if this is a file or is it the raw policy content
+            var policyContent = policyTemplateResource?.Properties?.PolicyContent ?? string.Empty;
+            if (policyContent.Contains(".xml"))
+            {
+                var fileNameSection = policyContent.Split(',')[1];
+                var policyFileName = ParameterNamingHelper.GetSubstringBetweenTwoCharacters('\'', '\'', fileNameSection);
+                var policyFileFullPath = Path.Combine(baseFilesGenerationDirectory, PoliciesDirectoryName, policyFileName);
+
+                if (File.Exists(policyFileFullPath))
+                {
+                    var policyContentFromFile = File.ReadAllText(policyFileFullPath);
+
+                    policyTemplateResource.Properties.PolicyContentFileFullPath = policyFileFullPath;
+                    this.policyPathToContentCache[policyFileFullPath] = policyContentFromFile;
+
+                    return policyContentFromFile;
+                }
+            }
+
+            return policyContent;
         }
 
         public async Task<PolicyTemplateResource> GenerateApiOperationPolicyResourceAsync(
@@ -194,14 +241,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string baseFilesDirectory,
             string policyFileName)
         {
-            string policyXMLContent = policyTemplateResource.Properties.PolicyContent;
             var policiesDirectory = Path.Combine(baseFilesDirectory, PoliciesDirectoryName);
+            var fullPolicyPathWithName = Path.Combine(policiesDirectory, policyFileName);
+            FileWriter.CreateFolderIfNotExists(policiesDirectory); // creating <files-root>/policies
 
-            // creating <files-root>/policies
-            FileWriter.CreateFolderIfNotExists(policiesDirectory);
+            var policyXMLContent = policyTemplateResource.Properties.PolicyContent;
+
+            if (this.policyPathToContentCache.ContainsKey(fullPolicyPathWithName))
+            {
+                this.logger.LogError("Policy content already exists in {0} and will be overwritten!", fullPolicyPathWithName);
+            }
+
+            // saving to cache + saving path for easily extraction
+            this.policyPathToContentCache[fullPolicyPathWithName] = policyXMLContent;
+            policyTemplateResource.Properties.PolicyContentFileFullPath = fullPolicyPathWithName;
 
             // writing <files-root>/policies/<policyFileName>.xml
-            await FileWriter.SaveTextToFileAsync(policyXMLContent, policiesDirectory, policyFileName);
+            await FileWriter.SaveTextToFileAsync(policyXMLContent, fullPolicyPathWithName);
         }
     }
 }

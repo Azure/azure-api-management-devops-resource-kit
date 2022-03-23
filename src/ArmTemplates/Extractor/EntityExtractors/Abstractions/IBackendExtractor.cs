@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IBackendExtractor
     {
-        Task<Tuple<Template, Dictionary<string, BackendApiParameters>>> GenerateBackendsARMTemplateAsync(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, List<TemplateResource> propertyResources, ExtractorParameters extractorParameters);
+        Task<Tuple<Template, Dictionary<string, BackendApiParameters>>> GenerateBackendsARMTemplateAsync(
+            string singleApiName, 
+            List<PolicyTemplateResource> policyTemplateResources,
+            List<TemplateResource> propertyResources, 
+            ExtractorParameters extractorParameters,
+            string baseFilesGenerationDirectory);
 
-        Task<bool> IsNamedValueUsedInBackends(string apimname, string resourceGroup, string singleApiName, List<TemplateResource> apiTemplateResources, ExtractorParameters extractorParameters, string propertyName, string propertyDisplayName);
+        Task<bool> IsNamedValueUsedInBackends(
+            string apimname, 
+            string resourceGroup, 
+            string singleApiName, 
+            List<TemplateResource> apiTemplateResources, 
+            ExtractorParameters extractorParameters, 
+            string propertyName, 
+            string propertyDisplayName,
+            string baseFilesGenerationDirectory);
     }
 }

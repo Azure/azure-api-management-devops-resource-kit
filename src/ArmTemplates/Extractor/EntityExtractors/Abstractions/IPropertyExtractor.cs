@@ -7,6 +7,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IPropertyExtractor
     {
-        Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, ExtractorParameters extractorParameters, IBackendExtractor backendExtractor, List<TemplateResource> loggerTemplateResources);
+        Task<Template> GenerateNamedValuesTemplateAsync(
+            string singleApiName, 
+            List<TemplateResource> apiTemplateResources, 
+            ExtractorParameters extractorParameters, 
+            IBackendExtractor backendExtractor, 
+            List<TemplateResource> loggerTemplateResources,
+            string baseFilesGenerationDirectory);
     }
 }

@@ -7,6 +7,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
     {
         static readonly Regex ExcludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
 
+        public static string GetSubstringBetweenTwoCharacters(char left, char right, string fullString)
+        {
+            var regex = new Regex($"(?<={left})(.*?)(?={right})");
+            var matchString = regex.Match(fullString);
+            return matchString.Captures.FirstOrDefault()?.Value ?? string.Empty;
+        }
+
         public static string GenerateValidParameterName(string apiName, string prefix)
         {
             if (string.IsNullOrEmpty(apiName))
