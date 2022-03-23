@@ -10,6 +10,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public class PolicyTemplateProperties
     {
+        [JsonIgnore]
+        public string PolicyContentFileFullPath { get; set; }
+
         [JsonProperty("value")]
         public string PolicyContent { get; set; }
 

@@ -38,6 +38,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public List<PolicyTemplateResource> ApiPolicies { get; set; } = new();
 
+        public List<PolicyTemplateResource> GetAllPolicies()
+        {
+            var policies = new List<PolicyTemplateResource>();
+
+            if (!this.ApiPolicies.IsNullOrEmpty())
+            {
+                policies.AddRange(this.ApiPolicies);
+            }
+
+            if (!this.ApiOperationsPolicies.IsNullOrEmpty())
+            {
+                policies.AddRange(this.ApiOperationsPolicies);
+            }
+
+            return policies;
+        }
+
         public void AddResourcesData(ApiTemplateResources otherResources)
         {
             if (otherResources is null)

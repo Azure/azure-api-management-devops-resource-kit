@@ -15,11 +15,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
     class MockPolicyClient
     {
         public const string TemplateName = "name";
+        public const string GlobalPolicyContent = "<policies> my mocked policies </policies>";
 
         public static PolicyTemplateProperties TemplateProperties = new PolicyTemplateProperties
         {
             Format = "rawxml",
-            PolicyContent = @"<policies> my mocked policies </policies>"
+            PolicyContent = GlobalPolicyContent
         };
 
         public static IPolicyClient GetMockedApiClientWithDefaultValues()

@@ -717,9 +717,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var apiTemplateResources = apiTemplate.Resources.ToList();
             Template loggerTemplate = await this.loggerExtractor.GenerateLoggerTemplateAsync(this.extractorParameters, singleApiName, apiTemplateResources, apiLoggerId);
             List<TemplateResource> loggerResources = loggerTemplate.Resources.ToList();
-            Template namedValueTemplate = await this.propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, this.extractorParameters, this.backendExtractor, loggerResources);
+            Template namedValueTemplate = await this.propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, this.extractorParameters, this.backendExtractor, loggerResources, baseFilesGenerationDirectory);
             List<TemplateResource> namedValueResources = namedValueTemplate.Resources.ToList();
-            var backendResult = await this.backendExtractor.GenerateBackendsARMTemplateAsync(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, namedValueResources, this.extractorParameters);
+            var backendResult = await this.backendExtractor.GenerateBackendsARMTemplateAsync(
+                singleApiName, 
+                apiTemplate.TypedResources.GetAllPolicies(), 
+                namedValueResources, 
+                this.extractorParameters, 
+                baseFilesGenerationDirectory);
 
             Dictionary<string, string> loggerResourceIds = null;
             if (this.extractorParameters.ParameterizeLogResourceId)

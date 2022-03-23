@@ -18,11 +18,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public class PropertyExtractor : EntityExtractorBase, IPropertyExtractor
     {
+        readonly IPolicyExtractor policyExtractor;
         readonly ITemplateBuilder templateBuilder;
 
-        public PropertyExtractor(ITemplateBuilder templateBuilder)
+        public PropertyExtractor(
+            ITemplateBuilder templateBuilder,
+            IPolicyExtractor policyExtractor)
         {
             this.templateBuilder = templateBuilder;
+            this.policyExtractor = policyExtractor;
         }
 
         public async Task<string[]> GetPropertiesAsync(string apiManagementName, string resourceGroupName)
@@ -62,7 +66,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return await this.CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateNamedValuesTemplateAsync(string singleApiName, List<TemplateResource> apiTemplateResources, ExtractorParameters extractorParameters, IBackendExtractor backendExtractor, List<TemplateResource> loggerTemplateResources)
+        public async Task<Template> GenerateNamedValuesTemplateAsync(
+            string singleApiName, 
+            List<TemplateResource> apiTemplateResources, 
+            ExtractorParameters extractorParameters, 
+            IBackendExtractor backendExtractor, 
+            List<TemplateResource> loggerTemplateResources,
+            string baseFilesGenerationDirectory)
         {
             Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
 
@@ -138,8 +148,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 else
                 {
                     // if the user is executing a single api, extract all the named values used in the template resources
-                    bool foundInPolicy = this.DoesPolicyReferenceNamedValue(extractorParameters, policyResources, propertyName, propertyTemplateResource);
-                    bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, extractorParameters, propertyName, propertyTemplateResource.Properties.displayName);
+                    bool foundInPolicy = this.DoesPolicyReferenceNamedValue(extractorParameters, policyResources, propertyName, propertyTemplateResource, baseFilesGenerationDirectory);
+                    bool foundInBackEnd = await backendExtractor.IsNamedValueUsedInBackends(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, singleApiName, apiTemplateResources, extractorParameters, propertyName, propertyTemplateResource.Properties.displayName, baseFilesGenerationDirectory);
                     bool foundInLogger = this.DoesLoggerReferenceNamedValue(loggerTemplateResources, propertyName, propertyTemplateResource);
 
                     // check if named value is referenced in a backend
@@ -156,12 +166,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return armTemplate;
         }
 
-        bool DoesPolicyReferenceNamedValue(ExtractorParameters extractorParameters, IEnumerable<TemplateResource> policyResources, string propertyName, PropertyTemplateResource propertyTemplateResource)
+        bool DoesPolicyReferenceNamedValue(
+            ExtractorParameters extractorParameters, 
+            IEnumerable<TemplateResource> policyResources, 
+            string propertyName, 
+            PropertyTemplateResource propertyTemplateResource,
+            string baseFilesGenerationDirectory)
         {
             // check if named value is referenced in a policy file
             foreach (PolicyTemplateResource policyTemplateResource in policyResources)
             {
-                string policyContent = PolicyTemplateUtils.GetPolicyContent(extractorParameters, policyTemplateResource);
+                var policyContent = this.policyExtractor.GetCachedPolicyContent(policyTemplateResource, baseFilesGenerationDirectory);
 
                 if (policyContent.Contains(string.Concat("{{", propertyTemplateResource.Properties.displayName, "}}")) || policyContent.Contains(string.Concat("{{", propertyName, "}}")))
                 {
