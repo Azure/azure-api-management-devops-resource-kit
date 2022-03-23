@@ -17,12 +17,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         public const string TemplateName = "name";
         public const string GlobalPolicyContent = "<policies> my mocked policies </policies>";
 
-        public static PolicyTemplateProperties TemplateProperties = new PolicyTemplateProperties
-        {
-            Format = "rawxml",
-            PolicyContent = GlobalPolicyContent
-        };
-
         public static IPolicyClient GetMockedApiClientWithDefaultValues()
         {
             var mockPolicyApiClient = new Mock<IPolicyClient>(MockBehavior.Strict);
@@ -33,7 +27,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     Name = TemplateName,
                     Type = ResourceTypeConstants.GlobalServicePolicy,
-                    Properties = TemplateProperties
+                    Properties = new PolicyTemplateProperties
+                    {
+                        Format = "rawxml",
+                        PolicyContent = GlobalPolicyContent
+                    }
                 });
 
             mockPolicyApiClient
@@ -42,7 +40,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     Name = $"{productName}-{TemplateName}",
                     Type = ResourceTypeConstants.ProductPolicy,
-                    Properties = TemplateProperties
+                    Properties = new PolicyTemplateProperties
+                    {
+                        Format = "rawxml",
+                        PolicyContent = GlobalPolicyContent
+                    }
                 });
 
             mockPolicyApiClient
@@ -51,7 +53,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     Name = $"{apiName}-{TemplateName}",
                     Type = ResourceTypeConstants.ProductPolicy,
-                    Properties = TemplateProperties
+                    Properties = new PolicyTemplateProperties
+                    {
+                        Format = "rawxml",
+                        PolicyContent = GlobalPolicyContent
+                    }
                 });
 
             mockPolicyApiClient
@@ -60,7 +66,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     Name = $"{apiName}-{apiOperation}-{TemplateName}",
                     Type = ResourceTypeConstants.ProductPolicy,
-                    Properties = TemplateProperties
+                    Properties = new PolicyTemplateProperties
+                    {
+                        Format = "rawxml",
+                        PolicyContent = GlobalPolicyContent
+                    }
                 });
 
             return mockPolicyApiClient.Object;
