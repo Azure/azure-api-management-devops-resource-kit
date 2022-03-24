@@ -1,8 +1,7 @@
 {
   "profiles": {
     "apimtemplate": {
-      "commandName": "Project",
-      "commandLineArgs": "extract --extractorConfig C:\\Projects\\other\\2022-08-01-extractorConfig.json"
+      "commandName": "Project"
     }
   }
 }
