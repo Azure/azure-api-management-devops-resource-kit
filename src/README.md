@@ -346,6 +346,7 @@ Below are the steps to run the Creator from the source code:
 ```dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --namedValues namedvalue1|namevaluevalue1;namedvalue2|namevaluevalue2 ```
 Add new key to namedValues section in valid yaml file then use the same key name here in this cli parameter
     **Here displayName can not have | or ; in their name.**
+- Run the following command `dotnet run create --configFile CONFIG_YAML_FILE_LOCATION --parameterizeNamedValuesAndSecrets " "` to parameterize namedValues and KeyVault Secrets and allow to use single ARM template for multiple environments
 
 You can also run it directly from the [releases](https://github.com/Azure/azure-api-management-devops-resource-kit/releases).
 

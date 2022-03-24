@@ -32,5 +32,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
 
         [Option(longName: "preferredAPIsForDeployment", HelpText = "Create ARM templates for the given APIs Name(comma separated) else leave this parameter blank then by default all api's will be considered")]
         public string PreferredAPIsForDeployment { get; set; }
+
+        [Option(longName: "parameterizeNamedValuesAndSecrets", HelpText = "Allows Creator to parameterize NamedValues and KeyVault Secrets. Output ARM Template then can be deployed to multiple environments")]
+        public string ParamNamedValue { get; set; }
     }
 }

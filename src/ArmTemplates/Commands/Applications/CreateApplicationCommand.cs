@@ -13,6 +13,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurati
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications
 {
@@ -72,6 +73,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                 creatorConfig.PreferredApis = configuration.PreferredAPIsForDeployment.Split(",");
             }
 
+            //if parameterizeNamedValuesAndSecrets passed as parameter
+            if (!string.IsNullOrEmpty(configuration.ParamNamedValue))
+            {
+                creatorConfig.paramNamedValue = true;
+            }
+
             //if backendurlfile passed as parameter
             if (configuration.BackendUrlConfigFile != null && !string.IsNullOrEmpty(configuration.BackendUrlConfigFile))
             {
@@ -85,6 +92,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
 
         public async Task ExecuteCommandAsync(CreatorConfig creatorConfig)
         {
+            if (!Directory.Exists(creatorConfig.outputLocation))
+            {
+                Directory.CreateDirectory(creatorConfig.outputLocation);
+            }
+
             FileReader fileReader = new FileReader();
 
             // initialize file helper classes
