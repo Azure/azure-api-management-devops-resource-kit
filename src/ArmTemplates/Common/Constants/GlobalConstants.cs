@@ -11,8 +11,8 @@
         public const string ExtractName = "extract";
         public const string ExtractDescription = "Extract an existing API Management instance";
 
-        public const string ApiVersion = "2021-01-01-preview";
-        public const string LinkedAPIVersion = "2018-05-01";
+        public const string ApiVersion = "2021-08-01";
+        public const string LinkedAPIVersion = "2021-08-01";
         public const int NumOfRecords = 100;
 
         public const string azAccessToken = "account get-access-token --query \"accessToken\" --output json";
