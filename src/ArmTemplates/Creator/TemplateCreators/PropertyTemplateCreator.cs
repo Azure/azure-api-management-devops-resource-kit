@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
             };
 
-            if (creatorConfig.paramNamedValue)
+            if (creatorConfig.parameterizeNamedValue)
             {
                 if (creatorConfig.namedValues.Any(x => x.value != null))
                 {
@@ -46,12 +46,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             foreach (PropertyConfig namedValue in creatorConfig.namedValues)
             {
                 string value = namedValue.value == null ? null
-                   : creatorConfig.paramNamedValue
+                   : creatorConfig.parameterizeNamedValue
                        ? $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.displayName, ParameterPrefix.Property)}]"
                        : namedValue.value;
 
                 PropertyResourceKeyVaultProperties keyVault = namedValue.keyVault == null ? null
-                    : creatorConfig.paramNamedValue
+                    : creatorConfig.parameterizeNamedValue
                         ? new PropertyResourceKeyVaultProperties
                         {
                             secretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.displayName, ParameterPrefix.Property)}]"
