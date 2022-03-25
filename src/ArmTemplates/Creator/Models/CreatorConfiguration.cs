@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
         public string linkedTemplatesUrlQueryString { get; set; }
         public string baseFileName { get; set; }
 
-        public bool parameterizeNamedValue { get; set; }
+        public bool parameterizeNamedValues { get; set; }
         public List<ServiceUrlProperty> serviceUrlParameters { get; set; }
     }
 

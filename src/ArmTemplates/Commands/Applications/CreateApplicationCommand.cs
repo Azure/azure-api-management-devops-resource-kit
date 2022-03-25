@@ -74,9 +74,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
             }
 
             //if parameterizeNamedValuesAndSecrets passed as parameter
-            if (!string.IsNullOrEmpty(configuration.ParameterizeNamedValue))
+            if (!string.IsNullOrEmpty(configuration.ParameterizeNamedValues))
             {
-                creatorConfig.parameterizeNamedValue = true;
+                creatorConfig.parameterizeNamedValues = true;
             }
 
             //if backendurlfile passed as parameter

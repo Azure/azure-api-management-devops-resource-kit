@@ -34,6 +34,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         public string PreferredAPIsForDeployment { get; set; }
 
         [Option(longName: "parameterizeNamedValuesAndSecrets", HelpText = "Allows Creator to parameterize NamedValues and KeyVault Secrets. Output ARM Template then can be deployed to multiple environments")]
-        public string ParameterizeNamedValue { get; set; }
+        public string ParameterizeNamedValues { get; set; }
     }
 }
