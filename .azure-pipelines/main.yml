@@ -64,11 +64,10 @@ stages:
               projects: 'tests/**/*Tests/*.csproj'
 
           - task: DotNetCoreCLI@2
+            displayName: 'Publish build artifacts'
             inputs:
               command: publish
-              publishWebProjects: True
               arguments: '--configuration $(configuration) --output $(Build.ArtifactStagingDirectory)'
-              zipAfterPublish: True
 
   - stage: postbuild
     displayName: 'Post Build Checks'
