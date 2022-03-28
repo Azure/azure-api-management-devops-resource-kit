@@ -68,6 +68,7 @@ stages:
             inputs:
               command: publish
               arguments: '--configuration $(configuration) --output $(Build.ArtifactStagingDirectory)'
+              publishWebProjects: false
 
   - stage: postbuild
     displayName: 'Post Build Checks'
