@@ -69,6 +69,15 @@ stages:
               command: publish
               arguments: '--configuration $(configuration) --output $(Build.ArtifactStagingDirectory)'
               publishWebProjects: false
+              
+          - pwsh: |
+              get-childitem src\ArmTemplates\bin\$(configuration)\netcoreapp3.1
+            displayName: Display Build Package Contents
+            
+          - task: PublishBuildArtifacts@1
+            displayName: Publish Build Artifacts
+            inputs: 'src\ArmTemplates\bin\$(configuration)\netcoreapp3.1'
+            artifactName: build
 
   - stage: postbuild
     displayName: 'Post Build Checks'
