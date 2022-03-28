@@ -71,7 +71,7 @@ stages:
               publishWebProjects: false
               
           - pwsh: |
-              New-Item '$(Build.ArtifactStagingDirectory)/build'
+              New-Item '$(Build.ArtifactStagingDirectory)/build' -Type Directory
               Get-ChildItem -Path 'src/ArmTemplates/bin/$(configuration)/netcoreapp3.1' -File | %{
                 Write-Host "Copy-Item -Path $_ -Destination '$(Build.ArtifactStagingDirectory)/build'"
                 Copy-Item -Path $_ -Destination '$(Build.ArtifactStagingDirectory)/build'
