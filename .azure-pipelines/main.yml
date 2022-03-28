@@ -76,6 +76,7 @@ stages:
                 Write-Host "Copy-Item -Path $_ -Destination '$(Build.ArtifactStagingDirectory)/build'"
                 Copy-Item -Path $_ -Destination '$(Build.ArtifactStagingDirectory)/build'
               }
+              Get-ChildItem '$(Build.ArtifactStagingDirectory)' -Recurse
             displayName: Consolidate Build Artifacts
             
           - task: PublishBuildArtifacts@1
