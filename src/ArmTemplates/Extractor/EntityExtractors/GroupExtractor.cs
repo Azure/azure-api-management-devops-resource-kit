@@ -8,7 +8,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Azure.Management.Authorization.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors

@@ -46,8 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                     await creatorCommandApplication.ExecuteCommandAsync(creatorConfig);
                 },
 
-                async errors =>
-                {
+                errors => {
                     applicationLogger.Information("Azure API Management DevOps Resource toolkit finished.");
 
                     if (!errors.IsNullOrEmpty())
@@ -63,8 +62,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                             {
                                 case ErrorType.VersionRequestedError:
                                 case ErrorType.HelpRequestedError:
-                                    return;
-
+                                    return Task.CompletedTask;
                                 case ErrorType.HelpVerbRequestedError:
                                     applicationLogger.Error("No verb found. Use \"help\" command to view all supported commands.");
                                     break;
@@ -84,10 +82,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                             var errorMessage = (i < errorMessages.Count) ? errorMessages[i] : string.Empty;
 
                             applicationLogger.Error("[{0}] {1}", errorList[i].Tag, errorMessage);
-                        }                        
+                        }
                     }
-                }
-            );
+
+                    return Task.CompletedTask;
+                });
         }
 
         public static IServiceProvider CreateServiceProvider(ILogger logger)

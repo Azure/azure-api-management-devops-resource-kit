@@ -4,14 +4,11 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiOperations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Azure.Management.Compute.Fluent.Models;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
