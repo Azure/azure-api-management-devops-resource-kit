@@ -80,8 +80,9 @@ stages:
             
           - task: PublishBuildArtifacts@1
             displayName: Publish Build Artifacts
-            inputs: '$(Build.ArtifactStagingDirectory)/build'
-            artifactName: build
+            inputs: 
+              pathToPublish: '$(Build.ArtifactStagingDirectory)/build'
+              artifactName: build
 
   - stage: postbuild
     displayName: 'Post Build Checks'
