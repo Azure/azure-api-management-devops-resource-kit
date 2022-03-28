@@ -142,3 +142,35 @@ stages:
 
           - task: PublishSecurityAnalysisLogs@3
             displayName: 'Publish security analysis logs'
+  
+  - stage: release
+    displayName: Release Toolkit
+    dependsOn: [ 'postbuild' ]
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    jobs:
+      - job: update_github_release
+        displayName: Update GitHub Releases
+        steps:
+          - pwsh: |
+              $tagVersion = $env:BUILD_SOURCEBRANCHNAME
+              Write-Host "Tag version: $tagVersion"
+              Write-Host "##vso[task.setvariable variable=githubReleaseVersion]$tagVersion"
+            displayName: Get Release Name on GitHub
+            
+          - pwsh: |
+              New-Item -Path '$(Build.ArtifactStagingDirectory)/release' -Type Directory -Force
+            displayName: Set up environment
+            
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifact: 'release'
+              path: '$(Build.ArtifactStagingDirectory)/release'
+            displayName: Download Release ZIP Packages
+
+          - task: GitHubRelease@1
+            inputs:
+              gitHubConnection: Github-adhal-azure-devops-resource-kit
+              repositoryName: 'azure/azure-api-management-devops-resource-kit'
+              tag: $(githubReleaseVersion)
+              action: 'edit'
+              assets: $(Build.ArtifactStagingDirectory)/release/*.zip
