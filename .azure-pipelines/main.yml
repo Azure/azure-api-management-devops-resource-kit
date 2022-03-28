@@ -87,7 +87,7 @@ stages:
               
           - pwsh: |
               New-Item '$(Build.ArtifactStagingDirectory)/release' -Type Directory
-              Compress-Archive -LiteralPath '$(Build.ArtifactStagingDirectory)/build/*' -DestinationPath '$(Build.ArtifactStagingDirectory)/release/reskit-$(APP_VERSION).zip'
+              Compress-Archive -Path '$(Build.ArtifactStagingDirectory)/build/*' -DestinationPath '$(Build.ArtifactStagingDirectory)/release/reskit-$(APP_VERSION).zip'
             displayName: Create ZIP Release Archive
             
           - task: PublishBuildArtifacts@1
