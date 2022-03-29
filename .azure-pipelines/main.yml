@@ -145,7 +145,7 @@ stages:
   
   - stage: release
     displayName: Release Toolkit
-    dependsOn: [ 'postbuild' ]
+    dependsOn: [ 'build' ]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     jobs:
       - job: update_github_release
