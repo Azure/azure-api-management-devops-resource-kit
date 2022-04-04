@@ -53,13 +53,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {
-                    apiDiagnostic.Properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{ParameterNamingHelper.GenerateValidParameterName(apiDiagnosticOriginalName, ParameterPrefix.Diagnostic)}]";
+                    apiDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{ParameterNamingHelper.GenerateValidParameterName(apiDiagnosticOriginalName, ParameterPrefix.Diagnostic)}]";
                 }
 
                 if (!apiDiagnosticOriginalName.Contains("applicationinsights"))
                 {
                     // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
-                    apiDiagnostic.Properties.enableHttpCorrelationHeaders = null;
+                    apiDiagnostic.Properties.EnableHttpCorrelationHeaders = null;
                 }
 
                 templateResources.Add(apiDiagnostic);
@@ -96,14 +96,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {
-                    serviceDiagnostic.Properties.loggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(originalDiagnosticName, ParameterPrefix.Diagnostic)}]";
+                    serviceDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(originalDiagnosticName, ParameterPrefix.Diagnostic)}]";
                 }
 
                 if (!originalDiagnosticName.Contains("applicationinsights"))
                 {
                     // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
                     //TODO: Check this settings still valid?
-                    serviceDiagnostic.Properties.enableHttpCorrelationHeaders = null;
+                    serviceDiagnostic.Properties.EnableHttpCorrelationHeaders = null;
                 }
 
                 templateResources.Add(serviceDiagnostic);

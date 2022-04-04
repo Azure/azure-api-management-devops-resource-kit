@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                 {
                     if (aPIConfig.diagnostic != null)
                     {
-                        aPIConfig.diagnostic.loggerId = appInsightNamePassed;
+                        aPIConfig.diagnostic.LoggerId = appInsightNamePassed;
                     }
                 }
             }
@@ -30,9 +30,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                     {
                         creatorConfig.loggers[0].name = appInsightNamePassed;
                     }
-                    if (creatorConfig.loggers[0].credentials != null)
+                    if (creatorConfig.loggers[0].Credentials != null)
                     {
-                        creatorConfig.loggers[0].credentials.instrumentationKey = appInsightsInstrumentationKeyPassed;
+                        creatorConfig.loggers[0].Credentials.InstrumentationKey = appInsightsInstrumentationKeyPassed;
                     }
                 }
             }

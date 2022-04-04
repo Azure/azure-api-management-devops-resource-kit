@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -18,19 +18,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             CreatorConfig creatorConfig = new CreatorConfig() { namedValues = new List<PropertyConfig>() };
             PropertyConfig property = new PropertyConfig()
             {
-                displayName = "displayName",
-                value = "value"
+                DisplayName = "displayName",
+                Value = "value"
             };
             creatorConfig.namedValues.Add(property);
 
             // act
             var propertyTemplate = propertyTemplateCreator.CreatePropertyTemplate(creatorConfig);
-            var propertyTemplateResource = (PropertyTemplateResource)propertyTemplate.Resources[0];
+            var propertyTemplateResource = (NamedValueTemplateResource)propertyTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{property.displayName}')]", propertyTemplateResource.Name);
-            Assert.Equal(property.displayName, propertyTemplateResource.Properties.displayName);
-            Assert.Equal(property.value, propertyTemplateResource.Properties.value);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{property.DisplayName}')]", propertyTemplateResource.Name);
+            Assert.Equal(property.DisplayName, propertyTemplateResource.Properties.DisplayName);
+            Assert.Equal(property.Value, propertyTemplateResource.Properties.Value);
         }
     }
 }

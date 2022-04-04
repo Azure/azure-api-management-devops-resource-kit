@@ -34,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                             string[] keyValueSeperatedArray = keyValue.Split(KeyValueSeperator);
                             if (creatorConfig.namedValues != null && creatorConfig.namedValues.Count > 0)
                             {
-                                creatorConfig.namedValues.Where(x => x.displayName == keyValueSeperatedArray[0]).FirstOrDefault().value = keyValueSeperatedArray[1];
+                                creatorConfig.namedValues.Where(x => x.DisplayName == keyValueSeperatedArray[0]).FirstOrDefault().Value = keyValueSeperatedArray[1];
                             }
                         }
                     }

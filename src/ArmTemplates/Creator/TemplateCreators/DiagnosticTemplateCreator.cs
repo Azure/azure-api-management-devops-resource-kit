@@ -17,18 +17,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 ApiVersion = GlobalConstants.ApiVersion,
                 Properties = new DiagnosticTemplateProperties()
                 {
-                    alwaysLog = api.diagnostic.alwaysLog,
-                    sampling = api.diagnostic.sampling,
-                    frontend = api.diagnostic.frontend,
-                    backend = api.diagnostic.backend,
-                    enableHttpCorrelationHeaders = api.diagnostic.enableHttpCorrelationHeaders
+                    AlwaysLog = api.diagnostic.AlwaysLog,
+                    Sampling = api.diagnostic.Sampling,
+                    Frontend = api.diagnostic.Frontend,
+                    Backend = api.diagnostic.Backend,
+                    EnableHttpCorrelationHeaders = api.diagnostic.EnableHttpCorrelationHeaders
                 },
                 DependsOn = dependsOn
             };
             // reference the provided logger if loggerId is provided
-            if (api.diagnostic.loggerId != null)
+            if (api.diagnostic.LoggerId != null)
             {
-                diagnosticTemplateResource.Properties.loggerId = $"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('{ParameterNames.ApimServiceName}'), '{api.diagnostic.loggerId}')]";
+                diagnosticTemplateResource.Properties.LoggerId = $"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('{ParameterNames.ApimServiceName}'), '{api.diagnostic.LoggerId}')]";
             }
             return diagnosticTemplateResource;
         }

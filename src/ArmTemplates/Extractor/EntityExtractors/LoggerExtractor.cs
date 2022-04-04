@@ -12,117 +12,142 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
     public class LoggerExtractor : EntityExtractorBase, ILoggerExtractor
     {
+        readonly ILogger<LoggerExtractor> logger;
+        readonly IDiagnosticClient diagnosticClient;
+        readonly ILoggerClient loggerClient;
         readonly ITemplateBuilder templateBuilder;
 
-        public LoggerExtractor(ITemplateBuilder templateBuilder)
+        public LoggersCache Cache { get; private set; } = new LoggersCache();
+
+        public LoggerExtractor(
+            ILogger<LoggerExtractor> logger,
+            ITemplateBuilder templateBuilder,
+            ILoggerClient loggerClient,
+            IDiagnosticClient diagnosticClient)
         {
+            this.logger = logger;
             this.templateBuilder = templateBuilder;
-        }
+            this.diagnosticClient = diagnosticClient;
+            this.loggerClient = loggerClient;
+        }        
 
-        public async Task<string> GetLoggersAsync(string apiManagementName, string resourceGroupName)
+        public async Task<Template<LoggerTemplateResources>> GenerateLoggerTemplateAsync(
+            List<string> apisToExtract,
+            List<PolicyTemplateResource> apiPolicies,
+            ExtractorParameters extractorParameters)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            var loggerTemplate = this.templateBuilder
+                                        .GenerateTemplateWithApimServiceNameProperty()
+                                        .Build<LoggerTemplateResources>();
 
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers?api-version={4}",
-               BaseUrl, azSubId, resourceGroupName, apiManagementName, GlobalConstants.ApiVersion);
-
-            return await this.CallApiManagementAsync(azToken, requestUrl);
-        }
-
-        public async Task<string> GetLoggerDetailsAsync(string apiManagementName, string resourceGroupName, string loggerName)
-        {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers/{4}?api-version={5}",
-               BaseUrl, azSubId, resourceGroupName, apiManagementName, loggerName, GlobalConstants.ApiVersion);
-
-            return await this.CallApiManagementAsync(azToken, requestUrl);
-        }
-
-        public async Task<Template> GenerateLoggerTemplateAsync(ExtractorParameters extractorParameters, string singleApiName, List<TemplateResource> apiTemplateResources, Dictionary<string, object> apiLoggerId)
-        {
-            Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Extracting loggers from service");
-            Template armTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
-
-            if (extractorParameters.ParameterizeLogResourceId)
+            if (extractorParameters.ParameterizeApiLoggerId)
             {
-                TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
-                {
-                    type = "object"
-                };
-                armTemplate.Parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
+                await this.LoadAllReferencedLoggers(apisToExtract, extractorParameters);
             }
 
-            // isolate product api associations in the case of a single api extraction
-            var policyResources = apiTemplateResources.Where(resource => resource.Type == ResourceTypeConstants.APIPolicy || resource.Type == ResourceTypeConstants.APIOperationPolicy || resource.Type == ResourceTypeConstants.ProductPolicy);
-
-            List<TemplateResource> templateResources = new List<TemplateResource>();
-
-            // pull all loggers for service
-            string loggers = await this.GetLoggersAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
-            JObject oLoggers = JObject.Parse(loggers);
-            foreach (var extractedLogger in oLoggers["value"])
+            var loggers = await this.loggerClient.GetAllAsync(extractorParameters);
+            foreach (var logger in loggers)
             {
-                string loggerName = ((JValue)extractedLogger["name"]).Value.ToString();
-                string fullLoggerResource = await this.GetLoggerDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, loggerName);
+                var originalLoggerName = logger.Name;
 
-                // convert returned logger to template resource class
-                LoggerTemplateResource loggerResource = fullLoggerResource.Deserialize<LoggerTemplateResource>();
-                loggerResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{loggerName}')]";
-                loggerResource.Type = ResourceTypeConstants.Logger;
-                loggerResource.ApiVersion = GlobalConstants.ApiVersion;
-                loggerResource.Scale = null;
+                logger.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalLoggerName}')]";
+                logger.Type = ResourceTypeConstants.Logger;
+                logger.ApiVersion = GlobalConstants.ApiVersion;
+                logger.Scale = null;
 
-                if (string.IsNullOrEmpty(singleApiName))
+                // single api extraction
+                if (apisToExtract?.Count != 1)
                 {
-                    // if the user is extracting all apis, extract all the loggers
-                    Console.WriteLine("'{0}' Logger found", loggerName);
-                    templateResources.Add(loggerResource);
+                    loggerTemplate.TypedResources.Loggers.Add(logger);
                 }
                 else
                 {
                     // if the user is extracting a single api, extract the loggers referenced by its diagnostics and api policies
-                    bool isReferencedInPolicy = false;
+                    var isReferencedInPolicy = apiPolicies?.Any(x => x.Properties.PolicyContent.Contains(originalLoggerName));
+                    
                     bool isReferencedInDiagnostic = false;
-                    foreach (PolicyTemplateResource policyTemplateResource in policyResources)
+                    var validApiName = ParameterNamingHelper.GenerateValidParameterName(apisToExtract.First(), ParameterPrefix.Api);
+                    if (extractorParameters.ParameterizeApiLoggerId && this.Cache.ApiDiagnosticLoggerBindings.ContainsKey(validApiName))
                     {
-                        if (policyTemplateResource.Properties.PolicyContent.Contains(loggerName))
+                        var diagnosticLoggerBindings = this.Cache.ApiDiagnosticLoggerBindings[validApiName];
+                        
+                        if (!diagnosticLoggerBindings.IsNullOrEmpty())
                         {
-                            isReferencedInPolicy = true;
-                        }
-                    }
-
-                    string validApiName = ParameterNamingHelper.GenerateValidParameterName(singleApiName, ParameterPrefix.Api);
-                    if (extractorParameters.ParameterizeApiLoggerId && apiLoggerId.ContainsKey(validApiName))
-                    {
-                        object diagnosticObj = apiLoggerId[validApiName];
-                        if (diagnosticObj is Dictionary<string, string>)
-                        {
-                            Dictionary<string, string> curDiagnostic = (Dictionary<string, string>)diagnosticObj;
-                            string validDName = ParameterNamingHelper.GenerateValidParameterName(loggerResource.Properties.loggerType, ParameterPrefix.Diagnostic).ToLower();
-                            if (curDiagnostic.ContainsKey(validDName) && curDiagnostic[validDName].Contains(loggerName))
+                            var validDiagnosticName = ParameterNamingHelper.GenerateValidParameterName(logger.Properties.LoggerType, ParameterPrefix.Diagnostic).ToLower();
+                            if (diagnosticLoggerBindings.Any(x => x.DiagnosticName == validDiagnosticName))
                             {
                                 isReferencedInDiagnostic = true;
                             }
                         }
                     }
-                    if (isReferencedInPolicy == true || isReferencedInDiagnostic == true)
+
+                    if (isReferencedInPolicy == true || isReferencedInDiagnostic)
                     {
                         // logger was used in policy or diagnostic, extract it
-                        Console.WriteLine("'{0}' Logger found", loggerName);
-                        templateResources.Add(loggerResource);
+                        loggerTemplate.TypedResources.Loggers.Add(logger);
                     }
-                };
+                }
             }
 
-            armTemplate.Resources = templateResources.ToArray();
-            return armTemplate;
+            return loggerTemplate;
+        }
+
+        async Task LoadAllReferencedLoggers(
+            List<string> apisToExtract, 
+            ExtractorParameters extractorParameters)
+        {
+            var serviceDiagnostics = await this.diagnosticClient.GetAllAsync(extractorParameters);
+
+            var serviceloggerIds = new Dictionary<string, string>();
+            foreach (var serviceDiagnostic in serviceDiagnostics)
+            {
+                string loggerId = serviceDiagnostic.Properties.LoggerId;
+                
+                this.Cache.ServiceLevelDiagnosticLoggerBindings.Add(
+                    ParameterNamingHelper.GenerateValidParameterName(serviceDiagnostic.Name, ParameterPrefix.Diagnostic),
+                    loggerId);
+            }
+
+            if (apisToExtract.IsNullOrEmpty())
+            {
+                this.logger.LogWarning("No apis to extract are passed to {0}", nameof(LoggerExtractor));
+                return;
+            }
+
+            foreach (string curApiName in apisToExtract)
+            {
+                var diagnostics = await this.diagnosticClient.GetApiDiagnosticsAsync(curApiName, extractorParameters);
+
+                if (diagnostics.IsNullOrEmpty())
+                {
+                    this.logger.LogWarning("No diagnostics found for '{0}' api", curApiName);
+                    continue;
+                }
+
+                var diagnosticLoggerBindings = new HashSet<DiagnosticLoggerBinding>();
+                foreach (var diagnostic in diagnostics)
+                {
+                    diagnosticLoggerBindings.Add(new DiagnosticLoggerBinding
+                    {
+                        DiagnosticName = ParameterNamingHelper.GenerateValidParameterName(diagnostic.Name, ParameterPrefix.Diagnostic),
+                        LoggerId = diagnostic.Properties.LoggerId
+                    });
+                }
+
+                if (!diagnosticLoggerBindings.IsNullOrEmpty())
+                {
+                    this.Cache.ApiDiagnosticLoggerBindings.Add(
+                        ParameterNamingHelper.GenerateValidParameterName(curApiName, ParameterPrefix.Api), 
+                        diagnosticLoggerBindings);
+                }
+            }
         }
     }
 }

@@ -9,42 +9,38 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateM
 
     public class DiagnosticTemplateProperties
     {
-        public string alwaysLog { get; set; }
-        public string loggerId { get; set; }
-        public string httpCorrelationProtocol { get; set; }
-        public string verbosity { get; set; }
-        public bool? logClientIp { get; set; }
+        public string AlwaysLog { get; set; }
+        public string LoggerId { get; set; }
+        public string HttpCorrelationProtocol { get; set; }
+        public string Verbosity { get; set; }
+        public bool? LogClientIp { get; set; }
 
-        public DiagnosticTemplateSampling sampling { get; set; }
-        public DiagnosticTemplateFrontendBackend frontend { get; set; }
-        public DiagnosticTemplateFrontendBackend backend { get; set; }
-        public bool? enableHttpCorrelationHeaders { get; set; }
+        public DiagnosticTemplateSampling Sampling { get; set; }
+        public DiagnosticTemplateFrontendBackend Frontend { get; set; }
+        public DiagnosticTemplateFrontendBackend Backend { get; set; }
+        public bool? EnableHttpCorrelationHeaders { get; set; }
     }
 
     public class DiagnosticTemplateSampling
     {
-        public string samplingType { get; set; }
-        public double percentage { get; set; }
+        public string SamplingType { get; set; }
+        public double Percentage { get; set; }
     }
 
     public class DiagnosticTemplateFrontendBackend
     {
-        public DiagnosticTemplateRequestResponse request { get; set; }
-        public DiagnosticTemplateRequestResponse response { get; set; }
+        public DiagnosticTemplateRequestResponse Request { get; set; }
+        public DiagnosticTemplateRequestResponse Response { get; set; }
     }
 
     public class DiagnosticTemplateRequestResponse
     {
-        public string[] headers { get; set; }
-        public DiagnosticTemplateRequestResponseBody body { get; set; }
+        public string[] Headers { get; set; }
+        public DiagnosticTemplateRequestResponseBody Body { get; set; }
     }
 
     public class DiagnosticTemplateRequestResponseBody
     {
-        public int bytes { get; set; }
+        public int Bytes { get; set; }
     }
-
-
-
-
 }

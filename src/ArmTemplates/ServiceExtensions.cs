@@ -25,6 +25,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Gateway;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Loggers;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.NamedValues;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -76,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IPolicyExtractor, PolicyExtractor>();
             services.AddScoped<IProductApisExtractor, ProductApisExtractor>();
             services.AddScoped<IProductExtractor, ProductExtractor>();
-            services.AddScoped<IPropertyExtractor, PropertyExtractor>();
+            services.AddScoped<INamedValuesExtractor, NamedValuesExtractor>();
             services.AddScoped<ITagApiExtractor, TagApiExtractor>();
             services.AddScoped<ITagExtractor, TagExtractor>();
             services.AddScoped<IGroupExtractor, GroupExtractor>();
@@ -103,6 +105,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IProductsClient, ProductsClient>();
             services.AddScoped<IDiagnosticClient, DiagnosticClient>();
             services.AddScoped<IGatewayClient, GatewayClient>();
+            services.AddScoped<ILoggerClient, LoggerClient>();
+            services.AddScoped<INamedValuesClient, NamedValuesClient>();
         }
     }
 }
