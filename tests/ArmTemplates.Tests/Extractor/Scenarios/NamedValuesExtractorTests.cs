@@ -10,7 +10,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
@@ -55,12 +54,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             mockBackendExtractor
                 .Setup(x => x.IsNamedValueUsedInBackends(
                     It.IsAny<string>(), 
-                    It.IsAny<string>(), 
-                    It.IsAny<string>(), 
                     It.IsAny<List<PolicyTemplateResource>>(), 
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<ExtractorParameters>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
                     It.IsAny<string>()))
                 .ReturnsAsync(false);
 

@@ -104,13 +104,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         baseFilesGenerationDirectory);
 
                     var foundInBackEnd = await this.backendExtractor.IsNamedValueUsedInBackends(
-                        extractorParameters.SourceApimName, 
-                        extractorParameters.ResourceGroup, 
-                        singleApiName, 
-                        apiPolicies, 
-                        extractorParameters, 
-                        originalNamedValueName, 
-                        namedValueResource.Properties.DisplayName, 
+                        singleApiName,
+                        apiPolicies,
+                        originalNamedValueName,
+                        namedValueResource.Properties.DisplayName,
+                        extractorParameters,
                         baseFilesGenerationDirectory);
 
                     var foundInLogger = this.DoesLoggerReferenceNamedValue(

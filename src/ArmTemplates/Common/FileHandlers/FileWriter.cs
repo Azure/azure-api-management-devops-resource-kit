@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
-using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
 

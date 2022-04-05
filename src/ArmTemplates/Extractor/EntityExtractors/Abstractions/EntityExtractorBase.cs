@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions
 {
