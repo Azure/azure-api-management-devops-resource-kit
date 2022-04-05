@@ -20,52 +20,52 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 diagnostic = new DiagnosticConfig()
                 {
                     name = "applicationinsights",
-                    alwaysLog = "alwaysLog",
-                    loggerId = "loggerId",
-                    sampling = new DiagnosticTemplateSampling()
+                    AlwaysLog = "alwaysLog",
+                    LoggerId = "loggerId",
+                    Sampling = new DiagnosticTemplateSampling()
                     {
-                        samplingType = "samplingType",
-                        percentage = 100
+                        SamplingType = "samplingType",
+                        Percentage = 100
                     },
-                    frontend = new DiagnosticTemplateFrontendBackend()
+                    Frontend = new DiagnosticTemplateFrontendBackend()
                     {
-                        request = new DiagnosticTemplateRequestResponse()
+                        Request = new DiagnosticTemplateRequestResponse()
                         {
-                            headers = new string[] { "frontendrequestheader" },
-                            body = new DiagnosticTemplateRequestResponseBody()
+                            Headers = new string[] { "frontendrequestheader" },
+                            Body = new DiagnosticTemplateRequestResponseBody()
                             {
-                                bytes = 512
+                                Bytes = 512
                             }
                         },
-                        response = new DiagnosticTemplateRequestResponse()
+                        Response = new DiagnosticTemplateRequestResponse()
                         {
-                            headers = new string[] { "frontendresponseheader" },
-                            body = new DiagnosticTemplateRequestResponseBody()
+                            Headers = new string[] { "frontendresponseheader" },
+                            Body = new DiagnosticTemplateRequestResponseBody()
                             {
-                                bytes = 512
+                                Bytes = 512
                             }
                         }
                     },
-                    backend = new DiagnosticTemplateFrontendBackend()
+                    Backend = new DiagnosticTemplateFrontendBackend()
                     {
-                        request = new DiagnosticTemplateRequestResponse()
+                        Request = new DiagnosticTemplateRequestResponse()
                         {
-                            headers = new string[] { "backendrequestheader" },
-                            body = new DiagnosticTemplateRequestResponseBody()
+                            Headers = new string[] { "backendrequestheader" },
+                            Body = new DiagnosticTemplateRequestResponseBody()
                             {
-                                bytes = 512
+                                Bytes = 512
                             }
                         },
-                        response = new DiagnosticTemplateRequestResponse()
+                        Response = new DiagnosticTemplateRequestResponse()
                         {
-                            headers = new string[] { "backendresponseheader" },
-                            body = new DiagnosticTemplateRequestResponseBody()
+                            Headers = new string[] { "backendresponseheader" },
+                            Body = new DiagnosticTemplateRequestResponseBody()
                             {
-                                bytes = 512
+                                Bytes = 512
                             }
                         }
                     },
-                    enableHttpCorrelationHeaders = true
+                    EnableHttpCorrelationHeaders = true
                 }
             };
             creatorConfig.apis.Add(api);
@@ -77,19 +77,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             // assert
             Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/{api.diagnostic.name}')]", diagnosticTemplateResource.Name);
             Assert.Equal(dependsOn, diagnosticTemplateResource.DependsOn);
-            Assert.Equal(api.diagnostic.alwaysLog, diagnosticTemplateResource.Properties.alwaysLog);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('{ParameterNames.ApimServiceName}'), '{api.diagnostic.loggerId}')]", diagnosticTemplateResource.Properties.loggerId);
-            Assert.Equal(api.diagnostic.enableHttpCorrelationHeaders, diagnosticTemplateResource.Properties.enableHttpCorrelationHeaders);
-            Assert.Equal(api.diagnostic.sampling.samplingType, diagnosticTemplateResource.Properties.sampling.samplingType);
-            Assert.Equal(api.diagnostic.sampling.percentage, diagnosticTemplateResource.Properties.sampling.percentage);
-            Assert.Equal(api.diagnostic.frontend.request.headers, diagnosticTemplateResource.Properties.frontend.request.headers);
-            Assert.Equal(api.diagnostic.frontend.request.body.bytes, diagnosticTemplateResource.Properties.frontend.request.body.bytes);
-            Assert.Equal(api.diagnostic.frontend.response.headers, diagnosticTemplateResource.Properties.frontend.response.headers);
-            Assert.Equal(api.diagnostic.frontend.response.body.bytes, diagnosticTemplateResource.Properties.frontend.response.body.bytes);
-            Assert.Equal(api.diagnostic.backend.request.headers, diagnosticTemplateResource.Properties.backend.request.headers);
-            Assert.Equal(api.diagnostic.backend.request.body.bytes, diagnosticTemplateResource.Properties.backend.request.body.bytes);
-            Assert.Equal(api.diagnostic.backend.response.headers, diagnosticTemplateResource.Properties.backend.response.headers);
-            Assert.Equal(api.diagnostic.backend.response.body.bytes, diagnosticTemplateResource.Properties.backend.response.body.bytes);
+            Assert.Equal(api.diagnostic.AlwaysLog, diagnosticTemplateResource.Properties.AlwaysLog);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/loggers', parameters('{ParameterNames.ApimServiceName}'), '{api.diagnostic.LoggerId}')]", diagnosticTemplateResource.Properties.LoggerId);
+            Assert.Equal(api.diagnostic.EnableHttpCorrelationHeaders, diagnosticTemplateResource.Properties.EnableHttpCorrelationHeaders);
+            Assert.Equal(api.diagnostic.Sampling.SamplingType, diagnosticTemplateResource.Properties.Sampling.SamplingType);
+            Assert.Equal(api.diagnostic.Sampling.Percentage, diagnosticTemplateResource.Properties.Sampling.Percentage);
+            Assert.Equal(api.diagnostic.Frontend.Request.Headers, diagnosticTemplateResource.Properties.Frontend.Request.Headers);
+            Assert.Equal(api.diagnostic.Frontend.Request.Body.Bytes, diagnosticTemplateResource.Properties.Frontend.Request.Body.Bytes);
+            Assert.Equal(api.diagnostic.Frontend.Response.Headers, diagnosticTemplateResource.Properties.Frontend.Response.Headers);
+            Assert.Equal(api.diagnostic.Frontend.Response.Body.Bytes, diagnosticTemplateResource.Properties.Frontend.Response.Body.Bytes);
+            Assert.Equal(api.diagnostic.Backend.Request.Headers, diagnosticTemplateResource.Properties.Backend.Request.Headers);
+            Assert.Equal(api.diagnostic.Backend.Request.Body.Bytes, diagnosticTemplateResource.Properties.Backend.Request.Body.Bytes);
+            Assert.Equal(api.diagnostic.Backend.Response.Headers, diagnosticTemplateResource.Properties.Backend.Response.Headers);
+            Assert.Equal(api.diagnostic.Backend.Response.Body.Bytes, diagnosticTemplateResource.Properties.Backend.Response.Body.Bytes);
         }
     }
 }

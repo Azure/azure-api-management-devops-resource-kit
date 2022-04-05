@@ -36,5 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         TemplateBuilder AddParameterizeServiceUrlProperty(ExtractorParameters extractorParameters);
 
         TemplateBuilder AddParameterizeApiLoggerIdProperty(ExtractorParameters extractorParameters);
+
+        TemplateBuilder AddParameterizeLogResourceIdProperty(ExtractorParameters extractorParameters);
     }
 }

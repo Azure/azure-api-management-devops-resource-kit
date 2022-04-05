@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using System.Collections.Generic;
@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions
 {
-    public interface ILoggerExtractor
+    public interface INamedValuesExtractor
     {
-        LoggersCache Cache { get; }
-
-        Task<Template<LoggerTemplateResources>> GenerateLoggerTemplateAsync(
-            List<string> apisToExtract,
-            List<PolicyTemplateResource> apiPolicyTemplateResources,
-            ExtractorParameters extractorParameters);
+        Task<Template<NamedValuesResources>> GenerateNamedValuesTemplateAsync(
+            string singleApiName,
+            List<PolicyTemplateResource> apiPolicies,
+            List<LoggerTemplateResource> loggerResources,
+            ExtractorParameters extractorParameters,
+            string baseFilesGenerationDirectory);
     }
 }

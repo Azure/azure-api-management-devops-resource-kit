@@ -15,8 +15,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
     public class MockDiagnosticClient
     {
         public const string DiagnosticName = "diagnostic";
+        public const string DefaultDiagnosticName = "default-diagnostic";
 
-        public static IDiagnosticClient GetMockedApiClientWithDefaultValues()
+        public static IDiagnosticClient GetMockedClientWithApiDependentValues()
         {
             var mockDiagnosticClient = new Mock<IDiagnosticClient>(MockBehavior.Strict);
 
@@ -29,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = DiagnosticName,
                         Properties = new DiagnosticTemplateProperties()
                         {
-                            loggerId = "logger-id"
+                            LoggerId = "logger-id"
                         }
                     }
                 });
@@ -43,7 +44,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = $"{apiName}-{DiagnosticName}",
                         Properties = new DiagnosticTemplateProperties()
                         {
-                            loggerId = "logger-id"
+                            LoggerId = "logger-id"
+                        }
+                    }
+                });
+
+            return mockDiagnosticClient.Object;
+        }
+
+        public static IDiagnosticClient GetMockedApiClientWithDefaultValues()
+        {
+            var mockDiagnosticClient = new Mock<IDiagnosticClient>(MockBehavior.Strict);
+
+            mockDiagnosticClient
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((ExtractorParameters _) => new List<DiagnosticTemplateResource>
+                {
+                    new DiagnosticTemplateResource
+                    {
+                        Name = DefaultDiagnosticName,
+                        Properties = new DiagnosticTemplateProperties()
+                        {
+                            LoggerId = "logger-id"
+                        }
+                    }
+                });
+
+            mockDiagnosticClient
+                .Setup(x => x.GetApiDiagnosticsAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string _, ExtractorParameters _) => new List<DiagnosticTemplateResource>
+                {
+                    new DiagnosticTemplateResource
+                    {
+                        Name = DefaultDiagnosticName,
+                        Properties = new DiagnosticTemplateProperties()
+                        {
+                            LoggerId = "logger-id"
                         }
                     }
                 });

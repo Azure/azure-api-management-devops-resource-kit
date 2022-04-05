@@ -18,12 +18,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string baseFilesGenerationDirectory);
 
         Task<bool> IsNamedValueUsedInBackends(
-            string apimname, 
-            string resourceGroup, 
-            string singleApiName, 
-            List<TemplateResource> apiTemplateResources, 
-            ExtractorParameters extractorParameters, 
-            string propertyName, 
+            string apimname,
+            string resourceGroup,
+            string singleApiName,
+            List<PolicyTemplateResource> apiPolicies,
+            ExtractorParameters extractorParameters,
+            string propertyName,
             string propertyDisplayName,
             string baseFilesGenerationDirectory);
     }

@@ -4,6 +4,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -131,7 +132,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models
         public List<SubscriptionConfig> subscriptions { get; set; }
     }
 
-    public class PropertyConfig : PropertyResourceProperties
+    public class PropertyConfig : NamedValueProperties
     {
 
     }

@@ -20,15 +20,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             LoggerConfig logger = new LoggerConfig()
             {
                 name = "name",
-                loggerType = "applicationinsights",
-                description = "description",
-                isBuffered = true,
-                resourceId = "resourceId",
-                credentials = new LoggerCredentials()
+                LoggerType = "applicationinsights",
+                Description = "description",
+                IsBuffered = true,
+                ResourceId = "resourceId",
+                Credentials = new LoggerCredentials()
                 {
-                    connectionString = "connString",
-                    instrumentationKey = "iKey",
-                    name = "credName"
+                    ConnectionString = "connString",
+                    InstrumentationKey = "iKey",
+                    Name = "credName"
                 }
 
             };
@@ -40,13 +40,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // assert
             Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.name}')]", loggerTemplateResource.Name);
-            Assert.Equal(logger.loggerType, loggerTemplateResource.Properties.loggerType);
-            Assert.Equal(logger.description, loggerTemplateResource.Properties.description);
-            Assert.Equal(logger.isBuffered, loggerTemplateResource.Properties.isBuffered);
-            Assert.Equal(logger.resourceId, loggerTemplateResource.Properties.resourceId);
-            Assert.Equal(logger.credentials.connectionString, loggerTemplateResource.Properties.credentials.connectionString);
-            Assert.Equal(logger.credentials.instrumentationKey, loggerTemplateResource.Properties.credentials.instrumentationKey);
-            Assert.Equal(logger.credentials.name, loggerTemplateResource.Properties.credentials.name);
+            Assert.Equal(logger.LoggerType, loggerTemplateResource.Properties.LoggerType);
+            Assert.Equal(logger.Description, loggerTemplateResource.Properties.Description);
+            Assert.Equal(logger.IsBuffered, loggerTemplateResource.Properties.IsBuffered);
+            Assert.Equal(logger.ResourceId, loggerTemplateResource.Properties.ResourceId);
+            Assert.Equal(logger.Credentials.ConnectionString, loggerTemplateResource.Properties.Credentials.ConnectionString);
+            Assert.Equal(logger.Credentials.InstrumentationKey, loggerTemplateResource.Properties.Credentials.InstrumentationKey);
+            Assert.Equal(logger.Credentials.Name, loggerTemplateResource.Properties.Credentials.Name);
         }
     }
 }

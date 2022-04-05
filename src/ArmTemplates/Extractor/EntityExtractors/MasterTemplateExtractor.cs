@@ -22,6 +22,9 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Pro
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.TagApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -29,11 +32,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         readonly ITemplateBuilder templateBuilder;
         readonly IPolicyExtractor policyExtractor;
+        readonly INamedValuesClient namedValuesClient;
 
         public MasterTemplateExtractor(
+            ILogger<NamedValuesExtractor> namedValuesExtractorLogger,
             ILogger<ApiExtractor> logger,
             ITemplateBuilder templateBuilder,
             IApisClient apisClient,
+            INamedValuesClient namedValuesClient,
             IDiagnosticExtractor diagnosticExtractor,
             IApiSchemaExtractor apiSchemaExtractor,
             IPolicyExtractor policyExtractor,
@@ -44,6 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             this.templateBuilder = templateBuilder;
             this.policyExtractor = policyExtractor;
+            this.namedValuesClient = namedValuesClient;
         }
 
         public Template GenerateLinkedMasterTemplate(
@@ -477,11 +484,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return revDependsOn.ToArray();
         }
 
-        public async Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, ExtractorParameters extractorParameters,
-            Dictionary<string, object> apiLoggerId,
-            Dictionary<string, string> loggerResourceIds,
+        public async Task<Template> CreateMasterTemplateParameterValues(
+            List<string> apisToExtract, 
+            ExtractorParameters extractorParameters,
+            LoggersCache loggersCache,
+            LoggerTemplateResources loggerTemplateResources,
             Dictionary<string, BackendApiParameters> backendParams,
-             List<TemplateResource> propertyResources)
+            List<TemplateResource> propertyResources)
         {
             // used to create the parameter values for use in parameters file
             // create empty template
@@ -556,25 +565,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (extractorParameters.ParameterizeNamedValue)
             {
                 Dictionary<string, string> namedValues = new Dictionary<string, string>();
-                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder, this.policyExtractor);
-                string[] properties = await pExc.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
+                var namedValuesResponse = await this.namedValuesClient.GetAllAsync(extractorParameters);
 
-                foreach (var extractedProperty in properties)
+                foreach (var extractedProperty in namedValuesResponse)
                 {
-                    JToken oProperty = JObject.Parse(extractedProperty);
-                    string propertyName = ((JValue)oProperty["name"]).Value.ToString();
+                    var propertyName = extractedProperty.Name;
 
                     // check if the property has been extracted as it is being used in a policy or backend
                     if (propertyResources.Count(item => item.Name.Contains(propertyName)) > 0)
                     {
-                        string fullPropertyResource = await pExc.GetPropertyDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, propertyName);
-                        PropertyTemplateResource propertyTemplateResource = fullPropertyResource.Deserialize<PropertyTemplateResource>();
-
                         //Only add the property if it is not controlled by keyvault
-                        if (propertyTemplateResource?.Properties.keyVault == null)
+                        if (extractedProperty?.Properties.KeyVault == null)
                         {
-                            string propertyValue = propertyTemplateResource.Properties.value;
-                            string validPName = ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property);
+                            var propertyValue = extractedProperty.Properties.Value;
+                            var validPName = ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property);
                             namedValues.Add(validPName, propertyValue);
                         }
                     }
@@ -588,23 +592,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
             {
                 Dictionary<string, string> keyVaultNamedValues = new Dictionary<string, string>();
-                PropertyExtractor pExc = new PropertyExtractor(this.templateBuilder, this.policyExtractor);
-                string[] properties = await pExc.GetPropertiesAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
+                var namedValues = await this.namedValuesClient.GetAllAsync(extractorParameters);
 
-                foreach (var extractedProperty in properties)
+                foreach (var extractedProperty in namedValues)
                 {
-                    JToken oProperty = JObject.Parse(extractedProperty);
-                    string propertyName = ((JValue)oProperty["name"]).Value.ToString();
+                    var propertyName = extractedProperty.Name;
 
                     // check if the property has been extracted as it is being used in a policy or backend
                     if (propertyResources.Count(item => item.Name.Contains(propertyName)) > 0)
                     {
-                        string fullPropertyResource = await pExc.GetPropertyDetailsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, propertyName);
-                        PropertyTemplateResource propertyTemplateResource = fullPropertyResource.Deserialize<PropertyTemplateResource>();
-                        if (propertyTemplateResource?.Properties.keyVault != null)
+                        if (extractedProperty?.Properties.KeyVault != null)
                         {
-                            string propertyValue = propertyTemplateResource.Properties.keyVault.secretIdentifier;
-                            string validPName = ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property);
+                            var propertyValue = extractedProperty.Properties.KeyVault.SecretIdentifier;
+                            var validPName = ParameterNamingHelper.GenerateValidParameterName(propertyName, ParameterPrefix.Property);
                             keyVaultNamedValues.Add(validPName, propertyValue);
                         }
                     }
@@ -619,7 +619,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 TemplateObjectParameterProperties loggerIdProperties = new TemplateObjectParameterProperties()
                 {
-                    value = apiLoggerId
+                    value = loggersCache.CreateResultingMap()
                 };
                 parameters.Add(ParameterNames.ApiLoggerId, loggerIdProperties);
             }
@@ -627,7 +627,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 TemplateObjectParameterProperties loggerResourceIdProperties = new TemplateObjectParameterProperties()
                 {
-                    value = loggerResourceIds
+                    value = loggerTemplateResources.LoggerResourceIds
                 };
                 parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdProperties);
             }

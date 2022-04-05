@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using System.Collections.Generic;
@@ -58,9 +59,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             bool isValid = true;
             if (this.creatorConfig.namedValues != null)
             {
-                foreach (PropertyResourceProperties property in this.creatorConfig.namedValues)
+                foreach (var property in this.creatorConfig.namedValues)
                 {
-                    if (property.displayName == null)
+                    if (property.DisplayName == null)
                     {
                         isValid = false;
                         throw new CreatorConfigurationIsInvalidException("Display name is required is a Named Value is provided");
@@ -200,7 +201,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
                         }
                     }
                 }
-                if (api.diagnostic != null && api.diagnostic.loggerId == null)
+                if (api.diagnostic != null && api.diagnostic.LoggerId == null)
                 {
                     isValid = false;
                     throw new CreatorConfigurationIsInvalidException("LoggerId is required if an API diagnostic is provided");

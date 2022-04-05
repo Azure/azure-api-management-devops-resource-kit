@@ -390,7 +390,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
         public async Task<bool> DetermineIfAPIDependsOnLoggerAsync(APIConfig api, FileReader fileReader)
         {
-            if (api.diagnostic != null && api.diagnostic.loggerId != null)
+            if (api.diagnostic != null && api.diagnostic.LoggerId != null)
             {
                 // capture api diagnostic dependent on logger
                 return true;

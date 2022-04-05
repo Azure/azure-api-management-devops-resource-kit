@@ -43,7 +43,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             string apiVersionSetName = MockApiVersionSetName,
             string multipleApiNames = MockMultipleApis,
             bool includeAllRevisions = MockIncludeAllRevisions,
-            bool toParameterizeApiLoggerId = MockParameterizeApiLoggerId)
+            bool toParameterizeApiLoggerId = MockParameterizeApiLoggerId,
+            bool toNotIncludeNamedValue = MockNotIncludeNamedValue)
         {
             return new ExtractorConsoleAppConfiguration
             {
@@ -68,7 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ParamApiLoggerId = toParameterizeApiLoggerId.ToString(),
                 ParamLogResourceId = MockParameterizeLogResourceId.ToString(),
                 ServiceBaseUrl = MockServiceBaseUrl,
-                NotIncludeNamedValue = MockNotIncludeNamedValue.ToString(),
+                NotIncludeNamedValue = toNotIncludeNamedValue.ToString(),
                 ParamNamedValuesKeyVaultSecrets = MockToParameterizeNamedValuesKeyVaultSecrets.ToString(),
                 OperationBatchSize = MockOperationBatchSize,
                 ParamBackend = MockParameterizeBackend.ToString(),

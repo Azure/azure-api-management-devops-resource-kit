@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
@@ -12,6 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gat
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.GatewayApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IPolicyExtractor policyExtractor;
         readonly IProductApisExtractor productApisExtractor;
         readonly IProductExtractor productExtractor;
-        readonly IPropertyExtractor propertyExtractor;
+        readonly INamedValuesExtractor namedValuesExtractor;
         readonly ITagApiExtractor tagApiExtractor;
         readonly ITagExtractor tagExtractor;
         readonly IGroupExtractor groupExtractor;
@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IPolicyExtractor policyExtractor,
             IProductApisExtractor productApisExtractor,
             IProductExtractor productExtractor,
-            IPropertyExtractor propertyExtractor,
+            INamedValuesExtractor namedValuesExtractor,
             ITagApiExtractor tagApiExtractor,
             ITagExtractor tagExtractor,
             IGroupExtractor groupExtractor,
@@ -83,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.masterTemplateExtractor = masterTemplateExtractor;
             this.policyExtractor = policyExtractor;
             this.productApisExtractor = productApisExtractor;
-            this.propertyExtractor = propertyExtractor;
+            this.namedValuesExtractor = namedValuesExtractor;
             this.productExtractor = productExtractor;
             this.tagApiExtractor = tagApiExtractor;
             this.tagExtractor = tagExtractor;
@@ -109,7 +109,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IPolicyExtractor policyExtractor = null,
             IProductApisExtractor productApisExtractor = null,
             IProductExtractor productExtractor = null,
-            IPropertyExtractor propertyExtractor = null,
+            INamedValuesExtractor namedValuesExtractor = null,
             ITagApiExtractor tagApiExtractor = null,
             ITagExtractor tagExtractor = null,
             IGroupExtractor groupExtractor = null,
@@ -128,7 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 policyExtractor,
                 productApisExtractor,
                 productExtractor,
-                propertyExtractor,
+                namedValuesExtractor,
                 tagApiExtractor,
                 tagExtractor,
                 groupExtractor,
@@ -441,6 +441,77 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         }
 
         /// <summary>
+        /// Generates named-values templates in the desired folder
+        /// </summary>
+        /// <param name="singleApiName">name of API to load named-values from</param>
+        /// <param name="multipleApiNames">multiple API names to load named-values from</param>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated named-values template</returns>
+        public async Task<Template<NamedValuesResources>> GenerateNamedValuesTemplateAsync(
+            string singleApiName,
+            List<PolicyTemplateResource> apiPolicies,
+            List<LoggerTemplateResource> loggerResources,
+            string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of named-values template...");
+
+            var namedValuesTemplate = await this.namedValuesExtractor.GenerateNamedValuesTemplateAsync(
+                singleApiName,
+                apiPolicies,
+                loggerResources,
+                this.extractorParameters,
+                baseFilesGenerationDirectory);
+
+            if (namedValuesTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    namedValuesTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.NamedValues);
+            }
+
+            this.logger.LogInformation("Finished generation of named-values template...");
+            return namedValuesTemplate;
+        }
+
+        /// <summary>
+        /// Generates logger templates in the desired folder
+        /// </summary>
+        /// <param name="singleApiName">name of API to load logger from</param>
+        /// <param name="multipleApiNames">multiple API names to load logger from</param>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated logger template</returns>
+        public async Task<Template<LoggerTemplateResources>> GenerateLoggerTemplateAsync(
+            List<string> apisToExtract,
+            List<PolicyTemplateResource> apiPolicies,
+            string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of logger template...");
+
+            var loggerTemplate = await this.loggerExtractor.GenerateLoggerTemplateAsync(
+                apisToExtract, 
+                apiPolicies,
+                this.extractorParameters);
+
+            if (this.extractorParameters.ParameterizeLogResourceId)
+            {
+                loggerTemplate.TypedResources.FormAllLoggerResourceIdsCache();
+                loggerTemplate.TypedResources.SetLoggerResourceIdForEachLogger();
+            }
+
+            if (loggerTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    loggerTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.Loggers);
+            }
+
+            this.logger.LogInformation("Finished generation of logger template...");
+            return loggerTemplate;
+        }
+
+        /// <summary>
         /// Generates gateway template in the desired folder
         /// </summary>
         /// <param name="singleApiName">name of API to load gateway from</param>
@@ -668,8 +739,69 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 throw new SingleAndMultipleApisCanNotExistTogetherException("Can't specify single API and multiple APIs to extract at the same time");
             }
 
-            // Get all Apis that will be extracted
-            List<string> apisToExtract = new List<string>();
+            var apisToExtract = await this.GetApiNamesToExtract(singleApiName, multipleApiNames);
+
+            // generate different templates using extractors and write to output
+            apiTemplate = apiTemplate ?? await this.GenerateApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
+
+            // refactored
+            var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
+            var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
+            var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.ApiProducts);
+            var apiVersionSetTemplate = await this.GenerateApiVersionSetTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
+            var authorizationServerTemplate = await this.GenerateAuthorizationServerTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
+            var tagTemplate = await this.GenerateTagTemplateAsync(singleApiName, apiTemplate.TypedResources, productTemplate.TypedResources, baseFilesGenerationDirectory);
+            var apiTagTemplate = await this.GenerateTagApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
+            var loggerTemplate = await this.GenerateLoggerTemplateAsync(apisToExtract, apiTemplate.TypedResources.GetAllPolicies(), baseFilesGenerationDirectory);
+            var namedValueTemplate = await this.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), loggerTemplate.TypedResources.Loggers, baseFilesGenerationDirectory);
+            await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
+            await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
+
+            // not refactored
+            List<TemplateResource> namedValueResources = namedValueTemplate.Resources.ToList();
+
+            var backendResult = await this.backendExtractor.GenerateBackendsARMTemplateAsync(
+                singleApiName, 
+                apiTemplate.TypedResources.GetAllPolicies(), 
+                namedValueResources, 
+                this.extractorParameters, 
+                baseFilesGenerationDirectory);
+
+            // create parameters file
+            Template templateParameters = await this.masterTemplateExtractor.CreateMasterTemplateParameterValues(
+                apisToExtract, 
+                this.extractorParameters, 
+                this.loggerExtractor.Cache,
+                loggerTemplate.TypedResources, 
+                backendResult.Item2, 
+                namedValueResources);
+
+            
+            // won't generate template when there is no resources
+            if (!backendResult.Item1.Resources.IsNullOrEmpty())
+            {
+                FileWriter.WriteJSONToFile(backendResult.Item1, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Backends));
+            }
+
+            if (this.extractorParameters.LinkedTemplatesBaseUrl != null)
+            {
+                // create a master template that links to all other templates
+                Template masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
+                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productApiTemplate,
+                    apiTagTemplate, loggerTemplate, backendResult.Item1, authorizationServerTemplate, namedValueTemplate,
+                    tagTemplate, this.extractorParameters.FileNames, this.extractorParameters);
+
+                FileWriter.WriteJSONToFile(masterTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.LinkedMaster));
+            }
+
+            // write parameters to outputLocation
+            FileWriter.WriteJSONToFile(templateParameters, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Parameters));
+        }
+
+
+        async Task<List<string>> GetApiNamesToExtract(string singleApiName, List<string> multipleApiNames)
+        {
+            var apisToExtract = new List<string>();
             if (!string.IsNullOrEmpty(singleApiName))
             {
                 apisToExtract.Add(singleApiName);
@@ -693,77 +825,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 apisToExtract.AddRange(apiNames);
             }
 
-            // generate different templates using extractors and write to output
-            apiTemplate = apiTemplate ?? await this.GenerateApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
-
-            // refactored
-            var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
-            var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
-            var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.ApiProducts);
-            var apiVersionSetTemplate = await this.GenerateApiVersionSetTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
-            var authorizationServerTemplate = await this.GenerateAuthorizationServerTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
-            var tagTemplate = await this.GenerateTagTemplateAsync(singleApiName, apiTemplate.TypedResources, productTemplate.TypedResources, baseFilesGenerationDirectory);
-            var apiTagTemplate = await this.GenerateTagApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
-            await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
-            await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
-
-            // not refactored
-            Dictionary<string, object> apiLoggerId = null;
-            if (this.extractorParameters.ParameterizeApiLoggerId)
-            {
-                apiLoggerId = await this.GetAllReferencedLoggers(apisToExtract, this.extractorParameters);
-            }
-
-            var apiTemplateResources = apiTemplate.Resources.ToList();
-            Template loggerTemplate = await this.loggerExtractor.GenerateLoggerTemplateAsync(this.extractorParameters, singleApiName, apiTemplateResources, apiLoggerId);
-            List<TemplateResource> loggerResources = loggerTemplate.Resources.ToList();
-            Template namedValueTemplate = await this.propertyExtractor.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplateResources, this.extractorParameters, this.backendExtractor, loggerResources, baseFilesGenerationDirectory);
-            List<TemplateResource> namedValueResources = namedValueTemplate.Resources.ToList();
-            var backendResult = await this.backendExtractor.GenerateBackendsARMTemplateAsync(
-                singleApiName, 
-                apiTemplate.TypedResources.GetAllPolicies(), 
-                namedValueResources, 
-                this.extractorParameters, 
-                baseFilesGenerationDirectory);
-
-            Dictionary<string, string> loggerResourceIds = null;
-            if (this.extractorParameters.ParameterizeLogResourceId)
-            {
-                loggerResourceIds = LoggerTemplateUtils.GetAllLoggerResourceIds(loggerResources);
-                loggerTemplate = LoggerTemplateUtils.SetLoggerResourceId(loggerTemplate);
-            }
-
-            // create parameters file
-            Template templateParameters = await this.masterTemplateExtractor.CreateMasterTemplateParameterValues(apisToExtract, this.extractorParameters, apiLoggerId, loggerResourceIds, backendResult.Item2, namedValueResources);
-
-            
-            // won't generate template when there is no resources
-            if (!backendResult.Item1.Resources.IsNullOrEmpty())
-            {
-                FileWriter.WriteJSONToFile(backendResult.Item1, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Backends));
-            }
-            if (!loggerTemplate.Resources.IsNullOrEmpty())
-            {
-                FileWriter.WriteJSONToFile(loggerTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Loggers));
-            }
-            if (!namedValueTemplate.Resources.IsNullOrEmpty())
-            {
-                FileWriter.WriteJSONToFile(namedValueTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.NamedValues));
-            }
-
-            if (this.extractorParameters.LinkedTemplatesBaseUrl != null)
-            {
-                // create a master template that links to all other templates
-                Template masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
-                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productApiTemplate,
-                    apiTagTemplate, loggerTemplate, backendResult.Item1, authorizationServerTemplate, namedValueTemplate,
-                    tagTemplate, this.extractorParameters.FileNames, this.extractorParameters);
-
-                FileWriter.WriteJSONToFile(masterTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.LinkedMaster));
-            }
-
-            // write parameters to outputLocation
-            FileWriter.WriteJSONToFile(templateParameters, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Parameters));
+            return apisToExtract;
         }
 
         /// <summary>
@@ -792,42 +854,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 }
             }
             return apiDictionary;
-        }
-
-        async Task<Dictionary<string, object>> GetAllReferencedLoggers(List<string> apisToExtract, ExtractorParameters extractorParameters)
-        {
-            var apiLoggerId = new Dictionary<string, object>();
-
-            var serviceDiagnostics = await this.apiExtractor.GetServiceDiagnosticsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup);
-            JObject oServiceDiagnostics = JObject.Parse(serviceDiagnostics);
-
-            var serviceloggerIds = new Dictionary<string, string>();
-            foreach (var serviceDiagnostic in oServiceDiagnostics["value"])
-            {
-                string diagnosticName = ((JValue)serviceDiagnostic["name"]).Value.ToString();
-                string loggerId = ((JValue)serviceDiagnostic["properties"]["loggerId"]).Value.ToString();
-                apiLoggerId.Add(ParameterNamingHelper.GenerateValidParameterName(diagnosticName, ParameterPrefix.Diagnostic), loggerId);
-            }
-
-
-            foreach (string curApiName in apisToExtract)
-            {
-                var loggerIds = new Dictionary<string, string>();
-                var diagnostics = await this.apiExtractor.GetApiDiagnosticsAsync(extractorParameters.SourceApimName, extractorParameters.ResourceGroup, curApiName);
-                JObject oDiagnostics = JObject.Parse(diagnostics);
-                foreach (var diagnostic in oDiagnostics["value"])
-                {
-                    string diagnosticName = ((JValue)diagnostic["name"]).Value.ToString();
-                    string loggerId = ((JValue)diagnostic["properties"]["loggerId"]).Value.ToString();
-                    loggerIds.Add(ParameterNamingHelper.GenerateValidParameterName(diagnosticName, ParameterPrefix.Diagnostic), loggerId);
-                }
-                if (loggerIds.Count != 0)
-                {
-                    apiLoggerId.Add(ParameterNamingHelper.GenerateValidParameterName(curApiName, ParameterPrefix.Api), loggerIds);
-                }
-            }
-
-            return apiLoggerId;
         }
     }
 }

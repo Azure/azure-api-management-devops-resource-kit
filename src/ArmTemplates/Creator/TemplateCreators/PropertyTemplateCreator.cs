@@ -2,9 +2,9 @@
 using System.Linq;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
@@ -31,12 +31,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
             if (creatorConfig.parameterizeNamedValues)
             {
-                if (creatorConfig.namedValues.Any(x => x.value != null))
+                if (creatorConfig.namedValues.Any(x => x.Value != null))
                 {
                     propertyTemplate.Parameters.Add(ParameterNames.NamedValues, new TemplateParameterProperties { type = "object" });
                 }
 
-                if (creatorConfig.namedValues.Any(x => x.keyVault != null))
+                if (creatorConfig.namedValues.Any(x => x.KeyVault != null))
                 {
                     propertyTemplate.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateParameterProperties { type = "object" });
                 }
@@ -45,32 +45,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             List<TemplateResource> resources = new List<TemplateResource>();
             foreach (PropertyConfig namedValue in creatorConfig.namedValues)
             {
-                string value = namedValue.value == null ? null
+                string value = namedValue.Value == null ? null
                    : creatorConfig.parameterizeNamedValues
-                       ? $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.displayName, ParameterPrefix.Property)}]"
-                       : namedValue.value;
+                       ? $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"
+                       : namedValue.Value;
 
-                PropertyResourceKeyVaultProperties keyVault = namedValue.keyVault == null ? null
+                var keyVault = namedValue.KeyVault == null ? null
                     : creatorConfig.parameterizeNamedValues
-                        ? new PropertyResourceKeyVaultProperties
+                        ? new NamedValueResourceKeyVaultProperties
                         {
-                            secretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.displayName, ParameterPrefix.Property)}]"
+                            SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"
                         }
-                        : namedValue.keyVault;
+                        : namedValue.KeyVault;
 
                 // create property resource with properties
-                PropertyTemplateResource propertyTemplateResource = new PropertyTemplateResource()
+                NamedValueTemplateResource propertyTemplateResource = new NamedValueTemplateResource()
                 {
-                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{namedValue.displayName}')]",
-                    Type = ResourceTypeConstants.Property,
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{namedValue.DisplayName}')]",
+                    Type = ResourceTypeConstants.NamedValues,
                     ApiVersion = GlobalConstants.ApiVersion,
-                    Properties = new PropertyResourceProperties()
+                    Properties = new NamedValueProperties()
                     {
-                        displayName = namedValue.displayName,
-                        value = value,
-                        secret = namedValue.secret,
-                        tags = namedValue.tags,
-                        keyVault = keyVault
+                        DisplayName = namedValue.DisplayName,
+                        Value = value,
+                        Secret = namedValue.Secret,
+                        Tags = namedValue.Tags,
+                        KeyVault = keyVault
 
                     },
                     DependsOn = new string[] { }

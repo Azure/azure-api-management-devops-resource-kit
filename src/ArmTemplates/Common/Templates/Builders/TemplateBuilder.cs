@@ -123,5 +123,47 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
             return this;
         }
+
+        public TemplateBuilder AddParameterizeNamedValueParameters(ExtractorParameters extractorParameters)
+        {
+            if (extractorParameters.ParameterizeNamedValue)
+            {
+                TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                this.template.Parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
+            }
+
+            return this;
+        }
+
+        public TemplateBuilder AddParameterizeNamedValuesKeyVaultSecretParameters(ExtractorParameters extractorParameters)
+        {
+            if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
+            {
+                TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                this.template.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
+            }
+
+            return this;
+        }
+
+        public TemplateBuilder AddParameterizeLogResourceIdProperty(ExtractorParameters extractorParameters)
+        {
+            if (extractorParameters.ParameterizeLogResourceId)
+            {
+                TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                this.template.Parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
+            }
+
+            return this;
+        }
     }
 }

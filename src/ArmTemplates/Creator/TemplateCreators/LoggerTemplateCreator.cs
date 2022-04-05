@@ -38,11 +38,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     ApiVersion = GlobalConstants.ApiVersion,
                     Properties = new LoggerTemplateProperties()
                     {
-                        loggerType = logger.loggerType,
-                        description = logger.description,
-                        credentials = logger.credentials,
-                        isBuffered = logger.isBuffered,
-                        resourceId = logger.resourceId
+                        LoggerType = logger.LoggerType,
+                        Description = logger.Description,
+                        Credentials = logger.Credentials,
+                        IsBuffered = logger.IsBuffered,
+                        ResourceId = logger.ResourceId
                     },
                     DependsOn = new string[] { }
                 };

@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
             var mockedTagClient = MockTagClient.GetMockedApiClientWithDefaultValues();
             var mockedApiOperationClient = MockApiOperationClient.GetMockedApiClientWithDefaultValues();
-            var mockedDiagnosticClient = MockDiagnosticClient.GetMockedApiClientWithDefaultValues();
+            var mockedDiagnosticClient = MockDiagnosticClient.GetMockedClientWithApiDependentValues();
 
             // mocked extractors
             var mockedDiagnosticExtractor = new DiagnosticExtractor(this.GetTestLogger<DiagnosticExtractor>(), mockedDiagnosticClient);

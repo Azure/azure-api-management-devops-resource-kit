@@ -4,6 +4,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
@@ -17,11 +19,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IMasterTemplateExtractor
     {
-        Task<Template> CreateMasterTemplateParameterValues(List<string> apisToExtract, ExtractorParameters extractorParameters,
-            Dictionary<string, object> apiLoggerId,
-            Dictionary<string, string> loggerResourceIds,
+        Task<Template> CreateMasterTemplateParameterValues(
+            List<string> apisToExtract,
+            ExtractorParameters extractorParameters,
+            LoggersCache loggersCache,
+            LoggerTemplateResources loggerTemplateResources,
             Dictionary<string, BackendApiParameters> backendParams,
-             List<TemplateResource> propertyResources);
+            List<TemplateResource> propertyResources);
 
         Template GenerateLinkedMasterTemplate(
             Template<ApiTemplateResources> apiTemplate,
