@@ -14,5 +14,4 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public bool IsBuffered { get; set; }
         public string ResourceId { get; set; }
     }
-
 }
