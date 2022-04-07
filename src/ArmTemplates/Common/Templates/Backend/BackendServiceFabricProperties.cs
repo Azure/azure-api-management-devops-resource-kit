@@ -6,7 +6,7 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend
 {
-    public class BackendSubProperties
+    public class BackendServiceFabricProperties
     {
         public BackendServiceFabricCluster ServiceFabricCluster { get; set; }
     }

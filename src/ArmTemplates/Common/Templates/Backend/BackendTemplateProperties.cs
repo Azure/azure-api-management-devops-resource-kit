@@ -11,7 +11,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public string Title { get; set; }
         public string Description { get; set; }
         public string ResourceId { get; set; }
-        public BackendSubProperties Properties { get; set; }
+        public BackendServiceFabricProperties Properties { get; set; }
         public BackendCredentials Credentials { get; set; }
         public BackendProxy Proxy { get; set; }
         public BackendTls Tls { get; set; }

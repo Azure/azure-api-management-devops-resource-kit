@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                         Parameter = "parameter"
                     }
                 },
-                Properties = new BackendSubProperties()
+                Properties = new BackendServiceFabricProperties()
                 {
                     ServiceFabricCluster = new BackendServiceFabricCluster()
                     {

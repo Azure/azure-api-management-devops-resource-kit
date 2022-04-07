@@ -90,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                             backendTemplate.TypedResources.Backends.Add(backendResource);
                             SaveBackendApiParametersToCache();
 
-                            // dont need to go through all policies if the back end has already been found
+                            // don't need to go through all policies if the back end has already been found
                             break;
                         }
                     }
@@ -100,7 +100,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     if (!extractorParameters.ParameterizeBackend)
                     {
-                        this.logger.LogDebug("Parameter '{0}' is false, so skip storing api-backend mapping in cache");
+                        this.logger.LogDebug("Parameter '{0}' is false. Skipping storing api-backend mapping in cache", nameof(ExtractorParameters.ParameterizeBackend));
                         return;
                     }
 
@@ -152,9 +152,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 return true;
             }
 
-            return namedValueResourcesUsedByBackend?.Any(x => 
+            return namedValueResourcesUsedByBackend.Any(x => 
                     (x.Properties.DisplayName is not null && policyContent.Contains(x.Properties.DisplayName)) ||
-                    (x.Properties.Value is not null && policyContent.Contains(x.Properties.Value))) == true;
+                    (x.Properties.Value is not null && policyContent.Contains(x.Properties.Value)));
         }
 
         public bool DoesBackendReferenceNamedValue(NamedValueTemplateResource namedValueResource, BackendTemplateResource backendTemplateResource)
@@ -211,7 +211,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                             var policyContent = this.policyExtractor.GetCachedPolicyContent(policyTemplateResource, baseFilesGenerationDirectory);
                             if (this.DoesPolicyReferenceBackend(policyContent, Array.Empty<NamedValueTemplateResource>(), backendName, backendResource))
                             {
-                                // dont need to go through all policies and backends if the named values has already been found
+                                // don't need to go through all policies and backends if the named values has already been found
                                 return true;
                             }
                         }
