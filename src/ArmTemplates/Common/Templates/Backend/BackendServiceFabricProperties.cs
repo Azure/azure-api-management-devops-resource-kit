@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------
-//  <copyright file="BackendSubProperties.cs" company="Microsoft">
+//  <copyright file="BackendServiceFabricProperties.cs" company="Microsoft">
 //      Copyright (c) Microsoft Corporation. All rights reserved.
 //  </copyright>
 // --------------------------------------------------------------------------
