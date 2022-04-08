@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiSchemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;

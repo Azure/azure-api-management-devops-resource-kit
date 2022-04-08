@@ -1,9 +1,9 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             ExtractorParameters extractorParameters,
             LoggersCache loggersCache,
             LoggerTemplateResources loggerTemplateResources,
-            Dictionary<string, BackendApiParameters> backendParams,
+            IDictionary<string, BackendApiParameters> backendParams,
             List<TemplateResource> propertyResources);
 
         Template GenerateLinkedMasterTemplate(

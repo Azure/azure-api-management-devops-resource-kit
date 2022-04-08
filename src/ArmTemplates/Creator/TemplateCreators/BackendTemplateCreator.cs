@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 // create backend resource with properties
                 BackendTemplateResource backendTemplateResource = new BackendTemplateResource()
                 {
-                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendTemplatePropeties.title}')]",
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendTemplatePropeties.Title}')]",
                     Type = ResourceTypeConstants.Backend,
                     ApiVersion = GlobalConstants.ApiVersion,
                     Properties = backendTemplatePropeties,

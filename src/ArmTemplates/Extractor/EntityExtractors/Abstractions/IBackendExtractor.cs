@@ -1,8 +1,8 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,21 +10,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IBackendExtractor
     {
-        Task<Tuple<Template, Dictionary<string, BackendApiParameters>>> GenerateBackendsARMTemplateAsync(
-            string singleApiName, 
-            List<PolicyTemplateResource> policyTemplateResources,
-            List<TemplateResource> propertyResources, 
-            ExtractorParameters extractorParameters,
-            string baseFilesGenerationDirectory);
-
-        Task<bool> IsNamedValueUsedInBackends(
-            string apimname,
-            string resourceGroup,
+        Task<Template<BackendTemplateResources>> GenerateBackendsTemplateAsync(
             string singleApiName,
             List<PolicyTemplateResource> apiPolicies,
-            ExtractorParameters extractorParameters,
+            List<NamedValueTemplateResource> namedValues,
+            string baseFilesGenerationDirectory,
+            ExtractorParameters extractorParameters);
+
+        Task<bool> IsNamedValueUsedInBackends(
+            string singleApiName,
+            List<PolicyTemplateResource> apiPolicies,
             string propertyName,
             string propertyDisplayName,
+            ExtractorParameters extractorParameters,
             string baseFilesGenerationDirectory);
     }
 }

@@ -165,5 +165,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
             return this;
         }
+
+        public TemplateBuilder AddParameterizeBackendProperty(ExtractorParameters extractorParameters)
+        {
+            if (extractorParameters.ParameterizeBackend)
+            {
+                TemplateParameterProperties extractBackendParametersProperties = new TemplateParameterProperties()
+                {
+                    type = "object"
+                };
+                this.template.Parameters.Add(ParameterNames.BackendSettings, extractBackendParametersProperties);
+            }
+
+            return this;
+        }
     }
 }

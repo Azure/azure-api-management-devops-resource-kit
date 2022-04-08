@@ -4,9 +4,7 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;

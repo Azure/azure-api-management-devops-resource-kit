@@ -7,6 +7,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gateway;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.GatewayApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
@@ -441,6 +442,40 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         }
 
         /// <summary>
+        /// Generates backend templates in the desired folder
+        /// </summary>
+        /// <param name="singleApiName">name of API to load backend from</param>
+        /// <param name="multipleApiNames">multiple API names to load backend from</param>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated backend template</returns>
+        public async Task<Template<BackendTemplateResources>> GenerateBackendTemplateAsync(
+            string singleApiName,
+            List<PolicyTemplateResource> apiPolicies,
+            List<NamedValueTemplateResource> namedValueResources,
+            string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of backend template...");
+
+            var backendTemplate = await this.backendExtractor.GenerateBackendsTemplateAsync(
+                singleApiName,
+                apiPolicies,
+                namedValueResources,
+                baseFilesGenerationDirectory,
+                this.extractorParameters);
+
+            if (backendTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    backendTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.Backends);
+            }
+
+            this.logger.LogInformation("Finished generation of backend template...");
+            return backendTemplate;
+        }
+
+        /// <summary>
         /// Generates named-values templates in the desired folder
         /// </summary>
         /// <param name="singleApiName">name of API to load named-values from</param>
@@ -754,41 +789,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var apiTagTemplate = await this.GenerateTagApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var loggerTemplate = await this.GenerateLoggerTemplateAsync(apisToExtract, apiTemplate.TypedResources.GetAllPolicies(), baseFilesGenerationDirectory);
             var namedValueTemplate = await this.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), loggerTemplate.TypedResources.Loggers, baseFilesGenerationDirectory);
+            var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
             await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
-            await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
+            await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);          
 
             // not refactored
-            List<TemplateResource> namedValueResources = namedValueTemplate.Resources.ToList();
-
-            var backendResult = await this.backendExtractor.GenerateBackendsARMTemplateAsync(
-                singleApiName, 
-                apiTemplate.TypedResources.GetAllPolicies(), 
-                namedValueResources, 
-                this.extractorParameters, 
-                baseFilesGenerationDirectory);
-
-            // create parameters file
             Template templateParameters = await this.masterTemplateExtractor.CreateMasterTemplateParameterValues(
                 apisToExtract, 
                 this.extractorParameters, 
                 this.loggerExtractor.Cache,
                 loggerTemplate.TypedResources, 
-                backendResult.Item2, 
-                namedValueResources);
-
-            
-            // won't generate template when there is no resources
-            if (!backendResult.Item1.Resources.IsNullOrEmpty())
-            {
-                FileWriter.WriteJSONToFile(backendResult.Item1, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Backends));
-            }
+                backendTemplate.TypedResources.BackendNameParametersCache,
+                namedValueTemplate.Resources.ToList());
 
             if (this.extractorParameters.LinkedTemplatesBaseUrl != null)
             {
                 // create a master template that links to all other templates
                 Template masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
                     apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productApiTemplate,
-                    apiTagTemplate, loggerTemplate, backendResult.Item1, authorizationServerTemplate, namedValueTemplate,
+                    apiTagTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
                     tagTemplate, this.extractorParameters.FileNames, this.extractorParameters);
 
                 FileWriter.WriteJSONToFile(masterTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.LinkedMaster));

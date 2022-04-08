@@ -1,11 +1,11 @@
 ﻿using Xunit;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -19,45 +19,45 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             CreatorConfig creatorConfig = new CreatorConfig() { backends = new List<BackendTemplateProperties>() };
             BackendTemplateProperties backend = new BackendTemplateProperties()
             {
-                title = "title",
-                description = "description",
-                resourceId = "resourceId",
-                url = "url",
-                protocol = "protocol",
-                proxy = new BackendProxy()
+                Title = "title",
+                Description = "description",
+                ResourceId = "resourceId",
+                Url = "url",
+                Protocol = "protocol",
+                Proxy = new BackendProxy()
                 {
-                    url = "url",
-                    username = "user",
-                    password = "pass"
+                    Url = "url",
+                    Username = "user",
+                    Password = "pass"
                 },
-                tls = new BackendTLS()
+                Tls = new BackendTls()
                 {
-                    validateCertificateChain = true,
-                    validateCertificateName = true
+                    ValidateCertificateChain = true,
+                    ValidateCertificateName = true
                 },
-                credentials = new BackendCredentials()
+                Credentials = new BackendCredentials()
                 {
-                    certificate = new string[] { "cert1" },
-                    query = new object(),
-                    header = new object(),
-                    authorization = new BackendCredentialsAuthorization()
+                    Certificate = new string[] { "cert1" },
+                    Query = new object(),
+                    Header = new object(),
+                    Authorization = new BackendCredentialsAuthorization()
                     {
-                        scheme = "scheme",
-                        parameter = "parameter"
+                        Scheme = "scheme",
+                        Parameter = "parameter"
                     }
                 },
-                properties = new BackendSubProperties()
+                Properties = new BackendServiceFabricProperties()
                 {
-                    serviceFabricCluster = new BackendServiceFabricCluster()
+                    ServiceFabricCluster = new BackendServiceFabricCluster()
                     {
-                        clientCertificatethumbprint = "",
-                        managementEndpoints = new string[] { "endpoint" },
-                        maxPartitionResolutionRetries = 1,
-                        serverCertificateThumbprints = new string[] { "thumbprint" },
-                        serverX509Names = new ServerX509Names[]{
+                        ClientCertificatethumbprint = "",
+                        ManagementEndpoints = new string[] { "endpoint" },
+                        MaxPartitionResolutionRetries = 1,
+                        ServerCertificateThumbprints = new string[] { "thumbprint" },
+                        ServerX509Names = new ServerX509Names[]{
                         new ServerX509Names(){
-                            name = "name",
-                            issuerCertificateThumbprint = "thumbprint"
+                            Name = "name",
+                            IssuerCertificateThumbprint = "thumbprint"
                         } }
                     }
                 }
@@ -70,28 +70,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             BackendTemplateResource backendTemplateResource = (BackendTemplateResource)backendTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backend.title}')]", backendTemplateResource.Name);
-            Assert.Equal(backend.title, backendTemplateResource.Properties.title);
-            Assert.Equal(backend.description, backendTemplateResource.Properties.description);
-            Assert.Equal(backend.resourceId, backendTemplateResource.Properties.resourceId);
-            Assert.Equal(backend.url, backendTemplateResource.Properties.url);
-            Assert.Equal(backend.protocol, backendTemplateResource.Properties.protocol);
-            Assert.Equal(backend.proxy.url, backendTemplateResource.Properties.proxy.url);
-            Assert.Equal(backend.proxy.username, backendTemplateResource.Properties.proxy.username);
-            Assert.Equal(backend.proxy.password, backendTemplateResource.Properties.proxy.password);
-            Assert.Equal(backend.tls.validateCertificateChain, backendTemplateResource.Properties.tls.validateCertificateChain);
-            Assert.Equal(backend.tls.validateCertificateName, backendTemplateResource.Properties.tls.validateCertificateName);
-            Assert.Equal(backend.credentials.certificate, backendTemplateResource.Properties.credentials.certificate);
-            Assert.Equal(backend.credentials.query, backendTemplateResource.Properties.credentials.query);
-            Assert.Equal(backend.credentials.header, backendTemplateResource.Properties.credentials.header);
-            Assert.Equal(backend.credentials.authorization.scheme, backendTemplateResource.Properties.credentials.authorization.scheme);
-            Assert.Equal(backend.credentials.authorization.parameter, backendTemplateResource.Properties.credentials.authorization.parameter);
-            Assert.Equal(backend.properties.serviceFabricCluster.clientCertificatethumbprint, backendTemplateResource.Properties.properties.serviceFabricCluster.clientCertificatethumbprint);
-            Assert.Equal(backend.properties.serviceFabricCluster.managementEndpoints, backendTemplateResource.Properties.properties.serviceFabricCluster.managementEndpoints);
-            Assert.Equal(backend.properties.serviceFabricCluster.maxPartitionResolutionRetries, backendTemplateResource.Properties.properties.serviceFabricCluster.maxPartitionResolutionRetries);
-            Assert.Equal(backend.properties.serviceFabricCluster.serverCertificateThumbprints, backendTemplateResource.Properties.properties.serviceFabricCluster.serverCertificateThumbprints);
-            Assert.Equal(backend.properties.serviceFabricCluster.serverX509Names[0].issuerCertificateThumbprint, backendTemplateResource.Properties.properties.serviceFabricCluster.serverX509Names[0].issuerCertificateThumbprint);
-            Assert.Equal(backend.properties.serviceFabricCluster.serverX509Names[0].name, backendTemplateResource.Properties.properties.serviceFabricCluster.serverX509Names[0].name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backend.Title}')]", backendTemplateResource.Name);
+            Assert.Equal(backend.Title, backendTemplateResource.Properties.Title);
+            Assert.Equal(backend.Description, backendTemplateResource.Properties.Description);
+            Assert.Equal(backend.ResourceId, backendTemplateResource.Properties.ResourceId);
+            Assert.Equal(backend.Url, backendTemplateResource.Properties.Url);
+            Assert.Equal(backend.Protocol, backendTemplateResource.Properties.Protocol);
+            Assert.Equal(backend.Proxy.Url, backendTemplateResource.Properties.Proxy.Url);
+            Assert.Equal(backend.Proxy.Username, backendTemplateResource.Properties.Proxy.Username);
+            Assert.Equal(backend.Proxy.Password, backendTemplateResource.Properties.Proxy.Password);
+            Assert.Equal(backend.Tls.ValidateCertificateChain, backendTemplateResource.Properties.Tls.ValidateCertificateChain);
+            Assert.Equal(backend.Tls.ValidateCertificateName, backendTemplateResource.Properties.Tls.ValidateCertificateName);
+            Assert.Equal(backend.Credentials.Certificate, backendTemplateResource.Properties.Credentials.Certificate);
+            Assert.Equal(backend.Credentials.Query, backendTemplateResource.Properties.Credentials.Query);
+            Assert.Equal(backend.Credentials.Header, backendTemplateResource.Properties.Credentials.Header);
+            Assert.Equal(backend.Credentials.Authorization.Scheme, backendTemplateResource.Properties.Credentials.Authorization.Scheme);
+            Assert.Equal(backend.Credentials.Authorization.Parameter, backendTemplateResource.Properties.Credentials.Authorization.Parameter);
+            Assert.Equal(backend.Properties.ServiceFabricCluster.ClientCertificatethumbprint, backendTemplateResource.Properties.Properties.ServiceFabricCluster.ClientCertificatethumbprint);
+            Assert.Equal(backend.Properties.ServiceFabricCluster.ManagementEndpoints, backendTemplateResource.Properties.Properties.ServiceFabricCluster.ManagementEndpoints);
+            Assert.Equal(backend.Properties.ServiceFabricCluster.MaxPartitionResolutionRetries, backendTemplateResource.Properties.Properties.ServiceFabricCluster.MaxPartitionResolutionRetries);
+            Assert.Equal(backend.Properties.ServiceFabricCluster.ServerCertificateThumbprints, backendTemplateResource.Properties.Properties.ServiceFabricCluster.ServerCertificateThumbprints);
+            Assert.Equal(backend.Properties.ServiceFabricCluster.ServerX509Names[0].IssuerCertificateThumbprint, backendTemplateResource.Properties.Properties.ServiceFabricCluster.ServerX509Names[0].IssuerCertificateThumbprint);
+            Assert.Equal(backend.Properties.ServiceFabricCluster.ServerX509Names[0].Name, backendTemplateResource.Properties.Properties.ServiceFabricCluster.ServerX509Names[0].Name);
         }
     }
 }

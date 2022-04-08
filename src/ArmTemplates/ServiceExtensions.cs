@@ -27,6 +27,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtr
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Gateway;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Loggers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Backend;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -107,6 +108,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IGatewayClient, GatewayClient>();
             services.AddScoped<ILoggerClient, LoggerClient>();
             services.AddScoped<INamedValuesClient, NamedValuesClient>();
+            services.AddScoped<IBackendClient, BackendClient>();
         }
     }
 }
