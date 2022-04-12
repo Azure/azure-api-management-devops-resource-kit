@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors
@@ -42,6 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IAuthorizationServerExtractor authorizationServerExtractor;
         readonly IBackendExtractor backendExtractor;
         readonly ILoggerExtractor loggerExtractor;
+        readonly IParametersExtractor parametersExtractor;
         readonly IMasterTemplateExtractor masterTemplateExtractor;
         readonly IPolicyExtractor policyExtractor;
         readonly IProductApisExtractor productApisExtractor;
@@ -62,6 +64,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IAuthorizationServerExtractor authorizationServerExtractor,
             IBackendExtractor backendExtractor,
             ILoggerExtractor loggerExtractor,
+            IParametersExtractor parametersExtractor,
             IMasterTemplateExtractor masterTemplateExtractor,
             IPolicyExtractor policyExtractor,
             IProductApisExtractor productApisExtractor,
@@ -81,6 +84,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.authorizationServerExtractor = authorizationServerExtractor;
             this.backendExtractor = backendExtractor;
             this.loggerExtractor = loggerExtractor;
+            this.parametersExtractor = parametersExtractor;
             this.masterTemplateExtractor = masterTemplateExtractor;
             this.policyExtractor = policyExtractor;
             this.productApisExtractor = productApisExtractor;
@@ -106,6 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IAuthorizationServerExtractor authorizationServerExtractor = null,
             IBackendExtractor backendExtractor = null,
             ILoggerExtractor loggerExtractor = null,
+            IParametersExtractor parametersExtractor = null,
             IMasterTemplateExtractor masterTemplateExtractor = null,
             IPolicyExtractor policyExtractor = null,
             IProductApisExtractor productApisExtractor = null,
@@ -125,6 +130,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 authorizationServerExtractor,
                 backendExtractor,
                 loggerExtractor,
+                parametersExtractor,
                 masterTemplateExtractor,
                 policyExtractor,
                 productApisExtractor,
@@ -269,7 +275,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
         /// <returns>generated products template</returns>
         public async Task<Template<ProductTemplateResources>> GenerateProductsTemplateAsync(
-            string singleApiName, 
+            string singleApiName,
             string baseFilesGenerationDirectory,
             List<ProductApiTemplateResource> productApiResources)
         {
@@ -378,6 +384,67 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             this.logger.LogInformation("Finished generation of api template...");
             return apiTemplate;
+        }
+
+        /// <summary>
+        /// Generates parameters template in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated parameters template</returns>
+        public async Task<Template> GenerateParametersTemplateAsync(
+            List<string> apisToExtract,
+            LoggerTemplateResources loggerResources,
+            BackendTemplateResources backendResources,
+            NamedValuesResources namedValuesResources,
+            string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of parameters template...");
+
+            var templateParameters = await this.parametersExtractor.CreateMasterTemplateParameterValues(
+                apisToExtract,
+                this.loggerExtractor.Cache,
+                loggerResources,
+                backendResources,
+                namedValuesResources,
+                this.extractorParameters);
+
+            if (!templateParameters.Parameters.IsNullOrEmpty())
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    templateParameters,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.Parameters);
+            }
+
+            this.logger.LogInformation("Finished generation of parameters template...");
+            return templateParameters;
+        }
+
+        public async Task<Template> GenerateMasterTemplateAsync()
+        {
+            if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
+            {
+                this.logger.LogInformation("'{0}' is not passed. Skipping master-template generation.", nameof(this.extractorParameters.LinkedTemplatesBaseUrl));
+                return;
+            }
+
+            this.logger.LogInformation("Started generation of master template...");
+
+            var masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
+                apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productApiTemplate,
+                apiTagTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
+                tagTemplate, this.extractorParameters.FileNames, this.extractorParameters);
+
+            if (!masterTemplate.Parameters.IsNullOrEmpty())
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    templateParameters,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.LinkedMaster);
+            }
+
+            this.logger.LogInformation("Finished generation of master template...");
+            return masterTemplate;
         }
 
         /// <summary>
@@ -524,7 +591,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.logger.LogInformation("Started generation of logger template...");
 
             var loggerTemplate = await this.loggerExtractor.GenerateLoggerTemplateAsync(
-                apisToExtract, 
+                apisToExtract,
                 apiPolicies,
                 this.extractorParameters);
 
@@ -719,7 +786,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         async Task GenerateSingleAPIWithRevisionsTemplates()
         {
             this.logger.LogInformation("Extracting singleAPI {0} with revisions", this.extractorParameters.SingleApiName);
-            
+
             string currentRevision = null;
             List<string> revList = new List<string>();
 
@@ -743,7 +810,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             {
                 throw new ApiRevisionNotFoundException($"Revision {this.extractorParameters.SingleApiName} doesn't exist, something went wrong!");
             }
-            
+
             // generate revisions master folder
             var revisionMasterFolder = Path.Combine(this.extractorParameters.FilesGenerationRootDirectory, this.extractorParameters.FileNames.RevisionMasterFolder);
             Directory.CreateDirectory(revisionMasterFolder);
@@ -791,30 +858,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var namedValueTemplate = await this.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), loggerTemplate.TypedResources.Loggers, baseFilesGenerationDirectory);
             var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
             await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
-            await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);          
+            await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
 
-            // not refactored
-            Template templateParameters = await this.masterTemplateExtractor.CreateMasterTemplateParameterValues(
-                apisToExtract, 
-                this.extractorParameters, 
-                this.loggerExtractor.Cache,
-                loggerTemplate.TypedResources, 
-                backendTemplate.TypedResources.BackendNameParametersCache,
-                namedValueTemplate.Resources.ToList());
-
-            if (this.extractorParameters.LinkedTemplatesBaseUrl != null)
-            {
-                // create a master template that links to all other templates
-                Template masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
-                    apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productApiTemplate,
-                    apiTagTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
-                    tagTemplate, this.extractorParameters.FileNames, this.extractorParameters);
-
-                FileWriter.WriteJSONToFile(masterTemplate, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.LinkedMaster));
-            }
-
-            // write parameters to outputLocation
-            FileWriter.WriteJSONToFile(templateParameters, string.Concat(baseFilesGenerationDirectory, this.extractorParameters.FileNames.Parameters));
+            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, baseFilesGenerationDirectory);
+            await this.GenerateMasterTemplateAsync();
         }
 
 

@@ -2,6 +2,6 @@
 {
     public class TemplateObjectParameterProperties : TemplateParameterProperties
     {
-        public new object value { get; set; }
+        public new object Value { get; set; }
     }
 }

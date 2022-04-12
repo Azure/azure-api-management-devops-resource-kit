@@ -238,7 +238,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     },
                     parameters = new Dictionary<string, TemplateParameterProperties>
                     {
-                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
+                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
                     }
                 },
                 DependsOn = dependsOn
@@ -248,7 +248,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                 {
-                    value = $"[parameters('{apiName}-ServiceUrl')]"
+                    Value = $"[parameters('{apiName}-ServiceUrl')]"
                 };
                 masterTemplateResource.Properties.parameters.Add(apiName + "-ServiceUrl", serviceUrlParamProperty);
             }
@@ -289,11 +289,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
-                metadata = new TemplateParameterMetadata()
+                Metadata = new TemplateParameterMetadata()
                 {
                     description = "Name of the API Management"
                 },
-                type = "string"
+                Type = "string"
             };
             parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
             // add remote location of template files for linked option
@@ -301,22 +301,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
-                    metadata = new TemplateParameterMetadata()
+                    Metadata = new TemplateParameterMetadata()
                     {
                         description = "Base URL of the repository"
                     },
-                    type = "string"
+                    Type = "string"
                 };
                 parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
                 if (creatorConfig.linkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
                     {
-                        metadata = new TemplateParameterMetadata()
+                        Metadata = new TemplateParameterMetadata()
                         {
                             description = "Query string for the URL of the repository"
                         },
-                        type = "string"
+                        Type = "string"
                     };
                     parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
@@ -329,11 +329,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                     {
-                        metadata = new TemplateParameterMetadata()
+                        Metadata = new TemplateParameterMetadata()
                         {
                             description = "ServiceUrl parameter for API: " + serviceUrlProperty.ApiName
                         },
-                        type = "string"
+                        Type = "string"
                     };
                     parameters.Add(serviceUrlProperty.ApiName + "-ServiceUrl", serviceUrlParamProperty);
                 }
@@ -352,21 +352,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
-                value = creatorConfig.apimServiceName
+                Value = creatorConfig.apimServiceName
             };
             parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
             if (creatorConfig.linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
-                    value = creatorConfig.linkedTemplatesBaseUrl
+                    Value = creatorConfig.linkedTemplatesBaseUrl
                 };
                 parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
                 if (creatorConfig.linkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
                     {
-                        value = creatorConfig.linkedTemplatesUrlQueryString
+                        Value = creatorConfig.linkedTemplatesUrlQueryString
                     };
                     parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
@@ -378,7 +378,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                     {
-                        value = serviceUrlProperty.ServiceUrl
+                        Value = serviceUrlProperty.ServiceUrl
                     };
                     parameters.Add(serviceUrlProperty.ApiName + "-ServiceUrl", serviceUrlParamProperty);
                 }

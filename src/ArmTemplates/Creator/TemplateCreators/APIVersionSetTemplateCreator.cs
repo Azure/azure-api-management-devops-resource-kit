@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // add parameters
             apiVersionSetTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Type = "string" } }
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();

@@ -43,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             this.template.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
                 {
-                    ParameterNames.ApimServiceName, new TemplateParameterProperties() { type = "string" }
+                    ParameterNames.ApimServiceName, new TemplateParameterProperties() { Type = "string" }
                 }
             };
 
@@ -78,7 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                 {
-                    type = "string"
+                    Type = "string"
                 };
 
                 this.template.Parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
@@ -88,7 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
                 {
-                    type = "string"
+                    Type = "string"
                 };
                 this.template.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
             }
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                 {
-                    type = "object"
+                    Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
             }
@@ -116,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
                 {
-                    type = "object"
+                    Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.ApiLoggerId, apiLoggerProperty);
             }
@@ -130,7 +130,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
                 {
-                    type = "object"
+                    Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
             }
@@ -144,7 +144,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
                 {
-                    type = "object"
+                    Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
             }
@@ -158,7 +158,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
                 {
-                    type = "object"
+                    Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
             }
@@ -172,7 +172,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             {
                 TemplateParameterProperties extractBackendParametersProperties = new TemplateParameterProperties()
                 {
-                    type = "object"
+                    Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.BackendSettings, extractBackendParametersProperties);
             }

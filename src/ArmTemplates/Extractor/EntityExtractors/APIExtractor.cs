@@ -157,18 +157,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
         }
 
-        public async Task<string> GetAPIServiceUrl(string apiManagementName, string resourceGroupName, string apiName)
-        {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
-
-            string requestUrl = string.Format("{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}",
-               BaseUrl, azSubId, resourceGroupName, apiManagementName, apiName, GlobalConstants.ApiVersion);
-
-            string apiDetails = await this.CallApiManagementAsync(azToken, requestUrl);            
-            APITemplateResource apiResource = apiDetails.Deserialize<APITemplateResource>();
-            return apiResource.Properties.ServiceUrl;
-        }
-
         public async Task<string> GetApiDiagnosticsAsync(string apiManagementName, string resourceGroupName, string apiName)
         {
             (string azToken, string azSubId) = await this.Auth.GetAccessToken();

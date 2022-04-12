@@ -69,6 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var originalNamedValueName = namedValueResource.Name;
 
                 // convert returned named value to template resource class
+                namedValueResource.OriginalName = originalNamedValueName;
                 namedValueResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalNamedValueName}')]";
                 namedValueResource.Type = ResourceTypeConstants.NamedValues;
                 namedValueResource.ApiVersion = GlobalConstants.ApiVersion;
