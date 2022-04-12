@@ -270,7 +270,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 Name = name,
                 Type = "Microsoft.Resources/deployments",
-                ApiVersion = GlobalConstants.LinkedAPIVersion,
+                ApiVersion = GlobalConstants.ArmApiVersion,
                 Properties = new MasterTemplateProperties()
                 {
                     mode = "Incremental",
