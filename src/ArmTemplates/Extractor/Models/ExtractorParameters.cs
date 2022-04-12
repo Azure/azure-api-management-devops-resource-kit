@@ -126,17 +126,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             // there can be no service url parameters in overriding configuration
             // this.ServiceUrlParameters = overridingConfig.ServiceUrlParameters ?? this.ServiceUrlParameters;
 
-            this.ParameterizeServiceUrl = overridingConfig.ParamServiceUrl != null && overridingConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || overridingConfig.ServiceUrlParameters != null;
-            this.ParameterizeNamedValue = overridingConfig.ParamNamedValue != null && overridingConfig.ParamNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ParameterizeApiLoggerId = overridingConfig.ParamApiLoggerId != null && overridingConfig.ParamApiLoggerId.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ParameterizeLogResourceId = overridingConfig.ParamLogResourceId != null && overridingConfig.ParamLogResourceId.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.NotIncludeNamedValue = overridingConfig.NotIncludeNamedValue != null && overridingConfig.NotIncludeNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParameterizeServiceUrl = !string.IsNullOrEmpty(overridingConfig.ParamServiceUrl) ? overridingConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || overridingConfig.ServiceUrlParameters != null : this.ParameterizeServiceUrl;
+            this.ParameterizeNamedValue = !string.IsNullOrEmpty(overridingConfig.ParamNamedValue) ? overridingConfig.ParamNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeNamedValue;
+            this.ParameterizeApiLoggerId = !string.IsNullOrEmpty(overridingConfig.ParamApiLoggerId) ? overridingConfig.ParamApiLoggerId.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeApiLoggerId;
+            this.ParameterizeLogResourceId = !string.IsNullOrEmpty(overridingConfig.ParamLogResourceId) ? overridingConfig.ParamLogResourceId.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeLogResourceId;
+            this.NotIncludeNamedValue = !string.IsNullOrEmpty(overridingConfig.NotIncludeNamedValue) ? overridingConfig.NotIncludeNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase) : this.NotIncludeNamedValue;
             this.OperationBatchSize = overridingConfig.OperationBatchSize ?? this.OperationBatchSize;
-            this.ParamNamedValuesKeyVaultSecrets = overridingConfig.ParamNamedValuesKeyVaultSecrets != null && overridingConfig.ParamNamedValuesKeyVaultSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ParameterizeBackend = overridingConfig.ParamBackend != null && overridingConfig.ParamBackend.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.SplitApis = !string.IsNullOrEmpty(overridingConfig.SplitAPIs) && overridingConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.IncludeAllRevisions = !string.IsNullOrEmpty(overridingConfig.IncludeAllRevisions) && overridingConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ExtractGateways = string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? this.ExtractGateways : overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParamNamedValuesKeyVaultSecrets = !string.IsNullOrEmpty(overridingConfig.ParamNamedValuesKeyVaultSecrets) ? overridingConfig.ParamNamedValuesKeyVaultSecrets.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParamNamedValuesKeyVaultSecrets;
+            this.ParameterizeBackend = !string.IsNullOrEmpty(overridingConfig.ParamBackend) ? overridingConfig.ParamBackend.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeBackend;
+            this.SplitApis = !string.IsNullOrEmpty(overridingConfig.SplitAPIs) ? overridingConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase) : this.SplitApis;
+            this.IncludeAllRevisions = !string.IsNullOrEmpty(overridingConfig.IncludeAllRevisions) ? overridingConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase) : this.IncludeAllRevisions;
+            this.ExtractGateways = !string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractGateways;
 
             if (!string.IsNullOrEmpty(overridingConfig.BaseFileName) && !string.IsNullOrEmpty(overridingConfig.BaseFileName))
             {
