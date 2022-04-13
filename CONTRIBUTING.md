@@ -53,4 +53,9 @@ Once a maintainer approves the PR, it will be merged.
 
 ## Releases
 
-We release 
+We release whenever there is significant changes.  To release, a maintainer will generate a release tag.  This will set off a
+build and test process that automatically uploads the artifacts to GitHub releases.  You can always find the latest release on
+GitHub releases.
+
+If your issue is fixed but has not been released yet, you can run a build yourself.  The Azure Pipelines configuration we use to
+build and release is in the `.azure-pipelines` directory within the repository.
