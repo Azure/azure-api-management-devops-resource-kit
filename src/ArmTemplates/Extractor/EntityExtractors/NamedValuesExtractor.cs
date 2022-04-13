@@ -14,7 +14,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class NamedValuesExtractor : EntityExtractorBase, INamedValuesExtractor
+    public class NamedValuesExtractor : INamedValuesExtractor
     {
         readonly ILogger<NamedValuesExtractor> logger;
         readonly ITemplateBuilder templateBuilder;

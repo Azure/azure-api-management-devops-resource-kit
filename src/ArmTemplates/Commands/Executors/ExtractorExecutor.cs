@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
@@ -154,7 +155,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             if (!string.IsNullOrEmpty(extractorConfiguration.ServiceBaseUrl))
             {
-                EntityExtractorBase.BaseUrl = extractorConfiguration.ServiceBaseUrl;
+                GlobalConstants.BaseManagementAzureUrl = extractorConfiguration.ServiceBaseUrl;
             }
         }
 
@@ -696,7 +697,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         async Task GenerateSplitAPITemplates()
         {
             // Generate folders based on all apiversionset
-            var apiDictionary = await this.GetAllAPIsDictionary(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup);
+            var apiDictionary = await this.GetAllAPIsDictionary(this.extractorParameters);
 
             // Generate templates based on each API/APIversionSet
             foreach (var versionSetEntry in apiDictionary)
@@ -741,7 +742,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         async Task GenerateAPIVersionSetTemplates()
         {
             // get api dictionary and check api version set
-            var apiDictionary = await this.GetAllAPIsDictionary(this.extractorParameters.SourceApimName, this.extractorParameters.ResourceGroup);
+            var apiDictionary = await this.GetAllAPIsDictionary(this.extractorParameters);
             if (!apiDictionary.ContainsKey(this.extractorParameters.ApiVersionSetName))
             {
                 throw new NoApiVersionSetWithSuchNameFoundException("API Version Set with this name doesn't exist");
@@ -920,27 +921,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// Generates an api dictionary with apiName/versionsetName (if exist one) as key, list of apiNames as value
         /// </summary>
         /// <returns></returns>
-        async Task<Dictionary<string, List<string>>> GetAllAPIsDictionary(string sourceApim, string resourceGroup)
+        async Task<Dictionary<string, List<string>>> GetAllAPIsDictionary(ExtractorParameters extractorParameters)
         {
             // pull all apis from service
-            JToken[] apis = await this.apiExtractor.GetAllApiObjsAsync(sourceApim, resourceGroup);
+            var apis = await this.apisClient.GetAllAsync(extractorParameters);
 
             // Generate folders based on all apiversionset
             var apiDictionary = new Dictionary<string, List<string>>();
-            foreach (JToken oApi in apis)
+            
+            foreach (var api in apis)
             {
-                string apiDisplayName = ((JValue)oApi["properties"]["displayName"]).Value.ToString();
+                string apiDisplayName = api.Properties.DisplayName;
+                
                 if (!apiDictionary.ContainsKey(apiDisplayName))
                 {
-                    List<string> apiVersionSet = new List<string>();
-                    apiVersionSet.Add(((JValue)oApi["name"]).Value.ToString());
+                    var apiVersionSet = new List<string>();
+                    apiVersionSet.Add(api.Name);
                     apiDictionary[apiDisplayName] = apiVersionSet;
                 }
                 else
                 {
-                    apiDictionary[apiDisplayName].Add(((JValue)oApi["name"]).Value.ToString());
+                    apiDictionary[apiDisplayName].Add(api.Name);
                 }
             }
+
             return apiDictionary;
         }
     }

@@ -15,7 +15,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Log
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class LoggerExtractor : EntityExtractorBase, ILoggerExtractor
+    public class LoggerExtractor : ILoggerExtractor
     {
         readonly ILogger<LoggerExtractor> logger;
         readonly IDiagnosticClient diagnosticClient;

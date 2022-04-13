@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class BackendExtractor : EntityExtractorBase, IBackendExtractor
+    public class BackendExtractor : IBackendExtractor
     {
         readonly ILogger<BackendExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
