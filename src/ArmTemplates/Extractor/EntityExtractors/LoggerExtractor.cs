@@ -103,14 +103,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var serviceDiagnostics = await this.diagnosticClient.GetAllAsync(extractorParameters);
 
-            var serviceloggerIds = new Dictionary<string, string>();
             foreach (var serviceDiagnostic in serviceDiagnostics)
             {
                 string loggerId = serviceDiagnostic.Properties.LoggerId;
-                
-                this.Cache.ServiceLevelDiagnosticLoggerBindings.Add(
-                    ParameterNamingHelper.GenerateValidParameterName(serviceDiagnostic.Name, ParameterPrefix.Diagnostic),
-                    loggerId);
+
+                var serviceDiagnosticsKey = ParameterNamingHelper.GenerateValidParameterName(serviceDiagnostic.Name, ParameterPrefix.Diagnostic);
+
+                if (!this.Cache.ServiceLevelDiagnosticLoggerBindings.ContainsKey(serviceDiagnosticsKey))
+                {
+                    this.Cache.ServiceLevelDiagnosticLoggerBindings.Add(serviceDiagnosticsKey, loggerId);
+                }
             }
 
             if (apisToExtract.IsNullOrEmpty())
