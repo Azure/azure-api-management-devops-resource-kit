@@ -4,9 +4,9 @@ using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
@@ -230,13 +230,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 ApiVersion = GlobalConstants.ArmApiVersion,
                 Properties = new MasterTemplateProperties()
                 {
-                    mode = "Incremental",
-                    templateLink = new MasterTemplateLink()
+                    Mode = "Incremental",
+                    TemplateLink = new MasterTemplateLink()
                     {
-                        uri = uriLink,
-                        contentVersion = "1.0.0.0"
+                        Uri = uriLink,
+                        ContentVersion = "1.0.0.0"
                     },
-                    parameters = new Dictionary<string, TemplateParameterProperties>
+                    Parameters = new Dictionary<string, TemplateParameterProperties>
                     {
                         { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
                     }
@@ -250,7 +250,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     Value = $"[parameters('{apiName}-ServiceUrl')]"
                 };
-                masterTemplateResource.Properties.parameters.Add(apiName + "-ServiceUrl", serviceUrlParamProperty);
+                masterTemplateResource.Properties.Parameters.Add(apiName + "-ServiceUrl", serviceUrlParamProperty);
             }
 
             return masterTemplateResource;
@@ -291,7 +291,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 Metadata = new TemplateParameterMetadata()
                 {
-                    description = "Name of the API Management"
+                    Description = "Name of the API Management"
                 },
                 Type = "string"
             };
@@ -303,7 +303,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     Metadata = new TemplateParameterMetadata()
                     {
-                        description = "Base URL of the repository"
+                        Description = "Base URL of the repository"
                     },
                     Type = "string"
                 };
@@ -314,7 +314,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     {
                         Metadata = new TemplateParameterMetadata()
                         {
-                            description = "Query string for the URL of the repository"
+                            Description = "Query string for the URL of the repository"
                         },
                         Type = "string"
                     };
@@ -331,7 +331,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     {
                         Metadata = new TemplateParameterMetadata()
                         {
-                            description = "ServiceUrl parameter for API: " + serviceUrlProperty.ApiName
+                            Description = "ServiceUrl parameter for API: " + serviceUrlProperty.ApiName
                         },
                         Type = "string"
                     };

@@ -12,6 +12,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gat
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.GatewayApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
@@ -26,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors
@@ -420,25 +420,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             return templateParameters;
         }
 
-        public async Task<Template> GenerateMasterTemplateAsync()
+        public async Task<Template<MasterTemplateResources>> GenerateMasterTemplateAsync(
+           string baseFilesGenerationDirectory,
+           ApiTemplateResources apiTemplateResources = null,
+           PolicyTemplateResources policyTemplateResources = null,
+           ApiVersionSetTemplateResources apiVersionSetTemplateResources = null,
+           ProductTemplateResources productsTemplateResources = null,
+           ProductApiTemplateResources productApisTemplateResources = null,
+           TagApiTemplateResources apiTagsTemplateResources = null,
+           LoggerTemplateResources loggersTemplateResources = null,
+           BackendTemplateResources backendsTemplateResources = null,
+           AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
+           NamedValuesResources namedValuesTemplateResources = null,
+           TagTemplateResources tagTemplateResources = null)
         {
             if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
             {
                 this.logger.LogInformation("'{0}' is not passed. Skipping master-template generation.", nameof(this.extractorParameters.LinkedTemplatesBaseUrl));
-                return;
+                return null;
             }
 
             this.logger.LogInformation("Started generation of master template...");
 
             var masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
-                apiTemplate, globalServicePolicyTemplate, apiVersionSetTemplate, productTemplate, productApiTemplate,
-                apiTagTemplate, loggerTemplate, backendTemplate, authorizationServerTemplate, namedValueTemplate,
-                tagTemplate, this.extractorParameters.FileNames, this.extractorParameters);
+                this.extractorParameters, apiTemplateResources, policyTemplateResources, apiVersionSetTemplateResources,
+                productsTemplateResources, productApisTemplateResources, apiTagsTemplateResources, loggersTemplateResources,
+                backendsTemplateResources, authorizationServersTemplateResources, namedValuesTemplateResources, tagTemplateResources);
 
-            if (!masterTemplate.Parameters.IsNullOrEmpty())
+            if (masterTemplate?.HasResources() == true)
             {
                 await FileWriter.SaveAsJsonAsync(
-                    templateParameters,
+                    masterTemplate,
                     directory: baseFilesGenerationDirectory,
                     fileName: this.extractorParameters.FileNames.LinkedMaster);
             }
@@ -845,8 +857,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             // generate different templates using extractors and write to output
             apiTemplate = apiTemplate ?? await this.GenerateApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
-
-            // refactored
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.ApiProducts);
@@ -859,9 +869,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
             await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
-
             await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, baseFilesGenerationDirectory);
-            await this.GenerateMasterTemplateAsync();
+            
+            await this.GenerateMasterTemplateAsync(
+                baseFilesGenerationDirectory,
+                apiTemplateResources: apiTemplate.TypedResources,
+                policyTemplateResources: globalServicePolicyTemplate.TypedResources,
+                apiVersionSetTemplateResources: apiVersionSetTemplate.TypedResources,
+                productsTemplateResources: productTemplate.TypedResources,
+                productApisTemplateResources: productApiTemplate.TypedResources,
+                apiTagsTemplateResources: apiTagTemplate.TypedResources,
+                loggersTemplateResources: loggerTemplate.TypedResources,
+                backendsTemplateResources: backendTemplate.TypedResources,
+                authorizationServersTemplateResources: authorizationServerTemplate.TypedResources,
+                namedValuesTemplateResources: namedValueTemplate.TypedResources,
+                tagTemplateResources: tagTemplate.TypedResources);
         }
 
 

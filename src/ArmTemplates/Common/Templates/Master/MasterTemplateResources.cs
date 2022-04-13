@@ -1,28 +1,27 @@
 ﻿// --------------------------------------------------------------------------
-//  <copyright file="ParametersTemplateResources.cs" company="Microsoft">
+//  <copyright file="MasterTemplateResources.cs" company="Microsoft">
 //      Copyright (c) Microsoft Corporation. All rights reserved.
 //  </copyright>
 // --------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.Text;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Parameters
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master
 {
-    public class ParametersTemplateResources : ITemplateResources
+    public class MasterTemplateResources : ITemplateResources
     {
-        public List<> Parameters { get; set; }
+        public List<MasterTemplateResource> DeploymentResources { get; set; } = new();
 
         public TemplateResource[] BuildTemplateResources()
         {
-            throw new NotImplementedException();
+            return this.DeploymentResources.ToArray();
         }
 
         public bool HasContent()
         {
-            throw new NotImplementedException();
+            return !this.DeploymentResources.IsNullOrEmpty();
         }
     }
 }

@@ -4,10 +4,8 @@
 //  </copyright>
 // --------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -20,7 +18,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Log
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -50,6 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var parametersTemplate = this.templateBuilder
                 .GenerateEmptyTemplate()
                 .Build();
+            parametersTemplate.Parameters = new();
             var parameters = parametersTemplate.Parameters;
 
             parameters.Add(ParameterNames.ApimServiceName, new() { Value = extractorParameters.DestinationApimName });

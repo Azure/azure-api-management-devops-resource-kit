@@ -90,6 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IApiRevisionExtractor, ApiRevisionExtractor>();
             services.AddScoped<IGatewayExtractor, GatewayExtractor>();
             services.AddScoped<IGatewayApiExtractor, GatewayApiExtractor>();
+            services.AddScoped<IParametersExtractor, ParametersExtractor>();
         }
 
         static void SetupApiClients(IServiceCollection services)
