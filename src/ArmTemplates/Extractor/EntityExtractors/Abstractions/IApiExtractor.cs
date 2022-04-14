@@ -9,12 +9,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IApiExtractor
     {
-        Task<JToken[]> GetAllApiObjsAsync(string apiManagementName, string resourceGroupName);
-
-        Task<string> GetServiceDiagnosticsAsync(string apiManagementName, string resourceGroupName);
-
-        Task<string> GetApiDiagnosticsAsync(string apiManagementName, string resourceGroupName, string apiName);
-
         Task<Template<ApiTemplateResources>> GenerateApiTemplateAsync(string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);
 
         Task<ApiTemplateResources> GenerateSingleApiTemplateResourcesAsync(string singleApiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);

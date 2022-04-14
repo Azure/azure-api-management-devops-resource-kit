@@ -15,7 +15,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Pro
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
-    public class TagExtractor : EntityExtractorBase, ITagExtractor
+    public class TagExtractor : ITagExtractor
     {
         readonly ILogger<TagExtractor> logger;
         readonly ITagClient tagClient;

@@ -26,19 +26,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // add parameters
             propertyTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" } }
+                { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Type = "string" } }
             };
 
             if (creatorConfig.parameterizeNamedValues)
             {
                 if (creatorConfig.namedValues.Any(x => x.Value != null))
                 {
-                    propertyTemplate.Parameters.Add(ParameterNames.NamedValues, new TemplateParameterProperties { type = "object" });
+                    propertyTemplate.Parameters.Add(ParameterNames.NamedValues, new TemplateParameterProperties { Type = "object" });
                 }
 
                 if (creatorConfig.namedValues.Any(x => x.KeyVault != null))
                 {
-                    propertyTemplate.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateParameterProperties { type = "object" });
+                    propertyTemplate.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateParameterProperties { Type = "object" });
                 }
             }
 

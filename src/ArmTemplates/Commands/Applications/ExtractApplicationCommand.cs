@@ -63,10 +63,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applica
                 await this.extractorExecutor.ExecuteGenerationBasedOnConfiguration();
 
                 this.logger.LogInformation("Templates written to output location");
-                this.logger.LogInformation("Press any key to exit process:");
-#if DEBUG
-                Console.ReadKey();
-#endif
             }
             catch (Exception ex)
             {

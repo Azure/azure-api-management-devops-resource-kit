@@ -5,41 +5,31 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Api
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.TagApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions
 {
     public interface IMasterTemplateExtractor
     {
-        Task<Template> CreateMasterTemplateParameterValues(
-            List<string> apisToExtract,
-            ExtractorParameters extractorParameters,
-            LoggersCache loggersCache,
-            LoggerTemplateResources loggerTemplateResources,
-            IDictionary<string, BackendApiParameters> backendParams,
-            List<TemplateResource> propertyResources);
-
-        Template GenerateLinkedMasterTemplate(
-            Template<ApiTemplateResources> apiTemplate,
-            Template<PolicyTemplateResources> globalServicePolicyTemplate,
-            Template<ApiVersionSetTemplateResources> apiVersionSetTemplate,
-            Template<ProductTemplateResources> productsTemplate,
-            Template<ProductApiTemplateResources> productAPIsTemplate,
-            Template<TagApiTemplateResources> apiTagsTemplate,
-            Template loggersTemplate,
-            Template backendsTemplate,
-            Template<AuthorizationServerTemplateResources> authorizationServersTemplate,
-            Template namedValuesTemplate,
-            Template<TagTemplateResources> tagTemplate,
-            FileNames fileNames,
-            ExtractorParameters extractorParameters);
+        Template<MasterTemplateResources> GenerateLinkedMasterTemplate(
+           ExtractorParameters extractorParameters,
+           ApiTemplateResources apiTemplateResources = null,
+           PolicyTemplateResources policyTemplateResources = null,
+           ApiVersionSetTemplateResources apiVersionSetTemplateResources = null,
+           ProductTemplateResources productsTemplateResources = null,
+           ProductApiTemplateResources productAPIsTemplateResources = null,
+           TagApiTemplateResources apiTagsTemplateResources = null,
+           LoggerTemplateResources loggersTemplateResources = null,
+           BackendTemplateResources backendsTemplateResources = null,
+           AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
+           NamedValuesResources namedValuesTemplateResources = null,
+           TagTemplateResources tagTemplateResources = null);
     }
 }

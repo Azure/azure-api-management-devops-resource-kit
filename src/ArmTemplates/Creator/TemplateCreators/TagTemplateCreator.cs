@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // add parameters
             tagTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
             {
-                {ParameterNames.ApimServiceName, new TemplateParameterProperties(){ type = "string" }}
+                {ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Type = "string" }}
             };
 
             // aggregate all tags from apis

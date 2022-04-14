@@ -88,7 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // assert
             Assert.Equal(name, masterTemplateResource.Name);
-            Assert.Equal(uriLink, masterTemplateResource.Properties.templateLink.uri);
+            Assert.Equal(uriLink, masterTemplateResource.Properties.TemplateLink.Uri);
             Assert.Equal(dependsOn, masterTemplateResource.DependsOn);
         }
 
