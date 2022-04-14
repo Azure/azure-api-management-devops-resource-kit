@@ -93,51 +93,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             return apiRevisionTemplate;
         }
-
-        async Task<ApiTemplateResources> GenerateCurrentRevisionApiTemplateResourcesAsync(string apiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters)
-        {
-            var apiTemplateResources = new ApiTemplateResources();
-
-            // gets the current revision of this api and will remove "isCurrent" paramter
-            var versionedApiResource = await this.GenerateApiTemplateResourceAsVersioned(apiName, extractorParameters);
-
-            apiTemplateResources.Apis.Add(versionedApiResource);
-            var relatedTemplateResources = await this.apiExtractor.GetApiRelatedTemplateResourcesAsync(apiName, baseFilesGenerationDirectory, extractorParameters);
-            apiTemplateResources.AddResourcesData(relatedTemplateResources);
-
-            return apiTemplateResources;
-        }
-
-        async Task<ApiTemplateResource> GenerateApiTemplateResourceAsVersioned(string apiName, ExtractorParameters extractorParameters)
-        {
-            var apiDetails = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
-
-            apiDetails.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}')]";
-            apiDetails.ApiVersion = GlobalConstants.ApiVersion;
-            apiDetails.Scale = null;
-            apiDetails.Properties.IsCurrent = null;
-
-            if (extractorParameters.ParameterizeServiceUrl)
-            {
-                apiDetails.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
-            }
-
-            if (apiDetails.Properties.ApiVersionSetId != null)
-            {
-                apiDetails.DependsOn = Array.Empty<string>();
-
-                string versionSetName = apiDetails.Properties.ApiVersionSetId;
-                int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
-
-                versionSetName = versionSetName.Substring(versionSetPosition, versionSetName.Length - versionSetPosition);
-                apiDetails.Properties.ApiVersionSetId = $"[concat(resourceId('Microsoft.ApiManagement/service', parameters('{ParameterNames.ApimServiceName}')), '/{versionSetName}')]";
-            }
-            else
-            {
-                apiDetails.DependsOn = Array.Empty<string>();
-            }
-
-            return apiDetails;
-        }
     }
 }
