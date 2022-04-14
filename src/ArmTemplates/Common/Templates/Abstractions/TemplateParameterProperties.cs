@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public TemplateParameterProperties(string metadataDescription, string type)
         {
-            this.Metadata = new()
+            this.Metadata = new TemplateParameterMetadata()
             {
                 Description = metadataDescription,
             };
