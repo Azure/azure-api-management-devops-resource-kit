@@ -118,14 +118,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 productAPIDependsOn.Add("[resourceId('Microsoft.Resources/deployments', 'productsTemplate')]");
                 string productsUri = this.GenerateLinkedTemplateUri(extractorParameters.LinkedTemplatesUrlQueryString, extractorParameters.LinkedTemplatesSasToken, fileNames.Products);
                 var templateResource = this.CreateLinkedMasterTemplateResource("productsTemplate", productsUri, dependsOnNamedValues);
-                if (extractorParameters.PolicyXMLBaseUrl != null)
-                {
-                    templateResource.Properties.parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
-                }
-                if (extractorParameters.PolicyXMLSasToken != null)
-                {
-                    templateResource.Properties.parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
-                }
+
+                templateResource.Properties.parameters = this.GetTemplateParameters(productsTemplate);
+
                 resources.Add(templateResource);
             }
 
@@ -652,6 +647,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
             }
             return null;
+        }
+
+        public Dictionary<string, TemplateParameterProperties> GetTemplateParameters(Template productsTemplate)
+        {
+            var parameters = new Dictionary<string, TemplateParameterProperties>();
+
+            foreach (var parameterKey in productsTemplate.Parameters.Keys)
+            {
+                parameters.Add(parameterKey, new TemplateParameterProperties() { value = $"[parameters('{parameterKey }')]" });
+            }
+
+            return parameters;
         }
 
         public string GenerateLinkedTemplateUri(string linkedTemplatesUrlQueryString, string linkedTemplatesSasToken, string fileName)
