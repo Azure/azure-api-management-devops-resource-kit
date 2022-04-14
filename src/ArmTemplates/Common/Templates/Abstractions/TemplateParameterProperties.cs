@@ -10,13 +10,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public string DefaultValue { get; set; }
         public string Value { get; set; }
 
-        public static TemplateParameterProperties Create(string metadataDescription, string type) => new()
+        public TemplateParameterProperties()
         {
-            Metadata = new()
+        }
+
+        public TemplateParameterProperties(string metadataDescription, string type)
+        {
+            this.Metadata = new()
             {
                 Description = metadataDescription,
-            },
-            Type = type
-        };    
+            };
+            this.Type = type;
+        }  
     }
 }

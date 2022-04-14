@@ -325,19 +325,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             parameters.Add(
                 ParameterNames.ApimServiceName, 
-                TemplateParameterProperties.Create(metadataDescription: "Name of the API Management", type: "string"));
+                new TemplateParameterProperties(metadataDescription: "Name of the API Management", type: "string"));
             
             // add remote location of template files for linked option
             parameters.Add(
-                ParameterNames.LinkedTemplatesBaseUrl, 
-                TemplateParameterProperties.Create(metadataDescription: "Base URL of the repository that contains the generated templates", type: "string"));
+                ParameterNames.LinkedTemplatesBaseUrl,
+                new TemplateParameterProperties(metadataDescription: "Base URL of the repository that contains the generated templates", type: "string"));
 
             // add linkedTemplatesSasToken parameter if provided and if the templates are linked
             if (!string.IsNullOrEmpty(extractorParameters.LinkedTemplatesSasToken))
             {
                 parameters.Add(
                     ParameterNames.LinkedTemplatesSasToken,
-                    TemplateParameterProperties.Create(metadataDescription: "The Shared Access Signature for the URL of the repository", type: "string"));
+                    new TemplateParameterProperties(metadataDescription: "The Shared Access Signature for the URL of the repository", type: "string"));
             }
             
             // add linkedTemplatesUrlQueryString parameter if provided and if the templates are linked
@@ -345,20 +345,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 parameters.Add(
                     ParameterNames.LinkedTemplatesUrlQueryString,
-                    TemplateParameterProperties.Create(metadataDescription: "Query string for the URL of the repository", type: "string"));
+                    new TemplateParameterProperties(metadataDescription: "Query string for the URL of the repository", type: "string"));
             }
 
             if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLBaseUrl))
             {
                 parameters.Add(
                     ParameterNames.PolicyXMLBaseUrl,
-                    TemplateParameterProperties.Create(metadataDescription: "Base URL of the repository that contains the generated policy files", type: "string"));
+                    new TemplateParameterProperties(metadataDescription: "Base URL of the repository that contains the generated policy files", type: "string"));
 
                 if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLSasToken))
                 {
                     parameters.Add(
                         ParameterNames.PolicyXMLSasToken,
-                        TemplateParameterProperties.Create(metadataDescription: "The SAS token for the URL of the policy container", type: "string"));
+                        new TemplateParameterProperties(metadataDescription: "The SAS token for the URL of the policy container", type: "string"));
                 }
             }
 
@@ -366,42 +366,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 parameters.Add(
                     ParameterNames.ServiceUrl,
-                    TemplateParameterProperties.Create(metadataDescription: "Service url for each Api", type: "object"));
+                    new TemplateParameterProperties(metadataDescription: "Service url for each Api", type: "object"));
             }
 
             if (extractorParameters.ParameterizeNamedValue)
             {
                 parameters.Add(
                     ParameterNames.NamedValues,
-                    TemplateParameterProperties.Create(metadataDescription: "Named values", type: "object"));
+                    new TemplateParameterProperties(metadataDescription: "Named values", type: "object"));
             }
 
             if (extractorParameters.ParameterizeApiLoggerId)
             {
                 parameters.Add(
                     ParameterNames.ApiLoggerId,
-                    TemplateParameterProperties.Create(metadataDescription: "LoggerId for this api", type: "object"));
+                    new TemplateParameterProperties(metadataDescription: "LoggerId for this api", type: "object"));
             }
 
             if (extractorParameters.ParameterizeLogResourceId)
             {
                 parameters.Add(
                     ParameterNames.LoggerResourceId,
-                    TemplateParameterProperties.Create(metadataDescription: "ResourceId for the logger", type: "object"));
+                    new TemplateParameterProperties(metadataDescription: "ResourceId for the logger", type: "object"));
             }
 
             if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
             {
                 parameters.Add(
                     ParameterNames.NamedValueKeyVaultSecrets,
-                    TemplateParameterProperties.Create(metadataDescription: "Key Vault Secrets for Named Values", type: "object"));
+                    new TemplateParameterProperties(metadataDescription: "Key Vault Secrets for Named Values", type: "object"));
             }
 
             if (extractorParameters.ParameterizeBackend)
             {
                 parameters.Add(
                     ParameterNames.BackendSettings,
-                    TemplateParameterProperties.Create(metadataDescription: "The settings for the Backends", type: "object"));
+                    new TemplateParameterProperties(metadataDescription: "The settings for the Backends", type: "object"));
             }
 
             return parameters;
