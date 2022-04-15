@@ -10,7 +10,7 @@ indent_style = space
 indent_size = 4
 charset = utf-8-bom
 
-file_header_template =--------------------------------------------------------------------------\n <copyright file="{fileName}" company="Microsoft">\n     Copyright (c) Microsoft Corporation. All rights reserved.\n </copyright>\n--------------------------------------------------------------------------
+file_header_template =--------------------------------------------------------------------------\n Copyright (c) Microsoft Corporation. All rights reserved.\n Licensed under the MIT License.\n--------------------------------------------------------------------------
 
 # use this. for all instance member access
 dotnet_style_qualification_for_field = true:error
@@ -47,7 +47,7 @@ dotnet_naming_symbols.static_fields.applicable_accessibilities = *
 dotnet_naming_symbols.static_fields.required_modifiers = static
 
 # Private instance private fields are camelCase
-dotnet_naming_rule.private_instance_fields_should_be_camel_case.severity = error 
+dotnet_naming_rule.private_instance_fields_should_be_camel_case.severity = error
 dotnet_naming_rule.private_instance_fields_should_be_camel_case.symbols = private_instance_fields 
 dotnet_naming_rule.private_instance_fields_should_be_camel_case.style = camel_case
 
@@ -69,12 +69,38 @@ dotnet_naming_rule.local_functions_should_be_pascal_case.style = pascal_case
 dotnet_naming_symbols.local_functions.applicable_kinds = local_function
 
 # All public and internal members are PascalCase
-dotnet_naming_rule.public_members_should_be_pascal_case.severity = error 
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = error
 dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_members 
 dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case
 
 dotnet_naming_symbols.public_members.applicable_kinds = property, method, field, event, delegate
 dotnet_naming_symbols.public_members.applicable_accessibilities = public, internal
+csharp_indent_labels = one_less_than_current
+csharp_using_directive_placement = outside_namespace:silent
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_braces = true:silent
+csharp_style_namespace_declarations = block_scoped:silent
+csharp_style_expression_bodied_methods = false:silent
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_operators = false:silent
+csharp_style_expression_bodied_properties = true:silent
+csharp_style_expression_bodied_indexers = true:silent
+csharp_style_expression_bodied_accessors = true:silent
+csharp_style_expression_bodied_lambdas = true:silent
+csharp_style_expression_bodied_local_functions = false:silent
+csharp_style_throw_expression = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_prefer_simple_default_expression = true:suggestion
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+csharp_style_deconstructed_variable_declaration = true:suggestion
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent
+csharp_space_around_binary_operators = before_and_after
 
 # let's not take responsibility for DotNetty problems (is external repo)
 [Proxy/DotNetty/**.cs]

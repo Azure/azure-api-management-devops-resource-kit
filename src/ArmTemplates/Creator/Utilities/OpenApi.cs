@@ -1,4 +1,9 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+﻿// --------------------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//  Licensed under the MIT License.
+// --------------------------------------------------------------------------
+
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;

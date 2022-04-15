@@ -1,4 +1,9 @@
-﻿using Xunit;
+﻿// --------------------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//  Licensed under the MIT License.
+// --------------------------------------------------------------------------
+
+using Xunit;
 using System.IO;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;

@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// --------------------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//  Licensed under the MIT License.
+// --------------------------------------------------------------------------
+
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
