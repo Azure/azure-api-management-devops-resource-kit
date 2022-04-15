@@ -53,7 +53,7 @@ Once a maintainer approves the PR, it will be merged.
 
 ## Releases
 
-We release whenever there is significant changes.  To release, a maintainer will generate a release tag.  This will set off a
+We release whenever there are significant changes. To release, a maintainer will generate a release tag. This will set off a
 build and test process that automatically uploads the artifacts to GitHub releases.  You can always find the latest release on
 GitHub releases.
 
