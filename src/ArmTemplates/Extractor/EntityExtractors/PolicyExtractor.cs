@@ -228,11 +228,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             policyTemplate.Properties.Format = "rawxml-link";
             if (extractorParameters.PolicyXMLSasToken != null)
             {
-                policyTemplate.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{policyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
+                policyTemplate.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{PoliciesDirectoryName}/', '{policyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
             }
             else
             {
-                policyTemplate.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{policyFileName}')]";
+                policyTemplate.Properties.PolicyContent = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{PoliciesDirectoryName}/', '{policyFileName}')]";
             }
         }
 
