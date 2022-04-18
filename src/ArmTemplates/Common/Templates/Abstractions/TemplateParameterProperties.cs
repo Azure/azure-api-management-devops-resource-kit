@@ -1,4 +1,9 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
+﻿// --------------------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//  Licensed under the MIT License.
+// --------------------------------------------------------------------------
+
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Applications;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions
 {

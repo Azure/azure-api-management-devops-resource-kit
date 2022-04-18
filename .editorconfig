@@ -10,7 +10,7 @@ indent_style = space
 indent_size = 4
 charset = utf-8-bom
 
-file_header_template =--------------------------------------------------------------------------\n <copyright file="{fileName}" company="Microsoft">\n     Copyright (c) Microsoft Corporation. All rights reserved.\n </copyright>\n--------------------------------------------------------------------------
+file_header_template =--------------------------------------------------------------------------\n Copyright (c) Microsoft Corporation. All rights reserved.\n Licensed under the MIT License.\n--------------------------------------------------------------------------
 
 # use this. for all instance member access
 dotnet_style_qualification_for_field = true:error
@@ -47,7 +47,7 @@ dotnet_naming_symbols.static_fields.applicable_accessibilities = *
 dotnet_naming_symbols.static_fields.required_modifiers = static
 
 # Private instance private fields are camelCase
-dotnet_naming_rule.private_instance_fields_should_be_camel_case.severity = error 
+dotnet_naming_rule.private_instance_fields_should_be_camel_case.severity = error
 dotnet_naming_rule.private_instance_fields_should_be_camel_case.symbols = private_instance_fields 
 dotnet_naming_rule.private_instance_fields_should_be_camel_case.style = camel_case
 
@@ -69,7 +69,7 @@ dotnet_naming_rule.local_functions_should_be_pascal_case.style = pascal_case
 dotnet_naming_symbols.local_functions.applicable_kinds = local_function
 
 # All public and internal members are PascalCase
-dotnet_naming_rule.public_members_should_be_pascal_case.severity = error 
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = error
 dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_members 
 dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case
 

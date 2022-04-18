@@ -1,4 +1,9 @@
-﻿using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+﻿// --------------------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//  Licensed under the MIT License.
+// --------------------------------------------------------------------------
+
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities

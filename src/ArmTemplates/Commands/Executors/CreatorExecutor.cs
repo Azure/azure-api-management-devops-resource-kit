@@ -1,4 +1,9 @@
-﻿namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors
+﻿// --------------------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//  Licensed under the MIT License.
+// --------------------------------------------------------------------------
+
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors
 {
     public class CreatorExecutor
     {
