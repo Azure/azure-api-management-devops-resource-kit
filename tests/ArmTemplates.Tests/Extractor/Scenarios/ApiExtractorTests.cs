@@ -124,6 +124,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiTemplate.TypedResources.ApiOperations.Count().Should().Be(2);
             apiTemplate.TypedResources.ApiOperations.All(x => x.Type == ResourceTypeConstants.APIOperation).Should().BeTrue();
             apiTemplate.TypedResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperations.SelectMany(x => x.DependsOn).Any(x => x.Contains($"'{ResourceTypeConstants.API}'")).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperations.SelectMany(x => x.DependsOn).Any(x => x.Contains($"'{ResourceTypeConstants.APIOperation}'")).Should().BeFalse();
 
             // api operations policies
             apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(2);
