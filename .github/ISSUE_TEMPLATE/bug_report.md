@@ -2,10 +2,15 @@
 name: Bug report
 about: Create a report to help us improve the Azure DevOps Resource Kit
 title: ''
-labels: bug
+labels: bug, triage
 assignees: adrianhall
 
 ---
+
+## Where did you encounter this bug?
+
+* [] Extractor
+* [] Creator
 
 ## Describe the bug
 
