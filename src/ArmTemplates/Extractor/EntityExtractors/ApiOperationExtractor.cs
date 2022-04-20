@@ -44,7 +44,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiOperation.OriginalName = apiOperation.Name;
 
                 apiOperation.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiOperation.OriginalName}')]";
-                apiOperation.DependsOn = new[]{ $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
                 apiOperation.ApiVersion = GlobalConstants.ApiVersion;
                 apiOperation.Scale = null;
 
@@ -70,6 +69,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         }
                     }
                 }
+
+                apiOperation.DependsOn = operationDependsOn.ToArray();
             }
 
             return apiOperations;
