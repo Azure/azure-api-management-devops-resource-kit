@@ -72,7 +72,7 @@ stages:
               
           - pwsh: |
               New-Item '$(Build.ArtifactStagingDirectory)/build' -Type Directory
-              Get-ChildItem -Path 'src/ArmTemplates/bin/$(configuration)/netcoreapp3.1' -File | %{
+              Get-ChildItem -Path 'src/ArmTemplates/bin/$(configuration)/net6.0' -File | %{
                 Write-Host "Copy-Item -Path $_ -Destination '$(Build.ArtifactStagingDirectory)/build'"
                 Copy-Item -Path $_ -Destination '$(Build.ArtifactStagingDirectory)/build'
               }
