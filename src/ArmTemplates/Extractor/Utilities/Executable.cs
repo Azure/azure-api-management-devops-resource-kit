@@ -13,21 +13,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 {
     class Executable
     {
-        string _arguments;
-        string _exeName;
-        bool _shareConsole;
-        bool _streamOutput;
-        readonly bool _visibleProcess;
-        readonly string _workingDirectory;
+        readonly string arguments;
+        readonly string exeName;
+        bool shareConsole;
+        bool streamOutput;
+        readonly bool visibleProcess;
+        readonly string workingDirectory;
 
         public Executable(string exeName, string arguments = null, bool streamOutput = true, bool shareConsole = false, bool visibleProcess = false, string workingDirectory = null)
         {
-            this._exeName = exeName;
-            this._arguments = arguments;
-            this._streamOutput = streamOutput;
-            this._shareConsole = shareConsole;
-            this._visibleProcess = visibleProcess;
-            this._workingDirectory = workingDirectory;
+            this.exeName = exeName;
+            this.arguments = arguments;
+            this.streamOutput = streamOutput;
+            this.shareConsole = shareConsole;
+            this.visibleProcess = visibleProcess;
+            this.workingDirectory = workingDirectory;
         }
 
         public Process Process { get; private set; }
@@ -36,14 +36,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
         {
             var processInfo = new ProcessStartInfo
             {
-                FileName = _exeName,
-                Arguments = _arguments,
-                CreateNoWindow = !this._visibleProcess,
-                UseShellExecute = _shareConsole,
-                RedirectStandardError = _streamOutput,
-                RedirectStandardInput = _streamOutput,
-                RedirectStandardOutput = _streamOutput,
-                WorkingDirectory = this._workingDirectory ?? Environment.CurrentDirectory
+                FileName = exeName,
+                Arguments = arguments,
+                CreateNoWindow = !this.visibleProcess,
+                UseShellExecute = shareConsole,
+                RedirectStandardError = streamOutput,
+                RedirectStandardInput = streamOutput,
+                RedirectStandardOutput = streamOutput,
+                WorkingDirectory = this.workingDirectory ?? Environment.CurrentDirectory
             };
 
             try
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                 throw ex;
             }
 
-            if (this._streamOutput)
+            if (this.streamOutput)
             {
                 this.Process.OutputDataReceived += (s, e) => outputCallback?.Invoke(e.Data);
                 this.Process.BeginOutputReadLine();
@@ -71,13 +71,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
             var exitCodeTask = this.Process.WaitForExitAsync();
 
             if (timeout == null)
-                return await exitCodeTask;
+            {
+                await exitCodeTask;
+                return exitCodeTask.IsCompletedSuccessfully ? 0 : -1;
+            }
             else
             {
                 await Task.WhenAny(exitCodeTask, Task.Delay(timeout.Value));
 
                 if (exitCodeTask.IsCompleted)
-                    return exitCodeTask.Result;
+                    return exitCodeTask.IsCompletedSuccessfully ? 0 : -1;
                 else
                 {
                     this.Process.Kill();
