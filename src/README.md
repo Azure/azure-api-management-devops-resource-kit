@@ -12,8 +12,8 @@
 Follow this guide for manually building and running the application
 1. git clone repository
 2. navigate to repo root
-3. build application using `dotnet build src/ArmTemplates/ArmTemplates.csproj` (netcore3.1 must be installed)
-4. navigate to built binaries using `cd .\src\ArmTemplates\bin\Debug\netcoreapp3.1\`
+3. build application using `dotnet build src/ArmTemplates/ArmTemplates.csproj` (net6.0 must be installed. Visit [Download .NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) for more information)
+4. navigate to built binaries using `cd .\src\ArmTemplates\bin\Debug\net6.0\`
 5. run ` dotnet .\ArmTemplates.dll --help` to view all available commands
 6. Investigate possible commands to run and choose desired
 
