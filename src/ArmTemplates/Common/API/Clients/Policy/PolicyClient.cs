@@ -6,7 +6,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy.Responses;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -27,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetGlobalServicePolicyRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.CallApiManagementAsync<PolicyTemplateResource>(azToken, requestUrl);
+            return await this.GetResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
         }
 
         public async Task<PolicyTemplateResource> GetPolicyLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
@@ -37,8 +36,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetPolicyLinkedToProductRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
-            var response = await this.CallApiManagementAsync<GetPoliciesResponse>(azToken, requestUrl);
-            return response.Policies.FirstOrDefault();
+            var policies = await this.GetPagedResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
+            return policies.FirstOrDefault();
         }
 
         public async Task<PolicyTemplateResource> GetPolicyLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
@@ -48,8 +47,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetPolicyLinkedToApiRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
-            var response = await this.CallApiManagementAsync<GetPoliciesResponse>(azToken, requestUrl);
-            return response.Policies.FirstOrDefault();
+            var policies = await this.GetPagedResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
+            return policies.FirstOrDefault();
         }
 
         public async Task<PolicyTemplateResource> GetPolicyLinkedToApiOperationAsync(string apiName, string operationName, ExtractorParameters extractorParameters)
@@ -59,8 +58,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetPolicyLinkedToApiOperationRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, operationName, GlobalConstants.ApiVersion);
 
-            var response = await this.CallApiManagementAsync<GetPoliciesResponse>(azToken, requestUrl);
-            return response.Policies.FirstOrDefault();
+            var policies = await this.GetPagedResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
+            return policies.FirstOrDefault();
         }
     }
 }

@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiVersionSet.Responses;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -24,8 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllVersionSetsRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            var response = await this.CallApiManagementAsync<GetApiVersionSetsResponse>(azToken, requestUrl);
-            return response.ApiVersionSets;
+            return await this.GetPagedResponseAsync<ApiVersionSetTemplateResource>(azToken, requestUrl);
         }
     }
 }

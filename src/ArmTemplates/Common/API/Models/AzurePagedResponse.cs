@@ -4,16 +4,20 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Newtonsoft.Json;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Diagnostics.Responses
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Models
 {
-    class GetDiagnosticsResponse
+    public class AzurePagedResponse<T>
     {
         [JsonProperty("value")]
-        public List<DiagnosticTemplateResource> Diagnostics { get; set; }
+        public List<T> Items { get; set; }
 
         public int Count { get; set; }
+
+        /// <summary>
+        /// Represents url of request that needs to be called for retrieving next page of responses
+        /// </summary>
+        public string NextLink { get; set; }
     }
 }

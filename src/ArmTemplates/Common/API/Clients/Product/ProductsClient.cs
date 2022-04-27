@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Product.Responses;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
@@ -26,8 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllProductsRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            var response = await this.CallApiManagementAsync<GetAllProductsResponse>(azToken, requestUrl);
-            return response.Products;
+            return await this.GetPagedResponseAsync<ProductsTemplateResource>(azToken, requestUrl);
         }
 
         public async Task<List<ProductApiTemplateResource>> GetAllLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
@@ -37,8 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllProductsLinkedToApiRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
-            var response = await this.CallApiManagementAsync<GetAllProductsLinkedToApiResponse>(azToken, requestUrl);
-            return response.ProductApis;
+            return await this.GetPagedResponseAsync<ProductApiTemplateResource>(azToken, requestUrl);
         }
     }
 }
