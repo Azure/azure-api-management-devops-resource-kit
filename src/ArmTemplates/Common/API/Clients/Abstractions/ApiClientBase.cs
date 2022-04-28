@@ -3,9 +3,11 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
@@ -20,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         protected string BaseUrl { get; private set; } = GlobalConstants.BaseManagementAzureUrl;
 
-        protected Authentication Auth { get; private set; } = new Authentication();
+        protected AzureCliAuthenticator Auth { get; private set; } = new AzureCliAuthenticator();
 
         public ApiClientBase(string baseUrl = null) 
         {
@@ -49,10 +51,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return responseBody;
         }
 
-        protected async Task<TResponse> CallApiManagementAsync<TResponse>(string azToken, string requestUrl)
+        protected async Task<TResponse> GetResponseAsync<TResponse>(string azToken, string requestUrl)
         {
             var stringResponse = await this.CallApiManagementAsync(azToken, requestUrl);
             return stringResponse.Deserialize<TResponse>();
+        }
+
+        protected async Task<List<TResponse>> GetPagedResponseAsync<TResponse>(string azToken, string requestUrl)
+        {
+            var pageResponse = await MakePagedRequestAsync(requestUrl);
+
+            var responseItems = new List<TResponse>(pageResponse.Items);
+            while (pageResponse?.NextLink is not null)
+            {
+                pageResponse = await MakePagedRequestAsync(pageResponse.NextLink);
+                responseItems.AddRange(pageResponse.Items);
+            }
+
+            return responseItems;
+
+            async Task<AzurePagedResponse<TResponse>> MakePagedRequestAsync(string requestUrl)
+            {
+                var stringResponse = await this.CallApiManagementAsync(azToken, requestUrl);
+                return stringResponse.Deserialize<AzurePagedResponse<TResponse>>();
+            }
         }
     }
 }

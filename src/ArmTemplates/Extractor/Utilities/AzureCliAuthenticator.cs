@@ -12,7 +12,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities
 {
-    public class Authentication
+    public class AzureCliAuthenticator
     {
         bool isTokenValid = false;
         DateTime start = DateTime.Now;
