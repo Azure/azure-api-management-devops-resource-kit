@@ -10,6 +10,6 @@ This **Resource-Kit** works with `Resource` entities. Let's define, what `Resour
 `Resource` - entity, that is exposed by ApiManagement, representing some information regarding specific ApiManagement instance. If one contains some set of `resources` describing ApiManagement instance, he\she can recreate another instance one by one (with absolutely the same resources)
 
 ## Supported Resources 
-Please, refer to this document to understand what resources are supported in each of the Api-Versions published by ApiManagement team:
+Please, refer to this document to understand what resources are supported in each of the Api-Versions published by the ApiManagement team:
 
 - [api-version = 2021-08-01](./2021-08-01.md)
