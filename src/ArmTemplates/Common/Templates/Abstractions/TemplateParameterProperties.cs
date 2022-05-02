@@ -13,8 +13,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         
         public string[] AllowedValues { get; set; }
 
-        public string DefaultValue { get; set; }
-
         public string Value { get; set; }
 
         public TemplateParameterProperties()
