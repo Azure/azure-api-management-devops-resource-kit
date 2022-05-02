@@ -79,6 +79,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool ParameterizeBackend { get; private set; }
 
+        public bool ParameterizeBackendProxySection { get; private set; }
+
         public bool ExtractGateways { get; set; }
 
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
@@ -104,6 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.OperationBatchSize = extractorConfig.OperationBatchSize ?? default;
             this.ParamNamedValuesKeyVaultSecrets = extractorConfig.ParamNamedValuesKeyVaultSecrets != null && extractorConfig.ParamNamedValuesKeyVaultSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ParameterizeBackend = extractorConfig.ParamBackend != null && extractorConfig.ParamBackend.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParameterizeBackendProxySection = extractorConfig.ParameterizeBackendProxySection != null && extractorConfig.ParameterizeBackendProxySection.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.SplitApis = !string.IsNullOrEmpty(extractorConfig.SplitAPIs) && extractorConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.IncludeAllRevisions = !string.IsNullOrEmpty(extractorConfig.IncludeAllRevisions) && extractorConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.FileNames = this.GenerateFileNames(extractorConfig.BaseFileName, extractorConfig.SourceApimName);
@@ -138,6 +141,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.NotIncludeNamedValue = !string.IsNullOrEmpty(overridingConfig.NotIncludeNamedValue) ? overridingConfig.NotIncludeNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase) : this.NotIncludeNamedValue;
             this.ParamNamedValuesKeyVaultSecrets = !string.IsNullOrEmpty(overridingConfig.ParamNamedValuesKeyVaultSecrets) ? overridingConfig.ParamNamedValuesKeyVaultSecrets.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParamNamedValuesKeyVaultSecrets;
             this.ParameterizeBackend = !string.IsNullOrEmpty(overridingConfig.ParamBackend) ? overridingConfig.ParamBackend.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeBackend;
+            this.ParameterizeBackendProxySection = !string.IsNullOrEmpty(overridingConfig.ParameterizeBackendProxySection) ? overridingConfig.ParameterizeBackendProxySection.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeBackendProxySection;
             this.SplitApis = !string.IsNullOrEmpty(overridingConfig.SplitAPIs) ? overridingConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase) : this.SplitApis;
             this.IncludeAllRevisions = !string.IsNullOrEmpty(overridingConfig.IncludeAllRevisions) ? overridingConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase) : this.IncludeAllRevisions;
             this.ExtractGateways = !string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractGateways;

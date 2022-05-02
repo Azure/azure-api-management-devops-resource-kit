@@ -34,7 +34,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const bool MockNotIncludeNamedValue = true;
         protected const bool MockToParameterizeNamedValuesKeyVaultSecrets = true;
         protected const int MockOperationBatchSize = 32;
-        protected const bool MockParameterizeBackend = true;
+        protected const bool MockParameterizeBackendSettings = true;
+        protected const bool MockParameterizeBackendProxySection = false;
         protected const bool MockExtractGateways = true;
 
         protected ExtractorConsoleAppConfiguration GetMockedExtractorConsoleAppConfiguration(
@@ -43,7 +44,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             string multipleApiNames = MockMultipleApis,
             bool includeAllRevisions = MockIncludeAllRevisions,
             bool toParameterizeApiLoggerId = MockParameterizeApiLoggerId,
-            bool toNotIncludeNamedValue = MockNotIncludeNamedValue)
+            bool toNotIncludeNamedValue = MockNotIncludeNamedValue,
+            bool parameterizeBackendProxySection = MockParameterizeBackendProxySection)
         {
             return new ExtractorConsoleAppConfiguration
             {
@@ -71,7 +73,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 NotIncludeNamedValue = toNotIncludeNamedValue.ToString(),
                 ParamNamedValuesKeyVaultSecrets = MockToParameterizeNamedValuesKeyVaultSecrets.ToString(),
                 OperationBatchSize = MockOperationBatchSize,
-                ParamBackend = MockParameterizeBackend.ToString(),
+                ParamBackend = MockParameterizeBackendSettings.ToString(),
+                ParameterizeBackendProxySection = parameterizeBackendProxySection.ToString(),
                 ExtractGateways = MockExtractGateways.ToString()
             };
         }  

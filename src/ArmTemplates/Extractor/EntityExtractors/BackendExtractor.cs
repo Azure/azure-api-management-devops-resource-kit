@@ -54,7 +54,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var backendTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
-                                        .AddParameterizeBackendProperty(extractorParameters)
+                                        .AddParameterizeBackendSettings(extractorParameters)
+                                        .AddParameterizeBackendProxySection(extractorParameters)
                                         .Build<BackendTemplateResources>();
 
             var backends = await this.backendClient.GetAllAsync(extractorParameters);
@@ -71,6 +72,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 backendResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalBackendName}')]";
                 backendResource.Type = ResourceTypeConstants.Backend;
                 backendResource.ApiVersion = GlobalConstants.ApiVersion;
+
+                // set backend proxy section values according to parameter
+                if (extractorParameters.ParameterizeBackendProxySection)
+                {
+                    backendResource.Properties.Proxy = new BackendProxy
+                    {
+                        Url = $"[parameters('{ParameterNames.BackendProxy}').url]",
+                        Username = $"[parameters('{ParameterNames.BackendProxy}').username]",
+                        Password = $"[parameters('{ParameterNames.BackendProxy}').password]"
+                    };
+                }
 
                 if (string.IsNullOrEmpty(singleApiName))
                 {

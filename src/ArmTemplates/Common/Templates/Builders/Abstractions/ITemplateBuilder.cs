@@ -24,6 +24,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public Template<TTemplateResources> Build<TTemplateResources>()
             where TTemplateResources : ITemplateResources, new();
 
+        /// <summary>
+        /// Builds generic template using pre-defined template resources
+        /// </summary>
+        /// <typeparam name="TTemplateResources">type of resources of template, which has parameterless constructor</typeparam>
+        public Template<TTemplateResources> Build<TTemplateResources>(TTemplateResources templateResources)
+            where TTemplateResources : ITemplateResources, new();
+
         TemplateBuilder GenerateTemplateWithApimServiceNameProperty();
 
         TemplateBuilder GenerateTemplateWithPresetProperties(ExtractorParameters extractorParameters);
@@ -36,7 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         TemplateBuilder AddParameterizeApiLoggerIdProperty(ExtractorParameters extractorParameters);
 
-        TemplateBuilder AddParameterizeBackendProperty(ExtractorParameters extractorParameters);
+        TemplateBuilder AddParameterizeBackendSettings(ExtractorParameters extractorParameters);
 
         TemplateBuilder AddParameterizeLogResourceIdProperty(ExtractorParameters extractorParameters);
     }

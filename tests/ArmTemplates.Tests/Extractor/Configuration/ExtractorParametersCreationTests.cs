@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             extractorParameters.NotIncludeNamedValue.Should().Be(MockNotIncludeNamedValue);
             extractorParameters.ParamNamedValuesKeyVaultSecrets.Should().Be(MockToParameterizeNamedValuesKeyVaultSecrets);
             extractorParameters.OperationBatchSize.Should().Be(MockOperationBatchSize);
-            extractorParameters.ParameterizeBackend.Should().Be(MockParameterizeBackend);
+            extractorParameters.ParameterizeBackend.Should().Be(MockParameterizeBackendSettings);
 
             // more complicated assertions with parsing arguments
             extractorParameters.MultipleApiNames.Should().Contain(new[] { "test-multiple-api-1", "test-multiple-api-2" });
