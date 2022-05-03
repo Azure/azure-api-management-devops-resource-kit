@@ -8,11 +8,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class AuthorizationServerTemplateCreator
+    public class AuthorizationServerTemplateCreator : IAuthorizationServerTemplateCreator
     {
         readonly ITemplateBuilder templateBuilder;
 
@@ -21,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
-        public Template CreateAuthorizationServerTemplate(CreatorConfig creatorConfig)
+        public Template CreateAuthorizationServerTemplate(CreatorParameters creatorConfig)
         {
             // create empty template
             Template authorizationTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
@@ -33,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            foreach (AuthorizationServerProperties authorizationServerTemplateProperties in creatorConfig.authorizationServers)
+            foreach (AuthorizationServerProperties authorizationServerTemplateProperties in creatorConfig.AuthorizationServers)
             {
                 // create authorization server resource with properties
                 AuthorizationServerTemplateResource authorizationServerTemplateResource = new AuthorizationServerTemplateResource()

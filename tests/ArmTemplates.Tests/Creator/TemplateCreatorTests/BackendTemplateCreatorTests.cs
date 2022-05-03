@@ -5,12 +5,12 @@
 
 using Xunit;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             BackendTemplateCreator backendTemplateCreator = new BackendTemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig() { backends = new List<BackendTemplateProperties>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { Backends = new List<BackendTemplateProperties>() };
             BackendTemplateProperties backend = new BackendTemplateProperties()
             {
                 Title = "title",
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 }
 
             };
-            creatorConfig.backends.Add(backend);
+            creatorConfig.Backends.Add(backend);
 
             // act
             Template backendTemplate = backendTemplateCreator.CreateBackendTemplate(creatorConfig);

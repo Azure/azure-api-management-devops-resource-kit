@@ -9,7 +9,6 @@ using System;
 using System.Net;
 using System.Linq;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
@@ -18,27 +17,29 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.TagApi;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class APITemplateCreator
+    public class ApiTemplateCreator : IApiTemplateCreator
     {
         readonly ITemplateBuilder templateBuilder;
 
         FileReader fileReader;
-        PolicyTemplateCreator policyTemplateCreator;
-        ProductAPITemplateCreator productAPITemplateCreator;
-        TagAPITemplateCreator tagAPITemplateCreator;
-        DiagnosticTemplateCreator diagnosticTemplateCreator;
-        ReleaseTemplateCreator releaseTemplateCreator;
+        readonly IPolicyTemplateCreator policyTemplateCreator;
+        readonly IProductApiTemplateCreator productAPITemplateCreator;
+        readonly ITagApiTemplateCreator tagAPITemplateCreator;
+        readonly IDiagnosticTemplateCreator diagnosticTemplateCreator;
+        readonly IReleaseTemplateCreator releaseTemplateCreator;
 
-        public APITemplateCreator(
+        public ApiTemplateCreator(
             FileReader fileReader, 
-            PolicyTemplateCreator policyTemplateCreator, 
-            ProductAPITemplateCreator productAPITemplateCreator, 
-            TagAPITemplateCreator tagAPITemplateCreator, 
-            DiagnosticTemplateCreator diagnosticTemplateCreator, 
-            ReleaseTemplateCreator releaseTemplateCreator,
+            IPolicyTemplateCreator policyTemplateCreator, 
+            IProductApiTemplateCreator productAPITemplateCreator, 
+            ITagApiTemplateCreator tagAPITemplateCreator, 
+            IDiagnosticTemplateCreator diagnosticTemplateCreator, 
+            IReleaseTemplateCreator releaseTemplateCreator,
             ITemplateBuilder templateBuilder)
         {
             this.fileReader = fileReader;
@@ -50,19 +51,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
-        public async Task<List<Template>> CreateAPITemplatesAsync(APIConfig api)
+        public async Task<List<Template>> CreateAPITemplatesAsync(ApiConfig api)
         {
             // determine if api needs to be split into multiple templates
             bool isSplit = this.IsSplitAPI(api);
 
             // update api name if necessary (apiRevision > 1 and isCurrent = true) 
             int revisionNumber = 0;
-            if (int.TryParse(api.apiRevision, out revisionNumber))
+            if (int.TryParse(api.ApiRevision, out revisionNumber))
             {
-                if (revisionNumber > 1 && api.isCurrent == false)
+                if (revisionNumber > 1 && api.IsCurrent == false)
                 {
-                    string currentAPIName = api.name;
-                    api.name += $";rev={revisionNumber}";
+                    string currentAPIName = api.Name;
+                    api.Name += $";rev={revisionNumber}";
                 }
             }
 
@@ -81,7 +82,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return apiTemplates;
         }
 
-        public async Task<Template> CreateAPITemplateAsync(APIConfig api, bool isSplit, bool isInitial)
+        public async Task<Template> CreateAPITemplateAsync(ApiConfig api, bool isSplit, bool isInitial)
         {
             // create empty template
             Template apiTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
@@ -92,9 +93,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Type = "string" } }
             };
 
-            if (!string.IsNullOrEmpty(api.serviceUrl))
+            if (!string.IsNullOrEmpty(api.ServiceUrl))
             {
-                apiTemplate.Parameters.Add(api.name + "-ServiceUrl", new TemplateParameterProperties() { Type = "string" });
+                apiTemplate.Parameters.Add(api.Name + "-ServiceUrl", new TemplateParameterProperties() { Type = "string" });
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
@@ -111,19 +112,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return apiTemplate;
         }
 
-        public List<TemplateResource> CreateChildResourceTemplates(APIConfig api)
+        public List<TemplateResource> CreateChildResourceTemplates(ApiConfig api)
         {
             List<TemplateResource> resources = new List<TemplateResource>();
             // all child resources will depend on the api
-            string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{api.name}')]" };
+            string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{api.Name}')]" };
 
-            PolicyTemplateResource apiPolicyResource = api.policy != null ? this.policyTemplateCreator.CreateAPIPolicyTemplateResource(api, dependsOn) : null;
-            List<PolicyTemplateResource> operationPolicyResources = api.operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(api, dependsOn) : null;
-            List<ProductApiTemplateResource> productAPIResources = api.products != null ? this.productAPITemplateCreator.CreateProductAPITemplateResources(api, dependsOn) : null;
-            List<TagApiTemplateResource> tagAPIResources = api.tags != null ? this.tagAPITemplateCreator.CreateTagAPITemplateResources(api, dependsOn) : null;
-            DiagnosticTemplateResource diagnosticTemplateResource = api.diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn) : null;
+            PolicyTemplateResource apiPolicyResource = api.Policy != null ? this.policyTemplateCreator.CreateAPIPolicyTemplateResource(api, dependsOn) : null;
+            List<PolicyTemplateResource> operationPolicyResources = api.Operations != null ? this.policyTemplateCreator.CreateOperationPolicyTemplateResources(api, dependsOn) : null;
+            List<ProductApiTemplateResource> productAPIResources = api.Products != null ? this.productAPITemplateCreator.CreateProductAPITemplateResources(api, dependsOn) : null;
+            List<TagApiTemplateResource> tagAPIResources = api.Tags != null ? this.tagAPITemplateCreator.CreateTagAPITemplateResources(api, dependsOn) : null;
+            DiagnosticTemplateResource diagnosticTemplateResource = api.Diagnostic != null ? this.diagnosticTemplateCreator.CreateAPIDiagnosticTemplateResource(api, dependsOn) : null;
             // add release resource if the name has been appended with ;rev{revisionNumber}
-            ReleaseTemplateResource releaseTemplateResource = api.name.Contains(";rev") == true ? this.releaseTemplateCreator.CreateAPIReleaseTemplateResource(api, dependsOn) : null;
+            ReleaseTemplateResource releaseTemplateResource = api.Name.Contains(";rev") == true ? this.releaseTemplateCreator.CreateAPIReleaseTemplateResource(api, dependsOn) : null;
 
             // add resources if not null
             if (apiPolicyResource != null) resources.Add(apiPolicyResource);
@@ -136,7 +137,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return resources;
         }
 
-        public async Task<APITemplateResource> CreateAPITemplateResourceAsync(APIConfig api, bool isSplit, bool isInitial)
+        public async Task<APITemplateResource> CreateAPITemplateResourceAsync(ApiConfig api, bool isSplit, bool isInitial)
         {
             // create api resource
             APITemplateResource apiTemplateResource = new APITemplateResource()
@@ -152,43 +153,43 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             if (!isSplit || !isInitial)
             {
                 // add metadata properties for initial and unified templates
-                apiTemplateResource.Properties.ApiVersion = api.apiVersion;
+                apiTemplateResource.Properties.ApiVersion = api.ApiVersion;
                 apiTemplateResource.Properties.ServiceUrl = this.MakeServiceUrl(api);
-                apiTemplateResource.Properties.Type = api.type;
-                apiTemplateResource.Properties.ApiType = api.type;
-                apiTemplateResource.Properties.Description = api.description;
-                apiTemplateResource.Properties.SubscriptionRequired = api.subscriptionRequired;
-                apiTemplateResource.Properties.ApiRevision = api.apiRevision;
-                apiTemplateResource.Properties.ApiRevisionDescription = api.apiRevisionDescription;
-                apiTemplateResource.Properties.ApiVersionDescription = api.apiVersionDescription;
-                apiTemplateResource.Properties.AuthenticationSettings = api.authenticationSettings;
-                apiTemplateResource.Properties.SubscriptionKeyParameterNames = api.subscriptionKeyParameterNames;
-                apiTemplateResource.Properties.Path = api.suffix;
-                apiTemplateResource.Properties.IsCurrent = api.isCurrent;
-                apiTemplateResource.Properties.DisplayName = string.IsNullOrEmpty(api.displayName) ? api.name : api.displayName;
+                apiTemplateResource.Properties.Type = api.Type;
+                apiTemplateResource.Properties.ApiType = api.Type;
+                apiTemplateResource.Properties.Description = api.Description;
+                apiTemplateResource.Properties.SubscriptionRequired = api.SubscriptionRequired;
+                apiTemplateResource.Properties.ApiRevision = api.ApiRevision;
+                apiTemplateResource.Properties.ApiRevisionDescription = api.ApiRevisionDescription;
+                apiTemplateResource.Properties.ApiVersionDescription = api.ApiVersionDescription;
+                apiTemplateResource.Properties.AuthenticationSettings = api.AuthenticationSettings;
+                apiTemplateResource.Properties.SubscriptionKeyParameterNames = api.SubscriptionKeyParameterNames;
+                apiTemplateResource.Properties.Path = api.Suffix;
+                apiTemplateResource.Properties.IsCurrent = api.IsCurrent;
+                apiTemplateResource.Properties.DisplayName = string.IsNullOrEmpty(api.DisplayName) ? api.Name : api.DisplayName;
                 apiTemplateResource.Properties.Protocols = this.CreateProtocols(api);
                 // set the version set id
-                if (api.apiVersionSetId != null)
+                if (api.ApiVersionSetId != null)
                 {
                     // point to the supplied version set if the apiVersionSetId is provided
-                    apiTemplateResource.Properties.ApiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
+                    apiTemplateResource.Properties.ApiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.ApiVersionSetId}')]";
                 }
                 // set the authorization server id
-                if (api.authenticationSettings != null && api.authenticationSettings.OAuth2 != null && api.authenticationSettings.OAuth2.AuthorizationServerId != null
+                if (api.AuthenticationSettings != null && api.AuthenticationSettings.OAuth2 != null && api.AuthenticationSettings.OAuth2.AuthorizationServerId != null
                     && apiTemplateResource.Properties.AuthenticationSettings != null && apiTemplateResource.Properties.AuthenticationSettings.OAuth2 != null && apiTemplateResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId != null)
                 {
-                    apiTemplateResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId = api.authenticationSettings.OAuth2.AuthorizationServerId;
+                    apiTemplateResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId = api.AuthenticationSettings.OAuth2.AuthorizationServerId;
                 }
                 // set the subscriptionKey Parameter Names
-                if (api.subscriptionKeyParameterNames != null)
+                if (api.SubscriptionKeyParameterNames != null)
                 {
-                    if (api.subscriptionKeyParameterNames.Header != null)
+                    if (api.SubscriptionKeyParameterNames.Header != null)
                     {
-                        apiTemplateResource.Properties.SubscriptionKeyParameterNames.Header = api.subscriptionKeyParameterNames.Header;
+                        apiTemplateResource.Properties.SubscriptionKeyParameterNames.Header = api.SubscriptionKeyParameterNames.Header;
                     }
-                    if (api.subscriptionKeyParameterNames.Query != null)
+                    if (api.SubscriptionKeyParameterNames.Query != null)
                     {
-                        apiTemplateResource.Properties.SubscriptionKeyParameterNames.Query = api.subscriptionKeyParameterNames.Query;
+                        apiTemplateResource.Properties.SubscriptionKeyParameterNames.Query = api.SubscriptionKeyParameterNames.Query;
                     }
                 }
             }
@@ -203,37 +204,37 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 bool isUrl = IsUri(api, out var _);
 
                 string fileContents = null;
-                if (!isUrl || api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
-                    fileContents = await this.fileReader.RetrieveFileContentsAsync(api.openApiSpec);
+                if (!isUrl || api.OpenApiSpecFormat == OpenApiSpecFormat.Unspecified)
+                    fileContents = await this.fileReader.RetrieveFileContentsAsync(api.OpenApiSpec);
 
                 value = isUrl
-                    ? api.openApiSpec
+                    ? api.OpenApiSpec
                     : fileContents
                     ;
 
                 bool isVersionThree = false;
-                if (api.openApiSpecFormat == OpenApiSpecFormat.Unspecified)
+                if (api.OpenApiSpecFormat == OpenApiSpecFormat.Unspecified)
                 {
                     isJSON = this.fileReader.IsJSON(fileContents);
 
                     if (isJSON == true)
                     {
                         var openAPISpecReader = new OpenAPISpecReader();
-                        isVersionThree = await openAPISpecReader.IsJSONOpenAPISpecVersionThreeAsync(api.openApiSpec);
+                        isVersionThree = await openAPISpecReader.IsJSONOpenAPISpecVersionThreeAsync(api.OpenApiSpec);
                     }
                     format = GetOpenApiSpecFormat(isUrl, isJSON, isVersionThree);
                 }
 
                 else
                 {
-                    isJSON = IsOpenApiSpecJson(api.openApiSpecFormat);
-                    format = GetOpenApiSpecFormat(isUrl, api.openApiSpecFormat);
+                    isJSON = IsOpenApiSpecJson(api.OpenApiSpecFormat);
+                    format = GetOpenApiSpecFormat(isUrl, api.OpenApiSpecFormat);
                 }
 
                 // if the title needs to be modified
                 // we need to embed the OpenAPI definition
 
-                if (!string.IsNullOrEmpty(api.displayName))
+                if (!string.IsNullOrEmpty(api.DisplayName))
                 {
                     format = GetOpenApiSpecFormat(false, isJSON, isVersionThree);
 
@@ -248,16 +249,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     // update title
 
                     value = new OpenApi(value, format)
-                        .SetTitle(api.displayName)
+                        .SetTitle(api.DisplayName)
                         .GetDefinition()
                         ;
                 }
 
                 // set the version set id
-                if (api.apiVersionSetId != null)
+                if (api.ApiVersionSetId != null)
                 {
                     // point to the supplied version set if the apiVersionSetId is provided
-                    apiTemplateResource.Properties.ApiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.apiVersionSetId}')]";
+                    apiTemplateResource.Properties.ApiVersionSetId = $"[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('{ParameterNames.ApimServiceName}'), '{api.ApiVersionSetId}')]";
                 }
                 apiTemplateResource.Properties.Format = format;
                 apiTemplateResource.Properties.Value = value;
@@ -268,14 +269,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
                 if (isSplit && isInitial)
                 {
-                    apiTemplateResource.Properties.Path = api.suffix + $"/{Guid.NewGuid():n}";
+                    apiTemplateResource.Properties.Path = api.Suffix + $"/{Guid.NewGuid():n}";
                 }
                 else
                 {
-                    apiTemplateResource.Properties.Path = api.suffix;
+                    apiTemplateResource.Properties.Path = api.Suffix;
                 }
 
-                if (!string.IsNullOrEmpty(api.serviceUrl))
+                if (!string.IsNullOrEmpty(api.ServiceUrl))
                 {
                     apiTemplateResource.Properties.ServiceUrl = this.MakeServiceUrl(api);
                 }
@@ -283,14 +284,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return apiTemplateResource;
         }
 
-        internal static IDictionary<string, string[]> GetApiVersionSets(CreatorConfig creatorConfig)
+        internal static IDictionary<string, string[]> GetApiVersionSets(CreatorParameters creatorConfig)
         {
-            var apiVersions = (creatorConfig.apiVersionSets ?? new List<APIVersionSetConfig>())
-                .ToDictionary(v => v.id, v => new List<string>())
+            var apiVersions = (creatorConfig.ApiVersionSets ?? new List<ApiVersionSetConfig>())
+                .ToDictionary(v => v.Id, v => new List<string>())
                 ;
 
-            foreach (var api in creatorConfig.apis.Where(a => !string.IsNullOrEmpty(a.apiVersionSetId)))
-                apiVersions[api.apiVersionSetId].Add(api.name)
+            foreach (var api in creatorConfig.Apis.Where(a => !string.IsNullOrEmpty(a.ApiVersionSetId)))
+                apiVersions[api.ApiVersionSetId].Add(api.Name)
                     ;
 
             return apiVersions.ToDictionary(
@@ -347,25 +348,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             }
         }
 
-        static bool IsUri(APIConfig api, out Uri uriResult)
+        static bool IsUri(ApiConfig api, out Uri uriResult)
         {
             return
-                Uri.TryCreate(api.openApiSpec, UriKind.Absolute, out uriResult) &&
+                Uri.TryCreate(api.OpenApiSpec, UriKind.Absolute, out uriResult) &&
                 (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)
                 ;
         }
 
-        public static string MakeResourceName(APIConfig api)
+        public static string MakeResourceName(ApiConfig api)
         {
-            return $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}')]";
+            return $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.Name}')]";
         }
 
-        public string[] CreateProtocols(APIConfig api)
+        public string[] CreateProtocols(ApiConfig api)
         {
             string[] protocols;
-            if (api.protocols != null)
+            if (api.Protocols != null)
             {
-                protocols = api.protocols.Split(", ");
+                protocols = api.Protocols.Split(", ");
             }
             else
             {
@@ -374,15 +375,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return protocols;
         }
 
-        public bool IsSplitAPI(APIConfig apiConfig)
+        public bool IsSplitAPI(ApiConfig apiConfig)
         {
             // the api needs to be split into multiple templates if the user has supplied a version or version set - deploying swagger related properties at the same time as api version related properties fails, so they must be written and deployed separately
-            return apiConfig.apiVersion != null || apiConfig.apiVersionSetId != null || apiConfig.authenticationSettings != null && apiConfig.authenticationSettings.OAuth2 != null && apiConfig.authenticationSettings.OAuth2.AuthorizationServerId != null;
+            return apiConfig.ApiVersion != null || apiConfig.ApiVersionSetId != null || apiConfig.AuthenticationSettings != null && apiConfig.AuthenticationSettings.OAuth2 != null && apiConfig.AuthenticationSettings.OAuth2.AuthorizationServerId != null;
         }
 
-        string MakeServiceUrl(APIConfig api)
+        string MakeServiceUrl(ApiConfig api)
         {
-            return !string.IsNullOrEmpty(api.serviceUrl) ? $"[parameters('{api.name + "-ServiceUrl"}')]" : null;
+            return !string.IsNullOrEmpty(api.ServiceUrl) ? $"[parameters('{api.Name + "-ServiceUrl"}')]" : null;
         }
     }
 }

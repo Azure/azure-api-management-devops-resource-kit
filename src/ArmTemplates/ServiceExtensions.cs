@@ -27,6 +27,9 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.G
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Loggers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Backend;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -43,11 +46,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
                 builder.AddSerilog(logger);
             });
 
+            services.AddScoped<FileReader>();
+
             SetupCommands(services);
             SetupExecutors(services);
             SetupApiClients(services);
             SetupBuilders(services);
             SetupExtractors(services);
+            SetupCreators(services);
         }
 
         static void SetupCommands(IServiceCollection services)
@@ -65,6 +71,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
         {
             services.AddScoped(typeof(ExtractorExecutor));
             services.AddScoped(typeof(CreatorExecutor));
+        }
+
+        static void SetupCreators(IServiceCollection services)
+        {
+            services.AddScoped<IApiTemplateCreator, ApiTemplateCreator>();
+            services.AddScoped<IApiVersionSetTemplateCreator, ApiVersionSetTemplateCreator>();
+            services.AddScoped<IAuthorizationServerTemplateCreator, AuthorizationServerTemplateCreator>();
+            services.AddScoped<IBackendTemplateCreator, BackendTemplateCreator>();
+            services.AddScoped<IDiagnosticTemplateCreator, DiagnosticTemplateCreator>();
+            services.AddScoped<ILoggerTemplateCreator, LoggerTemplateCreator>();
+            services.AddScoped<IMasterTemplateCreator, MasterTemplateCreator>();
+            services.AddScoped<IPolicyTemplateCreator, PolicyTemplateCreator>();
+            services.AddScoped<IProductApiTemplateCreator, ProductApiTemplateCreator>();
+            services.AddScoped<IProductGroupTemplateCreator, ProductGroupTemplateCreator>();
+            services.AddScoped<IProductTemplateCreator, ProductTemplateCreator>();
+            services.AddScoped<IPropertyTemplateCreator, PropertyTemplateCreator>();
+            services.AddScoped<IReleaseTemplateCreator, ReleaseTemplateCreator>();
+            services.AddScoped<ISubscriptionTemplateCreator, SubscriptionTemplateCreator>();
+            services.AddScoped<ITagApiTemplateCreator, TagApiTemplateCreator>();
+            services.AddScoped<ITagTemplateCreator, TagTemplateCreator>();
         }
 
         static void SetupExtractors(IServiceCollection services)

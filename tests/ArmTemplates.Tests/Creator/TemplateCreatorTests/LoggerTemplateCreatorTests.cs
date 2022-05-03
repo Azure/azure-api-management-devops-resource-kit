@@ -5,12 +5,12 @@
 
 using Xunit;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -21,10 +21,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             LoggerTemplateCreator loggerTemplateCreator = new LoggerTemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig() { loggers = new List<LoggerConfig>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { Loggers = new List<LoggerConfig>() };
             LoggerConfig logger = new LoggerConfig()
             {
-                name = "name",
+                Name = "name",
                 LoggerType = "applicationinsights",
                 Description = "description",
                 IsBuffered = true,
@@ -37,14 +37,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 }
 
             };
-            creatorConfig.loggers.Add(logger);
+            creatorConfig.Loggers.Add(logger);
 
             // act
             Template loggerTemplate = loggerTemplateCreator.CreateLoggerTemplate(creatorConfig);
             LoggerTemplateResource loggerTemplateResource = (LoggerTemplateResource)loggerTemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.name}')]", loggerTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.Name}')]", loggerTemplateResource.Name);
             Assert.Equal(logger.LoggerType, loggerTemplateResource.Properties.LoggerType);
             Assert.Equal(logger.Description, loggerTemplateResource.Properties.Description);
             Assert.Equal(logger.IsBuffered, loggerTemplateResource.Properties.IsBuffered);

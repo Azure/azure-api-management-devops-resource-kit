@@ -7,7 +7,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using System.Collections.Generic;
 using Xunit;
@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateCorrectNumberOfDeploymentResources()
         {
             // arrange
-            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true };
+            CreatorParameters creatorConfig = new CreatorParameters() { ApimServiceName = "apimService", Linked = true };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
             Template apiVersionSetsTemplate = new Template();
             Template globalServicePolicyTemplate = new Template();
@@ -30,13 +30,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             Template tagTemplate = new Template();
             Template loggersTemplate = new Template();
             List<LinkedMasterTemplateAPIInformation> apiInfoList = new List<LinkedMasterTemplateAPIInformation>() { new LinkedMasterTemplateAPIInformation() { name = "api", isSplit = true } };
-            FileNames creatorFileNames = FileNameGenerator.GenerateFileNames(creatorConfig.apimServiceName);
+            FileNames creatorFileNames = FileNameGenerator.GenerateFileNames(creatorConfig.ApimServiceName);
 
             // should create 8 resources (globalServicePolicy, apiVersionSet, product, property, tag, logger, both api templates)
             int count = 9;
 
             // act
-            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.apimServiceName);
+            Template masterTemplate = masterTemplateCreator.CreateLinkedMasterTemplate(creatorConfig, globalServicePolicyTemplate, apiVersionSetsTemplate, productAPIsTemplate, productsTemplate, propertyTemplate, loggersTemplate, null, null, tagTemplate, apiInfoList, creatorFileNames, creatorConfig.ApimServiceName);
 
             // assert
             Assert.Equal(count, masterTemplate.Resources.Length);
@@ -47,11 +47,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig()
+            CreatorParameters creatorConfig = new CreatorParameters()
             {
-                apimServiceName = "apimServiceName",
-                linked = true,
-                linkedTemplatesBaseUrl = "linkedTemplatesBaseUrl"
+                ApimServiceName = "apimServiceName",
+                Linked = true,
+                LinkedTemplatesBaseUrl = "linkedTemplatesBaseUrl"
             };
             // linked templates result in 2 values
             int count = 2;
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateCorrectNumberOfParametersWhenUnlinked()
         {
             // arrange
-            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = false };
+            CreatorParameters creatorConfig = new CreatorParameters() { ApimServiceName = "apimService", Linked = false };
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
             // unlinked templates result in 1 value
             int count = 1;
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             MasterTemplateCreator masterTemplateCreator = new MasterTemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig() { apimServiceName = "apimService", linked = true, linkedTemplatesBaseUrl = "http://someurl.com", linkedTemplatesUrlQueryString = "?param=1" };
+            CreatorParameters creatorConfig = new CreatorParameters() { ApimServiceName = "apimService", Linked = true, LinkedTemplatesBaseUrl = "http://someurl.com", LinkedTemplatesUrlQueryString = "?param=1" };
             string apiVersionSetFileName = "/versionSet1-apiVersionSets.template.json";
 
             // act

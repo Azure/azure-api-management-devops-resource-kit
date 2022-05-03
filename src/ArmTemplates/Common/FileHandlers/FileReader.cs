@@ -9,15 +9,15 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers
 {
     public class FileReader
     {
-        public async Task<CreatorConfig> ConvertConfigYAMLToCreatorConfigAsync(string configFileLocation)
+        public async Task<CreatorParameters> ConvertConfigYAMLToCreatorConfigAsync(string configFileLocation)
         {
             // determine whether file location is local file path or remote url and convert appropriately
             Uri uriResult;
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                         StringWriter writer = new StringWriter();
                         jsonSerializer.Serialize(writer, deserializedYaml);
                         string jsonText = writer.ToString();
-                        CreatorConfig yamlObject = jsonText.Deserialize<CreatorConfig>();
+                        CreatorParameters yamlObject = jsonText.Deserialize<CreatorParameters>();
                         return yamlObject;
                     }
                 }
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                     jsonSerializer.Serialize(writer, deserializedYaml);
                     string jsonText = writer.ToString();
                     // deserialize CreatorConfig from json string
-                    CreatorConfig yamlObject = jsonText.Deserialize<CreatorConfig>();
+                    CreatorParameters yamlObject = jsonText.Deserialize<CreatorParameters>();
                     return yamlObject;
                 }
             }
