@@ -437,7 +437,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
            BackendTemplateResources backendsTemplateResources = null,
            AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
            NamedValuesResources namedValuesTemplateResources = null,
-           TagTemplateResources tagTemplateResources = null)
+           TagTemplateResources tagTemplateResources = null,
+           GroupTemplateResources groupTemplateResources = null)
         {
             if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
             {
@@ -450,7 +451,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var masterTemplate = this.masterTemplateExtractor.GenerateLinkedMasterTemplate(
                 this.extractorParameters, apiTemplateResources, policyTemplateResources, apiVersionSetTemplateResources,
                 productsTemplateResources, productApisTemplateResources, apiTagsTemplateResources, loggersTemplateResources,
-                backendsTemplateResources, authorizationServersTemplateResources, namedValuesTemplateResources, tagTemplateResources);
+                backendsTemplateResources, authorizationServersTemplateResources, namedValuesTemplateResources, tagTemplateResources, 
+                groupTemplateResources);
 
             if (masterTemplate?.HasResources() == true)
             {
@@ -872,7 +874,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var loggerTemplate = await this.GenerateLoggerTemplateAsync(apisToExtract, apiTemplate.TypedResources.GetAllPolicies(), baseFilesGenerationDirectory);
             var namedValueTemplate = await this.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), loggerTemplate.TypedResources.Loggers, baseFilesGenerationDirectory);
             var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
-            await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
+            var groupTemplate = await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, baseFilesGenerationDirectory);
             
@@ -888,7 +890,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 backendsTemplateResources: backendTemplate.TypedResources,
                 authorizationServersTemplateResources: authorizationServerTemplate.TypedResources,
                 namedValuesTemplateResources: namedValueTemplate.TypedResources,
-                tagTemplateResources: tagTemplate.TypedResources);
+                tagTemplateResources: tagTemplate.TypedResources,
+                groupTemplateResources: groupTemplate.TypedResources);
         }
 
 
