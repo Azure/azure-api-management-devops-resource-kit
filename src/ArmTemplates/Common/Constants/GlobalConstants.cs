@@ -38,13 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string ApimServiceName = "apimServiceName";
         public const string LinkedTemplatesBaseUrl = "linkedTemplatesBaseUrl";
         public const string NamedValueKeyVaultSecrets = "namedValueKeyVaultSecrets";
-
-        #region Backend
-
         public const string BackendSettings = "backendSettings";
-        public const string BackendProxy = "backendProxy";
-
-        #endregion
     }
 
     public static class ParameterPrefix

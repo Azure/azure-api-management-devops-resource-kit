@@ -26,27 +26,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
             return this;
         }
-
-        public TemplateBuilder AddParameterizeBackendProxySection(ExtractorParameters extractorParameters)
-        {
-            if (extractorParameters.ParameterizeBackendProxySection)
-            {
-                var backendProxySectionParameterObject = new TemplateParameterProperties<BackendProxySectionParameter>
-                {
-                    Type = "object",
-                    Metadata = new() { Description = "proxy settings for backend resource (view https://docs.microsoft.com/en-us/rest/api/apimanagement/current-ga/backend/create-or-update)" },
-                    Value = new BackendProxySectionParameter
-                    {
-                        Url = "preset-proxy-url-value",
-                        Username = "preset-proxy-username-value",
-                        Password = "preset-proxy-password-value"
-                    }
-                };
-
-                this.template.Parameters.Add(ParameterNames.BackendProxy, backendProxySectionParameterObject);
-            }
-
-            return this;
-        }
     }
 }

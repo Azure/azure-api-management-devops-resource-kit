@@ -417,7 +417,6 @@ You have two choices when specifying your settings:
 | notIncludeNamedValue | No                    | Set to "true" will not generate Named Value Templates|
 | paramNamedValuesKeyVaultSecrets | No | Set to true will parameterize all named values where the value is from a key vault secret |
 | paramBackend | No | Set to true will parameterize specific backend values (limited to resourceId, url and protocol) |
-| paramBackendProxy | No | Set to true will include `backendProxy` parameter in the output configuration file. Inner properties specification will set the same `proxy` settings to each backend resource |
 | extractGateways | No | Set to true will attempt to extract the Self Hosted Gateways. |
 
 #### Note

@@ -21,6 +21,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
     {
         public static async Task Main(string[] args)
         {
+            args = new[]
+            {
+                "extract",
+                "--extractorConfig", @"C:\Code\other\resource-kit\extractor\extractor-config.json"
+            };
+
             var applicationLogger = SetupApplicationLoggingToConsole();
             var serviceProvider = CreateServiceProvider(applicationLogger);
 

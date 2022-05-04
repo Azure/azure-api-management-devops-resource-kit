@@ -73,17 +73,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 backendResource.Type = ResourceTypeConstants.Backend;
                 backendResource.ApiVersion = GlobalConstants.ApiVersion;
 
-                // set backend proxy section values according to parameter
-                if (extractorParameters.ParameterizeBackendProxySection)
-                {
-                    backendResource.Properties.Proxy = new BackendProxy
-                    {
-                        Url = $"[parameters('{ParameterNames.BackendProxy}').url]",
-                        Username = $"[parameters('{ParameterNames.BackendProxy}').username]",
-                        Password = $"[parameters('{ParameterNames.BackendProxy}').password]"
-                    };
-                }
-
                 if (string.IsNullOrEmpty(singleApiName))
                 {
                     // if the user is extracting all apis, extract all the backends
