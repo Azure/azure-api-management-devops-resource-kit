@@ -62,6 +62,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         {
             this.logger = logger;
             this.fileReader = fileReader;
+
+            this.apiTemplateCreator = apiTemplateCreator;
+            this.apiVersionSetTemplateCreator = apiVersionSetTemplateCreator;
+            this.authorizationServerTemplateCreator = authorizationServerTemplateCreator;
+            this.backendTemplateCreator = backendTemplateCreator;
+            this.diagnosticTemplateCreator = diagnosticTemplateCreator;
+            this.loggerTemplateCreator = loggerTemplateCreator;
+            this.masterTemplateCreator = masterTemplateCreator;
+            this.policyTemplateCreator = policyTemplateCreator;
+            this.productAPITemplateCreator = productAPITemplateCreator;
+            this.productGroupTemplateCreator = productGroupTemplateCreator;
+            this.productTemplateCreator = productTemplateCreator;
+            this.propertyTemplateCreator = propertyTemplateCreator;
+            this.releaseTemplateCreator = releaseTemplateCreator;
+            this.subscriptionTemplateCreator = subscriptionTemplateCreator;
+            this.tagAPITemplateCreator = tagAPITemplateCreator;
+            this.tagTemplateCreator = tagTemplateCreator;
         }
 
         public static CreatorExecutor BuildCreatorExecutor(
