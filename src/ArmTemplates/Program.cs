@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using CommandLine.Text;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -24,6 +25,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             var applicationLogger = SetupApplicationLoggingToConsole();
             var serviceProvider = CreateServiceProvider(applicationLogger);
 
+            applicationLogger.Information("Booting up Azure-Api-Management-DevOps-Resource-Kit v{0} running .NET {1}", Application.BuildVersion, RuntimeInformation.FrameworkDescription);
+
             var commandLineParser = new Parser(parserSettings =>
             {
                 parserSettings.HelpWriter = Console.Out;
@@ -31,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             });
 
             var parserResult = commandLineParser.ParseArguments<ExtractorConsoleAppConfiguration, CreateConsoleAppConfiguration>(args);
-            
+
             await parserResult.MapResult(
                 async (ExtractorConsoleAppConfiguration consoleAppConfiguration) =>
                 {
