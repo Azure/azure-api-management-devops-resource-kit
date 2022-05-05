@@ -23,6 +23,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Mas
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -51,7 +52,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             BackendTemplateResources backendsTemplateResources = null,
             AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
             NamedValuesResources namedValuesTemplateResources = null,
-            TagTemplateResources tagTemplateResources = null)
+            TagTemplateResources tagTemplateResources = null,
+            GroupTemplateResources groupTemplateResources = null)
         {
             var masterTemplate = this.templateBuilder
                                         .GenerateEmptyTemplate()
@@ -228,7 +230,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 masterResources.DeploymentResources.Add(apiTagsDeployment);
             }
-            
+
+            if (groupTemplateResources?.HasContent() == true)
+            {
+                this.logger.LogDebug("Adding groups to master template");
+                const string GroupsTemplate = "groupsTemplate";
+
+                var groupsUri = this.GenerateLinkedTemplateUri(fileNames.Groups, extractorParameters);
+                var groupsDeployment = CreateLinkedMasterTemplateResource(GroupsTemplate, groupsUri, Array.Empty<string>());
+
+                masterResources.DeploymentResources.Add(groupsDeployment);
+            }
+
             return masterTemplate;
         }
 

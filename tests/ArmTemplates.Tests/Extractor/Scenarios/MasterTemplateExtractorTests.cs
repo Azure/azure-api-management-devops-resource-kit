@@ -14,6 +14,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
@@ -62,10 +63,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 }
             };
 
+            var groupTemplateResources = new GroupTemplateResources()
+            {
+                Groups = new()
+                {
+                    new GroupTemplateResource()
+                    {
+                        Name = "test-group",
+                        Properties = new() {
+                            DisplayName = "group-display-name",
+                            Description = "group-description",
+                            Type = "group-type",
+                            ExternalId = "group-external-id",
+                            BuiltIn = false
+                        }
+                    }
+                }
+            };
+
+
             // act
             var masterTemplate = await extractorExecutor.GenerateMasterTemplateAsync(
                 currentTestDirectory,
-                tagTemplateResources: tagTemplateResources);
+                tagTemplateResources: tagTemplateResources,
+                groupTemplateResources: groupTemplateResources);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.LinkedMaster)).Should().BeTrue();
 
@@ -80,13 +101,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.NamedValueKeyVaultSecrets);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.BackendSettings);
 
-            masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(1);
-            masterTemplate.Resources.Should().HaveCount(1);
+            masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(2);
+            masterTemplate.Resources.Should().HaveCount(2);
 
-            var tagDeployment = masterTemplate.TypedResources.DeploymentResources.First();
-
-            tagDeployment.Type.Should().Be(ResourceTypeConstants.ArmDeployments);
-            tagDeployment.Properties.Should().NotBeNull();
+            foreach(var deploymentResource in masterTemplate.TypedResources.DeploymentResources) {
+                deploymentResource.Type.Should().Be(ResourceTypeConstants.ArmDeployments);
+                deploymentResource.Properties.Should().NotBeNull();
+            }
         }
     }
 }
