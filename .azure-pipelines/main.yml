@@ -25,7 +25,7 @@ stages:
           - task: UseDotNet@2
             inputs:
               version: '6.0.x'
-              performMultiLevelLookup: true
+              performMultiLevelLookup: true          
 
           - pwsh: |
               $pr = "pr." + $env:SYSTEM_PULLREQUEST_PULLREQUESTNUMBER
@@ -63,11 +63,18 @@ stages:
               publishTestResults: true
               projects: 'tests/**/*Tests/*.csproj'
 
+          - pwsh: |
+              $buildNumberVersion = $env:APP_VERSION.Split(".")[-1]
+              $assemblyVersion = "$($env:BASE_VERSION).$($buildNumberVersion)"
+              Write-Host "Assembly Version: $($assemblyVersion)"
+              Write-Host "##vso[task.setvariable variable=ASSEMBLY_VERSION]$assemblyVersion"
+            displayName: Generate AssemblyVersion for publishing binaries
+
           - task: DotNetCoreCLI@2
             displayName: 'Publish build artifacts'
             inputs:
               command: publish
-              arguments: '--configuration $(configuration) --output $(Build.ArtifactStagingDirectory)'
+              arguments: '--configuration $(configuration) --output $(Build.ArtifactStagingDirectory) /p:Version=$env:ASSEMBLY_VERSION'
               publishWebProjects: false
               
           - pwsh: |

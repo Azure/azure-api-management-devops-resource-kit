@@ -41,6 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
+            request.Headers.UserAgent.TryParseAdd($"{Application.Name}/{Application.BuildVersion}");
 
             HttpResponseMessage response = await this.httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
