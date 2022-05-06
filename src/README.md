@@ -416,7 +416,7 @@ You have two choices when specifying your settings:
 | serviceBaseUrl | No                    | Specify the base url where you want to run your extractor |
 | notIncludeNamedValue | No                    | Set to "true" will not generate Named Value Templates|
 | paramNamedValuesKeyVaultSecrets | No | Set to true will parameterize all named values where the value is from a key vault secret |
-| paramBackend | No | Set to true will parameterize sepcific backend values (limited to resourceId, url and protocol) |
+| paramBackend | No | Set to true will parameterize specific backend values (limited to resourceId, url and protocol) |
 | extractGateways | No | Set to true will attempt to extract the Self Hosted Gateways. |
 
 #### Note

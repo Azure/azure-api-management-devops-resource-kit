@@ -7,7 +7,7 @@ using Xunit;
 using System;
 using System.IO;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common.FileHandlerTests
 {
@@ -18,18 +18,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common.Fil
         {
             // arrange
             FileReader fileReader = new FileReader();
-            string fileLocation = string.Concat(
-                "Resources", Path.DirectorySeparatorChar,
-                "YAMLConfigs", Path.DirectorySeparatorChar, "valid.yml");
+            string fileLocation = Path.Combine("Resources", "YAMLConfigs", "valid.yml");
 
             // act
-            CreatorConfig creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(fileLocation);
+            CreatorParameters creatorConfig = await fileReader.ConvertConfigYAMLToCreatorConfigAsync(fileLocation);
 
             // assert
-            Assert.Equal("0.0.1", creatorConfig.version);
-            Assert.Equal("myAPIMService", creatorConfig.apimServiceName);
-            Assert.Equal(@"C:\Users\myUsername\GeneratedTemplates", creatorConfig.outputLocation);
-            Assert.Equal("myAPI", creatorConfig.apis[0].name);
+            Assert.Equal("0.0.1", creatorConfig.Version);
+            Assert.Equal("myAPIMService", creatorConfig.ApimServiceName);
+            Assert.Equal(@"C:\Users\myUsername\GeneratedTemplates", creatorConfig.OutputLocation);
+            Assert.Equal("myAPI", creatorConfig.Apis[0].Name);
         }
 
         [Fact]

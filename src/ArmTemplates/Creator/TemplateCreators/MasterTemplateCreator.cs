@@ -6,16 +6,17 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class MasterTemplateCreator
+    public class MasterTemplateCreator : IMasterTemplateCreator
     {
         readonly ITemplateBuilder templateBuilder;
 
@@ -24,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
-        public Template CreateLinkedMasterTemplate(CreatorConfig creatorConfig,
+        public Template CreateLinkedMasterTemplate(CreatorParameters creatorConfig,
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
@@ -157,7 +158,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         }
 
         public string[] CreateAPIResourceDependencies(
-            CreatorConfig creatorConfig,
+            CreatorParameters creatorConfig,
             Template globalServicePolicyTemplate,
             Template apiVersionSetTemplate,
             Template productsTemplate,
@@ -261,21 +262,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return masterTemplateResource;
         }
 
-        public string GetDependsOnPreviousApiVersion(APIConfig api, IDictionary<string, string[]> apiVersions)
+        public string GetDependsOnPreviousApiVersion(ApiConfig api, IDictionary<string, string[]> apiVersions)
         {
-            if (api?.apiVersionSetId == null)
+            if (api?.ApiVersionSetId == null)
                 return null;
 
             // get all apis associated with the same versionSet
             // versions must be deployed in sequence and thus
             // each api must depend on the previous version.
 
-            var versions = apiVersions.ContainsKey(api.apiVersionSetId)
-                ? apiVersions[api.apiVersionSetId]
+            var versions = apiVersions.ContainsKey(api.ApiVersionSetId)
+                ? apiVersions[api.ApiVersionSetId]
                 : null
                 ;
 
-            var index = Array.IndexOf(versions, api.name);
+            var index = Array.IndexOf(versions, api.Name);
             var previous = index > 0
                 ? (int?)index - 1
                 : null
@@ -287,7 +288,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 ;
         }
 
-        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(CreatorConfig creatorConfig)
+        public Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(CreatorParameters creatorConfig)
         {
             // used to create the parameter metatadata, etc (not value) for use in file with resources
             // add parameters with metadata properties
@@ -302,7 +303,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             };
             parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
             // add remote location of template files for linked option
-            if (creatorConfig.linked == true)
+            if (creatorConfig.Linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
@@ -313,7 +314,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     Type = "string"
                 };
                 parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
-                if (creatorConfig.linkedTemplatesUrlQueryString != null)
+                if (creatorConfig.LinkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
                     {
@@ -328,9 +329,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             }
 
             // add serviceUrl parameter for linked option
-            if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
+            if (creatorConfig.ServiceUrlParameters != null && creatorConfig.ServiceUrlParameters.Count > 0)
             {
-                foreach (var serviceUrlProperty in creatorConfig.serviceUrlParameters)
+                foreach (var serviceUrlProperty in creatorConfig.ServiceUrlParameters)
                 {
                     TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                     {
@@ -347,7 +348,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return parameters;
         }
 
-        public Template CreateMasterTemplateParameterValues(CreatorConfig creatorConfig)
+        public Template CreateMasterTemplateParameterValues(CreatorParameters creatorConfig)
         {
             // used to create the parameter values for use in parameters file
             // create empty template
@@ -357,29 +358,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             Dictionary<string, TemplateParameterProperties> parameters = new Dictionary<string, TemplateParameterProperties>();
             TemplateParameterProperties apimServiceNameProperties = new TemplateParameterProperties()
             {
-                Value = creatorConfig.apimServiceName
+                Value = creatorConfig.ApimServiceName
             };
             parameters.Add(ParameterNames.ApimServiceName, apimServiceNameProperties);
-            if (creatorConfig.linked == true)
+            if (creatorConfig.Linked == true)
             {
                 TemplateParameterProperties linkedTemplatesBaseUrlProperties = new TemplateParameterProperties()
                 {
-                    Value = creatorConfig.linkedTemplatesBaseUrl
+                    Value = creatorConfig.LinkedTemplatesBaseUrl
                 };
                 parameters.Add(ParameterNames.LinkedTemplatesBaseUrl, linkedTemplatesBaseUrlProperties);
-                if (creatorConfig.linkedTemplatesUrlQueryString != null)
+                if (creatorConfig.LinkedTemplatesUrlQueryString != null)
                 {
                     TemplateParameterProperties linkedTemplatesUrlQueryStringProperties = new TemplateParameterProperties()
                     {
-                        Value = creatorConfig.linkedTemplatesUrlQueryString
+                        Value = creatorConfig.LinkedTemplatesUrlQueryString
                     };
                     parameters.Add(ParameterNames.LinkedTemplatesUrlQueryString, linkedTemplatesUrlQueryStringProperties);
                 }
             }
 
-            if (creatorConfig.serviceUrlParameters != null && creatorConfig.serviceUrlParameters.Count > 0)
+            if (creatorConfig.ServiceUrlParameters != null && creatorConfig.ServiceUrlParameters.Count > 0)
             {
-                foreach (var serviceUrlProperty in creatorConfig.serviceUrlParameters)
+                foreach (var serviceUrlProperty in creatorConfig.ServiceUrlParameters)
                 {
                     TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                     {
@@ -393,24 +394,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return masterTemplate;
         }
 
-        public async Task<bool> DetermineIfAPIDependsOnLoggerAsync(APIConfig api, FileReader fileReader)
+        public async Task<bool> DetermineIfAPIDependsOnLoggerAsync(ApiConfig api, FileReader fileReader)
         {
-            if (api.diagnostic != null && api.diagnostic.LoggerId != null)
+            if (api.Diagnostic != null && api.Diagnostic.LoggerId != null)
             {
                 // capture api diagnostic dependent on logger
                 return true;
             }
-            string apiPolicy = api.policy != null ? await fileReader.RetrieveFileContentsAsync(api.policy) : "";
+            string apiPolicy = api.Policy != null ? await fileReader.RetrieveFileContentsAsync(api.Policy) : "";
             if (apiPolicy.Contains("logger"))
             {
                 // capture api policy dependent on logger
                 return true;
             }
-            if (api.operations != null)
+            if (api.Operations != null)
             {
-                foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
+                foreach (KeyValuePair<string, OperationsConfig> operation in api.Operations)
                 {
-                    string operationPolicy = operation.Value.policy != null ? await fileReader.RetrieveFileContentsAsync(operation.Value.policy) : "";
+                    string operationPolicy = operation.Value.Policy != null ? await fileReader.RetrieveFileContentsAsync(operation.Value.Policy) : "";
                     if (operationPolicy.Contains("logger"))
                     {
                         // capture operation policy dependent on logger
@@ -421,19 +422,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return false;
         }
 
-        public async Task<bool> DetermineIfAPIDependsOnBackendAsync(APIConfig api, FileReader fileReader)
+        public async Task<bool> DetermineIfAPIDependsOnBackendAsync(ApiConfig api, FileReader fileReader)
         {
-            string apiPolicy = api.policy != null ? await fileReader.RetrieveFileContentsAsync(api.policy) : "";
+            string apiPolicy = api.Policy != null ? await fileReader.RetrieveFileContentsAsync(api.Policy) : "";
             if (apiPolicy.Contains("set-backend-service"))
             {
                 // capture api policy dependent on backend
                 return true;
             }
-            if (api.operations != null)
+            if (api.Operations != null)
             {
-                foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
+                foreach (KeyValuePair<string, OperationsConfig> operation in api.Operations)
                 {
-                    string operationPolicy = operation.Value.policy != null ? await fileReader.RetrieveFileContentsAsync(operation.Value.policy) : "";
+                    string operationPolicy = operation.Value.Policy != null ? await fileReader.RetrieveFileContentsAsync(operation.Value.Policy) : "";
                     if (operationPolicy.Contains("set-backend-service"))
                     {
                         // capture operation policy dependent on backend
@@ -444,9 +445,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return false;
         }
 
-        public string GenerateLinkedTemplateUri(CreatorConfig creatorConfig, string fileName)
+        public string GenerateLinkedTemplateUri(CreatorParameters creatorConfig, string fileName)
         {
-            return creatorConfig.linkedTemplatesUrlQueryString != null ?
+            return creatorConfig.LinkedTemplatesUrlQueryString != null ?
              $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}', parameters('{ParameterNames.LinkedTemplatesUrlQueryString}'))]"
              : $"[concat(parameters('{ParameterNames.LinkedTemplatesBaseUrl}'), '{fileName}')]";
         }

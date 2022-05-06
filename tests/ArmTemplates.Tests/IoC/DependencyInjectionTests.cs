@@ -26,5 +26,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.IoC
 
             resolveExtractorExecutorAction.Should().NotThrow();
         }
+
+        [Fact]
+        public void PresetServiceCollection_ResolvesCreatorExecutorCorrectly()
+        {
+            var consoleLogger = Program.SetupApplicationLoggingToConsole();
+            var serviceProvider = Program.CreateServiceProvider(consoleLogger);
+
+            var resolveExtractorExecutorAction = () =>
+            {
+                var extractorExecutor = serviceProvider.GetRequiredService<CreatorExecutor>();
+            };
+
+            resolveExtractorExecutorAction.Should().NotThrow();
+        }
     }
 }

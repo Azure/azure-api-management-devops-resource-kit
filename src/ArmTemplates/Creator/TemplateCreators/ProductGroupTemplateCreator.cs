@@ -6,11 +6,12 @@
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductGroupTemplateCreator
+    public class ProductGroupTemplateCreator : IProductGroupTemplateCreator
     {
         public GroupTemplateResource CreateProductGroupTemplateResource(string groupName, string productName, string[] dependsOn)
         {
@@ -31,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create a products/apis association resource for each product provided in the config file
             List<GroupTemplateResource> productGroupTemplates = new List<GroupTemplateResource>();
             // products is comma separated list of productIds
-            string[] groupNames = product.groups.Split(", ");
+            string[] groupNames = product.Groups.Split(", ");
             foreach (string groupName in groupNames)
             {
                 GroupTemplateResource productAPITemplate = this.CreateProductGroupTemplateResource(groupName, product.Name, dependsOn);

@@ -4,15 +4,16 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class TagTemplateCreator
+    public class TagTemplateCreator : ITagTemplateCreator
     {
         readonly ITemplateBuilder templateBuilder;
 
@@ -21,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
-        public Template CreateTagTemplate(CreatorConfig creatorConfig)
+        public Template CreateTagTemplate(CreatorParameters creatorConfig)
         {
             // create empty template
             Template tagTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
@@ -34,14 +35,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
             // aggregate all tags from apis
             HashSet<string> tagHashset = new HashSet<string>();
-            List<APIConfig> apis = creatorConfig.apis;
+            List<ApiConfig> apis = creatorConfig.Apis;
             if (apis != null)
             {
-                foreach (APIConfig api in apis)
+                foreach (ApiConfig api in apis)
                 {
-                    if (api.tags != null)
+                    if (api.Tags != null)
                     {
-                        string[] apiTags = api.tags.Split(", ");
+                        string[] apiTags = api.Tags.Split(", ");
                         foreach (string apiTag in apiTags)
                         {
                             tagHashset.Add(apiTag);
@@ -49,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     }
                 }
             }
-            foreach (TagProperties tag in creatorConfig.tags)
+            foreach (TagProperties tag in creatorConfig.Tags)
             {
                 tagHashset.Add(tag.DisplayName);
             }

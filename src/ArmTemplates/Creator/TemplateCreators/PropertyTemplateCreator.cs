@@ -10,11 +10,12 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class PropertyTemplateCreator
+    public class PropertyTemplateCreator : IPropertyTemplateCreator
     {
         readonly ITemplateBuilder templateBuilder;
 
@@ -23,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
-        public Template CreatePropertyTemplate(CreatorConfig creatorConfig)
+        public Template CreatePropertyTemplate(CreatorParameters creatorConfig)
         {
             // create empty template
             Template propertyTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
@@ -34,29 +35,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Type = "string" } }
             };
 
-            if (creatorConfig.parameterizeNamedValues)
+            if (creatorConfig.ParameterizeNamedValues)
             {
-                if (creatorConfig.namedValues.Any(x => x.Value != null))
+                if (creatorConfig.NamedValues.Any(x => x.Value != null))
                 {
                     propertyTemplate.Parameters.Add(ParameterNames.NamedValues, new TemplateParameterProperties { Type = "object" });
                 }
 
-                if (creatorConfig.namedValues.Any(x => x.KeyVault != null))
+                if (creatorConfig.NamedValues.Any(x => x.KeyVault != null))
                 {
                     propertyTemplate.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateParameterProperties { Type = "object" });
                 }
             }
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            foreach (PropertyConfig namedValue in creatorConfig.namedValues)
+            foreach (PropertyConfig namedValue in creatorConfig.NamedValues)
             {
                 string value = namedValue.Value == null ? null
-                   : creatorConfig.parameterizeNamedValues
+                   : creatorConfig.ParameterizeNamedValues
                        ? $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"
                        : namedValue.Value;
 
                 var keyVault = namedValue.KeyVault == null ? null
-                    : creatorConfig.parameterizeNamedValues
+                    : creatorConfig.ParameterizeNamedValues
                         ? new NamedValueResourceKeyVaultProperties
                         {
                             SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"

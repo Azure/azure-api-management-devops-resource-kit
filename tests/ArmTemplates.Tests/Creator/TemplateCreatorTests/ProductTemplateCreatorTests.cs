@@ -6,10 +6,10 @@
 using Xunit;
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorFactories;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             ProductTemplateCreator productTemplateCreator = ProductTemplateCreatorFactory.GenerateProductTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { Products = new List<ProductConfig>() };
             ProductConfig product = new ProductConfig()
             {
                 Name = "name",
@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 SubscriptionsLimit = 1,
                 State = "state"
             };
-            creatorConfig.products.Add(product);
+            creatorConfig.Products.Add(product);
 
             // act
             var productTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);
@@ -54,7 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             ProductTemplateCreator productTemplateCreator = ProductTemplateCreatorFactory.GenerateProductTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { Products = new List<ProductConfig>() };
             ProductConfig product = new ProductConfig()
             {
                 DisplayName = "displayName",
@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 SubscriptionsLimit = 1,
                 State = "state"
             };
-            creatorConfig.products.Add(product);
+            creatorConfig.Products.Add(product);
 
             // act
             var productTemplate = productTemplateCreator.CreateProductTemplate(creatorConfig);

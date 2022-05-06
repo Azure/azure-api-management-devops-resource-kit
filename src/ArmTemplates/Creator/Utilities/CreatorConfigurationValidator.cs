@@ -6,16 +6,16 @@
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using System.Collections.Generic;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilities
 {
     public class CreatorConfigurationValidator
     {
-        readonly CreatorConfig creatorConfig;
+        readonly CreatorParameters creatorConfig;
 
-        public CreatorConfigurationValidator(CreatorConfig creatorConfig)
+        public CreatorConfigurationValidator(CreatorParameters creatorConfig)
         {
             this.creatorConfig = creatorConfig;
         }
@@ -61,14 +61,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateNamedValues()
         {
             bool isValid = true;
-            if (this.creatorConfig.namedValues != null)
+            if (this.creatorConfig.NamedValues != null)
             {
-                foreach (var property in this.creatorConfig.namedValues)
+                foreach (var property in this.creatorConfig.NamedValues)
                 {
                     if (property.DisplayName == null)
                     {
                         isValid = false;
-                        throw new CreatorConfigurationIsInvalidException("Display name is required is a Named Value is provided");
+                        throw new CreatorConfigurationIsInvalidException("Display name is required if a Named Value is provided");
                     }
                 }
             }
@@ -78,9 +78,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateProducts()
         {
             bool isValid = true;
-            if (this.creatorConfig.products != null)
+            if (this.creatorConfig.Products != null)
             {
-                foreach (ProductsProperties product in this.creatorConfig.products)
+                foreach (ProductsProperties product in this.creatorConfig.Products)
                 {
                     if (product.DisplayName == null)
                     {
@@ -95,11 +95,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateLoggers()
         {
             bool isValid = true;
-            if (this.creatorConfig.loggers != null)
+            if (this.creatorConfig.Loggers != null)
             {
-                foreach (LoggerConfig logger in this.creatorConfig.loggers)
+                foreach (LoggerConfig logger in this.creatorConfig.Loggers)
                 {
-                    if (logger.name == null)
+                    if (logger.Name == null)
                     {
                         isValid = false;
                         throw new CreatorConfigurationIsInvalidException("Name is required if an Logger is provided");
@@ -112,9 +112,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateBackends()
         {
             bool isValid = true;
-            if (this.creatorConfig.backends != null)
+            if (this.creatorConfig.Backends != null)
             {
-                foreach (BackendTemplateProperties backend in this.creatorConfig.backends)
+                foreach (BackendTemplateProperties backend in this.creatorConfig.Backends)
                 {
                     if (backend.Title == null)
                     {
@@ -129,9 +129,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateAuthorizationServers()
         {
             bool isValid = true;
-            if (this.creatorConfig.authorizationServers != null)
+            if (this.creatorConfig.AuthorizationServers != null)
             {
-                foreach (var authorizationServer in this.creatorConfig.authorizationServers)
+                foreach (var authorizationServer in this.creatorConfig.AuthorizationServers)
                 {
                     if (authorizationServer.DisplayName == null)
                     {
@@ -146,22 +146,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateBaseProperties()
         {
             bool isValid = true;
-            if (this.creatorConfig.outputLocation == null)
+            if (this.creatorConfig.OutputLocation == null)
             {
                 isValid = false;
                 throw new CreatorConfigurationIsInvalidException("Output location is required");
             }
-            if (this.creatorConfig.version == null)
+            if (this.creatorConfig.Version == null)
             {
                 isValid = false;
                 throw new CreatorConfigurationIsInvalidException("Version is required");
             }
-            if (this.creatorConfig.apimServiceName == null)
+            if (this.creatorConfig.ApimServiceName == null)
             {
                 isValid = false;
                 throw new CreatorConfigurationIsInvalidException("APIM service name is required");
             }
-            if (this.creatorConfig.linked == true && this.creatorConfig.linkedTemplatesBaseUrl == null)
+            if (this.creatorConfig.Linked == true && this.creatorConfig.LinkedTemplatesBaseUrl == null)
             {
                 isValid = false;
                 throw new CreatorConfigurationIsInvalidException("LinkTemplatesBaseUrl is required for linked templates");
@@ -172,40 +172,40 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateAPIs()
         {
             bool isValid = true;
-            if (this.creatorConfig.apis == null)
+            if (this.creatorConfig.Apis == null)
             {
                 isValid = false;
                 throw new CreatorConfigurationIsInvalidException("API configuration is required");
             }
-            foreach (APIConfig api in this.creatorConfig.apis)
+            foreach (ApiConfig api in this.creatorConfig.Apis)
             {
-                if (api.name == null)
+                if (api.Name == null)
                 {
                     isValid = false;
                     throw new CreatorConfigurationIsInvalidException("API name is required");
                 }
-                if (api.openApiSpec == null)
+                if (api.OpenApiSpec == null)
                 {
                     isValid = false;
                     throw new CreatorConfigurationIsInvalidException("Open API Spec is required");
                 }
-                if (api.suffix == null)
+                if (api.Suffix == null)
                 {
                     isValid = false;
                     throw new CreatorConfigurationIsInvalidException("API suffix is required");
                 }
-                if (api.operations != null)
+                if (api.Operations != null)
                 {
-                    foreach (KeyValuePair<string, OperationsConfig> operation in api.operations)
+                    foreach (KeyValuePair<string, OperationsConfig> operation in api.Operations)
                     {
-                        if (operation.Value == null || operation.Value.policy == null)
+                        if (operation.Value == null || operation.Value.Policy == null)
                         {
                             isValid = false;
                             throw new CreatorConfigurationIsInvalidException("Policy XML is required if an API operation is provided");
                         }
                     }
                 }
-                if (api.diagnostic != null && api.diagnostic.LoggerId == null)
+                if (api.Diagnostic != null && api.Diagnostic.LoggerId == null)
                 {
                     isValid = false;
                     throw new CreatorConfigurationIsInvalidException("LoggerId is required if an API diagnostic is provided");
@@ -217,9 +217,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
         bool ValidateAPIVersionSets()
         {
             bool isValid = true;
-            if (this.creatorConfig.apiVersionSets != null)
+            if (this.creatorConfig.ApiVersionSets != null)
             {
-                foreach (APIVersionSetConfig apiVersionSet in this.creatorConfig.apiVersionSets)
+                foreach (ApiVersionSetConfig apiVersionSet in this.creatorConfig.ApiVersionSets)
                 {
                     if (apiVersionSet != null && apiVersionSet.DisplayName == null)
                     {

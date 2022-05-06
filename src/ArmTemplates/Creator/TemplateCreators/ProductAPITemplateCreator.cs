@@ -8,20 +8,21 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductAPITemplateCreator
+    public class ProductApiTemplateCreator : IProductApiTemplateCreator
     {
         readonly ITemplateBuilder templateBuilder;
 
-        public ProductAPITemplateCreator(ITemplateBuilder templateBuilder)
+        public ProductApiTemplateCreator(ITemplateBuilder templateBuilder)
         {
             this.templateBuilder = templateBuilder;
         }
 
-        public Template CreateProductAPITemplate(CreatorConfig creatorConfig)
+        public Template CreateProductAPITemplate(CreatorParameters creatorConfig)
         {
             // create empty template
             Template productTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
@@ -34,16 +35,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
             List<TemplateResource> resources = new List<TemplateResource>();
             string[] dependsOn = new string[] { };
-            foreach (APIConfig api in creatorConfig.apis)
+            foreach (ApiConfig api in creatorConfig.Apis)
             {
-                if (api.products != null)
+                if (api.Products != null)
                 {
                     List<ProductApiTemplateResource> apiResources = this.CreateProductAPITemplateResources(api, dependsOn);
                     resources.AddRange(apiResources);
 
                     // Add previous product/API resource as a dependency for next product/API resource(s)
                     string productID = apiResources[apiResources.Count - 1].Name.Split('/', 3)[1];
-                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]" };
+                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.Name}')]" };
                 }
             }
 
@@ -62,20 +63,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             };
             return productAPITemplateResource;
         }
-        public List<ProductApiTemplateResource> CreateProductAPITemplateResources(APIConfig api, string[] dependsOn)
+        public List<ProductApiTemplateResource> CreateProductAPITemplateResources(ApiConfig api, string[] dependsOn)
         {
             // create a products/apis association resource for each product provided in the config file
             List<ProductApiTemplateResource> productAPITemplates = new List<ProductApiTemplateResource>();
             // products is comma separated list of productIds
-            string[] productIDs = (api.products ?? "").Split(", ", System.StringSplitOptions.RemoveEmptyEntries);
+            string[] productIDs = (api.Products ?? "").Split(", ", System.StringSplitOptions.RemoveEmptyEntries);
             string[] allDependsOn = dependsOn;
             foreach (string productID in productIDs)
             {
-                ProductApiTemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.name, allDependsOn);
+                ProductApiTemplateResource productAPITemplate = this.CreateProductAPITemplateResource(productID, api.Name, allDependsOn);
                 // Add previous product/API resource as a dependency for next product/API resource
                 allDependsOn = new string[dependsOn.Length + 1];
                 dependsOn.CopyTo(allDependsOn, 1);
-                allDependsOn[0] = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.name}')]";
+                allDependsOn[0] = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productID}', '{api.Name}')]";
                 productAPITemplates.Add(productAPITemplate);
             }
             return productAPITemplates;

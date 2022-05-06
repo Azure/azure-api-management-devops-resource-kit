@@ -29,8 +29,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Properties = new BackendTemplateProperties
                         {
                             Description = $"{BackendName}-description",
-                            Credentials = new(),
-                            Tls = new(),
                             Url = $"{BackendName}-url",
                             Protocol = $"{BackendName}-protocol",
                             Proxy = new() 

@@ -6,10 +6,10 @@
 using Xunit;
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -19,12 +19,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateTagFromCreatorConfig()
         {
             TagTemplateCreator tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig() { tags = new List<TagProperties>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { Tags = new List<TagProperties>() };
             TagProperties tag = new TagProperties()
             {
                 DisplayName = "displayName"
             };
-            creatorConfig.tags.Add(tag);
+            creatorConfig.Tags.Add(tag);
 
             //act
             var tagTemplate = tagTemplateCreator.CreateTagTemplate(creatorConfig);

@@ -5,11 +5,11 @@
 
 using Xunit;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -20,13 +20,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             var propertyTemplateCreator = new PropertyTemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig() { namedValues = new List<PropertyConfig>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { NamedValues = new List<PropertyConfig>() };
             PropertyConfig property = new PropertyConfig()
             {
                 DisplayName = "displayName",
                 Value = "value"
             };
-            creatorConfig.namedValues.Add(property);
+            creatorConfig.NamedValues.Add(property);
 
             // act
             var propertyTemplate = propertyTemplateCreator.CreatePropertyTemplate(creatorConfig);

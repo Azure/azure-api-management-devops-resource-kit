@@ -6,11 +6,12 @@
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.TagApi;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class TagAPITemplateCreator
+    public class TagApiTemplateCreator : ITagApiTemplateCreator
     {
         public TagApiTemplateResource CreateTagAPITemplateResource(string tagName, string apiName, string[] dependsOn)
         {
@@ -29,15 +30,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             return tagAPITemplateResource;
         }
 
-        public List<TagApiTemplateResource> CreateTagAPITemplateResources(APIConfig api, string[] dependsOn)
+        public List<TagApiTemplateResource> CreateTagAPITemplateResources(ApiConfig api, string[] dependsOn)
         {
             // create a tag/apis association resource for each tag in the config file
             List<TagApiTemplateResource> tagAPITemplates = new List<TagApiTemplateResource>();
             // tags is comma seperated list pf tags
-            string[] tagIDs = api.tags.Split(", ");
+            string[] tagIDs = api.Tags.Split(", ");
             foreach (string tagID in tagIDs)
             {
-                TagApiTemplateResource tagAPITemplate = this.CreateTagAPITemplateResource(tagID, api.name, dependsOn);
+                TagApiTemplateResource tagAPITemplate = this.CreateTagAPITemplateResource(tagID, api.Name, dependsOn);
                 tagAPITemplates.Add(tagAPITemplate);
             }
             return tagAPITemplates;

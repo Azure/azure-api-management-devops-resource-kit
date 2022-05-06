@@ -7,7 +7,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using System.Collections.Generic;
 using Xunit;
@@ -20,8 +20,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateProductAPIFromCreatorConfig()
         {
             // arrange
-            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>(), apis = new List<APIConfig>() };
+            ProductApiTemplateCreator productAPITemplateCreator = new ProductApiTemplateCreator(new TemplateBuilder());
+            CreatorParameters creatorConfig = new CreatorParameters() { Products = new List<ProductConfig>(), Apis = new List<ApiConfig>() };
             ProductConfig product = new ProductConfig()
             {
                 Name = "productName",
@@ -33,19 +33,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 SubscriptionsLimit = 1,
                 State = "state"
             };
-            creatorConfig.products.Add(product);
-            APIConfig api = new APIConfig()
+            creatorConfig.Products.Add(product);
+            ApiConfig api = new ApiConfig()
             {
-                name = "apiName",
-                apiVersion = "apiVersion",
-                apiVersionDescription = "apiVersionDescription",
-                apiVersionSetId = "apiVersionSetId",
-                apiRevision = "revision",
-                apiRevisionDescription = "revisionDescription",
-                suffix = "suffix",
-                products = "productName",
-                subscriptionRequired = true,
-                authenticationSettings = new APITemplateAuthenticationSettings()
+                Name = "apiName",
+                ApiVersion = "apiVersion",
+                ApiVersionDescription = "apiVersionDescription",
+                ApiVersionSetId = "apiVersionSetId",
+                ApiRevision = "revision",
+                ApiRevisionDescription = "revisionDescription",
+                Suffix = "suffix",
+                Products = "productName",
+                SubscriptionRequired = true,
+                AuthenticationSettings = new APITemplateAuthenticationSettings()
                 {
                     OAuth2 = new APITemplateOAuth2()
                     {
@@ -59,19 +59,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                     },
                     SubscriptionKeyRequired = true
                 },
-                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
-                protocols = "https",
-                isCurrent = true,
-                type = "http"
+                OpenApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+                Protocols = "https",
+                IsCurrent = true,
+                Type = "http"
             };
-            creatorConfig.apis.Add(api);
+            creatorConfig.Apis.Add(api);
 
             // act
             Template productAPITemplate = productAPITemplateCreator.CreateProductAPITemplate(creatorConfig);
             ProductApiTemplateResource productAPITemplateResource = (ProductApiTemplateResource)productAPITemplate.Resources[0];
 
             // assert
-            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.Name}/{api.name}')]", productAPITemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{product.Name}/{api.Name}')]", productAPITemplateResource.Name);
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
 
             // arrange
-            ProductAPITemplateCreator productAPITemplateCreator = new ProductAPITemplateCreator(new TemplateBuilder());
+            ProductApiTemplateCreator productAPITemplateCreator = new ProductApiTemplateCreator(new TemplateBuilder());
             string productId = "productId";
             string apiName = "apiName";
             string[] dependsOn = new string[] { "dependsOn" };
@@ -96,11 +96,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         public void ShouldCreateCorrectNumberOfProductAPITemplateResourcesFromCreatorConfig()
         {
             // arrange
-            var productAPITemplateCreator = new ProductAPITemplateCreator(new TemplateBuilder());
-            CreatorConfig creatorConfig = new CreatorConfig();
-            var api = new APIConfig()
+            var productAPITemplateCreator = new ProductApiTemplateCreator(new TemplateBuilder());
+            CreatorParameters creatorConfig = new CreatorParameters();
+            var api = new ApiConfig()
             {
-                products = "1, 2, 3"
+                Products = "1, 2, 3"
             };
             int count = 3;
             string[] dependsOn = new string[] { "dependsOn" };

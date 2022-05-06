@@ -5,6 +5,7 @@
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Xunit;
 
@@ -36,7 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             var productgroupTemplateCreator = new ProductGroupTemplateCreator();
             var config = new ProductConfig()
             {
-                groups = "1, 2, 3"
+                Groups = "1, 2, 3"
             };
             int count = 3;
             string[] dependsOn = new string[] { "dependsOn" };

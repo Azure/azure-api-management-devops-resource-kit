@@ -11,7 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders
 {
-    public class TemplateBuilder : ITemplateBuilder
+    public partial class TemplateBuilder : ITemplateBuilder
     {
         Template template;
 
@@ -22,6 +22,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public Template<TTemplateResources> Build<TTemplateResources>()
             where TTemplateResources : ITemplateResources, new()
         {
+            return this.Build<TTemplateResources>(new());
+        }
+
+        /// <inheritdoc/>
+        public Template<TTemplateResources> Build<TTemplateResources>(TTemplateResources templateResources)
+            where TTemplateResources : ITemplateResources, new()
+        {
             // left Template.NotGeneric variant for backward compatibility
             // for refactored code please use Template.Generic and use explicit TTemplateResources type
             var genericTemplate = new Template<TTemplateResources>();
@@ -30,7 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             genericTemplate.ContentVersion = this.template.ContentVersion;
             genericTemplate.Parameters = this.template.Parameters;
             genericTemplate.Variables = this.template.Variables;
-            genericTemplate.TypedResources = new TTemplateResources(); // creating empty resources
+            genericTemplate.TypedResources = templateResources;
             genericTemplate.Outputs = this.template.Outputs;
 
             return genericTemplate;
@@ -52,8 +59,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public TemplateBuilder GenerateTemplateWithPresetProperties(ExtractorParameters extractorParameters)
             => this.GenerateTemplateWithApimServiceNameProperty()
                    .AddPolicyProperties(extractorParameters)
-                   .AddParameterizeServiceUrlProperty(extractorParameters)
-                   .AddParameterizeApiLoggerIdProperty(extractorParameters);
+                   .AddParameterizedServiceUrlProperty(extractorParameters)
+                   .AddParameterizedApiLoggerIdProperty(extractorParameters);
 
         public TemplateBuilder GenerateEmptyTemplate()
         {
@@ -95,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return this;
         }
 
-        public TemplateBuilder AddParameterizeServiceUrlProperty(ExtractorParameters extractorParameters)
+        public TemplateBuilder AddParameterizedServiceUrlProperty(ExtractorParameters extractorParameters)
         {
             if (extractorParameters.ParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
             {
@@ -109,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return this;
         }
 
-        public TemplateBuilder AddParameterizeApiLoggerIdProperty(ExtractorParameters extractorParameters)
+        public TemplateBuilder AddParameterizedApiLoggerIdProperty(ExtractorParameters extractorParameters)
         {
             if (extractorParameters.ParameterizeApiLoggerId)
             {
@@ -118,62 +125,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
                     Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.ApiLoggerId, apiLoggerProperty);
-            }
-
-            return this;
-        }
-
-        public TemplateBuilder AddParameterizeNamedValueParameters(ExtractorParameters extractorParameters)
-        {
-            if (extractorParameters.ParameterizeNamedValue)
-            {
-                TemplateParameterProperties namedValueParameterProperties = new TemplateParameterProperties()
-                {
-                    Type = "object"
-                };
-                this.template.Parameters.Add(ParameterNames.NamedValues, namedValueParameterProperties);
-            }
-
-            return this;
-        }
-
-        public TemplateBuilder AddParameterizeNamedValuesKeyVaultSecretParameters(ExtractorParameters extractorParameters)
-        {
-            if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
-            {
-                TemplateParameterProperties keyVaultNamedValueParameterProperties = new TemplateParameterProperties()
-                {
-                    Type = "object"
-                };
-                this.template.Parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, keyVaultNamedValueParameterProperties);
-            }
-
-            return this;
-        }
-
-        public TemplateBuilder AddParameterizeLogResourceIdProperty(ExtractorParameters extractorParameters)
-        {
-            if (extractorParameters.ParameterizeLogResourceId)
-            {
-                TemplateParameterProperties loggerResourceIdParameterProperties = new TemplateParameterProperties()
-                {
-                    Type = "object"
-                };
-                this.template.Parameters.Add(ParameterNames.LoggerResourceId, loggerResourceIdParameterProperties);
-            }
-
-            return this;
-        }
-
-        public TemplateBuilder AddParameterizeBackendProperty(ExtractorParameters extractorParameters)
-        {
-            if (extractorParameters.ParameterizeBackend)
-            {
-                TemplateParameterProperties extractBackendParametersProperties = new TemplateParameterProperties()
-                {
-                    Type = "object"
-                };
-                this.template.Parameters.Add(ParameterNames.BackendSettings, extractBackendParametersProperties);
             }
 
             return this;

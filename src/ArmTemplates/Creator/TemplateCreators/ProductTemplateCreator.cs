@@ -11,21 +11,22 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
-    public class ProductTemplateCreator
+    public class ProductTemplateCreator : IProductTemplateCreator
     {
         readonly ITemplateBuilder templateBuilder;
-        PolicyTemplateCreator policyTemplateCreator;
-        ProductGroupTemplateCreator productGroupTemplateCreator;
-        SubscriptionTemplateCreator subscriptionTemplateCreator;
+        readonly IPolicyTemplateCreator policyTemplateCreator;
+        readonly IProductGroupTemplateCreator productGroupTemplateCreator;
+        readonly ISubscriptionTemplateCreator subscriptionTemplateCreator;
 
         public ProductTemplateCreator(
-            PolicyTemplateCreator policyTemplateCreator,
-            ProductGroupTemplateCreator productGroupTemplateCreator,
-            SubscriptionTemplateCreator subscriptionTemplateCreator,
+            IPolicyTemplateCreator policyTemplateCreator,
+            IProductGroupTemplateCreator productGroupTemplateCreator,
+            ISubscriptionTemplateCreator subscriptionTemplateCreator,
             ITemplateBuilder templateBuilder)
         {
             this.policyTemplateCreator = policyTemplateCreator;
@@ -34,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
-        public Template CreateProductTemplate(CreatorConfig creatorConfig)
+        public Template CreateProductTemplate(CreatorParameters creatorConfig)
         {
             // create empty template
             Template productTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
@@ -46,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             };
 
             List<TemplateResource> resources = new List<TemplateResource>();
-            foreach (ProductConfig product in creatorConfig.products)
+            foreach (ProductConfig product in creatorConfig.Products)
             {
                 if (string.IsNullOrEmpty(product.Name))
                 {
@@ -73,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 resources.Add(productsTemplateResource);
 
                 // create product policy resource that depends on the product, if provided
-                if (product.policy != null)
+                if (product.Policy != null)
                 {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.Name}')]" };
                     PolicyTemplateResource productPolicy = this.policyTemplateCreator.CreateProductPolicyTemplateResource(product, dependsOn);
@@ -81,7 +82,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 }
 
                 // create product group resources if provided
-                if (product.groups != null)
+                if (product.Groups != null)
                 {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.Name}')]" };
                     List<GroupTemplateResource> productGroups = this.productGroupTemplateCreator.CreateProductGroupTemplateResources(product, dependsOn);
@@ -89,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 }
 
                 // create product subscriptions if provided
-                if (product.subscriptions != null)
+                if (product.Subscriptions != null)
                 {
                     string[] dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{product.Name}')]" };
                     List<SubscriptionsTemplateResource> subscriptions = this.subscriptionTemplateCreator.CreateSubscriptionsTemplateResources(product, dependsOn);

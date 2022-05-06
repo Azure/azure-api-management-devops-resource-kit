@@ -3,7 +3,7 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using System.Collections.Generic;
 using Xunit;
@@ -17,11 +17,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             SubscriptionTemplateCreator subscriptionTemplateCreator = new SubscriptionTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { subscriptions = new List<SubscriptionConfig>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { Subscriptions = new List<SubscriptionConfig>() };
 
             SubscriptionConfig subscription = new SubscriptionConfig()
             {
-                name = "subscriptionName",
+                Name = "subscriptionName",
                 ownerId = "user/ownerId",
                 scope = "/products/productId",
                 displayName = "displayName",
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // assert
 
-            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{subscription.name}')]", subscriptionsTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('ApimServiceName'), '/{subscription.Name}')]", subscriptionsTemplateResource.Name);
             Assert.Equal($"Microsoft.ApiManagement/service/subscriptions", subscriptionsTemplateResource.Type);
             Assert.Equal("2019-01-01", subscriptionsTemplateResource.ApiVersion);
 
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             // arrange
             var subscriptionTemplateCreator = new SubscriptionTemplateCreator();
 
-            CreatorConfig creatorConfig = new CreatorConfig() { products = new List<ProductConfig>() };
+            CreatorParameters creatorConfig = new CreatorParameters() { Products = new List<ProductConfig>() };
             ProductConfig product = new ProductConfig()
             {
                 Name = "productName",
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             SubscriptionConfig subscription = new SubscriptionConfig()
             {
-                name = "subscriptionName",
+                Name = "subscriptionName",
                 ownerId = "user/ownerId",
                 displayName = "displayName",
                 primaryKey = "primaryKey",
@@ -82,10 +82,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                 allowTracing = true,
             };
 
-            product.subscriptions = new List<SubscriptionConfig>();
-            product.subscriptions.Add(subscription);
+            product.Subscriptions = new List<SubscriptionConfig>();
+            product.Subscriptions.Add(subscription);
 
-            creatorConfig.products.Add(product);
+            creatorConfig.Products.Add(product);
 
             var dependsOn = new[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('ApimServiceName'), '{product.Name}')]" };
 

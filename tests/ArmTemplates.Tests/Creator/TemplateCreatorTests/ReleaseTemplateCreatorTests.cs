@@ -5,9 +5,9 @@
 
 using Xunit;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
@@ -18,17 +18,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             // arrange
             var releaseTemplateCreator = new ReleaseTemplateCreator();
-            CreatorConfig creatorConfig = new CreatorConfig() { apis = new List<APIConfig>() };
-            APIConfig api = new APIConfig()
+            CreatorParameters creatorConfig = new CreatorParameters() { Apis = new List<ApiConfig>() };
+            ApiConfig api = new ApiConfig()
             {
-                name = "name",
-                apiRevision = "2",
-                isCurrent = true,
-                suffix = "suffix",
-                subscriptionRequired = true,
-                openApiSpec = "https://petstore.swagger.io/v2/swagger.json",
+                Name = "name",
+                ApiRevision = "2",
+                IsCurrent = true,
+                Suffix = "suffix",
+                SubscriptionRequired = true,
+                OpenApiSpec = "https://petstore.swagger.io/v2/swagger.json",
             };
-            creatorConfig.apis.Add(api);
+            creatorConfig.Apis.Add(api);
 
             // act
             string[] dependsOn = new string[] { "dependsOn" };
@@ -36,10 +36,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             // assert
             string releaseName = $"";
-            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.name}/release-revision-{api.apiRevision}')]", releaseTemplateResource.Name);
+            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{api.Name}/release-revision-{api.ApiRevision}')]", releaseTemplateResource.Name);
             Assert.Equal(dependsOn, releaseTemplateResource.DependsOn);
-            Assert.Equal($"Release created to make revision {api.apiRevision} current.", releaseTemplateResource.Properties.notes);
-            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{api.name}')]", releaseTemplateResource.Properties.apiId);
+            Assert.Equal($"Release created to make revision {api.ApiRevision} current.", releaseTemplateResource.Properties.notes);
+            Assert.Equal($"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{api.Name}')]", releaseTemplateResource.Properties.apiId);
         }
     }
 }

@@ -12,6 +12,8 @@ using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using System;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Validator
 {
@@ -26,12 +28,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
                 "InvalidConfigurations", Path.DirectorySeparatorChar);
         }
 
+        CreateApplicationCommand GetCreateApplicationCommandTestInstance()
+        {
+            var logger = this.GetTestLogger<CreateApplicationCommand>();
+            return new CreateApplicationCommand(logger, CreatorExecutor.BuildCreatorExecutor(null, null), new FileReader());
+        }
+
         [Fact]
         public async Task ShouldFailWithUnknownCommand()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration());
@@ -44,8 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithUnknownOption()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -61,8 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidOutputLocation()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -78,8 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidVersion()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -95,8 +99,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidAPIMServiceName()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -112,8 +115,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidLinking()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -129,8 +131,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidAPIConfiguration()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -146,8 +147,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidOpenAPISpec()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -163,8 +163,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidSuffix()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -180,8 +179,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidAPIName()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -197,8 +195,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidOperationPolicy()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -214,8 +211,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidDiagnosticLoggerId()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -231,8 +227,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidVersionSetDisplayName()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -248,8 +243,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidProductDisplayName()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -265,8 +259,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidLoggerDisplayName()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -282,8 +275,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidBackendDisplayName()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
@@ -299,8 +291,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Va
         public async Task ShouldFailWithInvalidAuthorizationServerDisplayName()
         {
             // arrange
-            var logger = this.GetTestLogger<CreateApplicationCommand>();
-            var createApplicationCommand = new CreateApplicationCommand(logger, null, new TemplateBuilder());
+            var createApplicationCommand = this.GetCreateApplicationCommandTestInstance();
 
             // act
             Func<Task> act = async () => await createApplicationCommand.ParseInputConfigurationAsync(new CreateConsoleAppConfiguration
