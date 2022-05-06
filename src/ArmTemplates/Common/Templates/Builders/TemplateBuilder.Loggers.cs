@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public partial class TemplateBuilder : ITemplateBuilder
     {
-        public TemplateBuilder AddParameterizeLogResourceIdProperty(ExtractorParameters extractorParameters)
+        public TemplateBuilder AddParameterizedLogResourceIdProperty(ExtractorParameters extractorParameters)
         {
             if (extractorParameters.ParameterizeLogResourceId)
             {

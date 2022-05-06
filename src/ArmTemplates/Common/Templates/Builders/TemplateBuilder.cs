@@ -59,8 +59,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public TemplateBuilder GenerateTemplateWithPresetProperties(ExtractorParameters extractorParameters)
             => this.GenerateTemplateWithApimServiceNameProperty()
                    .AddPolicyProperties(extractorParameters)
-                   .AddParameterizeServiceUrlProperty(extractorParameters)
-                   .AddParameterizeApiLoggerIdProperty(extractorParameters);
+                   .AddParameterizedServiceUrlProperty(extractorParameters)
+                   .AddParameterizedApiLoggerIdProperty(extractorParameters);
 
         public TemplateBuilder GenerateEmptyTemplate()
         {
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return this;
         }
 
-        public TemplateBuilder AddParameterizeServiceUrlProperty(ExtractorParameters extractorParameters)
+        public TemplateBuilder AddParameterizedServiceUrlProperty(ExtractorParameters extractorParameters)
         {
             if (extractorParameters.ParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
             {
@@ -116,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return this;
         }
 
-        public TemplateBuilder AddParameterizeApiLoggerIdProperty(ExtractorParameters extractorParameters)
+        public TemplateBuilder AddParameterizedApiLoggerIdProperty(ExtractorParameters extractorParameters)
         {
             if (extractorParameters.ParameterizeApiLoggerId)
             {

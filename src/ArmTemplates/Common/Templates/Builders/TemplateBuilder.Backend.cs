@@ -12,7 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public partial class TemplateBuilder : ITemplateBuilder
     {
-        public TemplateBuilder AddParameterizeBackendSettings(ExtractorParameters extractorParameters)
+        public TemplateBuilder AddParameterizedBackendSettings(ExtractorParameters extractorParameters)
         {
             if (extractorParameters.ParameterizeBackend)
             {

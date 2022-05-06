@@ -32,12 +32,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         TemplateBuilder AddPolicyProperties(ExtractorParameters extractorParameters);
 
-        TemplateBuilder AddParameterizeServiceUrlProperty(ExtractorParameters extractorParameters);
+        TemplateBuilder AddParameterizedServiceUrlProperty(ExtractorParameters extractorParameters);
 
-        TemplateBuilder AddParameterizeApiLoggerIdProperty(ExtractorParameters extractorParameters);
+        TemplateBuilder AddParameterizedApiLoggerIdProperty(ExtractorParameters extractorParameters);
 
-        TemplateBuilder AddParameterizeBackendSettings(ExtractorParameters extractorParameters);
+        TemplateBuilder AddParameterizedBackendSettings(ExtractorParameters extractorParameters);
 
-        TemplateBuilder AddParameterizeLogResourceIdProperty(ExtractorParameters extractorParameters);
+        TemplateBuilder AddParameterizedLogResourceIdProperty(ExtractorParameters extractorParameters);
     }
 }

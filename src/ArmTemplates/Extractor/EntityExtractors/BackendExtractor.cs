@@ -54,7 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var backendTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
-                                        .AddParameterizeBackendSettings(extractorParameters)
+                                        .AddParameterizedBackendSettings(extractorParameters)
                                         .Build<BackendTemplateResources>();
 
             var backends = await this.backendClient.GetAllAsync(extractorParameters);
