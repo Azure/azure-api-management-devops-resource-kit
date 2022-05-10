@@ -100,6 +100,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.LoggerResourceId);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.NamedValueKeyVaultSecrets);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.BackendSettings);
+            masterTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
+            masterTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
 
             masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(2);
             masterTemplate.Resources.Should().HaveCount(2);

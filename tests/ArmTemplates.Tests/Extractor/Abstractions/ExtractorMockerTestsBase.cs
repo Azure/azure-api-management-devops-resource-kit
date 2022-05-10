@@ -43,8 +43,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             string multipleApiNames = MockMultipleApis,
             bool includeAllRevisions = MockIncludeAllRevisions,
             bool toParameterizeApiLoggerId = MockParameterizeApiLoggerId,
-            bool toNotIncludeNamedValue = MockNotIncludeNamedValue)
+            bool toNotIncludeNamedValue = MockNotIncludeNamedValue,
+            string policyXmlBaseUrl = MockPolicyXMLBaseUrl,
+            string policyXmlSasToken = MockPolicyXMLSasToken)
         {
+
             return new ExtractorConsoleAppConfiguration
             {
                 SourceApimName = MockSourceApimName,
@@ -56,8 +59,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 LinkedTemplatesBaseUrl = MockLinkedTemplatesBaseUrl,
                 LinkedTemplatesSasToken = MockLinkedTemplatesSasToken,
                 LinkedTemplatesUrlQueryString = MockLinkedTemplatesUrlQueryString,
-                PolicyXMLBaseUrl = MockPolicyXMLBaseUrl,
-                PolicyXMLSasToken = MockPolicyXMLSasToken,
+                PolicyXMLBaseUrl = policyXmlBaseUrl,
+                PolicyXMLSasToken = policyXmlSasToken,
                 SplitAPIs = splitApis.ToString(),
                 ApiVersionSetName = apiVersionSetName,
                 IncludeAllRevisions = includeAllRevisions.ToString(),
