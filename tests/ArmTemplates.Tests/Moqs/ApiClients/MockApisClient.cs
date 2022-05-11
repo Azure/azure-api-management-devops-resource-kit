@@ -85,12 +85,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockServiceApiProductsApiClient
-                .Setup(x => x.GetSingleAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .Setup(x => x.GetSingleAsync(It.Is<string>((o => o.Equals(ServiceApiName1))), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new ApiTemplateResource
                 {
                     Name = ServiceApiName1,
                     Type = TemplateType,
                     Properties = ServiceApiProperties1
+                });
+
+            mockServiceApiProductsApiClient
+                .Setup(x => x.GetSingleAsync(It.Is<string>((o => o.Equals(ServiceApiName2))), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new ApiTemplateResource
+                {
+                    Name = ServiceApiName2,
+                    Type = TemplateType,
+                    Properties = ServiceApiProperties2
                 });
 
 

@@ -125,6 +125,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiTemplate.TypedResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
             apiTemplate.TypedResources.ApiOperations.SelectMany(x => x.DependsOn).Any(x => x.Contains($"'{ResourceTypeConstants.API}'")).Should().BeTrue();
             apiTemplate.TypedResources.ApiOperations.SelectMany(x => x.DependsOn).Any(x => x.Contains($"'{ResourceTypeConstants.APIOperation}'")).Should().BeFalse();
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties.Request.Representations.Count() == 1).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties.Responses.Count() == 1).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties.Request.Representations.All(o => o.Examples.Count > 0)).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties.Request.Representations.All(o => o.Examples.ContainsKey("default"))).Should().BeTrue();
 
             // api operations policies
             apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(2);
