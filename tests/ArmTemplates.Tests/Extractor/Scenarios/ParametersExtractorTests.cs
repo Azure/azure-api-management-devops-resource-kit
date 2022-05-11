@@ -49,21 +49,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation));
 
-            var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
-                splitApis: false,
-                apiVersionSetName: string.Empty,
-                multipleApiNames: string.Empty,
-                includeAllRevisions: false);
-            
-            extractorConfig.ParamNamedValue = "false";
-            extractorConfig.ParamNamedValuesKeyVaultSecrets = "false";
-            extractorConfig.ParamServiceUrl = "false";
-            extractorConfig.ServiceUrlParameters = null;
-            extractorConfig.ParamApiLoggerId = null;
-            extractorConfig.ParamLogResourceId = null;
-            extractorConfig.ParamBackend = null;
+            var extractorParameters = this.CreateDefaultExtractorParameters(
+                policyXmlBaseUrl: string.Empty,
+                policyXmlSasToken: string.Empty
+            );
 
-            var extractorParameters = new ExtractorParameters(extractorConfig);
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
 
             // act
@@ -72,9 +62,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
             parametersTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
-            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.LinkedTemplatesBaseUrl);
-            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.LinkedTemplatesSasToken);
-            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.LinkedTemplatesUrlQueryString);
             parametersTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             parametersTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
 
@@ -86,23 +73,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_PolicyExcluded));
 
-            var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
-                splitApis: false,
-                apiVersionSetName: string.Empty,
-                multipleApiNames: string.Empty,
-                includeAllRevisions: false,
+            var extractorParameters = this.CreateDefaultExtractorParameters(
                 policyXmlBaseUrl: null,
-                policyXmlSasToken: null);
+                policyXmlSasToken: null
+            );
 
-            extractorConfig.ParamNamedValue = "false";
-            extractorConfig.ParamNamedValuesKeyVaultSecrets = "false";
-            extractorConfig.ParamServiceUrl = "false";
-            extractorConfig.ServiceUrlParameters = null;
-            extractorConfig.ParamApiLoggerId = null;
-            extractorConfig.ParamLogResourceId = null;
-            extractorConfig.ParamBackend = null;
-
-            var extractorParameters = new ExtractorParameters(extractorConfig);
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
             
             // act
@@ -111,9 +86,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
             parametersTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
-            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.LinkedTemplatesBaseUrl);
-            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.LinkedTemplatesSasToken);
-            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.LinkedTemplatesUrlQueryString);
             parametersTemplate.Parameters.Should().NotContainKey(ParameterNames.PolicyXMLBaseUrl);
             parametersTemplate.Parameters.Should().NotContainKey(ParameterNames.PolicyXMLSasToken);
         }

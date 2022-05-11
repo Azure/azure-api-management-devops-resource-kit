@@ -10,9 +10,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 {
     public abstract class ExtractorMockerTestsBase : TestsBase
     {
-        protected const string MockSourceApimName = "dmkorolev-APIM-test";
-        protected const string MockDestinationApimName = "test-destination-apim-name";
-        protected const string MockResourceGroup = "dmkorolev-test";
+        protected const string MockSourceApimName = "source-apim-name";
+        protected const string MockDestinationApimName = "destination-apim-name";
+        protected const string MockResourceGroup = "resource-group";
         protected const string MockFileFolder = "test-file-folder";
         protected const string MockApiName = "echo-api";
         protected const string MockMultipleApis = " test-multiple-api-1, test-multiple-api-2 ";
@@ -77,6 +77,69 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ParamBackend = MockParameterizeBackendSettings.ToString(),
                 ExtractGateways = MockExtractGateways.ToString()
             };
-        }  
+        }
+
+        protected ExtractorParameters CreateDefaultExtractorParameters(
+               string sourceApimName = MockSourceApimName,
+               string destinationApimName = MockDestinationApimName,
+               string resourceGroup = MockResourceGroup,
+               string fileFolder = MockFileFolder,
+               string apiName = MockApiName,
+               string multipleAPIs = null,
+               string linkedTemplatesBaseUrl = null,
+               string linkedTemplatesSasToken = null,
+               string linkedTemplatesUrlQueryString = null,
+               string policyXmlBaseUrl = null,
+               string policyXmlSasToken = null,
+               string splitAPIs = null,
+               string apiVersionSetName = null,
+               string includeAllRevisions = null,
+               string baseFileName = null,
+               ServiceUrlProperty[] serviceUrlParameters = null,
+               string paramServiceUrl = null,
+               string paramNamedValue = null,
+               string paramApiLoggerId = null,
+               string paramLogResourceId = null,
+               string serviceBaseUrl = null,
+               string notIncludeNamedValue = null,
+               string paramNamedValuesKeyVaultSecrets = null,
+               int? operationBatchSize = null,
+               string paramBackend = null,
+               string extractGateways = null
+         )
+        {
+
+            var extractorConfiguration = new ExtractorConsoleAppConfiguration
+            {
+                SourceApimName = sourceApimName,
+                DestinationApimName = destinationApimName,
+                ResourceGroup = resourceGroup,
+                FileFolder = fileFolder,
+                ApiName = apiName,
+                MultipleAPIs = multipleAPIs,
+                LinkedTemplatesBaseUrl = linkedTemplatesBaseUrl,
+                LinkedTemplatesSasToken = linkedTemplatesSasToken,
+                LinkedTemplatesUrlQueryString = linkedTemplatesUrlQueryString,
+                PolicyXMLBaseUrl = policyXmlBaseUrl,
+                PolicyXMLSasToken = policyXmlSasToken,
+                SplitAPIs = splitAPIs,
+                ApiVersionSetName = apiVersionSetName,
+                IncludeAllRevisions = includeAllRevisions,
+                BaseFileName = baseFileName,
+                ServiceUrlParameters = serviceUrlParameters,
+                ParamServiceUrl = paramServiceUrl,
+                ParamNamedValue = paramNamedValue,
+                ParamApiLoggerId = paramApiLoggerId,
+                ParamLogResourceId = paramLogResourceId,
+                ServiceBaseUrl = serviceBaseUrl,
+                NotIncludeNamedValue = notIncludeNamedValue,
+                ParamNamedValuesKeyVaultSecrets = paramNamedValuesKeyVaultSecrets,
+                OperationBatchSize = operationBatchSize,
+                ParamBackend = paramBackend,
+                ExtractGateways = extractGateways
+            };
+
+            return new ExtractorParameters(extractorConfiguration);
+        }
     }
 }

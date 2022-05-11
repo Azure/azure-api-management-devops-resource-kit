@@ -39,7 +39,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 splitApis: false,
                 apiVersionSetName: string.Empty,
                 multipleApiNames: string.Empty,
-                includeAllRevisions: false);
+                includeAllRevisions: false,
+                policyXmlBaseUrl: string.Empty,
+                policyXmlSasToken: string.Empty);
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var masterTemplateExtractor = new MasterTemplateExtractor(
