@@ -287,11 +287,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             MasterTemplateResource masterResourceTemplate = CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
 
-            if (extractorParameters.PolicyXMLBaseUrl != null)
+            if (extractorParameters.PolicyXMLBaseUrl is not null)
             {
                 masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
 
-                if (extractorParameters.PolicyXMLSasToken != null)
+                if (extractorParameters.PolicyXMLSasToken is not null)
                 {
                     masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
                 }

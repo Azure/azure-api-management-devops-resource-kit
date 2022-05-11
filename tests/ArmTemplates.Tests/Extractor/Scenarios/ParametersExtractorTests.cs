@@ -49,10 +49,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation));
 
-            var extractorParameters = this.CreateDefaultExtractorParameters(
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 policyXmlBaseUrl: string.Empty,
                 policyXmlSasToken: string.Empty
             );
+            var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
 
@@ -73,10 +74,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_PolicyExcluded));
 
-            var extractorParameters = this.CreateDefaultExtractorParameters(
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 policyXmlBaseUrl: null,
                 policyXmlSasToken: null
             );
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
 
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
             

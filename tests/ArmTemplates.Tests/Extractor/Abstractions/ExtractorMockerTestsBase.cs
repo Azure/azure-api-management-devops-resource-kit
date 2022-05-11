@@ -79,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             };
         }
 
-        protected ExtractorParameters CreateDefaultExtractorParameters(
+        protected ExtractorConsoleAppConfiguration GetDefaultExtractorConsoleAppConfiguration(
                string sourceApimName = MockSourceApimName,
                string destinationApimName = MockDestinationApimName,
                string resourceGroup = MockResourceGroup,
@@ -109,7 +109,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
          )
         {
 
-            var extractorConfiguration = new ExtractorConsoleAppConfiguration
+            return new ExtractorConsoleAppConfiguration
             {
                 SourceApimName = sourceApimName,
                 DestinationApimName = destinationApimName,
@@ -138,8 +138,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ParamBackend = paramBackend,
                 ExtractGateways = extractGateways
             };
-
-            return new ExtractorParameters(extractorConfiguration);
         }
     }
 }
