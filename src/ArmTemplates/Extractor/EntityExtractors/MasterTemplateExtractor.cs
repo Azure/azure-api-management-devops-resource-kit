@@ -127,14 +127,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 var productDeployment = CreateLinkedMasterTemplateResource(ProductsTemplate, productsUri, dependsOnNamedValues);
                 
-                if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLBaseUrl))
+                if (extractorParameters.PolicyXMLBaseUrl is not null)
                 {
                     productDeployment.Properties.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
-                }
 
-                if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLSasToken))
-                {
-                    productDeployment.Properties.Parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
+                    if (extractorParameters.PolicyXMLSasToken is not null)
+                    {
+                        productDeployment.Properties.Parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
+                    }
                 }
 
                 masterResources.DeploymentResources.Add(productDeployment);
@@ -248,14 +248,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         static MasterTemplateResource CreateLinkedMasterTemplateResourceForApiTemplate(string name, string uriLink, string[] dependsOn, ExtractorParameters extractorParameters)
         {
             MasterTemplateResource masterResourceTemplate = CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
-            if (extractorParameters.PolicyXMLBaseUrl != null)
+            if (extractorParameters.PolicyXMLBaseUrl is not null)
             {
                 masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
+                
+                if (extractorParameters.PolicyXMLSasToken is not null)
+                {
+                    masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
+                }
             }
-            if (extractorParameters.PolicyXMLSasToken != null)
-            {
-                masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
-            }
+            
             if (extractorParameters.ParameterizeServiceUrl)
             {
                 masterResourceTemplate.Properties.Parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.ServiceUrl}')]" });
@@ -285,14 +287,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             MasterTemplateResource masterResourceTemplate = CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
 
-            if (extractorParameters.PolicyXMLBaseUrl != null)
+            if (extractorParameters.PolicyXMLBaseUrl is not null)
             {
                 masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLBaseUrl}')]" });
+
+                if (extractorParameters.PolicyXMLSasToken is not null)
+                {
+                    masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
+                }
             }
-            if (extractorParameters.PolicyXMLSasToken != null)
-            {
-                masterResourceTemplate.Properties.Parameters.Add(ParameterNames.PolicyXMLSasToken, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.PolicyXMLSasToken}')]" });
-            }
+            
             return masterResourceTemplate;
         }
 
@@ -363,13 +367,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     new TemplateParameterProperties(metadataDescription: "Query string for the URL of the repository", type: "string"));
             }
 
-            if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLBaseUrl))
+            if (extractorParameters.PolicyXMLBaseUrl is not null)
             {
                 parameters.Add(
                     ParameterNames.PolicyXMLBaseUrl,
                     new TemplateParameterProperties(metadataDescription: "Base URL of the repository that contains the generated policy files", type: "string"));
 
-                if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLSasToken))
+                if (extractorParameters.PolicyXMLSasToken is not null)
                 {
                     parameters.Add(
                         ParameterNames.PolicyXMLSasToken,

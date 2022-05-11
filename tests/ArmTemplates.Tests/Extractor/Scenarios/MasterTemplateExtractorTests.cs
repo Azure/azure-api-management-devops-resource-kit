@@ -39,7 +39,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 splitApis: false,
                 apiVersionSetName: string.Empty,
                 multipleApiNames: string.Empty,
-                includeAllRevisions: false);
+                includeAllRevisions: false,
+                policyXmlBaseUrl: string.Empty,
+                policyXmlSasToken: string.Empty);
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var masterTemplateExtractor = new MasterTemplateExtractor(
@@ -100,6 +102,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.LoggerResourceId);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.NamedValueKeyVaultSecrets);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.BackendSettings);
+            masterTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
+            masterTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
 
             masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(2);
             masterTemplate.Resources.Should().HaveCount(2);

@@ -80,16 +80,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public TemplateBuilder AddPolicyProperties(ExtractorParameters extractorParameters)
         {
-            if (extractorParameters.PolicyXMLBaseUrl != null && extractorParameters.PolicyXMLSasToken != null)
-            {
-                TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
-                {
-                    Type = "string"
-                };
-
-                this.template.Parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
-            }
-
             if (extractorParameters.PolicyXMLBaseUrl != null)
             {
                 TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
@@ -97,8 +87,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
                     Type = "string"
                 };
                 this.template.Parameters.Add(ParameterNames.PolicyXMLBaseUrl, policyTemplateBaseUrlParameterProperties);
-            }
 
+
+                if (extractorParameters.PolicyXMLSasToken != null)
+                {
+                    TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                    {
+                        Type = "string"
+                    };
+
+                    this.template.Parameters.Add(ParameterNames.PolicyXMLSasToken, policyTemplateSasTokenParameterProperties);
+                }
+            }
             return this;
         }
 

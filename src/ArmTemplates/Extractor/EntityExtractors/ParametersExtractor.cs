@@ -77,14 +77,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             void AddPolicyParameters()
             {
-                if (string.IsNullOrEmpty(extractorParameters.PolicyXMLBaseUrl))
+                if (extractorParameters.PolicyXMLBaseUrl is null)
                 {
                     return;
                 }
 
                 parameters.Add(ParameterNames.PolicyXMLBaseUrl, new() { Value = extractorParameters.PolicyXMLBaseUrl });
 
-                if (!string.IsNullOrEmpty(extractorParameters.PolicyXMLSasToken))
+                if (extractorParameters.PolicyXMLSasToken is not null)
                 {
                     parameters.Add(ParameterNames.PolicyXMLSasToken, new() { Value = extractorParameters.PolicyXMLSasToken });
                 }
