@@ -105,7 +105,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                string paramNamedValuesKeyVaultSecrets = null,
                int? operationBatchSize = null,
                string paramBackend = null,
-               string extractGateways = null
+               string extractGateways = null,
+               string overrideGroupNames = null,
+               string overrideProductNames = null
          )
         {
 
@@ -136,7 +138,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ParamNamedValuesKeyVaultSecrets = paramNamedValuesKeyVaultSecrets,
                 OperationBatchSize = operationBatchSize,
                 ParamBackend = paramBackend,
-                ExtractGateways = extractGateways
+                ExtractGateways = extractGateways,
+                OverrideGroupNames = overrideGroupNames,
+                OverrideProductNames = overrideProductNames
             };
         }
     }

@@ -23,5 +23,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         [JsonProperty(Order = -2)]
         public string[] DependsOn { get; set; }
+
+        [JsonIgnore]
+        public string OriginalName { get; set; }
+
+        [JsonIgnore]
+        public string NewName { get; set; }
+
     }
 }

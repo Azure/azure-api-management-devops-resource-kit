@@ -9,13 +9,22 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Groups
 {
     public class GroupsClient : ApiClientBase, IGroupsClient
     {
+
+        readonly IGroupDataProcessor groupDataProcessor;
+
         const string GetAllGroupsLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/groups?api-version={5}";
         const string GetAllRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/groups?api-version={4}";
+
+        public GroupsClient(IGroupDataProcessor groupDataProcessor)
+        {
+            this.groupDataProcessor = groupDataProcessor;
+        }
 
         public async Task<List<GroupTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
         {
@@ -24,7 +33,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var requestUrl = string.Format(GetAllRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<GroupTemplateResource>(azToken, requestUrl);
+            var groupTemplates = await this.GetPagedResponseAsync<GroupTemplateResource>(azToken, requestUrl);
+
+            this.groupDataProcessor.ProcessData(groupTemplates, extractorParameters);
+
+            return groupTemplates;
         }
 
         public async Task<List<GroupTemplateResource>> GetAllLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
@@ -34,7 +47,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var requestUrl = string.Format(GetAllGroupsLinkedToProductRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<GroupTemplateResource>(azToken, requestUrl);
+            var groupTemplates = await this.GetPagedResponseAsync<GroupTemplateResource>(azToken, requestUrl);
+
+            this.groupDataProcessor.ProcessData(groupTemplates, extractorParameters);
+
+            return groupTemplates;
         }
     }
 }

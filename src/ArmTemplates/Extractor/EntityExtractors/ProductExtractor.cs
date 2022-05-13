@@ -77,6 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                     await this.AddProductPolicyToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources, baseFilesGenerationDirectory);
                     await this.AddProductTagsToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources);
+                    await this.AddGroupsLinkedToProductResources(extractorParameters, productOriginalName, productsTemplate.TypedResources);
                 }
             }
 
@@ -129,17 +130,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             try
             {
-                var groupsLinkedToProduct = await this.groupsClient.GetAllLinkedToProductAsync(productName, extractorParameters);
-
-                foreach (var productGroup in groupsLinkedToProduct)
-                {
-                    productGroup.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{productGroup.Name}')]";
-                    productGroup.Type = ResourceTypeConstants.ProductGroup;
-                    productGroup.ApiVersion = GlobalConstants.ApiVersion;
-                    productGroup.DependsOn = productResourceId;
-                    productTemplateResources.Groups.Add(productGroup);
-                }
-
                 var productPolicyResource = await this.policyExtractor.GenerateProductPolicyTemplateAsync(
                     extractorParameters,
                     productName,
@@ -157,5 +147,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 throw;
             }
         }
+
+        async Task AddGroupsLinkedToProductResources(
+            ExtractorParameters extractorParameters,
+            string productName,
+            ProductTemplateResources productTemplateResources)
+        {
+            var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productName}')]" };
+
+            try
+            {
+                var groupsLinkedToProduct = await this.groupsClient.GetAllLinkedToProductAsync(productName, extractorParameters);
+
+                foreach (var productGroup in groupsLinkedToProduct)
+                {
+                    productGroup.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{productGroup.Name}')]";
+                    productGroup.Type = ResourceTypeConstants.ProductGroup;
+                    productGroup.ApiVersion = GlobalConstants.ApiVersion;
+                    productGroup.DependsOn = productResourceId;
+                    productTemplateResources.Groups.Add(productGroup);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Exception occured while adding group linked to product");
+                throw;
+            }
+        }
+
     }
 }

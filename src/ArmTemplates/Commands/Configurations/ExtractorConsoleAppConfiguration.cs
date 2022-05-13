@@ -92,5 +92,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
 
         [Option(longName: "extractGateways", HelpText = "Attempt to extract information about Self-Hosted gateways")]
         public string ExtractGateways { get; set; }
+
+        [Option(longName: "overrideGroupNames", HelpText = "Override group GUID identification to system generated")]
+        public string OverrideGroupNames { get; set; }
+
+        [Option(longName: "overrideProductNames", HelpText = "Override product GUID identification to system generated")]
+        public string OverrideProductNames { get; set; }
     }
 }
