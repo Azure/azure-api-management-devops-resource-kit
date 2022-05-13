@@ -46,7 +46,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     ContentType = "application/json",
                     SchemaId = "api-operation-representation-schema-id",
-                    TypeName = "api-operation-representation-type-name"
+                    TypeName = "api-operation-representation-type-name",
+                    Examples = new Dictionary<string, ParameterExampleContract>() {
+                        {"default", new ParameterExampleContract { Description = "description", Value = new object(), Summary = "summary" } }
+                    }
                 }
             }
         };
@@ -70,7 +73,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     ContentType = "application/json",
                     SchemaId = "api-operation-representation-schema-id",
-                    TypeName = "api-operation-representation-type-name"
+                    TypeName = "api-operation-representation-type-name",
+                    Examples = new Dictionary<string, ParameterExampleContract>() {
+                        {"default", new ParameterExampleContract { Description = "description", Value = "plain value", Summary = "summary" } },
+                        {"not default", new ParameterExampleContract { Description = "description", Value = new object(), Summary = "summary" } }
+                    }
                 }
             }
         };
