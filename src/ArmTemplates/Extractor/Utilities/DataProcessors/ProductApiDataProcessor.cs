@@ -4,37 +4,41 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors
 {
-    public class GroupDataProcessor: IGroupDataProcessor
+    public class ProductApiDataProcessor: IProductApiDataProcessor
     {
         public IDictionary<string, string> OverrideRules { get; }
-
-        public GroupDataProcessor() {
+        public ProductApiDataProcessor() {
             this.OverrideRules = new Dictionary<string, string>() {
-                { "Administrators", "administrators" },
-                { "Developers", "developers" },
-                { "Guests", "guests" }
+                { "Starter", "starter" },
+                { "Unlimited", "unlimited" }
             };
         }
 
-        public void ProcessData(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters) {
+        public void ProcessData(List<ProductApiTemplateResource> productApiTemplates, ExtractorParameters extractorParameters)
+        {
 
-            foreach(var groupTemplate in groupTemplates) 
+            foreach (var productApiTemplate in productApiTemplates)
             {
-                if (extractorParameters.OverrideGroupNames)
+                // save Original name for future references
+                productApiTemplate.OriginalName = productApiTemplate.Name;
+                productApiTemplate.NewName = productApiTemplate.Name;
+                
+                if (extractorParameters.OverrideProductNames)
                 {
-                    this.OverrideName(groupTemplate);
+                    this.OverrideName(productApiTemplate);
                 }
             }
-            
+
         }
 
-        public void OverrideName(GroupTemplateResource template)
+
+        public void OverrideName(ProductApiTemplateResource template)
         {
             if (this.OverrideRules == null)
             {
@@ -47,7 +51,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                 {
                     if (!template.Name.Equals(rule.Value))
                     {
-                        template.OriginalName = template.Name;
                         template.NewName = rule.Value;
                         template.Name = rule.Value;
                         break;

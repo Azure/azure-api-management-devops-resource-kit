@@ -10,9 +10,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public class ApiOperationTemplateResource : TemplateResource
     {
-        [JsonIgnore]
-        public string OriginalName { get; set; }
-
         public ApiOperationProperties Properties { get; set; }
     }
 }

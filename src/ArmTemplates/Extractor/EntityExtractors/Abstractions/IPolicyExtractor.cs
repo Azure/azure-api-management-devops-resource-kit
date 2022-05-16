@@ -5,6 +5,7 @@
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         Task<PolicyTemplateResource> GenerateProductPolicyTemplateAsync(
             ExtractorParameters extractorParameters,
-            string productName,
+            ProductsTemplateResource productTemplateResource,
             string[] productResourceId,
             string baseFilesGenerationDirectory);
 

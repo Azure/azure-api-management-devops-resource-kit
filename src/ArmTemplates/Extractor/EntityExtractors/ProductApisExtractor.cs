@@ -131,19 +131,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 string lastProductAPIName = null;
                 foreach (var productApi in productApis)
                 {
-                    var originalProductApiName = productApi.Name;
-                    this.logger.LogInformation("'{0}' Product association found", originalProductApiName);
+                    this.logger.LogInformation("'{0}' Product association found", productApi.OriginalName);
 
                     // convert returned api product associations to template resource class
                     productApi.Type = ResourceTypeConstants.ProductApi;
-                    productApi.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalProductApiName}/{apiName}')]";
+                    productApi.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productApi.NewName}/{apiName}')]";
                     productApi.ApiVersion = GlobalConstants.ApiVersion;
                     productApi.Scale = null;
                     productApi.DependsOn = lastProductAPIName != null ? new string[] { lastProductAPIName } : dependsOn;
 
                     productApiResources.Add(productApi);
 
-                    lastProductAPIName = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{originalProductApiName}', '{apiName}')]";
+                    lastProductAPIName = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productApi.NewName}', '{apiName}')]";
                 }
             }
             catch (Exception ex) 
