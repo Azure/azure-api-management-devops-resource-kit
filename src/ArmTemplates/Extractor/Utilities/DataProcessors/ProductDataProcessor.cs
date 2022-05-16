@@ -39,7 +39,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                     this.OverrideName(productTemplate);
                 }
             }
-
         }
 
         public void OverrideName(ProductsTemplateResource template)

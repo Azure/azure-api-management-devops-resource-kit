@@ -68,7 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 productTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (singleApiName == null || productApiTemplateResources.Any(p => p.Name.Contains($"/{productTemplateResource.OriginalName}/")))
+                if (singleApiName == null || productApiTemplateResources.Any(p => p.Name.Contains($"/{productTemplateResource.NewName}/")))
                 {
                     this.logger.LogDebug("'{0}' product found", productTemplateResource.OriginalName);
                     productsTemplate.TypedResources.Products.Add(productTemplateResource);

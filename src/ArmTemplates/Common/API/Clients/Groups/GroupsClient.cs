@@ -45,7 +45,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
             var groupTemplates = await this.GetPagedResponseAsync<GroupTemplateResource>(azToken, requestUrl);
-
             this.groupDataProcessor.ProcessData(groupTemplates, extractorParameters);
 
             return groupTemplates;
