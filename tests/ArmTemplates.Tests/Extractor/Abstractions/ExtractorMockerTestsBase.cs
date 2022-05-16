@@ -106,8 +106,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                int? operationBatchSize = null,
                string paramBackend = null,
                string extractGateways = null,
-               string overrideGroupNames = null,
-               string overrideProductNames = null
+               string overrideGroupGuids = null,
+               string overrideProductGuids = null
          )
         {
 
@@ -139,8 +139,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 OperationBatchSize = operationBatchSize,
                 ParamBackend = paramBackend,
                 ExtractGateways = extractGateways,
-                OverrideGroupNames = overrideGroupNames,
-                OverrideProductNames = overrideProductNames
+                OverrideGroupGuids = overrideGroupGuids,
+                OverrideProductGuids = overrideProductGuids
             };
         }
     }

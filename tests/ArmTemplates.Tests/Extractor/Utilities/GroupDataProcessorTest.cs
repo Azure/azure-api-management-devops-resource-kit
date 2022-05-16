@@ -51,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         [Fact]
         public void TestOverrideName()
         {
-            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupNames:"true");
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupGuids: "true");
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var groupTemplates = this.GetMockGroupTemplates();
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         [Fact]
         public void TestSkipOverrideName()
         {
-            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupNames: "false");
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupGuids: "false");
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var groupDataProcessor = new GroupDataProcessor();

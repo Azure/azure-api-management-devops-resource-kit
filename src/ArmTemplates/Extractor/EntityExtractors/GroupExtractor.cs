@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             foreach (var extractedGroup in allGroups)
-            {   
+            {
                 extractedGroup.Type = ResourceTypeConstants.Group;
                 extractedGroup.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{extractedGroup.Name}')]";
                 extractedGroup.ApiVersion = GlobalConstants.ApiVersion;

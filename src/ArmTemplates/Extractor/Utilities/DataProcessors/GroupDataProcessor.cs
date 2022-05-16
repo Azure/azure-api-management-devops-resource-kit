@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
@@ -14,24 +15,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
     {
         public IDictionary<string, string> OverrideRules { get; }
 
-        public GroupDataProcessor() {
-            this.OverrideRules = new Dictionary<string, string>() {
+        public GroupDataProcessor()
+        {
+            this.OverrideRules = new Dictionary<string, string>()
+            {
                 { "Administrators", "administrators" },
                 { "Developers", "developers" },
                 { "Guests", "guests" }
             };
         }
 
-        public void ProcessData(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters) {
+        public void ProcessData(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters) 
+        {
 
-            foreach(var groupTemplate in groupTemplates) 
+            if (groupTemplates.IsNullOrEmpty() || !extractorParameters.OverrideGroupGuids)
             {
-                if (extractorParameters.OverrideGroupNames)
+                return;
+            }
+
+            foreach (var groupTemplate in groupTemplates) 
+            {
+                if (extractorParameters.OverrideGroupGuids)
                 {
                     this.OverrideName(groupTemplate);
                 }
-            }
-            
+            }   
         }
 
         public void OverrideName(GroupTemplateResource template)

@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
@@ -23,13 +24,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 
         public void ProcessData(List<ProductsTemplateResource> productsTemplates, ExtractorParameters extractorParameters)
         {
+            if (productsTemplates.IsNullOrEmpty() || !extractorParameters.OverrideProductGuids)
+            {
+                return;
+            }
 
             foreach (var productTemplate in productsTemplates)
             {
                 // save Original name for future references
                 productTemplate.OriginalName = productTemplate.Name;
                 productTemplate.NewName = productTemplate.Name;
-                if (extractorParameters.OverrideProductNames)
+                if (extractorParameters.OverrideProductGuids)
                 {
                     this.OverrideName(productTemplate);
                 }

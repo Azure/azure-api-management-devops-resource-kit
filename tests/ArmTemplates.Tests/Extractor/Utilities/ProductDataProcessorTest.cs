@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         [Fact]
         public void TestOverrideName()
         {
-            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideProductNames: "true");
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideProductGuids: "true");
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var productTemplates = this.GetMockProductTemplates();
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         [Fact]
         public void TestSkipOverrideName()
         {
-            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideProductNames: "false");
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideProductGuids: "false");
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var productTemplates = this.GetMockProductTemplates();
