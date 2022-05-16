@@ -4,17 +4,16 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction
 {
-    public interface IGroupDataProcessor
+    public interface IDataProcessor<TTemplateResource>
     {
         IDictionary<string, string> OverrideRules { get; }
 
-        void ProcessData(List<GroupTemplateResource> templates, ExtractorParameters extractorParameters);
+        void ProcessData(List<TTemplateResource> templates, ExtractorParameters extractorParameters);
 
-        void OverrideName(GroupTemplateResource template);
+        void OverrideName(TTemplateResource template);
     }
 }

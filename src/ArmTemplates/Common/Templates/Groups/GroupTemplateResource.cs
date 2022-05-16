@@ -15,6 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         [JsonIgnore]
         public string NewName { get; set; }
+
         public GroupProperties Properties { get; set; }
     }
 }
