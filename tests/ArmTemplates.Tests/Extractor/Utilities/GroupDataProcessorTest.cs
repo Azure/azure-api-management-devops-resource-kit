@@ -36,11 +36,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                     new GroupTemplateResource
                     {
                         Name = "guid-developers",
-                        Type = ResourceTypeConstants.ProductGroup,
+                        Type = ResourceTypeConstants.Group,
                         Properties = new GroupProperties
                         {
                             DisplayName = "Developers",
-                            Description = $"description",
+                            Description = "description",
                             BuiltIn = true,
                             Type = "system"
                         }
