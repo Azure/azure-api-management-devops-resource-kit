@@ -15,12 +15,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public class GroupsClient : ApiClientBase, IGroupsClient
     {
-
-        readonly IGroupDataProcessor groupDataProcessor;
-
         const string GetAllGroupsLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/groups?api-version={5}";
         const string GetAllRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/groups?api-version={4}";
 
+        readonly IGroupDataProcessor groupDataProcessor;
         public GroupsClient(IGroupDataProcessor groupDataProcessor)
         {
             this.groupDataProcessor = groupDataProcessor;

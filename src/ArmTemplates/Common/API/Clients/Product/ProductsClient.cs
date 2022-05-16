@@ -16,12 +16,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public class ProductsClient : ApiClientBase, IProductsClient
     {
-        readonly IProductDataProcessor productDataProcessor;
-        readonly IProductApiDataProcessor productApiDataProcessor;
-
-
         const string GetAllProductsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/products?api-version={5}";
         const string GetAllProductsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products?api-version={4}";
+
+        readonly IProductDataProcessor productDataProcessor;
+        readonly IProductApiDataProcessor productApiDataProcessor;
 
         public ProductsClient(IProductDataProcessor productDataProcessor, IProductApiDataProcessor productApiDataProcessor)
         {

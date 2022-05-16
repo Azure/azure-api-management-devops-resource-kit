@@ -35,11 +35,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 
             foreach (var groupTemplate in groupTemplates) 
             {
+                groupTemplate.OriginalName = groupTemplate.Name;
+                groupTemplate.NewName = groupTemplate.Name;
+
                 if (extractorParameters.OverrideGroupGuids)
                 {
                     this.OverrideName(groupTemplate);
                 }
-            }   
+            }
         }
 
         public void OverrideName(GroupTemplateResource template)
