@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 
         public void ProcessData(List<ProductsTemplateResource> productsTemplates, ExtractorParameters extractorParameters)
         {
-            if (productsTemplates.IsNullOrEmpty() || !extractorParameters.OverrideProductGuids)
+            if (productsTemplates.IsNullOrEmpty())
             {
                 return;
             }
@@ -49,16 +49,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                 return;
             }
 
-            foreach (var rule in this.OverrideRules)
+            if (this.OverrideRules.ContainsKey(template.Properties.DisplayName))
             {
-                if (template.Properties.DisplayName.Equals(rule.Key))
+                var newName = this.OverrideRules[template.Properties.DisplayName];
+
+                if (!template.Name.Equals(newName))
                 {
-                    if (!template.Name.Equals(rule.Value))
-                    {
-                        template.NewName = rule.Value;
-                        template.Name = rule.Value;
-                        break;
-                    }
+                    template.OriginalName = template.Name;
+                    template.NewName = newName;
+                    template.Name = newName;
                 }
             }
         }

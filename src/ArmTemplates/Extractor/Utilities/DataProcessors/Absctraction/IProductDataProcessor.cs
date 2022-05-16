@@ -12,6 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
     public interface IProductDataProcessor
     {
         IDictionary<string, string> OverrideRules { get; }
+
         void ProcessData(List<ProductsTemplateResource> templates, ExtractorParameters extractorParameters);
 
         void OverrideName(ProductsTemplateResource template);
