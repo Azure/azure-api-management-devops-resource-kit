@@ -14,8 +14,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public string TypeName { get; set; }
 
-        public string Sample { get; set; }
-
         public IDictionary<string, ParameterExampleContract> Examples { get; set; }
     }
 }
