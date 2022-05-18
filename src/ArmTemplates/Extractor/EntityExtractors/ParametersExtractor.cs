@@ -54,6 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             AddPolicyParameters();
             AddNamedValuesParameters();
             await AddServiceUrlParameterAsync();
+            await AddApiOauth2ScopeParameterAsync();
 
             void AddLinkedUrlParameters()
             {
@@ -117,6 +118,38 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
 
                 parameters.Add(ParameterNames.ServiceUrl, new TemplateObjectParameterProperties() { Value = serviceUrls });
+            }
+
+            async Task AddApiOauth2ScopeParameterAsync()
+            {
+                if (!extractorParameters.ParametrizeApiOauth2Scope)
+                {
+                    return;
+                }
+
+                var apiOauth2Scopes = new Dictionary<string, string>();
+                foreach (var apiName in apisToExtract)
+                {
+                    var validApiName = ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
+
+                    string apiOAuthScope;
+                    var apiDetails = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
+
+                    if (apiDetails.Properties.AuthenticationSettings?.OAuth2 is not null) {
+                        if (extractorParameters.ApiOauth2ScopeParameters is null)
+                        {
+                            apiOAuthScope = apiDetails.Properties.AuthenticationSettings.OAuth2?.Scope;
+                        }
+                        else
+                        {
+                            apiOAuthScope = extractorParameters.ApiOauth2ScopeParameters.FirstOrDefault(x => x.ApiName.Equals(apiName))?.Scope;
+                        }
+
+                        apiOauth2Scopes.Add(validApiName, apiOAuthScope);
+                    }
+                }
+
+                parameters.Add(ParameterNames.ApiOauth2ScopeSettings, new TemplateObjectParameterProperties() { Value = apiOauth2Scopes });
             }
 
             void AddNamedValuesParameters()

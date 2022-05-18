@@ -60,7 +60,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             => this.GenerateTemplateWithApimServiceNameProperty()
                    .AddPolicyProperties(extractorParameters)
                    .AddParameterizedServiceUrlProperty(extractorParameters)
-                   .AddParameterizedApiLoggerIdProperty(extractorParameters);
+                   .AddParameterizedApiLoggerIdProperty(extractorParameters)
+                   .AddParameterizedApiScopeProperty(extractorParameters);
 
         public TemplateBuilder GenerateEmptyTemplate()
         {
@@ -111,6 +112,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
                     Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.ServiceUrl, serviceUrlParamProperty);
+            }
+
+            return this;
+        }
+
+        public TemplateBuilder AddParameterizedApiScopeProperty(ExtractorParameters extractorParameters)
+        {
+            if (extractorParameters.ParametrizeApiOauth2Scope)
+            {
+                //check if there is existing api with such configured api scope or not if not let's not add it to the parameter later
+                TemplateParameterProperties apiScopeParameterProperty = new TemplateParameterProperties()
+                {
+                    Type = "object"
+                };
+                this.template.Parameters.Add(ParameterNames.ApiOauth2ScopeSettings, apiScopeParameterProperty);
             }
 
             return this;

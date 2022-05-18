@@ -390,6 +390,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 }
             }
 
+            //TODO: addparan=meters to master template as well
             masterTemplate.Parameters = parameters;
             return masterTemplate;
         }

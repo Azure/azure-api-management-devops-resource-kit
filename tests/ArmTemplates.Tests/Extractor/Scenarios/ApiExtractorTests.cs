@@ -33,12 +33,44 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateApiTemplates_ProperlyLaysTheInformation));
 
+
+
+
+            /*
+                
+                ExtractGateways = MockExtractGateways.ToString()
+             
+             */
+
+            var extractorDefaultConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                multipleAPIs: string.Empty,
+                apiVersionSetName: string.Empty,
+                includeAllRevisions: "false",
+                splitAPIs: "false",
+                policyXmlBaseUrl: "policyXmlUrl",
+                policyXmlSasToken: "policyXmlSasToken",
+                linkedTemplatesBaseUrl: "linkedBaseUrl",
+                linkedTemplatesSasToken: "linkedUrlToken",
+                serviceUrlParameters: new[] { new ServiceUrlProperty("test-service-url-property-api-name", "test-service-url-property-url") },
+                paramServiceUrl: "true",
+                paramNamedValue: "true",
+                paramApiLoggerId: "true",
+                paramLogResourceId: "true",
+                serviceBaseUrl: "test-service-base-url",
+                notIncludeNamedValue: "true",
+                paramNamedValuesKeyVaultSecrets: "true",
+                paramBackend: "true",
+                extractGateways: "true",
+                parametrizeApiOauth2Scope: "true"
+                );
+
+
             var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
                 splitApis: false,
                 apiVersionSetName: string.Empty,
                 multipleApiNames: string.Empty,
                 includeAllRevisions: false);
-            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorParameters = new ExtractorParameters(extractorDefaultConfig);
 
             // mocked clients
             var mockedApiClient = MockApisClient.GetMockedApiClientWithDefaultValues();

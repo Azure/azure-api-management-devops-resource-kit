@@ -39,7 +39,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             ServiceUrl = "https://azure-service-2-url.com",
             Path = "path-2",
             Protocols = new[] { "https" },
-            IsCurrent = true
+            IsCurrent = true,
+            AuthenticationSettings = new ApiTemplateAuthenticationSettings 
+            {
+                OAuth2 = new ApiTemplateOAuth2 { 
+                    Scope = "scope-default-value-2",
+                    AuthorizationServerId = "auth-server-id-1"
+                }
+            }
         };
 
         public static IApisClient GetMockedApiClientWithDefaultValues()
@@ -48,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
             mockServiceApiProductsApiClient
                 .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
-                .ReturnsAsync(new List<ApiTemplateResource>
+                .ReturnsAsync((ExtractorParameters _) => new List<ApiTemplateResource>
                 {
                     new ApiTemplateResource
                     {
@@ -86,7 +93,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
             mockServiceApiProductsApiClient
                 .Setup(x => x.GetSingleAsync(It.Is<string>((o => o.Equals(ServiceApiName1))), It.IsAny<ExtractorParameters>()))
-                .ReturnsAsync(new ApiTemplateResource
+                .ReturnsAsync((string _, ExtractorParameters _) => new ApiTemplateResource
                 {
                     Name = ServiceApiName1,
                     Type = TemplateType,
@@ -95,14 +102,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
             mockServiceApiProductsApiClient
                 .Setup(x => x.GetSingleAsync(It.Is<string>((o => o.Equals(ServiceApiName2))), It.IsAny<ExtractorParameters>()))
-                .ReturnsAsync(new ApiTemplateResource
+                .ReturnsAsync((string _, ExtractorParameters _) => new ApiTemplateResource
                 {
                     Name = ServiceApiName2,
                     Type = TemplateType,
                     Properties = ServiceApiProperties2
                 });
-
-
 
             mockServiceApiProductsApiClient
                 .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))

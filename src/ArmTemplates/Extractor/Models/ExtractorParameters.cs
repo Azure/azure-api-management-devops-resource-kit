@@ -85,6 +85,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool OverrideProductGuids { get; set; }
 
+        public bool ParametrizeApiOauth2Scope { get; set; }
+
+        public ApiOauth2ScopeProperty[] ApiOauth2ScopeParameters { get; private set; }
+
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
         {
             this.SourceApimName = extractorConfig.SourceApimName;
@@ -115,6 +119,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ExtractGateways = extractorConfig.ExtractGateways != null && extractorConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.OverrideGroupGuids = extractorConfig.OverrideGroupGuids != null && extractorConfig.OverrideGroupGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.OverrideProductGuids = extractorConfig.OverrideProductGuids != null && extractorConfig.OverrideProductGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ParametrizeApiOauth2Scope = extractorConfig.ParametrizeApiOauth2Scope != null && extractorConfig.ParametrizeApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ApiOauth2ScopeParameters = extractorConfig.ApiOauth2ScopeParameters;
         }
 
         public ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)
