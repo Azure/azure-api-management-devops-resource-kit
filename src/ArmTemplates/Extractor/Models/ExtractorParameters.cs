@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool ExtractGateways { get; set; }
 
-        public bool OverrideGroupGuids{ get; set; }
+        public bool OverrideGroupGuids { get; set; }
 
         public bool OverrideProductGuids { get; set; }
 

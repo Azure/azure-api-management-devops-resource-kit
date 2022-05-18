@@ -14,6 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
     public class ProductApiDataProcessor: IProductApiDataProcessor
     {
         public IDictionary<string, string> OverrideRules { get; }
+
         public ProductApiDataProcessor() {
             this.OverrideRules = new Dictionary<string, string>() {
                 { "Starter", "starter" },
@@ -23,7 +24,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 
         public void ProcessData(List<ProductApiTemplateResource> productApiTemplates, ExtractorParameters extractorParameters)
         {
-
             if (productApiTemplates.IsNullOrEmpty())
             {
                 return;
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 
         public void OverrideName(ProductApiTemplateResource template)
         {
-            if (this.OverrideRules == null)
+            if (this.OverrideRules.IsNullOrEmpty())
             {
                 return;
             }

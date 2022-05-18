@@ -11,8 +11,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 {
     public interface IGroupDataProcessor
     {
-        IDictionary<string, string> OverrideRules { get; }
-
         void ProcessData(List<GroupTemplateResource> templates, ExtractorParameters extractorParameters);
 
         void OverrideName(GroupTemplateResource template);
