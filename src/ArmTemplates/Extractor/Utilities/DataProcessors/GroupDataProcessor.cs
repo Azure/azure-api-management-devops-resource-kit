@@ -25,9 +25,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
             };
         }
 
-        public void ProcessData(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters) 
+        public void ProcessData(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters)
         {
-
             if (groupTemplates.IsNullOrEmpty())
             {
                 return;

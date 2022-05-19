@@ -59,7 +59,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             SetupDataProcessors(services);
         }
 
-        static void SetupDataProcessors(IServiceCollection services) {
+        static void SetupDataProcessors(IServiceCollection services)
+        {
             services.AddScoped<IGroupDataProcessor, GroupDataProcessor>();
             services.AddScoped<IProductDataProcessor, ProductDataProcessor>();
             services.AddScoped<IProductApiDataProcessor, ProductApiDataProcessor>();
