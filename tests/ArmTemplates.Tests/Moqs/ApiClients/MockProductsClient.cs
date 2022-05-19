@@ -44,6 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     new ProductsTemplateResource
                     {
                         Name = ProductName1,
+                        NewName = ProductName1,
                         Type = ResourceTypeConstants.Product,
                         Properties = new ProductsProperties
                         {

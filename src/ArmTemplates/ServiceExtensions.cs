@@ -30,6 +30,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.B
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -54,6 +56,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             SetupBuilders(services);
             SetupExtractors(services);
             SetupCreators(services);
+            SetupDataProcessors(services);
+        }
+
+        static void SetupDataProcessors(IServiceCollection services)
+        {
+            services.AddScoped<IGroupDataProcessor, GroupDataProcessor>();
+            services.AddScoped<IProductDataProcessor, ProductDataProcessor>();
+            services.AddScoped<IProductApiDataProcessor, ProductApiDataProcessor>();
         }
 
         static void SetupCommands(IServiceCollection services)

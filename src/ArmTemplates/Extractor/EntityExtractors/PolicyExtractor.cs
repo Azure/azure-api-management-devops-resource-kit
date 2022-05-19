@@ -18,6 +18,7 @@ using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -154,21 +155,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public async Task<PolicyTemplateResource> GenerateProductPolicyTemplateAsync(
             ExtractorParameters extractorParameters,
-            string productName,
+            ProductsTemplateResource productTemplateResource,
             string[] productResourceId,
             string baseFilesGenerationDirectory)
         {
-            var productPolicy = await this.policyClient.GetPolicyLinkedToProductAsync(productName, extractorParameters);
+            var productPolicy = await this.policyClient.GetPolicyLinkedToProductAsync(productTemplateResource.OriginalName, extractorParameters);
 
             if (productPolicy is null)
             {
-                this.logger.LogWarning($"Policy not found for product '{productName}'");
+                this.logger.LogWarning($"Policy not found for product '{productTemplateResource.OriginalName}'");
                 return productPolicy;
             }
 
-            this.logger.LogDebug($"Policy linked to {productName} product found successfuly");
+            this.logger.LogDebug($"Policy linked to {productTemplateResource.OriginalName} product found successfuly");
 
-            productPolicy.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/policy')]";
+            productPolicy.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productTemplateResource.NewName}/policy')]";
             productPolicy.ApiVersion = GlobalConstants.ApiVersion;
             productPolicy.Scale = null;
             productPolicy.DependsOn = productResourceId;
@@ -177,7 +178,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // telling that it is needed to provide a policy Xml file
             if (extractorParameters.PolicyXMLBaseUrl is not null)
             {
-                var policyFileName = string.Format(ProductPolicyFileNameFormat, productName);
+                var policyFileName = string.Format(ProductPolicyFileNameFormat, productTemplateResource.NewName);
                 await this.SavePolicyXmlAsync(productPolicy, baseFilesGenerationDirectory, policyFileName);
 
                 this.SetPolicyTemplateResourcePolicyContentWithArmPresetValues(extractorParameters, productPolicy, policyFileName);

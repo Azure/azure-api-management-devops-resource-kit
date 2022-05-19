@@ -418,6 +418,8 @@ You have two choices when specifying your settings:
 | paramNamedValuesKeyVaultSecrets | No | Set to true will parameterize all named values where the value is from a key vault secret |
 | paramBackend | No | Set to true will parameterize specific backend values (limited to resourceId, url and protocol) |
 | extractGateways | No | Set to true will attempt to extract the Self Hosted Gateways. |
+| overrideGroupGuids | No | Set to true will override the group id in output template in case it does not match with system predefined values. |
+| overrideProductGuids | No | Set to true will override the product id in output template in case it does not match with system predefined values. |
 
 #### Note
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API

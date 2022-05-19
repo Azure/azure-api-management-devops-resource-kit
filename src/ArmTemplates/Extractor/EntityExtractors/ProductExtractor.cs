@@ -64,19 +64,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             foreach (var productTemplateResource in products)
             {
-                var productOriginalName = productTemplateResource.Name;
-
-                productTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productOriginalName}')]";
+                productTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productTemplateResource.NewName}')]";
                 productTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (singleApiName == null || productApiTemplateResources.Any(p => p.Name.Contains($"/{productOriginalName}/")))
+                if (singleApiName == null || productApiTemplateResources.Any(p => p.Name.Contains($"/{productTemplateResource.NewName}/")))
                 {
-                    this.logger.LogDebug("'{0}' product found", productOriginalName);
+                    this.logger.LogDebug("'{0}' product found", productTemplateResource.OriginalName);
                     productsTemplate.TypedResources.Products.Add(productTemplateResource);
 
-                    await this.AddProductPolicyToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources, baseFilesGenerationDirectory);
-                    await this.AddProductTagsToTemplateResources(extractorParameters, productOriginalName, productsTemplate.TypedResources);
+                    await this.AddProductPolicyToTemplateResources(extractorParameters, productTemplateResource, productsTemplate.TypedResources, baseFilesGenerationDirectory);
+                    await this.AddProductTagsToTemplateResources(extractorParameters, productTemplateResource, productsTemplate.TypedResources);
+                    await this.AddGroupsLinkedToProductResources(extractorParameters, productTemplateResource, productsTemplate.TypedResources);
                 }
             }
 
@@ -85,29 +84,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         async Task AddProductTagsToTemplateResources(
             ExtractorParameters extractorParameters,
-            string productName,
+            ProductsTemplateResource productTemplateResource,
             ProductTemplateResources productTemplateResources)
         {
             try
             {
-                var productTags = await this.tagClient.GetAllTagsLinkedToProductAsync(productName, extractorParameters);
+                var productTags = await this.tagClient.GetAllTagsLinkedToProductAsync(productTemplateResource.OriginalName, extractorParameters);
 
                 if (productTags.IsNullOrEmpty())
                 {
-                    this.logger.LogWarning($"No tags found for product {productName}");
+                    this.logger.LogWarning($"No tags found for product {productTemplateResource.OriginalName}");
                     return;
                 }
 
                 foreach (var productTag in productTags)
                 {
                     string originalTagName = productTag.Name;
-                    this.logger.LogDebug("'{0}' tag association found for {1} product", originalTagName, productName);
+                    this.logger.LogDebug("'{0}' tag association found for {1} product", originalTagName, productTemplateResource.OriginalName);
 
-                    productTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{originalTagName}')]";
+                    productTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productTemplateResource.NewName}/{originalTagName}')]";
                     productTag.Type = ResourceTypeConstants.ProductTag;
                     productTag.ApiVersion = GlobalConstants.ApiVersion;
                     productTag.Scale = null;
-                    productTag.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productName}')]" };
+                    productTag.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productTemplateResource.NewName}')]" };
 
                     productTemplateResources.Tags.Add(productTag);
                 }
@@ -121,28 +120,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         async Task AddProductPolicyToTemplateResources(
             ExtractorParameters extractorParameters,
-            string productName,
+            ProductsTemplateResource productTemplateResource,
             ProductTemplateResources productTemplateResources,
             string filesGenerationDirectory)
         {
-            var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productName}')]" };
+            var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productTemplateResource.NewName}')]" };
 
             try
             {
-                var groupsLinkedToProduct = await this.groupsClient.GetAllLinkedToProductAsync(productName, extractorParameters);
-
-                foreach (var productGroup in groupsLinkedToProduct)
-                {
-                    productGroup.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productName}/{productGroup.Name}')]";
-                    productGroup.Type = ResourceTypeConstants.ProductGroup;
-                    productGroup.ApiVersion = GlobalConstants.ApiVersion;
-                    productGroup.DependsOn = productResourceId;
-                    productTemplateResources.Groups.Add(productGroup);
-                }
-
                 var productPolicyResource = await this.policyExtractor.GenerateProductPolicyTemplateAsync(
                     extractorParameters,
-                    productName,
+                    productTemplateResource,
                     productResourceId,
                     filesGenerationDirectory);
 
@@ -157,5 +145,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 throw;
             }
         }
+
+        async Task AddGroupsLinkedToProductResources(
+            ExtractorParameters extractorParameters,
+            ProductsTemplateResource productTemplateResource,
+            ProductTemplateResources productTemplateResources)
+        {
+            var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productTemplateResource.NewName}')]" };
+
+            try
+            {
+                var groupsLinkedToProduct = await this.groupsClient.GetAllLinkedToProductAsync(productTemplateResource.OriginalName, extractorParameters);
+
+                foreach (var productGroup in groupsLinkedToProduct)
+                {
+                    productGroup.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productTemplateResource.NewName}/{productGroup.Name}')]";
+                    productGroup.Type = ResourceTypeConstants.ProductGroup;
+                    productGroup.ApiVersion = GlobalConstants.ApiVersion;
+                    productGroup.DependsOn = productResourceId;
+                    productTemplateResources.Groups.Add(productGroup);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Exception occured while adding group linked to product");
+                throw;
+            }
+        }
+
     }
 }

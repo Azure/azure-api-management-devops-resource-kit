@@ -81,6 +81,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool ExtractGateways { get; set; }
 
+        public bool OverrideGroupGuids { get; set; }
+
+        public bool OverrideProductGuids { get; set; }
+
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
         {
             this.SourceApimName = extractorConfig.SourceApimName;
@@ -109,6 +113,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.FileNames = this.GenerateFileNames(extractorConfig.BaseFileName, extractorConfig.SourceApimName);
             this.MultipleApiNames = this.ParseMultipleApiNames(extractorConfig.MultipleAPIs);
             this.ExtractGateways = extractorConfig.ExtractGateways != null && extractorConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.OverrideGroupGuids = extractorConfig.OverrideGroupGuids != null && extractorConfig.OverrideGroupGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.OverrideProductGuids = extractorConfig.OverrideProductGuids != null && extractorConfig.OverrideProductGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
 
         public ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)
