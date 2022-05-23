@@ -99,8 +99,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "overrideProductGuids", HelpText = "Override product GUID identification to system generated")]
         public string OverrideProductGuids { get; set; }
 
-        [Option(longName: "parametrizeApiOauth2Scope", HelpText = "Parametrize API OAuth2 scope values")]
-        public string ParametrizeApiOauth2Scope { get; set; }
+        [Option(longName: "paramApiOauth2Scope", HelpText = "Parametrize API OAuth2 scope values")]
+        public string ParamApiOauth2Scope { get; set; }
 
         // this is used only from json-file and --extractorConfig option, so no option possibility here
         public ApiOauth2ScopeProperty[] ApiOauth2ScopeParameters { get; set; }

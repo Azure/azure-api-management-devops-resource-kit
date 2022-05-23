@@ -104,7 +104,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_ApiOauth2ScopeIncludedWSettings));
 
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
-                parametrizeApiOauth2Scope: "true",
+                paramApiOauth2Scope: "true",
                 apiOauth2ScopeParameters: new ApiOauth2ScopeProperty[1] { 
                     new ApiOauth2ScopeProperty("api-name-2", "scope_value2")
                 }
@@ -134,7 +134,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_ApiOauth2ScopeIncludedWOSettings));
 
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
-                parametrizeApiOauth2Scope: "true"
+                paramApiOauth2Scope: "true"
             );
             var extractorParameters = new ExtractorParameters(extractorConfig);
             var mockedApiClient = MockApisClient.GetMockedApiClientWithDefaultValues();

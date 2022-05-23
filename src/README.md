@@ -410,7 +410,7 @@ You have two choices when specifying your settings:
 |  linkedTemplatesSasToken | No                    | Specify sasToken for fetching linkedTemplate files    |
 | serviceUrlParameters  | No                    | Parameterize service url in advance (you can replace serviceUrl afterwards as well, you can refer example for more information).  |
 |  paramServiceUrl | No                    |  Set to "true" will parameterize all serviceUrl for each api and generate serviceUrl parameter to api template/parameter template/master template files |
-|  paramNamedValue | No                    |  Set to "true" will parameterize all named values and add named values parameter to property template/parameter template/mastert emplate files |
+|  paramNamedValue | No                    |  Set to "true" will parameterize all named values and add named values parameter to property template/parameter template/mastert template files |
 |  paramApiLoggerId | No                    |  Set to "true" will parameterize all logger ids in all apis (within api templates), Also includes the "All API" monitoring configuration |
 |  paramLogResourceId | No                    |  Set to "true" will parameterize all loggers' resource ids (within logger template)|
 | serviceBaseUrl | No                    | Specify the base url where you want to run your extractor |
@@ -420,6 +420,8 @@ You have two choices when specifying your settings:
 | extractGateways | No | Set to true will attempt to extract the Self Hosted Gateways. |
 | overrideGroupGuids | No | Set to true will override the group id in output template in case it does not match with system predefined values. |
 | overrideProductGuids | No | Set to true will override the product id in output template in case it does not match with system predefined values. |
+| paramApiOauth2Scope | No | Set to true will parametrize the scope values for APIs in which User authorization setting set to OAuth 2.0. |
+| apiOauth2ScopeParameters  | No                    | Parameterize scope values for APIs in advance.  |
 
 #### Note
 * Can not use "splitAPIs" and "apiName" at the same time, since using "apiName" only extract one API
@@ -535,7 +537,7 @@ Extract **all APIs with serviceUrlParameters**, use the following parameters:
     ]
 }
 ```
-Extract **all APIs within parameterServiceUrl**, use the following parameters: 
+Extract **all APIs within paramServiceUrl**, use the following parameters: 
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -547,7 +549,7 @@ Extract **all APIs within parameterServiceUrl**, use the following parameters:
     "paramServiceUrl": "true"
 }
 ```
-Extract **all APIs within parameterServiceUrl**, use the following parameters: 
+Extract **all APIs within paramNamedValue**, use the following parameters: 
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -557,6 +559,26 @@ Extract **all APIs within parameterServiceUrl**, use the following parameters:
     "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
     "policyXMLBaseUrl": "<policies_remote_location>",
     "paramNamedValue": "true"
+}
+```
+Extract **all APIs with parametrized OAuth2 scope with predefined parameters**, use the following parameters: 
+```
+{
+    "sourceApimName": "<source-apim-name>",
+    "destinationApimName": "<destination-apim-name>",
+    "resourceGroup": "<resource-group>",
+    "fileFolder": "<destination-file-folder>",
+    "linkedTemplatesBaseUrl": "<linked_templates_remote_location>",
+    "apiOauth2ScopeParameters": [
+      {
+         "apiName": "api1",
+         "scope": "scope-value-1"
+      },
+      {  
+         "apiName": "api2",
+         "scope": "scope-value-2"
+      }
+    ]
 }
 ```
 

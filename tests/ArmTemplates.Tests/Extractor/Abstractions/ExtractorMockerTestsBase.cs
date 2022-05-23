@@ -108,7 +108,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                string extractGateways = null,
                string overrideGroupGuids = null,
                string overrideProductGuids = null,
-               string parametrizeApiOauth2Scope = null,
+               string paramApiOauth2Scope = null,
                ApiOauth2ScopeProperty[] apiOauth2ScopeParameters = null
          )
         {
@@ -143,7 +143,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ExtractGateways = extractGateways,
                 OverrideGroupGuids = overrideGroupGuids,
                 OverrideProductGuids = overrideProductGuids,
-                ParametrizeApiOauth2Scope = parametrizeApiOauth2Scope,
+                ParamApiOauth2Scope = paramApiOauth2Scope,
                 ApiOauth2ScopeParameters = apiOauth2ScopeParameters
             };
         }

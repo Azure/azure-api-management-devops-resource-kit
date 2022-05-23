@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 paramNamedValuesKeyVaultSecrets: "true",
                 paramBackend: "true",
                 extractGateways: "true",
-                parametrizeApiOauth2Scope: "true"
+                paramApiOauth2Scope: "true"
                 );
 
             var extractorParameters = new ExtractorParameters(extractorConfig);
