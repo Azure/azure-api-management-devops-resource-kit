@@ -69,7 +69,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             parametersTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
             parametersTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             parametersTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
-
         }
 
         [Fact]
@@ -105,9 +104,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 paramApiOauth2Scope: "true",
-                apiOauth2ScopeParameters: new ApiOauth2ScopeProperty[1] { 
-                    new ApiOauth2ScopeProperty("api-name-2", "scope_value2")
-                }
+                apiParameters: new Dictionary<string, ApiParameterProperty> { { "api-name-2", new ApiParameterProperty(oauth2Scope: "scope_value2", serviceUrl: null) } }
             );
             var extractorParameters = new ExtractorParameters(extractorConfig);
 

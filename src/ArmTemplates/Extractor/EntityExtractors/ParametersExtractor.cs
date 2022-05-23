@@ -103,15 +103,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     var validApiName = ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
 
-                    string serviceUrl;
-                    if (extractorParameters.ServiceUrlParameters is null)
+                    string serviceUrl = null;
+                    if (extractorParameters.ApiParameters is null)
                     {
                         var apiDetails = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
                         serviceUrl = apiDetails.Properties.ServiceUrl;
                     }
                     else
                     {
-                        serviceUrl = extractorParameters.ServiceUrlParameters.FirstOrDefault(x => x.ApiName.Equals(apiName))?.ServiceUrl;
+                        if (extractorParameters.ApiParameters.ContainsKey(apiName))
+                        {
+                            serviceUrl = extractorParameters.ApiParameters[apiName].ServiceUrl;
+                        }
                     }
 
                     serviceUrls.Add(validApiName, serviceUrl);
@@ -134,16 +137,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                     if (apiDetails.Properties.AuthenticationSettings?.OAuth2 is not null)
                     {
-                        string apiOAuthScope;
+                        string apiOAuthScope = null;
                         var validApiName = ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
 
-                        if (extractorParameters.ApiOauth2ScopeParameters is null)
+                        if (extractorParameters.ApiParameters is null)
                         {
                             apiOAuthScope = apiDetails.Properties.AuthenticationSettings.OAuth2?.Scope;
                         }
                         else
                         {
-                            apiOAuthScope = extractorParameters.ApiOauth2ScopeParameters.FirstOrDefault(x => x.ApiName.Equals(apiName))?.Scope;
+                            if (extractorParameters.ApiParameters.ContainsKey(apiName))
+                            {
+                                apiOAuthScope = extractorParameters.ApiParameters[apiName].Oauth2Scope;
+                            }
                         }
 
                         apiOauth2Scopes.Add(validApiName, apiOAuthScope);

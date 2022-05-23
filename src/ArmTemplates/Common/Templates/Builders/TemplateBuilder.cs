@@ -105,7 +105,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public TemplateBuilder AddParameterizedServiceUrlProperty(ExtractorParameters extractorParameters)
         {
-            if (extractorParameters.ParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
+            if (extractorParameters.ParameterizeServiceUrl)
             {
                 TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
                 {

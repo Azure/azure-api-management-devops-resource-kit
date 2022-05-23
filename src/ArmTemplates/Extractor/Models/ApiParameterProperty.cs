@@ -5,16 +5,16 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 {
-    public class ApiOauth2ScopeProperty
+    public class ApiParameterProperty
     {
-        public string ApiName { get; private set; }
+        public string Oauth2Scope { get; private set; }
 
-        public string Scope { get; private set; }
+        public string ServiceUrl { get; private set; }
 
-        public ApiOauth2ScopeProperty(string apiName, string scope)
+        public ApiParameterProperty(string oauth2Scope, string serviceUrl)
         {
-            this.ApiName = apiName;
-            this.Scope = scope;
+            this.Oauth2Scope = oauth2Scope;
+            this.ServiceUrl = serviceUrl;
         }
     }
 }

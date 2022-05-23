@@ -3,6 +3,7 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using CommandLine;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -60,9 +61,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "baseFileName", HelpText = "Specify base name of the template file")]
         public string BaseFileName { get; set; }
 
-        // this is used only from json-file and --extractorConfig option, so no option possibility here
-        public ServiceUrlProperty[] ServiceUrlParameters { get; set; }
-
         [Option(longName: "paramServiceUrl", HelpText = "Parameterize serviceUrl")]
         public string ParamServiceUrl { get; set; }
 
@@ -102,7 +100,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "paramApiOauth2Scope", HelpText = "Parametrize API OAuth2 scope values")]
         public string ParamApiOauth2Scope { get; set; }
 
-        // this is used only from json-file and --extractorConfig option, so no option possibility here
-        public ApiOauth2ScopeProperty[] ApiOauth2ScopeParameters { get; set; }
+        /// <summary>
+        /// Api parameter properties for overriding Api OAuth2 scope or/and Service urloverride. Available via extractor-config file only.
+        /// </summary>
+        public Dictionary<string, ApiParameterProperty> ApiParameters { get; set; }
     }
 }

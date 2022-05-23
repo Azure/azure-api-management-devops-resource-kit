@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 policyXmlSasToken: "policyXmlSasToken",
                 linkedTemplatesBaseUrl: "linkedBaseUrl",
                 linkedTemplatesSasToken: "linkedUrlToken",
-                serviceUrlParameters: new[] { new ServiceUrlProperty("test-service-url-property-api-name", "test-service-url-property-url") },
+                apiParameters: new Dictionary<string, ApiParameterProperty> { { "test-service-url-property-api-name", new ApiParameterProperty(null, "test-service-url-property-url") } },
                 paramServiceUrl: "true",
                 paramNamedValue: "true",
                 paramApiLoggerId: "true",

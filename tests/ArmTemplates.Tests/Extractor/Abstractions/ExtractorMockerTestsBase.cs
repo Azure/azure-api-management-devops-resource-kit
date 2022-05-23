@@ -3,6 +3,7 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
@@ -26,6 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         protected const bool MockIncludeAllRevisions = true;
         protected const string MockBaseFileName = "test-base-file-name";
         protected static ServiceUrlProperty[] MockServiceUrlParameters = new[] { new ServiceUrlProperty("test-service-url-property-api-name", "test-service-url-property-url") };
+        protected static Dictionary<string, ApiParameterProperty> MockApiParameters = new Dictionary<string, ApiParameterProperty> { { "api-name-1", new ApiParameterProperty("oauth2-scope-value", "test-service-url") } };
         protected const bool MockParameterizeServiceUrl = true;
         protected const bool MockParameterizeNamedValue = true;
         protected const bool MockParameterizeApiLoggerId = true;
@@ -65,7 +67,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ApiVersionSetName = apiVersionSetName,
                 IncludeAllRevisions = includeAllRevisions.ToString(),
                 BaseFileName = MockBaseFileName,
-                ServiceUrlParameters = MockServiceUrlParameters,
                 ParamServiceUrl = MockParameterizeServiceUrl.ToString(),
                 ParamNamedValue = MockParameterizeNamedValue.ToString(),
                 ParamApiLoggerId = toParameterizeApiLoggerId.ToString(),
@@ -75,7 +76,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ParamNamedValuesKeyVaultSecrets = MockToParameterizeNamedValuesKeyVaultSecrets.ToString(),
                 OperationBatchSize = MockOperationBatchSize,
                 ParamBackend = MockParameterizeBackendSettings.ToString(),
-                ExtractGateways = MockExtractGateways.ToString()
+                ExtractGateways = MockExtractGateways.ToString(),
+                ApiParameters = MockApiParameters
             };
         }
 
@@ -95,7 +97,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                string apiVersionSetName = null,
                string includeAllRevisions = null,
                string baseFileName = null,
-               ServiceUrlProperty[] serviceUrlParameters = null,
                string paramServiceUrl = null,
                string paramNamedValue = null,
                string paramApiLoggerId = null,
@@ -109,7 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                string overrideGroupGuids = null,
                string overrideProductGuids = null,
                string paramApiOauth2Scope = null,
-               ApiOauth2ScopeProperty[] apiOauth2ScopeParameters = null
+               Dictionary<string, ApiParameterProperty> apiParameters = null
          )
         {
 
@@ -130,7 +131,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ApiVersionSetName = apiVersionSetName,
                 IncludeAllRevisions = includeAllRevisions,
                 BaseFileName = baseFileName,
-                ServiceUrlParameters = serviceUrlParameters,
                 ParamServiceUrl = paramServiceUrl,
                 ParamNamedValue = paramNamedValue,
                 ParamApiLoggerId = paramApiLoggerId,
@@ -144,7 +144,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 OverrideGroupGuids = overrideGroupGuids,
                 OverrideProductGuids = overrideProductGuids,
                 ParamApiOauth2Scope = paramApiOauth2Scope,
-                ApiOauth2ScopeParameters = apiOauth2ScopeParameters
+                ApiParameters = apiParameters
             };
         }
     }
