@@ -4,7 +4,6 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -19,7 +18,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         public const string ServiceApiName1 = "api-name-1";
         public const string ServiceApiName2 = "api-name-2";
 
-        public static ApiProperties GetMockedServiceApiProperties2() { 
+        public static ApiProperties GetMockedServiceApiProperties2()
+        { 
             return  new ApiProperties
             {
                 DisplayName = "api-display-name-2",

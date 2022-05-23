@@ -147,7 +147,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (extractorParameters.ParametrizeApiOauth2Scope)
             {
-                //add parameters to the template
                 if (apiResource.Properties.AuthenticationSettings?.OAuth2?.Scope is not null)
                 {
                     apiResource.Properties.AuthenticationSettings.OAuth2.Scope = $"[parameters('{ParameterNames.ApiOauth2ScopeSettings}').{ParameterNamingHelper.GenerateValidParameterName(originalServiceApiName, ParameterPrefix.ApiOauth2Scope)}]";
