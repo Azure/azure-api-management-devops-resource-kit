@@ -135,7 +135,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     string apiOAuthScope;
                     var apiDetails = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
 
-                    if (apiDetails.Properties.AuthenticationSettings?.OAuth2 is not null) {
+                    if (apiDetails.Properties.AuthenticationSettings?.OAuth2 is not null)
+                    {
                         if (extractorParameters.ApiOauth2ScopeParameters is null)
                         {
                             apiOAuthScope = apiDetails.Properties.AuthenticationSettings.OAuth2?.Scope;
