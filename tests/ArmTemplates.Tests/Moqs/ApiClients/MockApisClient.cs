@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -18,40 +19,49 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         public const string ServiceApiName1 = "api-name-1";
         public const string ServiceApiName2 = "api-name-2";
 
-        public static ApiProperties ServiceApiProperties1 = new ApiProperties
-        {
-            DisplayName = "api-display-name-1",
-            ApiRevision = "1",
-            Description = "api-description-1",
-            SubscriptionRequired = true,
-            ServiceUrl = "https://azure-service-1-url.com",
-            Path = "path-1",
-            Protocols = new [] { "https" },
-            IsCurrent = true
-        };
-
-        public static ApiProperties ServiceApiProperties2 = new ApiProperties
-        {
-            DisplayName = "api-display-name-2",
-            ApiRevision = "2",
-            Description = "api-description-2",
-            SubscriptionRequired = true,
-            ServiceUrl = "https://azure-service-2-url.com",
-            Path = "path-2",
-            Protocols = new[] { "https" },
-            IsCurrent = true,
-            AuthenticationSettings = new ApiTemplateAuthenticationSettings 
+        public static ApiProperties GetMockedServiceApiProperties2() { 
+            return  new ApiProperties
             {
-                OAuth2 = new ApiTemplateOAuth2 { 
-                    Scope = "scope-default-value-2",
-                    AuthorizationServerId = "auth-server-id-1"
+                DisplayName = "api-display-name-2",
+                ApiRevision = "2",
+                Description = "api-description-2",
+                SubscriptionRequired = true,
+                ServiceUrl = "https://azure-service-2-url.com",
+                Path = "path-2",
+                Protocols = new[] { "https" },
+                IsCurrent = true,
+                AuthenticationSettings = new ApiTemplateAuthenticationSettings
+                {
+                    OAuth2 = new ApiTemplateOAuth2
+                    {
+                        Scope = "scope-default-value-2",
+                        AuthorizationServerId = "auth-server-id-1"
+                    }
                 }
-            }
-        };
+            };
+        }
+
+        public static ApiProperties GetMockedServiceApiProperties1()
+        {
+            return new ApiProperties
+            {
+                DisplayName = "api-display-name-1",
+                ApiRevision = "1",
+                Description = "api-description-1",
+                SubscriptionRequired = true,
+                ServiceUrl = "https://azure-service-1-url.com",
+                Path = "path-1",
+                Protocols = new[] { "https" },
+                IsCurrent = true
+            };
+        }
 
         public static IApisClient GetMockedApiClientWithDefaultValues()
         {
             var mockServiceApiProductsApiClient = new Mock<IApisClient>(MockBehavior.Strict);
+
+            var serviceProperties1 = GetMockedServiceApiProperties1();
+            var serviceProperties2 = GetMockedServiceApiProperties2();
 
             mockServiceApiProductsApiClient
                 .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
@@ -61,14 +71,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     {
                         Name = ServiceApiName1,
                         Type = TemplateType,
-                        Properties = ServiceApiProperties1
+                        Properties = serviceProperties1
                     },
 
                     new ApiTemplateResource
                     {
                         Name = ServiceApiName2,
                         Type = TemplateType,
-                        Properties = ServiceApiProperties2
+                        Properties = serviceProperties2
                     },
                 });
 
@@ -80,14 +90,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     {
                         Name = $"{gatewayName}-{ServiceApiName1}",
                         Type = TemplateType,
-                        Properties = ServiceApiProperties1
+                        Properties = serviceProperties1
                     },
 
                     new ApiTemplateResource
                     {
                         Name = $"{gatewayName}-{ServiceApiName2}",
                         Type = TemplateType,
-                        Properties = ServiceApiProperties2
+                        Properties = serviceProperties2
                     },
                 });
 
@@ -97,7 +107,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     Name = ServiceApiName1,
                     Type = TemplateType,
-                    Properties = ServiceApiProperties1
+                    Properties = serviceProperties1
                 });
 
             mockServiceApiProductsApiClient
@@ -106,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     Name = ServiceApiName2,
                     Type = TemplateType,
-                    Properties = ServiceApiProperties2
+                    Properties = serviceProperties2
                 });
 
             mockServiceApiProductsApiClient
@@ -117,14 +127,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     {
                         Name = ServiceApiName1,
                         Type = TemplateType,
-                        Properties = ServiceApiProperties1
+                        Properties = serviceProperties1
                     },
 
                     new ApiTemplateResource
                     {
                         Name = ServiceApiName2,
                         Type = TemplateType,
-                        Properties = ServiceApiProperties2
+                        Properties = serviceProperties2
                     }
                 });
 

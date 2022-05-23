@@ -262,10 +262,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 masterResourceTemplate.Properties.Parameters.Add(ParameterNames.ServiceUrl, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.ServiceUrl}')]" });
             }
+
             if (extractorParameters.ParameterizeApiLoggerId)
             {
                 masterResourceTemplate.Properties.Parameters.Add(ParameterNames.ApiLoggerId, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.ApiLoggerId}')]" });
             }
+
+            if (extractorParameters.ParametrizeApiOauth2Scope)
+            {
+                masterResourceTemplate.Properties.Parameters.Add(ParameterNames.ApiOauth2ScopeSettings, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.ApiOauth2ScopeSettings}')]" });
+            }
+
             return masterResourceTemplate;
         }
 
@@ -421,6 +428,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 parameters.Add(
                     ParameterNames.BackendSettings,
                     new TemplateParameterProperties(metadataDescription: "The settings for the Backends", type: "object"));
+            }
+
+            if (extractorParameters.ParametrizeApiOauth2Scope)
+            {
+                parameters.Add(
+                    ParameterNames.ApiOauth2ScopeSettings,
+                    new TemplateParameterProperties(metadataDescription: "The settings for the APIs Oauth2 Scope values", type: "object"));
             }
 
             return parameters;

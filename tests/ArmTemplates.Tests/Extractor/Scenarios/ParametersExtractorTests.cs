@@ -98,7 +98,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             parametersTemplate.Parameters.Should().NotContainKey(ParameterNames.PolicyXMLSasToken);
         }
 
-
         [Fact]
         public async Task GenerateParametersTemplates_ProperlyLaysTheInformation_ApiOauth2ScopeIncludedWSettings()
         {
@@ -127,9 +126,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiOauth2ScopeSettingsValue.Count.Should().Be(1);
             apiOauth2ScopeSettingsValue.Should().ContainKey("apiname2");
             apiOauth2ScopeSettingsValue["apiname2"].Should().BeEquivalentTo("scope_value2");
-            //apiOauth2ScopeSettingsValue["apiname2"].Should().BeEquivalentTo("scope_value2");
         }
-
 
         [Fact]
         public async Task GenerateParametersTemplates_ProperlyLaysTheInformation_ApiOauth2ScopeIncludedWOSettings()

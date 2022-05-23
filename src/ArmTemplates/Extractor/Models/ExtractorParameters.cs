@@ -153,6 +153,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.SplitApis = !string.IsNullOrEmpty(overridingConfig.SplitAPIs) ? overridingConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase) : this.SplitApis;
             this.IncludeAllRevisions = !string.IsNullOrEmpty(overridingConfig.IncludeAllRevisions) ? overridingConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase) : this.IncludeAllRevisions;
             this.ExtractGateways = !string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractGateways;
+            this.ParametrizeApiOauth2Scope = !string.IsNullOrEmpty(overridingConfig.ParametrizeApiOauth2Scope) ? overridingConfig.ParametrizeApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParametrizeApiOauth2Scope;
 
             if (!string.IsNullOrEmpty(overridingConfig.BaseFileName))
             {

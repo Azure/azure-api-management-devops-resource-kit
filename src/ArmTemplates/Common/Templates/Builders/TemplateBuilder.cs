@@ -121,7 +121,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         {
             if (extractorParameters.ParametrizeApiOauth2Scope)
             {
-                //check if there is existing api with such configured api scope or not if not let's not add it to the parameter later
                 TemplateParameterProperties apiScopeParameterProperty = new TemplateParameterProperties()
                 {
                     Type = "object"

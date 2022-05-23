@@ -33,16 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateApiTemplates_ProperlyLaysTheInformation));
 
-
-
-
-            /*
-                
-                ExtractGateways = MockExtractGateways.ToString()
-             
-             */
-
-            var extractorDefaultConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 multipleAPIs: string.Empty,
                 apiVersionSetName: string.Empty,
                 includeAllRevisions: "false",
@@ -64,13 +55,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 parametrizeApiOauth2Scope: "true"
                 );
 
-
-            var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
-                splitApis: false,
-                apiVersionSetName: string.Empty,
-                multipleApiNames: string.Empty,
-                includeAllRevisions: false);
-            var extractorParameters = new ExtractorParameters(extractorDefaultConfig);
+            var extractorParameters = new ExtractorParameters(extractorConfig);
 
             // mocked clients
             var mockedApiClient = MockApisClient.GetMockedApiClientWithDefaultValues();
