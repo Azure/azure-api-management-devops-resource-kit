@@ -83,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         {
             if (extractorParameters.PolicyXMLBaseUrl != null)
             {
-                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
+                var policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
                 {
                     Type = "string"
                 };
@@ -92,7 +92,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
                 if (extractorParameters.PolicyXMLSasToken != null)
                 {
-                    TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                    var policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                     {
                         Type = "string"
                     };
@@ -107,7 +107,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         {
             if (extractorParameters.ParameterizeServiceUrl)
             {
-                TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
+                var serviceUrlParamProperty = new TemplateParameterProperties()
                 {
                     Type = "object"
                 };
@@ -121,7 +121,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         {
             if (extractorParameters.ParametrizeApiOauth2Scope)
             {
-                TemplateParameterProperties apiScopeParameterProperty = new TemplateParameterProperties()
+                var apiScopeParameterProperty = new TemplateParameterProperties()
                 {
                     Type = "object"
                 };
@@ -135,7 +135,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         {
             if (extractorParameters.ParameterizeApiLoggerId)
             {
-                TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
+                var apiLoggerProperty = new TemplateParameterProperties()
                 {
                     Type = "object"
                 };
