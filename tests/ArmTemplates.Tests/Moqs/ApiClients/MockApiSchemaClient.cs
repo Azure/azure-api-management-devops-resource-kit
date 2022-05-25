@@ -49,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         {
             // arrange
             FileReader fileReader = new FileReader();
-            string fileLocation = Path.Combine("Resources", "GraphqlSchema", "spacexSchema.gql");
+            string fileLocation = Path.Combine("Resources", "OpenAPISpecs", "spacexSchema.gql");
 
             Task<string> fileReadingTask = fileReader.RetrieveFileContentsAsync(fileLocation);
 

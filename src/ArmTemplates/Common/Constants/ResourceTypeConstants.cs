@@ -33,7 +33,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string Tag = "Microsoft.ApiManagement/service/tags";
         public const string Gateway = "Microsoft.ApiManagement/service/gateways";
         public const string GatewayApi = "Microsoft.ApiManagement/service/gateways/apis";
-        public const string SchemaContentType = "application/vnd.ms-azure-apim.graphql.schema";
         public const string ArmDeployments = "Microsoft.Resources/deployments";
     }
 }

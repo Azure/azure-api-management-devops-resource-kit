@@ -143,20 +143,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         [Fact]
         public async Task GenerateGraphQLApiTemplates()
         {
-
             FileReader fileReader = new FileReader();
-            string fileLocation = Path.Combine("Resources", "GraphqlSchema", "spacexSchema.gql");
+            string fileLocation = Path.Combine("Resources", "OpenAPISpecs", "spacexSchema.gql");
 
             Task<string> fileReadingTask = fileReader.RetrieveFileContentsAsync(fileLocation);
 
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGraphQLApiTemplates));
 
-            var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
-                splitApis: false,
-                apiVersionSetName: string.Empty,
-                multipleApiNames: string.Empty,
-                includeAllRevisions: false);
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+               sourceApimName: string.Empty,
+               destinationApimName: string.Empty,
+               resourceGroup: string.Empty,
+               fileFolder: string.Empty,
+               apiName: string.Empty);
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             // mocked clients
@@ -200,23 +200,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             // assert
             File.Exists(Path.Combine(currentTestDirectory, apiTemplate.TypedResources.FileName)).Should().BeTrue();
-            Directory.GetFiles(Path.Combine(currentTestDirectory, PolicyExtractor.PoliciesDirectoryName)).Count().Should().Be(4);
-
-            apiTemplate.Parameters.Should().NotBeNull();
-            apiTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
-            apiTemplate.Parameters.Should().ContainKey(ParameterNames.ServiceUrl);
-            apiTemplate.Parameters.Should().ContainKey(ParameterNames.ApiLoggerId);
-            apiTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
-            apiTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
-            apiTemplate.Resources.Count().Should().Be(23);
-
             
+            //schema name
+            string schemaContentType = "application/vnd.ms-azure-apim.graphql.schema";
+
             // api schemas
             apiTemplate.TypedResources.ApiSchemas.Count().Should().Be(2);
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Type == ResourceTypeConstants.APISchema).Should().BeTrue();
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties is not null).Should().BeTrue();
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties.Document.Value.ToString().Equals(fileReadingTask.Result.ToString())).Should().BeTrue();
-            apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties.ContentType.Equals(ResourceTypeConstants.SchemaContentType)).Should().BeTrue();
+            apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties.ContentType.Equals(schemaContentType)).Should().BeTrue();
         }
     }
 }
