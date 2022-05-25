@@ -540,7 +540,7 @@ Extract **all APIs within paramNamedValue**, use the following parameters:
     "paramNamedValue": "true"
 }
 ```
-Extract **all APIs with parametrized ApiParameters predefined parameters**, use the following parameters: 
+Extract **all APIs with predefined values for Api parameters**, using the following Extractor configuration:
 ```
 {
     "sourceApimName": "<source-apim-name>",

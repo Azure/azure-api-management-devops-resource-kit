@@ -117,8 +117,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.OverrideGroupGuids = extractorConfig.OverrideGroupGuids != null && extractorConfig.OverrideGroupGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.OverrideProductGuids = extractorConfig.OverrideProductGuids != null && extractorConfig.OverrideProductGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ApiParameters = extractorConfig.ApiParameters;
-            this.ParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || (extractorConfig.ApiParameters != null && this.ApiParameters.Any(x => x.Value.ServiceUrl is not null));
-            this.ParametrizeApiOauth2Scope = (extractorConfig.ParamApiOauth2Scope != null && extractorConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase)) || (extractorConfig.ApiParameters != null && this.ApiParameters.Any(x => x.Value.Oauth2Scope is not null));
+            this.ParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.ServiceUrl is not null));
+            this.ParametrizeApiOauth2Scope = (extractorConfig.ParamApiOauth2Scope != null && extractorConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase)) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.Oauth2Scope is not null));
         }
 
         public ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)

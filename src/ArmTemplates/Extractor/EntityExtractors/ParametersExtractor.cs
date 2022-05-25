@@ -140,7 +140,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         string apiOAuthScope = null;
                         var validApiName = ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
 
-                        if (extractorParameters.ApiParameters is null)
+                        if (extractorParameters.ApiParameters.IsNullOrEmpty())
                         {
                             apiOAuthScope = apiDetails.Properties.AuthenticationSettings.OAuth2?.Scope;
                         }
