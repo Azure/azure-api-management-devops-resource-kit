@@ -144,7 +144,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         public async Task GenerateGraphQLApiTemplates()
         {
             FileReader fileReader = new FileReader();
-            string fileLocation = Path.Combine("Resources", "OpenAPISpecs", "spacexSchema.gql");
+            string fileLocation = Path.Combine("Resources", "Schemas", "schema.gql");
 
             Task<string> fileReadingTask = fileReader.RetrieveFileContentsAsync(fileLocation);
 
