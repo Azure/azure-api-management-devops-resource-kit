@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             var tagNames = new List<string>()
             {
-                "tag 1", "tag2", "tag 3 ", "tag2"
+                "tag 1", "tag2", "tag 3", "tag2"
             };
             var apiTagNames = new List<string>()
             {
@@ -38,10 +38,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             };
             var apiTagNamesString = string.Join(", ", apiTagNames.ToArray());
 
-            var outputTags = new HashSet<string>();
-            
-            outputTags.UnionWith(tagNames);
-            outputTags.UnionWith(apiTagNames);
+            var expectedTagDictionary = new Dictionary<string, string>() 
+            {
+                { "tag-1", "tag 1" },
+                { "tag2", "tag2" },
+                { "tag-3" , "tag 3" },
+                { "api-tag-3", "api tag 3" },
+                { "api-tag2", "api tag2"}
+            };
 
             foreach (var tagName in tagNames)
             {
@@ -67,10 +71,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             tagTemplate.Resources.Count().Should().Be(5);
             
-            foreach (var tag in tagTemplate.Resources)
+            foreach (TagTemplateResource tag in tagTemplate.Resources)
             {
+                
                 var resourceTagName = tag.Name.Split("/")[1].Split("'")[0];
-                outputTags.Should().Contain(resourceTagName);
+                expectedTagDictionary.Should().ContainKey(resourceTagName);
+                var generatedTagDisplayName = expectedTagDictionary[resourceTagName];
+                tag.Properties.DisplayName.Equals(generatedTagDisplayName).Should().BeTrue();
             }
         }
 
@@ -90,6 +97,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             };
             var apiTagNamesString = string.Join(", ", apiTagNames.ToArray());
 
+            var expectedTagDictionary = new Dictionary<string, string>()
+            {
+                { "tag-1", "tag 1" },
+                { "tag2", "tag2" },
+                { "api-tag-3", "api tag 3" },
+                { "api-tag2", "api tag2"}
+            };
+
             var outputTags = new HashSet<string>();
             outputTags.UnionWith(apiTagNames);
 
@@ -105,10 +120,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             //assert
             tagTemplate.Resources.Count().Should().Be(4);
 
-            foreach (var tag in tagTemplate.Resources)
+            foreach (TagTemplateResource tag in tagTemplate.Resources)
             {
                 var resourceTagName = tag.Name.Split("/")[1].Split("'")[0];
-                outputTags.Should().Contain(resourceTagName);
+                expectedTagDictionary.Should().ContainKey(resourceTagName);
+                var generatedTagDisplayName = expectedTagDictionary[resourceTagName];
+                tag.Properties.DisplayName.Equals(generatedTagDisplayName).Should().BeTrue();
             }
         }
     }

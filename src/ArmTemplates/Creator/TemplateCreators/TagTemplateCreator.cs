@@ -11,6 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
@@ -23,10 +24,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
+        private void PlaceTagNameToDictionary(string tagName, Dictionary<string, string> tagsDictionary)
+        {
+            var resourceName = ResourceNamingHelper.GenerateValidResourceNameFromDisplayName(tagName);
+
+            if (tagsDictionary.ContainsKey(resourceName))
+            {
+                var existingValue = tagsDictionary[resourceName];
+                if (!existingValue.Equals(tagName))
+                {
+                    throw new Exception("Error ocured during generation of tag template. Please consider renaming the tag.");
+                }
+            }
+            else
+            {
+                tagsDictionary.Add(resourceName, tagName);
+            }
+        }
+
         public Template CreateTagTemplate(CreatorParameters creatorConfig)
         {
             var tagTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
-            var tagHashset = new HashSet<string>();
+            var tagsDictionary = new Dictionary<string, string>();
 
             if (!creatorConfig.Apis.IsNullOrEmpty())
             {
@@ -38,7 +57,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                         
                         foreach (var apiTag in apiTags)
                         {
-                            tagHashset.Add(apiTag);
+                            this.PlaceTagNameToDictionary(apiTag, tagsDictionary);
                         }
                     }
                 }
@@ -48,22 +67,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 foreach (var tag in creatorConfig.Tags)
                 {
-                    tagHashset.Add(tag.DisplayName);
+                    this.PlaceTagNameToDictionary(tag.DisplayName, tagsDictionary);
                 }
             }
 
             var resources = new List<TemplateResource>();
 
-            foreach (var tag in tagHashset)
+            foreach (var (tagResourceName, tagDisplayName) in tagsDictionary)
             {
                 var tagTemplateResource = new TagTemplateResource()
                 {
-                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag}')]",
+                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tagResourceName}')]",
                     Type = ResourceTypeConstants.Tag,
                     ApiVersion = GlobalConstants.ApiVersion,
                     Properties = new TagProperties()
                     {
-                        DisplayName = tag
+                        DisplayName = tagDisplayName
                     }
                 };
                 resources.Add(tagTemplateResource);
