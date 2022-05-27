@@ -33,11 +33,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateApiTemplates_ProperlyLaysTheInformation));
 
-            var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
-                splitApis: false,
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                multipleAPIs: string.Empty,
                 apiVersionSetName: string.Empty,
-                multipleApiNames: string.Empty,
-                includeAllRevisions: false);
+                includeAllRevisions: "false",
+                splitAPIs: "false",
+                policyXmlBaseUrl: "policyXmlUrl",
+                policyXmlSasToken: "policyXmlSasToken",
+                linkedTemplatesBaseUrl: "linkedBaseUrl",
+                linkedTemplatesSasToken: "linkedUrlToken",
+                apiParameters: new Dictionary<string, ApiParameterProperty> { { "test-service-url-property-api-name", new ApiParameterProperty(null, "test-service-url-property-url") } },
+                paramServiceUrl: "true",
+                paramNamedValue: "true",
+                paramApiLoggerId: "true",
+                paramLogResourceId: "true",
+                serviceBaseUrl: "test-service-base-url",
+                notIncludeNamedValue: "true",
+                paramNamedValuesKeyVaultSecrets: "true",
+                paramBackend: "true",
+                extractGateways: "true",
+                paramApiOauth2Scope: "true"
+                );
+
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             // mocked clients

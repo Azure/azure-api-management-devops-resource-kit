@@ -39,6 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string LinkedTemplatesBaseUrl = "linkedTemplatesBaseUrl";
         public const string NamedValueKeyVaultSecrets = "namedValueKeyVaultSecrets";
         public const string BackendSettings = "backendSettings";
+        public const string ApiOauth2ScopeSettings = "apiOauth2ScopeSettings";
     }
 
     public static class ParameterPrefix
@@ -48,5 +49,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string Property = "Property";
         public const string LogResourceId = "LogResourceId";
         public const string Backend = "Backend";
+        public const string ApiOauth2Scope = "ApiOauth2Scope";
     }
 }
