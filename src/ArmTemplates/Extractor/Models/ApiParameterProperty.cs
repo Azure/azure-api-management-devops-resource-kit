@@ -7,9 +7,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 {
     public class ApiParameterProperty
     {
-        public string Oauth2Scope { get; private set; }
+        public string Oauth2Scope { get; }
 
-        public string ServiceUrl { get; private set; }
+        public string ServiceUrl { get;  }
 
         public ApiParameterProperty(string oauth2Scope, string serviceUrl)
         {
