@@ -64,8 +64,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     Properties = new TagProperties()
                     {
                         DisplayName = tag
-                    },
-                    DependsOn = new string[] { }
+                    }
                 };
                 resources.Add(tagTemplateResource);
             }
