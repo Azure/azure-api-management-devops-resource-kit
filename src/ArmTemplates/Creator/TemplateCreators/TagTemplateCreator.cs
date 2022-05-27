@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tag
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
@@ -24,42 +25,38 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
 
         public Template CreateTagTemplate(CreatorParameters creatorConfig)
         {
-            // create empty template
-            Template tagTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
+            var tagTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
+            var tagHashset = new HashSet<string>();
 
-            // add parameters
-            tagTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
+            if (!creatorConfig.Apis.IsNullOrEmpty())
             {
-                {ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Type = "string" }}
-            };
-
-            // aggregate all tags from apis
-            HashSet<string> tagHashset = new HashSet<string>();
-            List<ApiConfig> apis = creatorConfig.Apis;
-            if (apis != null)
-            {
-                foreach (ApiConfig api in apis)
+                foreach (var api in creatorConfig.Apis)
                 {
                     if (api.Tags != null)
                     {
-                        string[] apiTags = api.Tags.Split(", ");
-                        foreach (string apiTag in apiTags)
+                        var apiTags = api.Tags.Split(", ");
+                        
+                        foreach (var apiTag in apiTags)
                         {
                             tagHashset.Add(apiTag);
                         }
                     }
                 }
             }
-            foreach (TagProperties tag in creatorConfig.Tags)
+
+            if (!creatorConfig.Tags.IsNullOrEmpty())
             {
-                tagHashset.Add(tag.DisplayName);
+                foreach (var tag in creatorConfig.Tags)
+                {
+                    tagHashset.Add(tag.DisplayName);
+                }
             }
 
-            List<TemplateResource> resources = new List<TemplateResource>();
-            foreach (string tag in tagHashset)
+            var resources = new List<TemplateResource>();
+
+            foreach (var tag in tagHashset)
             {
-                // create tag resource with properties
-                TagTemplateResource tagTemplateResource = new TagTemplateResource()
+                var tagTemplateResource = new TagTemplateResource()
                 {
                     Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag}')]",
                     Type = ResourceTypeConstants.Tag,
