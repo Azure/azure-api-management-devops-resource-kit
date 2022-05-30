@@ -169,6 +169,30 @@ _Additional properties found in [APITemplateSubscriptionKeyParameterNames](https
 
 
 
+### Sanitizing tags
+
+While creating config file, please keep in mind that the tag resource name will be generated from sanitized tag's display name.
+
+For example config:
+
+```
+tags: 
+ - displayName: tag 1
+ - displayName: tag 2
+```
+Will result two tag resources:
+```
+Tag 1:
+  resource name = tag-1
+  display name = tag 1
+
+Tag 2:
+  resource name = tag-2
+  display name = tag 2
+```
+
+In case there are two different tags which result the same sanitized tag's name program will throw an **exception** with conflicting tags.  
+
 ### Sample Config File
 
 The following is a full config.yml file with each property listed:
