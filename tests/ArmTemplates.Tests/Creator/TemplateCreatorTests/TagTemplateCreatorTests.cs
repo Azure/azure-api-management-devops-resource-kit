@@ -13,22 +13,51 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Param
 using System.Linq;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
     public class TagTemplateCreatorTests
     {
+
+        CreatorParameters GenerateCreatorParameters(List<string> tagNames = null, List<string> apiTagNames = null)
+        {
+            var creatorConfig = new CreatorParameters();
+
+            if (!tagNames.IsNullOrEmpty())
+            {
+                creatorConfig.Tags = new List<TagProperties>();
+                foreach (var tagName in tagNames)
+                {
+                    var tag = new TagProperties
+                    {
+                        DisplayName = tagName
+                    };
+                    creatorConfig.Tags.Add(tag);
+                }
+            }
+
+            if (!apiTagNames.IsNullOrEmpty())
+            {
+                creatorConfig.Apis = new List<ApiConfig>();
+                var apiTagNamesString = string.Join(", ", apiTagNames.ToArray());
+
+                var apiConfig = new ApiConfig
+                {
+                    Tags = apiTagNamesString
+                };
+
+                creatorConfig.Apis.Add(apiConfig);
+            }
+
+            return creatorConfig;
+        }
+
         [Fact]
         public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenApiTagsAndConfigTags()
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
             
-            var creatorConfig = new CreatorParameters() 
-            { 
-                Tags = new List<TagProperties>(),
-                Apis = new List<ApiConfig>()
-            };
-
             var tagNames = new List<string>()
             {
                 "tag 1", "tag2", "tag 3", "tag2"
@@ -37,31 +66,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             {
                 "tag 1", "tag2", "api tag 3", "api tag2"
             };
-            var apiTagNamesString = string.Join(", ", apiTagNames.ToArray());
 
-            var expectedTagDictionary = new Dictionary<string, string>() 
+            var creatorConfig = this.GenerateCreatorParameters(tagNames, apiTagNames);
+
+            var expectedTagDictionary = new Dictionary<string, string>()
             {
                 { "tag-1", "tag 1" },
                 { "tag2", "tag2" },
                 { "tag-3" , "tag 3" },
                 { "api-tag-3", "api tag 3" },
-                { "api-tag2", "api tag2"}
+                { "api-tag2", "api tag2" }
             };
-
-            foreach (var tagName in tagNames)
-            {
-                var tag = new TagProperties
-                {
-                    DisplayName = tagName
-                };
-                creatorConfig.Tags.Add(tag);
-            }
-
-            var apiConfig = new ApiConfig
-            {
-                Tags = apiTagNamesString
-            };
-            creatorConfig.Apis.Add(apiConfig);
 
             //act
             var tagTemplate = tagTemplateCreator.CreateTagTemplate(creatorConfig);
@@ -86,33 +101,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
 
-            var creatorConfig = new CreatorParameters()
-            {
-                Apis = new List<ApiConfig>()
-            };
-
             var apiTagNames = new List<string>()
             {
                 "tag 1", "tag2", "api tag 3", "api tag2"
             };
-            var apiTagNamesString = string.Join(", ", apiTagNames.ToArray());
+            var creatorConfig = this.GenerateCreatorParameters(apiTagNames: apiTagNames);
 
             var expectedTagsDictionary = new Dictionary<string, string>()
             {
                 { "tag-1", "tag 1" },
                 { "tag2", "tag2" },
                 { "api-tag-3", "api tag 3" },
-                { "api-tag2", "api tag2"}
+                { "api-tag2", "api tag2" }
             };
-
-            var outputTags = new HashSet<string>();
-            outputTags.UnionWith(apiTagNames);
-
-            var apiConfig = new ApiConfig
-            {
-                Tags = apiTagNamesString
-            };
-            creatorConfig.Apis.Add(apiConfig);
 
             //act
             var tagTemplate = tagTemplateCreator.CreateTagTemplate(creatorConfig);
@@ -134,15 +135,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
 
-            var creatorConfig = new CreatorParameters()
-            {
-                Tags = new List<TagProperties>()
-            };
-
             var tagNames= new List<string>()
             {
                 "tag 1?", "?tag 1?"
             };
+
+            var creatorConfig = this.GenerateCreatorParameters(tagNames: tagNames);
 
             foreach (var tagName in tagNames)
             {

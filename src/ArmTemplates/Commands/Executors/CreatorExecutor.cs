@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
@@ -205,7 +206,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             this.logger.LogInformation("Creating tag template");
             this.logger.LogInformation("------------------------------------------");
-            var tagTemplate = this.creatorParameters.Tags is not null || this.creatorParameters.Apis.Any(x => x.Tags is not null) ? this.tagTemplateCreator.CreateTagTemplate(this.creatorParameters) : null;
+            var tagTemplate = !this.creatorParameters.Tags.IsNullOrEmpty() || this.creatorParameters.Apis.Any(x => !x.Tags.IsNullOrEmpty()) ? this.tagTemplateCreator.CreateTagTemplate(this.creatorParameters) : null;
 
             // create parameters file
             var templateParameters = this.masterTemplateCreator.CreateMasterTemplateParameterValues(this.creatorParameters);
