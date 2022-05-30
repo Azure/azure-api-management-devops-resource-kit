@@ -11,7 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bui
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
-using System;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
@@ -24,40 +24,40 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
-        private void PlaceTagNameToDictionary(string tagName, Dictionary<string, string> tagsDictionary)
-        {
-            var resourceName = ResourceNamingHelper.GenerateValidResourceNameFromDisplayName(tagName);
-
-            if (tagsDictionary.ContainsKey(resourceName))
-            {
-                var existingValue = tagsDictionary[resourceName];
-                if (!existingValue.Equals(tagName))
-                {
-                    throw new Exception("Error ocured during generation of tag template. Please consider renaming the tag.");
-                }
-            }
-            else
-            {
-                tagsDictionary.Add(resourceName, tagName);
-            }
-        }
-
         public Template CreateTagTemplate(CreatorParameters creatorConfig)
         {
             var tagTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
             var tagsDictionary = new Dictionary<string, string>();
 
+            void AddTagNameToDictionary(string tagName, Dictionary<string, string> tagsDictionary)
+            {
+                var resourceName = ResourceNamingHelper.GenerateValidResourceNameFromDisplayName(tagName);
+
+                if (tagsDictionary.ContainsKey(resourceName))
+                {
+                    var existingValue = tagsDictionary[resourceName];
+                    if (!existingValue.Equals(tagName))
+                    {
+                        throw new DuplicateTagResourceNameException(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, existingValue, tagName, resourceName));
+                    }
+                }
+                else
+                {
+                    tagsDictionary.Add(resourceName, tagName);
+                }
+            }
+
             if (!creatorConfig.Apis.IsNullOrEmpty())
             {
                 foreach (var api in creatorConfig.Apis)
                 {
-                    if (api.Tags != null)
+                    if (!api.Tags.IsNullOrEmpty())
                     {
                         var apiTags = api.Tags.Split(", ");
                         
                         foreach (var apiTag in apiTags)
                         {
-                            this.PlaceTagNameToDictionary(apiTag, tagsDictionary);
+                            AddTagNameToDictionary(apiTag, tagsDictionary);
                         }
                     }
                 }
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 foreach (var tag in creatorConfig.Tags)
                 {
-                    this.PlaceTagNameToDictionary(tag.DisplayName, tagsDictionary);
+                    AddTagNameToDictionary(tag.DisplayName, tagsDictionary);
                 }
             }
 

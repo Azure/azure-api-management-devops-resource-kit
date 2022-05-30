@@ -12,13 +12,14 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
     public class TagTemplateCreatorTests
     {
         [Fact]
-        public void ShouldCreateTagFromCreatorConfig_GivenApiTagsAndConfigTags()
+        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenApiTagsAndConfigTags()
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
             
@@ -73,7 +74,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             
             foreach (TagTemplateResource tag in tagTemplate.Resources)
             {
-                
                 var resourceTagName = tag.Name.Split("/")[1].Split("'")[0];
                 expectedTagDictionary.Should().ContainKey(resourceTagName);
                 var generatedTagDisplayName = expectedTagDictionary[resourceTagName];
@@ -82,7 +82,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         }
 
         [Fact]
-        public void ShouldCreateTagFromCreatorConfig_GivenOnlyApiTags()
+        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenOnlyApiTags()
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
 
@@ -97,7 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             };
             var apiTagNamesString = string.Join(", ", apiTagNames.ToArray());
 
-            var expectedTagDictionary = new Dictionary<string, string>()
+            var expectedTagsDictionary = new Dictionary<string, string>()
             {
                 { "tag-1", "tag 1" },
                 { "tag2", "tag2" },
@@ -123,10 +123,39 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             foreach (TagTemplateResource tag in tagTemplate.Resources)
             {
                 var resourceTagName = tag.Name.Split("/")[1].Split("'")[0];
-                expectedTagDictionary.Should().ContainKey(resourceTagName);
-                var generatedTagDisplayName = expectedTagDictionary[resourceTagName];
+                expectedTagsDictionary.Should().ContainKey(resourceTagName);
+                var generatedTagDisplayName = expectedTagsDictionary[resourceTagName];
                 tag.Properties.DisplayName.Equals(generatedTagDisplayName).Should().BeTrue();
             }
+        }
+
+        [Fact]
+        public void CreateTagTemplate_ShouldThrowDuplicateTagResourceNameException_GivenDuplicateSanitizedDisplayName()
+        {
+            var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
+
+            var creatorConfig = new CreatorParameters()
+            {
+                Tags = new List<TagProperties>()
+            };
+
+            var tagNames= new List<string>()
+            {
+                "tag 1?", "?tag 1?"
+            };
+
+            foreach (var tagName in tagNames)
+            {
+                var tag = new TagProperties
+                {
+                    DisplayName = tagName
+                };
+                creatorConfig.Tags.Add(tag);
+            }
+
+            //act & assert
+            var exception = Assert.Throws<DuplicateTagResourceNameException>(() => tagTemplateCreator.CreateTagTemplate(creatorConfig));
+            exception.Message.Equals(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, "tag 1?", "?tag 1?", "tag-1")).Should().BeTrue();
         }
     }
 }
