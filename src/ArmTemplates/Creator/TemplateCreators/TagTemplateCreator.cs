@@ -28,12 +28,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
         {
             var resourceName = NamingHelper.GenerateValidResourceNameFromDisplayName(tagName);
 
+            if (string.IsNullOrEmpty(resourceName)) 
+            {
+                throw new EmptyResourceNameException(tagName);
+            }
+
             if (tagsDictionary.ContainsKey(resourceName))
             {
                 var existingValue = tagsDictionary[resourceName];
                 if (!existingValue.Equals(tagName))
                 {
-                    throw new DuplicateTagResourceNameException(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, existingValue, tagName, resourceName));
+                    throw new DuplicateTagResourceNameException(existingValue, tagName, resourceName);
                 }
             }
             else
@@ -53,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     if (!api.Tags.IsNullOrEmpty())
                     {
-                        var apiTags = api.Tags.Split(", ");
+                        var apiTags = api.Tags.Split(",");
                         
                         foreach (var apiTag in apiTags)
                         {

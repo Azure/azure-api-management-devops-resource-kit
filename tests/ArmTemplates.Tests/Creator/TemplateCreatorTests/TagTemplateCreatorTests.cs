@@ -41,7 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             if (!apiTagNames.IsNullOrEmpty())
             {
                 creatorConfig.Apis = new List<ApiConfig>();
-                var apiTagNamesString = string.Join(", ", apiTagNames.ToArray());
+                var apiTagNamesString = string.Join(",", apiTagNames.ToArray());
 
                 var apiConfig = new ApiConfig
                 {
@@ -70,7 +70,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             var creatorConfig = this.GenerateCreatorParameters(tagNames, apiTagNames);
 
-            var expectedTagDictionary = new Dictionary<string, string>()
+            var expectedTagsDictionary = new Dictionary<string, string>()
             {
                 { "tag-1", "tag 1" },
                 { "tag2", "tag2" },
@@ -85,15 +85,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             //assert
             tagTemplate.Parameters.Count().Should().Be(1);
             tagTemplate.Parameters.ContainsKey(ParameterNames.ApimServiceName).Should().BeTrue();
-
             tagTemplate.Resources.Count().Should().Be(5);
-            
+
+            var resourcesDictionary = new Dictionary<string, TagTemplateResource>();
             foreach (TagTemplateResource tag in tagTemplate.Resources)
             {
-                var resourceTagName = tag.Name.Split("/")[1].Split("'")[0];
-                expectedTagDictionary.Should().ContainKey(resourceTagName);
-                var generatedTagDisplayName = expectedTagDictionary[resourceTagName];
-                tag.Properties.DisplayName.Equals(generatedTagDisplayName).Should().BeTrue();
+                resourcesDictionary[tag.Name] = tag;
+            }
+
+            foreach (var (tagName, tagDisplayName) in expectedTagsDictionary) 
+            {
+                var resourceName = NamingHelper.GenerateParametrizedResourceName(ParameterNames.ApimServiceName, tagName);
+                resourcesDictionary.Should().ContainKey(resourceName);
+                var tagResource = resourcesDictionary[resourceName];
+                tagResource.Properties.DisplayName.Equals(tagDisplayName).Should().BeTrue();
             }
         }
 
@@ -122,12 +127,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             //assert
             tagTemplate.Resources.Count().Should().Be(4);
 
+            var resourcesDictionary = new Dictionary<string, TagTemplateResource>();
             foreach (TagTemplateResource tag in tagTemplate.Resources)
-            {    
-                var resourceTagName = tag.Name.Split("/")[1].Split("'")[0];
-                expectedTagsDictionary.Should().ContainKey(resourceTagName);
-                var generatedTagDisplayName = expectedTagsDictionary[resourceTagName];
-                tag.Properties.DisplayName.Equals(generatedTagDisplayName).Should().BeTrue();
+            {
+                resourcesDictionary[tag.Name] = tag;
+            }
+
+            foreach (var (tagName, tagDisplayName) in expectedTagsDictionary)
+            {
+                var resourceName = NamingHelper.GenerateParametrizedResourceName(ParameterNames.ApimServiceName, tagName);
+                resourcesDictionary.Should().ContainKey(resourceName);
+                var tagResource = resourcesDictionary[resourceName];
+                tagResource.Properties.DisplayName.Equals(tagDisplayName).Should().BeTrue();
             }
         }
 
@@ -143,19 +154,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
 
             var creatorConfig = this.GenerateCreatorParameters(tagNames: tagNames);
 
-            foreach (var tagName in tagNames)
-            {
-                var tag = new TagProperties
-                {
-                    DisplayName = tagName
-                };
-                creatorConfig.Tags.Add(tag);
-            }
-
             //act & assert
-
             Action act = () => tagTemplateCreator.CreateTagTemplate(creatorConfig);
             act.Should().Throw<DuplicateTagResourceNameException>().WithMessage(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, "tag 1?", "?tag 1?", "tag-1"));
+        }
+
+        [Fact]
+        public void CreateTagTemplate_ShouldThrowEmptyResourceNameAfterSanitizingErrorMessage_GivenOneEmptyTag()
+        {
+            var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
+
+            var apiTagNames = new List<string>()
+            {
+                "tag 1", "tag2", "api tag 3", " "
+            };
+            var creatorConfig = this.GenerateCreatorParameters(apiTagNames: apiTagNames);
+
+
+            //act & assert
+            Action act = () => tagTemplateCreator.CreateTagTemplate(creatorConfig);
+            act.Should().Throw<EmptyResourceNameException>().WithMessage(string.Format(ErrorMessages.EmptyResourceNameAfterSanitizingErrorMessage, " "));
         }
     }
 }

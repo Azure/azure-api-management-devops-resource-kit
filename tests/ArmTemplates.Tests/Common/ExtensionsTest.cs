@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Common
     public class ExtensionsTest
     {
         [Fact]
-        public void GenerateValidResourceNameFromDisplayName_ShouldReturnNull_GivenEmptyString() 
+        public void GenerateValidResourceNameFromDisplayName_ShouldReturnEmptyString_GivenEmptyString() 
         {
             var resourceName = NamingHelper.GenerateValidResourceNameFromDisplayName(string.Empty);
 

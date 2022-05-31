@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
             {
                 return string.Empty;
             }
-
+            
             var validApiName = ExcludeOtherFromLettersAndDigitsRegex.Replace(apiName, string.Empty);
 
             if (string.IsNullOrEmpty(validApiName))
@@ -46,7 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
 
         public static string GenerateValidResourceNameFromDisplayName(string displayName)
         {
-            if (displayName.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(displayName))
             {
                 return string.Empty;
             }
@@ -56,7 +56,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
             return resourceName;
         }
 
-        public static string GenerateParametrizedResourceName(string parameterName, string resourceName) {
+        public static string GenerateParametrizedResourceName(string parameterName, string resourceName)
+        {
             return $"[concat(parameters('{parameterName}'), '/{resourceName}')]";
         }
     }
