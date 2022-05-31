@@ -51,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         static string GetValidLoggerParamName(string resourceName)
         {
             var loggerNameStrs = resourceName.Split(new char[] { ',' });
-            var validLoggerName = ParameterNamingHelper.GenerateValidParameterName(loggerNameStrs[loggerNameStrs.Length - 1], ParameterPrefix.LogResourceId);
+            var validLoggerName = NamingHelper.GenerateValidParameterName(loggerNameStrs[loggerNameStrs.Length - 1], ParameterPrefix.LogResourceId);
             return validLoggerName;
         }
     }

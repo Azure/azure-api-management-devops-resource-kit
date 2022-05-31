@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {
-                    apiDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{ParameterNamingHelper.GenerateValidParameterName(apiDiagnosticOriginalName, ParameterPrefix.Diagnostic)}]";
+                    apiDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{NamingHelper.GenerateValidParameterName(apiDiagnosticOriginalName, ParameterPrefix.Diagnostic)}]";
                 }
 
                 if (!apiDiagnosticOriginalName.Contains("applicationinsights"))
@@ -95,7 +95,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {
-                    serviceDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{ParameterNamingHelper.GenerateValidParameterName(originalDiagnosticName, ParameterPrefix.Diagnostic)}]";
+                    serviceDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{NamingHelper.GenerateValidParameterName(originalDiagnosticName, ParameterPrefix.Diagnostic)}]";
                 }
 
                 if (!originalDiagnosticName.Contains("applicationinsights"))

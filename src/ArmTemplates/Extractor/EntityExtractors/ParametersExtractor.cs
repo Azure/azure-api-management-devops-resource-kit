@@ -100,7 +100,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var serviceUrls = new Dictionary<string, string>();
                 foreach (var apiName in apisToExtract)
                 {
-                    var validApiName = ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
+                    var validApiName = NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
 
                     string serviceUrl;
                     if (extractorParameters.ServiceUrlParameters is null)
@@ -134,14 +134,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     if (extractorParameters.ParameterizeNamedValue && namedValue?.Properties.KeyVault == null)
                     {
                         var propertyValue = namedValue.Properties.Value;
-                        var validPName = ParameterNamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
+                        var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
                         namedValuesParameters.Add(validPName, propertyValue);
                     }
 
                     if (extractorParameters.ParamNamedValuesKeyVaultSecrets && namedValue?.Properties.KeyVault is not null)
                     {
                         var propertyValue = namedValue.Properties.KeyVault.SecretIdentifier;
-                        var validPName = ParameterNamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
+                        var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
                         keyVaultNamedValues.Add(validPName, propertyValue);
                     }
                 }

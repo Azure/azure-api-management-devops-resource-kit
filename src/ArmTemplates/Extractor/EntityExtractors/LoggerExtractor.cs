@@ -76,14 +76,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     var isReferencedInPolicy = apiPolicies?.Any(x => x.Properties.PolicyContent.Contains(originalLoggerName));
                     
                     bool isReferencedInDiagnostic = false;
-                    var validApiName = ParameterNamingHelper.GenerateValidParameterName(apisToExtract.First(), ParameterPrefix.Api);
+                    var validApiName = NamingHelper.GenerateValidParameterName(apisToExtract.First(), ParameterPrefix.Api);
                     if (extractorParameters.ParameterizeApiLoggerId && this.Cache.ApiDiagnosticLoggerBindings.ContainsKey(validApiName))
                     {
                         var diagnosticLoggerBindings = this.Cache.ApiDiagnosticLoggerBindings[validApiName];
                         
                         if (!diagnosticLoggerBindings.IsNullOrEmpty())
                         {
-                            var validDiagnosticName = ParameterNamingHelper.GenerateValidParameterName(logger.Properties.LoggerType, ParameterPrefix.Diagnostic).ToLower();
+                            var validDiagnosticName = NamingHelper.GenerateValidParameterName(logger.Properties.LoggerType, ParameterPrefix.Diagnostic).ToLower();
                             if (diagnosticLoggerBindings.Any(x => x.DiagnosticName == validDiagnosticName))
                             {
                                 isReferencedInDiagnostic = true;
@@ -112,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 string loggerId = serviceDiagnostic.Properties.LoggerId;
 
-                var serviceDiagnosticsKey = ParameterNamingHelper.GenerateValidParameterName(serviceDiagnostic.Name, ParameterPrefix.Diagnostic);
+                var serviceDiagnosticsKey = NamingHelper.GenerateValidParameterName(serviceDiagnostic.Name, ParameterPrefix.Diagnostic);
 
                 if (!this.Cache.ServiceLevelDiagnosticLoggerBindings.ContainsKey(serviceDiagnosticsKey))
                 {
@@ -141,7 +141,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     diagnosticLoggerBindings.Add(new DiagnosticLoggerBinding
                     {
-                        DiagnosticName = ParameterNamingHelper.GenerateValidParameterName(diagnostic.Name, ParameterPrefix.Diagnostic),
+                        DiagnosticName = NamingHelper.GenerateValidParameterName(diagnostic.Name, ParameterPrefix.Diagnostic),
                         LoggerId = diagnostic.Properties.LoggerId
                     });
                 }
@@ -149,7 +149,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 if (!diagnosticLoggerBindings.IsNullOrEmpty())
                 {
                     this.Cache.ApiDiagnosticLoggerBindings.Add(
-                        ParameterNamingHelper.GenerateValidParameterName(curApiName, ParameterPrefix.Api), 
+                        NamingHelper.GenerateValidParameterName(curApiName, ParameterPrefix.Api), 
                         diagnosticLoggerBindings);
                 }
             }

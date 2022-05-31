@@ -8,9 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions
 {
-    static class ParameterNamingHelper
+    public static class NamingHelper
     {
         static readonly Regex ExcludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
+        static readonly Regex ExcludeOtherFromAlphaNumericsAndHyphensRegex = new Regex("[^a-zA-Z0-9-]");
 
         public static string GetSubstringBetweenTwoCharacters(char left, char right, string fullString)
         {
@@ -41,6 +42,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
             {
                 return validApiName;
             }
+        }
+
+        public static string GenerateValidResourceNameFromDisplayName(string displayName)
+        {
+            if (displayName.IsNullOrEmpty())
+            {
+                return string.Empty;
+            }
+
+            var trimmedDisplayName = displayName.Trim().Replace(" ", "-");
+            var resourceName = ExcludeOtherFromAlphaNumericsAndHyphensRegex.Replace(trimmedDisplayName, string.Empty);
+            return resourceName;
+        }
+
+        public static string GenerateParametrizedResourceName(string parameterName, string resourceName) {
+            return $"[concat(parameters('{parameterName}'), '/{resourceName}')]";
         }
     }
 }

@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (policyContent.Contains(".xml"))
             {
                 var fileNameSection = policyContent.Split(',')[1];
-                var policyFileName = ParameterNamingHelper.GetSubstringBetweenTwoCharacters('\'', '\'', fileNameSection);
+                var policyFileName = NamingHelper.GetSubstringBetweenTwoCharacters('\'', '\'', fileNameSection);
                 var policyFileFullPath = Path.Combine(baseFilesGenerationDirectory, PoliciesDirectoryName, policyFileName);
 
                 if (File.Exists(policyFileFullPath))

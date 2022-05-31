@@ -24,28 +24,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
+        static void AddTagNameToDictionary(string tagName, Dictionary<string, string> tagsDictionary)
+        {
+            var resourceName = NamingHelper.GenerateValidResourceNameFromDisplayName(tagName);
+
+            if (tagsDictionary.ContainsKey(resourceName))
+            {
+                var existingValue = tagsDictionary[resourceName];
+                if (!existingValue.Equals(tagName))
+                {
+                    throw new DuplicateTagResourceNameException(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, existingValue, tagName, resourceName));
+                }
+            }
+            else
+            {
+                tagsDictionary.Add(resourceName, tagName);
+            }
+        }
+
         public Template CreateTagTemplate(CreatorParameters creatorConfig)
         {
             var tagTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
             var tagsDictionary = new Dictionary<string, string>();
-
-            void AddTagNameToDictionary(string tagName, Dictionary<string, string> tagsDictionary)
-            {
-                var resourceName = ResourceNamingHelper.GenerateValidResourceNameFromDisplayName(tagName);
-
-                if (tagsDictionary.ContainsKey(resourceName))
-                {
-                    var existingValue = tagsDictionary[resourceName];
-                    if (!existingValue.Equals(tagName))
-                    {
-                        throw new DuplicateTagResourceNameException(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, existingValue, tagName, resourceName));
-                    }
-                }
-                else
-                {
-                    tagsDictionary.Add(resourceName, tagName);
-                }
-            }
 
             if (!creatorConfig.Apis.IsNullOrEmpty())
             {
@@ -77,7 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 var tagTemplateResource = new TagTemplateResource()
                 {
-                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tagResourceName}')]",
+                    Name = NamingHelper.GenerateParametrizedResourceName(ParameterNames.ApimServiceName, tagResourceName),
                     Type = ResourceTypeConstants.Tag,
                     ApiVersion = GlobalConstants.ApiVersion,
                     Properties = new TagProperties()

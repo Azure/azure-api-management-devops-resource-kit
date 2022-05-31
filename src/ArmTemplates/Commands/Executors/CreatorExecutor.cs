@@ -204,9 +204,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 }
             }
 
-            this.logger.LogInformation("Creating tag template");
-            this.logger.LogInformation("------------------------------------------");
-            var tagTemplate = !this.creatorParameters.Tags.IsNullOrEmpty() || this.creatorParameters.Apis.Any(x => !x.Tags.IsNullOrEmpty()) ? this.tagTemplateCreator.CreateTagTemplate(this.creatorParameters) : null;
+            var tagTemplate = this.GenerateTagsTemplate();
 
             // create parameters file
             var templateParameters = this.masterTemplateCreator.CreateMasterTemplateParameterValues(this.creatorParameters);
@@ -281,6 +279,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             // write parameters to outputLocation
             FileWriter.WriteJSONToFile(templateParameters, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Parameters));
             this.logger.LogInformation("Templates written to output location");
+        }
+
+        public Template GenerateTagsTemplate()
+        {
+            this.logger.LogInformation("Creating tag template");
+            var tagTemplate = !this.creatorParameters.Tags.IsNullOrEmpty() || this.creatorParameters.Apis.Any(x => !x.Tags.IsNullOrEmpty()) ? this.tagTemplateCreator.CreateTagTemplate(this.creatorParameters) : null;
+
+            if (tagTemplate != null)
+            {
+                FileWriter.WriteJSONToFile(tagTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Tags));
+            }
+
+            return tagTemplate;
         }
     }
 }

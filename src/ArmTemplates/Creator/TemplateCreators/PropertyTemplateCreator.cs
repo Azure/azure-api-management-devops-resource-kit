@@ -53,14 +53,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             {
                 string value = namedValue.Value == null ? null
                    : creatorConfig.ParameterizeNamedValues
-                       ? $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"
+                       ? $"[parameters('{ParameterNames.NamedValues}').{NamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"
                        : namedValue.Value;
 
                 var keyVault = namedValue.KeyVault == null ? null
                     : creatorConfig.ParameterizeNamedValues
                         ? new NamedValueResourceKeyVaultProperties
                         {
-                            SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"
+                            SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{NamingHelper.GenerateValidParameterName(namedValue.DisplayName, ParameterPrefix.Property)}]"
                         }
                         : namedValue.KeyVault;
 

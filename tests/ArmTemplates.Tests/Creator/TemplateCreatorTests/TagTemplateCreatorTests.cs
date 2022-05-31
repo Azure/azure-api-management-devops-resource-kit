@@ -14,12 +14,13 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
+    [Trait("Category", "Tag Template Creation")]
     public class TagTemplateCreatorTests
     {
-
         CreatorParameters GenerateCreatorParameters(List<string> tagNames = null, List<string> apiTagNames = null)
         {
             var creatorConfig = new CreatorParameters();
@@ -122,7 +123,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             tagTemplate.Resources.Count().Should().Be(4);
 
             foreach (TagTemplateResource tag in tagTemplate.Resources)
-            {
+            {    
                 var resourceTagName = tag.Name.Split("/")[1].Split("'")[0];
                 expectedTagsDictionary.Should().ContainKey(resourceTagName);
                 var generatedTagDisplayName = expectedTagsDictionary[resourceTagName];
@@ -152,8 +153,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             }
 
             //act & assert
-            var exception = Assert.Throws<DuplicateTagResourceNameException>(() => tagTemplateCreator.CreateTagTemplate(creatorConfig));
-            exception.Message.Equals(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, "tag 1?", "?tag 1?", "tag-1")).Should().BeTrue();
+
+            Action act = () => tagTemplateCreator.CreateTagTemplate(creatorConfig);
+            act.Should().Throw<DuplicateTagResourceNameException>().WithMessage(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, "tag 1?", "?tag 1?", "tag-1"));
         }
     }
 }

@@ -110,7 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     }
 
                     var backendApiParameters = new BackendApiParameters();
-                    var backendValidName = ParameterNamingHelper.GenerateValidParameterName(originalBackendName, ParameterPrefix.Diagnostic).ToLower();
+                    var backendValidName = NamingHelper.GenerateValidParameterName(originalBackendName, ParameterPrefix.Diagnostic).ToLower();
 
                     if (!string.IsNullOrEmpty(backendResource.Properties.ResourceId))
                     {
