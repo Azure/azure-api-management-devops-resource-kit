@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
             {
                 return string.Empty;
             }
-            
+
             var validApiName = ExcludeOtherFromLettersAndDigitsRegex.Replace(apiName, string.Empty);
 
             if (string.IsNullOrEmpty(validApiName))

@@ -19,7 +19,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
     [Trait("Category", "Creator teamplate execution")]
     public class CreatorExecutorTests : CreatorMockerWithOutputTestsBase
     {
-
         public CreatorExecutorTests() : base("creator-executor-test")
         {
         }
