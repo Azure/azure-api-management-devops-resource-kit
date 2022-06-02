@@ -66,6 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 "application/vnd.ms-azure-apim.swagger.definitions+json" => schemaTemplateProperties?.Document?.Definitions?.Serialize(),
                 "application/vnd.ms-azure-apim.xsd+xml" => schemaTemplateProperties?.Document?.Definitions?.Serialize(),
+                "application/vnd.ms-azure-apim.graphql.schema" => schemaTemplateProperties?.Document?.Value?.ToString(),
                 _ => string.Empty
             };
 

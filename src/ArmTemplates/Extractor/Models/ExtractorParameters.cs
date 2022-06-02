@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
@@ -61,8 +62,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public string ApiVersionSetName { get; private set; }
 
-        public ServiceUrlProperty[] ServiceUrlParameters { get; private set; }
-
         public bool ParameterizeServiceUrl { get; private set; }
 
         public bool ParameterizeNamedValue { get; private set; }
@@ -85,6 +84,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool OverrideProductGuids { get; set; }
 
+        public bool ParametrizeApiOauth2Scope { get; set; }
+
+        public Dictionary<string, ApiParameterProperty> ApiParameters { get; private set; }
+
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
         {
             this.SourceApimName = extractorConfig.SourceApimName;
@@ -99,8 +102,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.PolicyXMLSasToken = extractorConfig.PolicyXMLSasToken;
             this.ApiVersionSetName = extractorConfig.ApiVersionSetName;
             this.IncludeAllRevisions = extractorConfig.IncludeAllRevisions != null && extractorConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);
-            this.ServiceUrlParameters = extractorConfig.ServiceUrlParameters;
-            this.ParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || extractorConfig.ServiceUrlParameters != null;
             this.ParameterizeNamedValue = extractorConfig.ParamNamedValue != null && extractorConfig.ParamNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ParameterizeApiLoggerId = extractorConfig.ParamApiLoggerId != null && extractorConfig.ParamApiLoggerId.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ParameterizeLogResourceId = extractorConfig.ParamLogResourceId != null && extractorConfig.ParamLogResourceId.Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -115,6 +116,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ExtractGateways = extractorConfig.ExtractGateways != null && extractorConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.OverrideGroupGuids = extractorConfig.OverrideGroupGuids != null && extractorConfig.OverrideGroupGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.OverrideProductGuids = extractorConfig.OverrideProductGuids != null && extractorConfig.OverrideProductGuids.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ApiParameters = extractorConfig.ApiParameters;
+            this.ParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.ServiceUrl is not null));
+            this.ParametrizeApiOauth2Scope = (extractorConfig.ParamApiOauth2Scope != null && extractorConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase)) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.Oauth2Scope is not null));
         }
 
         public ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)
@@ -137,7 +141,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             // there can be no service url parameters in overriding configuration
             // this.ServiceUrlParameters = overridingConfig.ServiceUrlParameters ?? this.ServiceUrlParameters;
 
-            this.ParameterizeServiceUrl = !string.IsNullOrEmpty(overridingConfig.ParamServiceUrl) ? overridingConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || overridingConfig.ServiceUrlParameters != null : this.ParameterizeServiceUrl;
+            this.ParameterizeServiceUrl = !string.IsNullOrEmpty(overridingConfig.ParamServiceUrl) ? overridingConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeServiceUrl;
             this.ParameterizeNamedValue = !string.IsNullOrEmpty(overridingConfig.ParamNamedValue) ? overridingConfig.ParamNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeNamedValue;
             this.ParameterizeApiLoggerId = !string.IsNullOrEmpty(overridingConfig.ParamApiLoggerId) ? overridingConfig.ParamApiLoggerId.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeApiLoggerId;
             this.ParameterizeLogResourceId = !string.IsNullOrEmpty(overridingConfig.ParamLogResourceId) ? overridingConfig.ParamLogResourceId.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParameterizeLogResourceId;
@@ -147,6 +151,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.SplitApis = !string.IsNullOrEmpty(overridingConfig.SplitAPIs) ? overridingConfig.SplitAPIs.Equals("true", StringComparison.OrdinalIgnoreCase) : this.SplitApis;
             this.IncludeAllRevisions = !string.IsNullOrEmpty(overridingConfig.IncludeAllRevisions) ? overridingConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase) : this.IncludeAllRevisions;
             this.ExtractGateways = !string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractGateways;
+            this.ParametrizeApiOauth2Scope = !string.IsNullOrEmpty(overridingConfig.ParamApiOauth2Scope) ? overridingConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParametrizeApiOauth2Scope;
 
             if (!string.IsNullOrEmpty(overridingConfig.BaseFileName))
             {

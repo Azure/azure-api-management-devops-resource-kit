@@ -35,13 +35,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateMasterTemplates_ProperlyLaysTheInformation));
 
-            var extractorConfig = this.GetMockedExtractorConsoleAppConfiguration(
-                splitApis: false,
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                multipleAPIs: string.Empty,
                 apiVersionSetName: string.Empty,
-                multipleApiNames: string.Empty,
-                includeAllRevisions: false,
+                includeAllRevisions: "false",
+                splitAPIs: "false",
                 policyXmlBaseUrl: string.Empty,
-                policyXmlSasToken: string.Empty);
+                policyXmlSasToken: string.Empty,
+                linkedTemplatesBaseUrl: "linkedBaseUrl",
+                linkedTemplatesSasToken: "linkedUrlToken",
+                linkedTemplatesUrlQueryString: "queryString",
+                apiParameters: new Dictionary<string, ApiParameterProperty> { { "test-service-url-property-api-name", new ApiParameterProperty(null, "test-service-url-property-url") } },
+                paramServiceUrl: "true",
+                paramNamedValue: "true",
+                paramApiLoggerId: "true",
+                paramLogResourceId: "true",
+                serviceBaseUrl: "test-service-base-url",
+                notIncludeNamedValue: "true",
+                paramNamedValuesKeyVaultSecrets: "true",
+                paramBackend: "true",
+                extractGateways: "true",
+                paramApiOauth2Scope: "true"
+                );
+
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var masterTemplateExtractor = new MasterTemplateExtractor(
@@ -104,6 +120,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.BackendSettings);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
+            masterTemplate.Parameters.Should().ContainKey(ParameterNames.ApiOauth2ScopeSettings);
 
             masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(2);
             masterTemplate.Resources.Should().HaveCount(2);

@@ -26,6 +26,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
                 Description = metadataDescription,
             };
             this.Type = type;
-        }  
+        }
     }
 }

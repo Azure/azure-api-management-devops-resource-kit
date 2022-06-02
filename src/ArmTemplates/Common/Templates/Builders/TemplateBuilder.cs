@@ -60,7 +60,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             => this.GenerateTemplateWithApimServiceNameProperty()
                    .AddPolicyProperties(extractorParameters)
                    .AddParameterizedServiceUrlProperty(extractorParameters)
-                   .AddParameterizedApiLoggerIdProperty(extractorParameters);
+                   .AddParameterizedApiLoggerIdProperty(extractorParameters)
+                   .AddParameterizedApiScopeProperty(extractorParameters);
 
         public TemplateBuilder GenerateEmptyTemplate()
         {
@@ -82,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         {
             if (extractorParameters.PolicyXMLBaseUrl != null)
             {
-                TemplateParameterProperties policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
+                var policyTemplateBaseUrlParameterProperties = new TemplateParameterProperties()
                 {
                     Type = "string"
                 };
@@ -91,7 +92,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
                 if (extractorParameters.PolicyXMLSasToken != null)
                 {
-                    TemplateParameterProperties policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
+                    var policyTemplateSasTokenParameterProperties = new TemplateParameterProperties()
                     {
                         Type = "string"
                     };
@@ -104,9 +105,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public TemplateBuilder AddParameterizedServiceUrlProperty(ExtractorParameters extractorParameters)
         {
-            if (extractorParameters.ParameterizeServiceUrl || extractorParameters.ServiceUrlParameters != null && extractorParameters.ServiceUrlParameters.Length > 0)
+            if (extractorParameters.ParameterizeServiceUrl)
             {
-                TemplateParameterProperties serviceUrlParamProperty = new TemplateParameterProperties()
+                var serviceUrlParamProperty = new TemplateParameterProperties()
                 {
                     Type = "object"
                 };
@@ -116,11 +117,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return this;
         }
 
+        public TemplateBuilder AddParameterizedApiScopeProperty(ExtractorParameters extractorParameters)
+        {
+            if (extractorParameters.ParametrizeApiOauth2Scope)
+            {
+                var apiScopeParameterProperty = new TemplateParameterProperties()
+                {
+                    Type = "object"
+                };
+                this.template.Parameters.Add(ParameterNames.ApiOauth2ScopeSettings, apiScopeParameterProperty);
+            }
+
+            return this;
+        }
+
         public TemplateBuilder AddParameterizedApiLoggerIdProperty(ExtractorParameters extractorParameters)
         {
             if (extractorParameters.ParameterizeApiLoggerId)
             {
-                TemplateParameterProperties apiLoggerProperty = new TemplateParameterProperties()
+                var apiLoggerProperty = new TemplateParameterProperties()
                 {
                     Type = "object"
                 };

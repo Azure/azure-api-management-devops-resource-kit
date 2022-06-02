@@ -54,6 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             AddPolicyParameters();
             AddNamedValuesParameters();
             await AddServiceUrlParameterAsync();
+            await AddApiOauth2ScopeParameterAsync();
 
             void AddLinkedUrlParameters()
             {
@@ -102,21 +103,60 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     var validApiName = NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
 
-                    string serviceUrl;
-                    if (extractorParameters.ServiceUrlParameters is null)
+                    string serviceUrl = null;
+                    if (extractorParameters.ApiParameters is null)
                     {
                         var apiDetails = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
                         serviceUrl = apiDetails.Properties.ServiceUrl;
                     }
                     else
                     {
-                        serviceUrl = extractorParameters.ServiceUrlParameters.FirstOrDefault(x => x.ApiName.Equals(apiName))?.ServiceUrl;
+                        if (extractorParameters.ApiParameters.ContainsKey(apiName))
+                        {
+                            serviceUrl = extractorParameters.ApiParameters[apiName].ServiceUrl;
+                        }
                     }
 
                     serviceUrls.Add(validApiName, serviceUrl);
                 }
 
                 parameters.Add(ParameterNames.ServiceUrl, new TemplateObjectParameterProperties() { Value = serviceUrls });
+            }
+
+            async Task AddApiOauth2ScopeParameterAsync()
+            {
+                if (!extractorParameters.ParametrizeApiOauth2Scope)
+                {
+                    return;
+                }
+
+                var apiOauth2Scopes = new Dictionary<string, string>();
+                foreach (var apiName in apisToExtract)
+                {
+                    var apiDetails = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
+
+                    if (apiDetails.Properties.AuthenticationSettings?.OAuth2 is not null)
+                    {
+                        string apiOAuthScope = null;
+                        var validApiName = NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api);
+
+                        if (extractorParameters.ApiParameters.IsNullOrEmpty())
+                        {
+                            apiOAuthScope = apiDetails.Properties.AuthenticationSettings.OAuth2?.Scope;
+                        }
+                        else
+                        {
+                            if (extractorParameters.ApiParameters.ContainsKey(apiName))
+                            {
+                                apiOAuthScope = extractorParameters.ApiParameters[apiName].Oauth2Scope;
+                            }
+                        }
+
+                        apiOauth2Scopes.Add(validApiName, apiOAuthScope);
+                    }
+                }
+
+                parameters.Add(ParameterNames.ApiOauth2ScopeSettings, new TemplateObjectParameterProperties() { Value = apiOauth2Scopes });
             }
 
             void AddNamedValuesParameters()
