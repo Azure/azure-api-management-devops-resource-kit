@@ -44,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             creatorExecutor.SetCreatorParameters(creatorConfig);
             
             //act
-            var tagTemplate = await creatorExecutor.GenerateTagsTemplate();
+            var tagTemplate = await creatorExecutor.GenerateTagsTemplateAsync();
 
             //assert
             tagTemplate.Should().NotBeNull();
