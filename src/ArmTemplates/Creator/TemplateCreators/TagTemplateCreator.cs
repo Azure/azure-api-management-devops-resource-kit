@@ -10,6 +10,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tag
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCreators
 {
@@ -22,53 +24,71 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             this.templateBuilder = templateBuilder;
         }
 
+        static void AddTagNameToDictionary(string tagName, Dictionary<string, string> tagsDictionary)
+        {
+            var resourceName = NamingHelper.GenerateValidResourceNameFromDisplayName(tagName);
+
+            if (string.IsNullOrEmpty(resourceName)) 
+            {
+                throw new EmptyResourceNameException(tagName);
+            }
+
+            if (tagsDictionary.ContainsKey(resourceName))
+            {
+                var existingValue = tagsDictionary[resourceName];
+                if (!existingValue.Equals(tagName))
+                {
+                    throw new DuplicateTagResourceNameException(existingValue, tagName, resourceName);
+                }
+            }
+            else
+            {
+                tagsDictionary.Add(resourceName, tagName);
+            }
+        }
+
         public Template CreateTagTemplate(CreatorParameters creatorConfig)
         {
-            // create empty template
-            Template tagTemplate = this.templateBuilder.GenerateEmptyTemplate().Build();
+            var tagTemplate = this.templateBuilder.GenerateTemplateWithApimServiceNameProperty().Build();
+            var tagsDictionary = new Dictionary<string, string>();
 
-            // add parameters
-            tagTemplate.Parameters = new Dictionary<string, TemplateParameterProperties>
+            if (!creatorConfig.Apis.IsNullOrEmpty())
             {
-                {ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Type = "string" }}
-            };
-
-            // aggregate all tags from apis
-            HashSet<string> tagHashset = new HashSet<string>();
-            List<ApiConfig> apis = creatorConfig.Apis;
-            if (apis != null)
-            {
-                foreach (ApiConfig api in apis)
+                foreach (var api in creatorConfig.Apis)
                 {
-                    if (api.Tags != null)
+                    if (!api.Tags.IsNullOrEmpty())
                     {
-                        string[] apiTags = api.Tags.Split(", ");
-                        foreach (string apiTag in apiTags)
+                        var apiTags = api.Tags.Split(",");
+                        
+                        foreach (var apiTag in apiTags)
                         {
-                            tagHashset.Add(apiTag);
+                            AddTagNameToDictionary(apiTag, tagsDictionary);
                         }
                     }
                 }
             }
-            foreach (TagProperties tag in creatorConfig.Tags)
+
+            if (!creatorConfig.Tags.IsNullOrEmpty())
             {
-                tagHashset.Add(tag.DisplayName);
+                foreach (var tag in creatorConfig.Tags)
+                {
+                    AddTagNameToDictionary(tag.DisplayName, tagsDictionary);
+                }
             }
 
-            List<TemplateResource> resources = new List<TemplateResource>();
-            foreach (string tag in tagHashset)
+            var resources = new List<TemplateResource>();
+
+            foreach (var (tagResourceName, tagDisplayName) in tagsDictionary)
             {
-                // create tag resource with properties
-                TagTemplateResource tagTemplateResource = new TagTemplateResource()
+                var tagTemplateResource = new TagTemplateResource()
                 {
-                    Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag}')]",
+                    Name = NamingHelper.GenerateParametrizedResourceName(ParameterNames.ApimServiceName, tagResourceName),
                     Type = ResourceTypeConstants.Tag,
                     ApiVersion = GlobalConstants.ApiVersion,
                     Properties = new TagProperties()
                     {
-                        DisplayName = tag
-                    },
-                    DependsOn = new string[] { }
+                        DisplayName = tagDisplayName
+                    }
                 };
                 resources.Add(tagTemplateResource);
             }

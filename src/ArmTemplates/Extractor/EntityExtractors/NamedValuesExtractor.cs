@@ -82,7 +82,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (extractorParameters.ParameterizeNamedValue)
                 {
-                    namedValueResource.Properties.Value = $"[parameters('{ParameterNames.NamedValues}').{ParameterNamingHelper.GenerateValidParameterName(originalNamedValueName, ParameterPrefix.Property)}]";
+                    namedValueResource.Properties.Value = $"[parameters('{ParameterNames.NamedValues}').{NamingHelper.GenerateValidParameterName(originalNamedValueName, ParameterPrefix.Property)}]";
                 }
 
                 //Hide the value field if it is a keyvault named value
@@ -93,7 +93,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (namedValueResource.Properties.KeyVault != null && extractorParameters.ParamNamedValuesKeyVaultSecrets)
                 {
-                    namedValueResource.Properties.KeyVault.SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{ParameterNamingHelper.GenerateValidParameterName(originalNamedValueName, ParameterPrefix.Property)}]";
+                    namedValueResource.Properties.KeyVault.SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{NamingHelper.GenerateValidParameterName(originalNamedValueName, ParameterPrefix.Property)}]";
                 }
 
                 if (string.IsNullOrEmpty(singleApiName))

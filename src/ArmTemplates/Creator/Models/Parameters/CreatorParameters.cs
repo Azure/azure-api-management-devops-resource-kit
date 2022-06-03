@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.P
             }
         }
 
-        internal void GenerateFileNames()
+        public void GenerateFileNames()
         {
             this.FileNames = this.BaseFileName == null
                 ? FileNameGenerator.GenerateFileNames(this.ApimServiceName)

@@ -7,12 +7,12 @@ using System.IO;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions
 {
-    public class ExtractorMockerWithOutputTestsBase : ExtractorMockerTestsBase
+    public abstract class CreatorMockerWithOutputTestsBase : TestsBase
     {
-        protected const string TESTS_OUTPUT_DIRECTORY = "tests-output\\extractor";
+        protected const string TESTS_OUTPUT_DIRECTORY = "tests-output\\creator";
         protected string OutputDirectory;
-
-        protected ExtractorMockerWithOutputTestsBase(string outputDirectoryName)
+        
+        protected CreatorMockerWithOutputTestsBase(string outputDirectoryName)
         {
             this.OutputDirectory = Path.Combine(TESTS_OUTPUT_DIRECTORY, outputDirectoryName);
 

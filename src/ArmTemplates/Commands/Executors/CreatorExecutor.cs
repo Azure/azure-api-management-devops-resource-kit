@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
@@ -203,9 +204,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 }
             }
 
-            this.logger.LogInformation("Creating tag template");
-            this.logger.LogInformation("------------------------------------------");
-            var tagTemplate = this.creatorParameters.Tags != null ? this.tagTemplateCreator.CreateTagTemplate(this.creatorParameters) : null;
+            var tagTemplate = await this.GenerateTagsTemplateAsync();
 
             // create parameters file
             var templateParameters = this.masterTemplateCreator.CreateMasterTemplateParameterValues(this.creatorParameters);
@@ -242,44 +241,59 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
             if (globalServicePolicyTemplate != null)
             {
-                FileWriter.WriteJSONToFile(globalServicePolicyTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.GlobalServicePolicy));
+                FileWriter.WriteJSONToFile(globalServicePolicyTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.GlobalServicePolicy));
             }
             if (apiVersionSetsTemplate != null)
             {
-                FileWriter.WriteJSONToFile(apiVersionSetsTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.ApiVersionSets));
+                FileWriter.WriteJSONToFile(apiVersionSetsTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.ApiVersionSets));
             }
             if (productsTemplate != null)
             {
-                FileWriter.WriteJSONToFile(productsTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Products));
+                FileWriter.WriteJSONToFile(productsTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Products));
             }
             if (productAPIsTemplate != null)
             {
-                FileWriter.WriteJSONToFile(productAPIsTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.ProductAPIs));
+                FileWriter.WriteJSONToFile(productAPIsTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.ProductAPIs));
             }
             if (propertyTemplate != null)
             {
-                FileWriter.WriteJSONToFile(propertyTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.NamedValues));
+                FileWriter.WriteJSONToFile(propertyTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.NamedValues));
             }
             if (loggersTemplate != null)
             {
-                FileWriter.WriteJSONToFile(loggersTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Loggers));
+                FileWriter.WriteJSONToFile(loggersTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Loggers));
             }
             if (backendsTemplate != null)
             {
-                FileWriter.WriteJSONToFile(backendsTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Backends));
+                FileWriter.WriteJSONToFile(backendsTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Backends));
             }
             if (authorizationServersTemplate != null)
             {
-                FileWriter.WriteJSONToFile(authorizationServersTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.AuthorizationServers));
+                FileWriter.WriteJSONToFile(authorizationServersTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.AuthorizationServers));
             }
             if (tagTemplate != null)
             {
-                FileWriter.WriteJSONToFile(tagTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Tags));
+                FileWriter.WriteJSONToFile(tagTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Tags));
             }
 
             // write parameters to outputLocation
-            FileWriter.WriteJSONToFile(templateParameters, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Parameters));
+            FileWriter.WriteJSONToFile(templateParameters, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Parameters));
             this.logger.LogInformation("Templates written to output location");
+        }
+
+        public async Task<Template> GenerateTagsTemplateAsync()
+        {
+            if (this.creatorParameters.Tags.IsNullOrEmpty() && this.creatorParameters.Apis.All(x => x.Tags.IsNullOrEmpty()))
+            {
+                return null;    
+            }
+
+            this.logger.LogInformation("Creating tag template");
+            
+            var tagTemplate = this.tagTemplateCreator.CreateTagTemplate(this.creatorParameters);
+            await FileWriter.SaveAsJsonAsync(tagTemplate, this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.Tags);
+
+            return tagTemplate;
         }
     }
 }

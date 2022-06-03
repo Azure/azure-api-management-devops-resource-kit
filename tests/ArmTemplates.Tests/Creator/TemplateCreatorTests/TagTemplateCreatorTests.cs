@@ -10,28 +10,170 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tag
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Models.Parameters;
+using System.Linq;
+using FluentAssertions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+using System;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.TemplateCreatorTests
 {
+    [Trait("Category", "Tag Template Creation")]
     public class TagTemplateCreatorTests
     {
-        [Fact]
-        public void ShouldCreateTagFromCreatorConfig()
+        CreatorParameters GenerateCreatorParameters(List<string> tagNames = null, List<string> apiTagNames = null)
         {
-            TagTemplateCreator tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
-            CreatorParameters creatorConfig = new CreatorParameters() { Tags = new List<TagProperties>() };
-            TagProperties tag = new TagProperties()
+            var creatorConfig = new CreatorParameters();
+
+            if (!tagNames.IsNullOrEmpty())
             {
-                DisplayName = "displayName"
+                creatorConfig.Tags = new List<TagProperties>();
+                foreach (var tagName in tagNames)
+                {
+                    var tag = new TagProperties
+                    {
+                        DisplayName = tagName
+                    };
+                    creatorConfig.Tags.Add(tag);
+                }
+            }
+
+            if (!apiTagNames.IsNullOrEmpty())
+            {
+                creatorConfig.Apis = new List<ApiConfig>();
+                var apiTagNamesString = string.Join(",", apiTagNames.ToArray());
+
+                var apiConfig = new ApiConfig
+                {
+                    Tags = apiTagNamesString
+                };
+
+                creatorConfig.Apis.Add(apiConfig);
+            }
+
+            return creatorConfig;
+        }
+
+        [Fact]
+        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenApiTagsAndConfigTags()
+        {
+            var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
+            
+            var tagNames = new List<string>()
+            {
+                "tag 1", "tag2", "tag 3", "tag2"
             };
-            creatorConfig.Tags.Add(tag);
+            var apiTagNames = new List<string>()
+            {
+                "tag 1", "tag2", "api tag 3", "api tag2"
+            };
+
+            var creatorConfig = this.GenerateCreatorParameters(tagNames, apiTagNames);
+
+            var expectedTagsDictionary = new Dictionary<string, string>()
+            {
+                { "tag-1", "tag 1" },
+                { "tag2", "tag2" },
+                { "tag-3" , "tag 3" },
+                { "api-tag-3", "api tag 3" },
+                { "api-tag2", "api tag2" }
+            };
 
             //act
             var tagTemplate = tagTemplateCreator.CreateTagTemplate(creatorConfig);
-            var tagTemplateResource = (TagTemplateResource)tagTemplate.Resources[0];
 
             //assert
-            Assert.Equal($"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag.DisplayName}')]", tagTemplateResource.Name);
+            tagTemplate.Parameters.Count().Should().Be(1);
+            tagTemplate.Parameters.ContainsKey(ParameterNames.ApimServiceName).Should().BeTrue();
+            tagTemplate.Resources.Count().Should().Be(5);
+
+            var resourcesDictionary = new Dictionary<string, TagTemplateResource>();
+            foreach (TagTemplateResource tag in tagTemplate.Resources)
+            {
+                resourcesDictionary[tag.Name] = tag;
+            }
+
+            foreach (var (tagName, tagDisplayName) in expectedTagsDictionary) 
+            {
+                var resourceName = NamingHelper.GenerateParametrizedResourceName(ParameterNames.ApimServiceName, tagName);
+                resourcesDictionary.Should().ContainKey(resourceName);
+                var tagResource = resourcesDictionary[resourceName];
+                tagResource.Properties.DisplayName.Equals(tagDisplayName).Should().BeTrue();
+            }
+        }
+
+        [Fact]
+        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenOnlyApiTags()
+        {
+            var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
+
+            var apiTagNames = new List<string>()
+            {
+                "tag 1", "tag2", "api tag 3", "api tag2"
+            };
+            var creatorConfig = this.GenerateCreatorParameters(apiTagNames: apiTagNames);
+
+            var expectedTagsDictionary = new Dictionary<string, string>()
+            {
+                { "tag-1", "tag 1" },
+                { "tag2", "tag2" },
+                { "api-tag-3", "api tag 3" },
+                { "api-tag2", "api tag2" }
+            };
+
+            //act
+            var tagTemplate = tagTemplateCreator.CreateTagTemplate(creatorConfig);
+
+            //assert
+            tagTemplate.Resources.Count().Should().Be(4);
+
+            var resourcesDictionary = new Dictionary<string, TagTemplateResource>();
+            foreach (TagTemplateResource tag in tagTemplate.Resources)
+            {
+                resourcesDictionary[tag.Name] = tag;
+            }
+
+            foreach (var (tagName, tagDisplayName) in expectedTagsDictionary)
+            {
+                var resourceName = NamingHelper.GenerateParametrizedResourceName(ParameterNames.ApimServiceName, tagName);
+                resourcesDictionary.Should().ContainKey(resourceName);
+                var tagResource = resourcesDictionary[resourceName];
+                tagResource.Properties.DisplayName.Equals(tagDisplayName).Should().BeTrue();
+            }
+        }
+
+        [Fact]
+        public void CreateTagTemplate_ShouldThrowDuplicateTagResourceNameException_GivenDuplicateSanitizedDisplayName()
+        {
+            var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
+
+            var tagNames= new List<string>()
+            {
+                "tag 1?", "?tag 1?"
+            };
+
+            var creatorConfig = this.GenerateCreatorParameters(tagNames: tagNames);
+
+            //act & assert
+            Action act = () => tagTemplateCreator.CreateTagTemplate(creatorConfig);
+            act.Should().Throw<DuplicateTagResourceNameException>().WithMessage(string.Format(ErrorMessages.DuplicateTagResourceNameErrorMessage, "tag 1?", "?tag 1?", "tag-1"));
+        }
+
+        [Fact]
+        public void CreateTagTemplate_ShouldThrowEmptyResourceNameAfterSanitizingErrorMessage_GivenOneEmptyTag()
+        {
+            var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
+
+            var apiTagNames = new List<string>()
+            {
+                "tag 1", "tag2", "api tag 3", " "
+            };
+            var creatorConfig = this.GenerateCreatorParameters(apiTagNames: apiTagNames);
+
+
+            //act & assert
+            Action act = () => tagTemplateCreator.CreateTagTemplate(creatorConfig);
+            act.Should().Throw<EmptyResourceNameException>().WithMessage(string.Format(ErrorMessages.EmptyResourceNameAfterSanitizingErrorMessage, " "));
         }
     }
 }

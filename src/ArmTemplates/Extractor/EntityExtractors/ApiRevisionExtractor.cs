@@ -118,7 +118,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (extractorParameters.ParameterizeServiceUrl)
             {
-                apiDetails.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{ParameterNamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
+                apiDetails.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
             }
 
             if (apiDetails.Properties.ApiVersionSetId != null)

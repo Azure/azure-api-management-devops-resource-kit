@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions
 {
-    static class CollectionExtensions
+    public static class CollectionExtensions
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> collection)
         {
