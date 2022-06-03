@@ -3,6 +3,9 @@ contact_links:
   - name: Ask a question 💬
     url: https://github.com/Azure/azure-api-management-devops-resource-kit/discussions
     about: Ask a question or request support for using Azure API Management DevOps Resource Kit.
+  - name: Report a security vulnerability
+    url: https://github.com/Azure/azure-api-management-devops-resource-kit/security/policy
+    about: Please review our security policy for more details
   - name: Feature request for Azure API Management 🔭
     url: http://aka.ms/apimwish
     about: Suggest an idea for Azure API Management in general
