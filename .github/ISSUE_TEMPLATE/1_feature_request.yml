@@ -1,0 +1,31 @@
+name: Feature request 🧭
+description: Suggest an idea for this project
+title: "Feature Request: "
+labels: ["feature", "triage"]
+assignees: adrianhall
+body:
+- type: textarea
+  attributes:
+    label: Scenario
+    description: "Is your feature request related to a problem? Please describe"
+    placeholder: "A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]  If your problem is related to something not being extracted, please let us know what specific feature is not being extracted (preferably via an ARM template snippet)."
+- type: textarea
+  attributes:
+    label: Proposal
+    description: "Describe the solution you'd like"
+    placeholder: "A clear and concise description of what you want to happen."
+- type: textarea
+  attributes:
+    label: Describe alternatives you've considered
+    placeholder: "A clear and concise description of any alternative solutions or features you've considered."
+- type: textarea
+  attributes:
+    label: Additional context
+    description: "Add any other context or screenshots about the feature request here."
+- type: input
+  attributes:
+    label: Contact Details
+    description: How can we get in touch with you if we need more info?
+    placeholder: ex. email@example.com
+  validations:
+    required: false
