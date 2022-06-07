@@ -15,6 +15,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
     {
         public const string DiagnosticName = "diagnostic";
         public const string DefaultDiagnosticName = "default-diagnostic";
+        public const string LoggerIdValue = "logger-id";
 
         public static IDiagnosticClient GetMockedClientWithApiDependentValues()
         {
@@ -29,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = DiagnosticName,
                         Properties = new DiagnosticTemplateProperties()
                         {
-                            LoggerId = "logger-id"
+                            LoggerId = LoggerIdValue
                         }
                     }
                 });
@@ -43,7 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = $"{apiName}-{DiagnosticName}",
                         Properties = new DiagnosticTemplateProperties()
                         {
-                            LoggerId = "logger-id"
+                            LoggerId = LoggerIdValue
                         }
                     }
                 });
@@ -64,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = DefaultDiagnosticName,
                         Properties = new DiagnosticTemplateProperties()
                         {
-                            LoggerId = "logger-id"
+                            LoggerId = LoggerIdValue
                         }
                     }
                 });
@@ -78,7 +79,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = DefaultDiagnosticName,
                         Properties = new DiagnosticTemplateProperties()
                         {
-                            LoggerId = "logger-id"
+                            LoggerId = LoggerIdValue
                         }
                     }
                 });
