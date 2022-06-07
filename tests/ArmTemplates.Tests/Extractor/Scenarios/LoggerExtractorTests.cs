@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         }
 
         [Fact]
-        public async Task LoadAllReferencedLoggers_ShouldPopulateCacheWithoutError_GivenItCalledMultipleTimes()
+        public async Task GenerateLoggersTemplates_ShouldPopulateCacheWithoutError_GivenItCalledMultipleTimes()
         {
             // arrange
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
@@ -84,10 +84,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var mockedDiagnosticClient = MockDiagnosticClient.GetMockedApiClientWithDefaultValues();
+            var mockedLoggerClient = MockLoggerClient.GetMockedClientWithDiagnosticDependentValues();
             var loggerExtractor = new LoggerExtractor(
                 this.GetTestLogger<LoggerExtractor>(),
                 new TemplateBuilder(),
-                default,
+                mockedLoggerClient,
                 mockedDiagnosticClient);
 
             var apisToTest = new List<string>() {
@@ -114,20 +115,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             };
 
             // act
-            await loggerExtractor.LoadAllReferencedLoggers(apisToTest, extractorParameters);
+            await loggerExtractor.GenerateLoggerTemplateAsync(apisToTest, null, extractorParameters);
             foreach(var api in apisToTest)
             {
-                await loggerExtractor.LoadAllReferencedLoggers(new List<string>() { api }, extractorParameters);
+                await loggerExtractor.GenerateLoggerTemplateAsync(new List<string>() { api }, null, extractorParameters);
             }
 
             // assert
             loggerExtractor.Cache.ServiceLevelDiagnosticLoggerBindings.Count.Should().Be(1);
             loggerExtractor.Cache.ApiDiagnosticLoggerBindings.Count.Should().Be(2);
             
-            foreach( var (key, value) in expectedApiDiagnosticLoggerBingingsValues)
+            foreach (var (apiName, diagnosticLoggerBindings) in expectedApiDiagnosticLoggerBingingsValues)
             {
-                loggerExtractor.Cache.ApiDiagnosticLoggerBindings[key].Count.Should().Be(1);
-                loggerExtractor.Cache.ApiDiagnosticLoggerBindings[key].First().Equals(value.First()).Should().BeTrue();
+                loggerExtractor.Cache.ApiDiagnosticLoggerBindings[apiName].Count.Should().Be(1);
+                loggerExtractor.Cache.ApiDiagnosticLoggerBindings[apiName].First().Equals(diagnosticLoggerBindings.First()).Should().BeTrue();
             }
         }
     }

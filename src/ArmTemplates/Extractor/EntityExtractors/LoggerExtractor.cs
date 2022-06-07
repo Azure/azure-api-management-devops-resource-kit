@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return loggerTemplate;
         }
 
-        public async Task LoadAllReferencedLoggers(
+        async Task LoadAllReferencedLoggers(
             List<string> apisToExtract, 
             ExtractorParameters extractorParameters)
         {
