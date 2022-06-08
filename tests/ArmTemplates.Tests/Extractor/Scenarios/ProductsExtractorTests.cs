@@ -81,8 +81,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             templateParameters.Should().ContainKey(ParameterNames.ApimServiceName);
             templateParameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             templateParameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
-            templateParameters.Should().ContainKey(ParameterNames.ServiceUrl);
-            templateParameters.Should().ContainKey(ParameterNames.ApiLoggerId);
 
             var templateResources = productTemplate.Resources;
 
