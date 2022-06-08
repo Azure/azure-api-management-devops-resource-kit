@@ -1,0 +1,117 @@
+name: Report a bug 🐛
+description: Create a report to help us improve the Azure DevOps Resource Kit
+title: "Bug: "
+labels: ["bug", "triage"]
+assignees: adrianhall
+body:
+- type: textarea
+  attributes:
+    label: Report
+    description: "What bug have you encountered?"
+    placeholder: "A clear and concise description of what the bug is."
+- type: textarea
+  attributes:
+    label: Expected Behavior
+    description: What did you expect to happen?
+    placeholder: What did you expect to happen?
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Actual Behavior
+    description: Also tell us, what did you see is happen?
+    placeholder: Tell us what you see that is happening
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Steps to Reproduce the Problem
+    description: "How can we reproduce this bug? Please walk us through it step by step."
+    value: |
+      1.
+      2.
+      3.
+      ...
+  validations:
+    required: true
+- type: dropdown
+  attributes:
+    label: Component
+    description: Where did you encounter this bug?
+    multiple: true
+    options:
+    - Extractor
+    - Creator
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: DevOps Resource Kit Version
+    description: |
+      What version of the DevOps Resource Kit is being used?.
+
+      Make sure to validate that the bug is reproducible on the latest released version.
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: .NET Version
+    description: What version of dotnet are you running? Run `dotnet --version` to find out.
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: OS
+    description: What platform (OS and version) are you running on?
+    placeholder: If Windows, indicate if you are running on WSL.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Configuration
+    description: "Provide insights in the configuration that you are using, if you can share them"
+    value: |
+      Configuration:
+
+      ```yaml
+      version: 0.0.1
+      apimServiceName: example-apim-name
+      ```
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: API Management Configuration
+    description: |
+      How is your API Management Instance set up?
+
+      * What SKU is being used (as the source for extractor or destination for creator)?
+      * Do you have full admin rights to the service?
+      * Is the service in a VNET?  If so, describe how it is configured?
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: Logs
+    description: |
+      Provide logs of our component, if you can share them.
+
+      Feel free to provide a link to a gist if needed.
+    value: |
+      ```shell
+      example
+      ```
+  validations:
+    required: false
+- type: textarea
+  id: anything-else
+  attributes:
+    label: Anything else?
+    description: "Add any other context or screenshots about the bug report here."
+- type: input
+  attributes:
+    label: Contact Details
+    description: How can we get in touch with you if we need more info?
+    placeholder: ex. email@example.com
+  validations:
+    required: false
