@@ -148,9 +148,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (!diagnosticLoggerBindings.IsNullOrEmpty())
                 {
-                    this.Cache.ApiDiagnosticLoggerBindings.Add(
-                        NamingHelper.GenerateValidParameterName(curApiName, ParameterPrefix.Api), 
-                        diagnosticLoggerBindings);
+                    var diagnosticLoggerKey = NamingHelper.GenerateValidParameterName(curApiName, ParameterPrefix.Api);
+                    if (!this.Cache.ApiDiagnosticLoggerBindings.ContainsKey(diagnosticLoggerKey))
+                    {
+                        this.Cache.ApiDiagnosticLoggerBindings.Add(diagnosticLoggerKey, diagnosticLoggerBindings);
+                    }
                 }
             }
         }
