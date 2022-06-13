@@ -57,7 +57,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             ExtractorParameters extractorParameters)
         {
             var productsTemplate = this.templateBuilder
-                                        .GenerateTemplateWithPresetProperties(extractorParameters)
+                                        .GenerateTemplateWithApimServiceNameProperty()
+                                        .AddPolicyProperties(extractorParameters)
                                         .Build<ProductTemplateResources>();
 
             var products = await this.productsClient.GetAllAsync(extractorParameters);
