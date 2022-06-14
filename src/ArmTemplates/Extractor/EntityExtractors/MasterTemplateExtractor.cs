@@ -24,6 +24,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Log
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -53,7 +54,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
             NamedValuesResources namedValuesTemplateResources = null,
             TagTemplateResources tagTemplateResources = null,
-            GroupTemplateResources groupTemplateResources = null)
+            GroupTemplateResources groupTemplateResources = null,
+            IdentityProviderTemplateResources identityProviderTemplateResources = null)
         {
             var masterTemplate = this.templateBuilder
                                         .GenerateEmptyTemplate()
@@ -240,6 +242,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var groupsDeployment = CreateLinkedMasterTemplateResource(GroupsTemplate, groupsUri, Array.Empty<string>());
 
                 masterResources.DeploymentResources.Add(groupsDeployment);
+            }
+
+            if (identityProviderTemplateResources?.HasContent() == true)
+            {
+                this.logger.LogDebug("Adding identity providers to master template");
+                const string IdentityProvidersTemplate = "identityProvidersTemplate";
+
+                var identityProviderUri = this.GenerateLinkedTemplateUri(fileNames.IdentityProviders, extractorParameters);
+                var identityProviderDeployment = CreateLinkedMasterTemplateResource(IdentityProvidersTemplate, identityProviderUri, Array.Empty<string>());
+
+                masterResources.DeploymentResources.Add(identityProviderDeployment);
             }
 
             return masterTemplate;

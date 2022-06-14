@@ -9,6 +9,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Api
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
@@ -36,6 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
            AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
            NamedValuesResources namedValuesTemplateResources = null,
            TagTemplateResources tagTemplateResources = null,
-           GroupTemplateResources groupTemplateResources = null);
+           GroupTemplateResources groupTemplateResources = null,
+           IdentityProviderTemplateResources identityProviderTemplateResources = null);
     }
 }

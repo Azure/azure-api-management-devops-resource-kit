@@ -17,6 +17,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bac
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gateway;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.GatewayApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
@@ -60,6 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IApiRevisionExtractor apiRevisionExtractor;
         readonly IGatewayExtractor gatewayExtractor;
         readonly IGatewayApiExtractor gatewayApiExtractor;
+        readonly IIdentityProviderExtractor identityProviderExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -80,7 +82,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IGroupExtractor groupExtractor,
             IApiRevisionExtractor apiRevisionExtractor,
             IGatewayExtractor gatewayExtractor,
-            IGatewayApiExtractor gatewayApiExtractor)
+            IGatewayApiExtractor gatewayApiExtractor,
+            IIdentityProviderExtractor identityProviderExtractor)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -101,6 +104,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.apiRevisionExtractor = apiRevisionExtractor;
             this.gatewayExtractor = gatewayExtractor;
             this.gatewayApiExtractor = gatewayApiExtractor;
+            this.identityProviderExtractor = identityProviderExtractor;
         }
 
         /// <summary>
@@ -126,7 +130,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IGroupExtractor groupExtractor = null,
             IApiRevisionExtractor apiRevisionExtractor = null,
             IGatewayExtractor gatewayExtractor = null,
-            IGatewayApiExtractor gatewayApiExtractor = null)
+            IGatewayApiExtractor gatewayApiExtractor = null,
+            IIdentityProviderExtractor identityProviderExtractor = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -146,7 +151,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 groupExtractor,
                 apiRevisionExtractor,
                 gatewayExtractor,
-                gatewayApiExtractor);
+                gatewayApiExtractor,
+                identityProviderExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -438,7 +444,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
            AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
            NamedValuesResources namedValuesTemplateResources = null,
            TagTemplateResources tagTemplateResources = null,
-           GroupTemplateResources groupTemplateResources = null)
+           GroupTemplateResources groupTemplateResources = null,
+           IdentityProviderTemplateResources identityProviderTemplateResources = null)
         {
             if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
             {
@@ -452,7 +459,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 this.extractorParameters, apiTemplateResources, policyTemplateResources, apiVersionSetTemplateResources,
                 productsTemplateResources, productApisTemplateResources, apiTagsTemplateResources, loggersTemplateResources,
                 backendsTemplateResources, authorizationServersTemplateResources, namedValuesTemplateResources, tagTemplateResources, 
-                groupTemplateResources);
+                groupTemplateResources, identityProviderTemplateResources);
 
             if (masterTemplate?.HasResources() == true)
             {
@@ -661,6 +668,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             this.logger.LogInformation("Finished generation of gateway template...");
             return gatewayTemplate;
+        }
+
+        /// <summary>
+        /// Generates identity providers template in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated identity provider template</returns>
+        public async Task<Template<IdentityProviderTemplateResources>> GenerateIdentityProviderTemplateAsync(string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of identity provider template...");
+
+            var identityProviderTemplate = await this.identityProviderExtractor.GenerateIdentityProvidersTemplateAsync(this.extractorParameters);
+
+            if (identityProviderTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    identityProviderTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.IdentityProviders);
+            }
+
+            this.logger.LogInformation("Finished generation of identity providers template...");
+            return identityProviderTemplate;
         }
 
         /// <summary>
@@ -875,6 +905,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var namedValueTemplate = await this.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), loggerTemplate.TypedResources.Loggers, baseFilesGenerationDirectory);
             var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
             var groupTemplate = await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
+            var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, baseFilesGenerationDirectory);
             
@@ -891,7 +922,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 authorizationServersTemplateResources: authorizationServerTemplate.TypedResources,
                 namedValuesTemplateResources: namedValueTemplate.TypedResources,
                 tagTemplateResources: tagTemplate.TypedResources,
-                groupTemplateResources: groupTemplate.TypedResources);
+                groupTemplateResources: groupTemplate.TypedResources,
+                identityProviderTemplateResources: identityProviderTemplate.TypedResources);
         }
 
 

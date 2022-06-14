@@ -40,6 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string NamedValueKeyVaultSecrets = "namedValueKeyVaultSecrets";
         public const string BackendSettings = "backendSettings";
         public const string ApiOauth2ScopeSettings = "apiOauth2ScopeSettings";
+        public const string SecretValues = "secretValues";
     }
 
     public static class ParameterPrefix
