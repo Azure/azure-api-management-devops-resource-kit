@@ -38,9 +38,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var identityProviderTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
+                                        .AddParametrizedIdentityProvidersSecrets()
                                         .Build<IdentityProviderTemplateResources>();
-
             var identityProvideres = await this.identityProviderClient.GetAllAsync(extractorParameters);
+
             if (identityProvideres.IsNullOrEmpty())
             {
                 this.logger.LogWarning($"No identityProviders were found for '{extractorParameters.SourceApimName}' at '{extractorParameters.ResourceGroup}'");
@@ -50,7 +51,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             foreach (var identityProvider in identityProvideres)
             {
                 identityProvider.Type = ResourceTypeConstants.IdentityProviders;
-                identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').{NamingHelper.GenerateValidParameterName(identityProvider.Name, ParameterPrefix.Property)}]";
+                identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').identityProviders.{NamingHelper.GenerateValidParameterName(identityProvider.Name, ParameterPrefix.Property)}]";
                 identityProvider.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{identityProvider.Name}')]";
                 identityProvider.ApiVersion = GlobalConstants.ApiVersion;
                 identityProviderTemplate.TypedResources.IdentityProviders.Add(identityProvider);

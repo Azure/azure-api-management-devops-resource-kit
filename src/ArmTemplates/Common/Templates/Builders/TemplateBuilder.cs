@@ -144,5 +144,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
             return this;
         }
+
+        public TemplateBuilder AddParametrizedIdentityProvidersSecrets()
+        {
+            var apiLoggerProperty = new TemplateParameterProperties()
+            {
+                Type = "object"
+            };
+            this.template.Parameters.Add(ParameterNames.SecretValues, apiLoggerProperty);
+
+            return this;
+        }
     }
 }

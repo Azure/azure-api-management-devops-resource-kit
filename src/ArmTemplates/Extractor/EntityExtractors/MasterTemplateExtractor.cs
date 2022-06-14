@@ -61,7 +61,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                                         .GenerateEmptyTemplate()
                                         .Build<MasterTemplateResources>();
             masterTemplate.Parameters = this.CreateMasterTemplateParameters(extractorParameters);
-            
+            this.AddSecretValueParametersToMasterTemplate(masterTemplate.Parameters, identityProviderTemplateResources);
+
             var masterResources = masterTemplate.TypedResources;
             var fileNames = extractorParameters.FileNames;
 
@@ -348,7 +349,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     },
                     Parameters = new Dictionary<string, TemplateParameterProperties>
                     {
-                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
+                        { 
+                            ParameterNames.ApimServiceName, new TemplateParameterProperties()
+                            {
+                                Value = $"[parameters('{ParameterNames.ApimServiceName}')]" 
+                            }
+                        }
                     }
                 },
                 DependsOn = dependsOn
@@ -451,6 +457,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             return parameters;
+        }
+
+        void AddSecretValueParametersToMasterTemplate(Dictionary<string, TemplateParameterProperties> masterParameters, IdentityProviderTemplateResources identityProviderTemplateResources)
+        {
+            if (identityProviderTemplateResources.HasContent())
+            {
+                masterParameters.Add(
+                    ParameterNames.SecretValues,
+                    new TemplateParameterProperties(metadataDescription: "Secret values for services", type: "object"));
+            }
         }
 
         string GenerateLinkedTemplateUri(string fileName, ExtractorParameters extractorParameters)
