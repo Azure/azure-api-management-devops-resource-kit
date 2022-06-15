@@ -212,7 +212,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     var identityProviderParameterValue = string.Empty;
                     if (extractorParameters.ExtractSecrets)
                     {
-                        // place real value
+                        var identityProviderSecret = await this.identityProviderClient.ListIdentityProviderSecrets(identityProvider.OriginalName, extractorParameters);
+                        identityProviderParameterValue = identityProviderSecret.ClientSecret;
                     }
 
                     identityProviderParameteres.Add(identityProviderNameKey, identityProviderParameterValue);

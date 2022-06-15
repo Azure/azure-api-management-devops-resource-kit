@@ -100,13 +100,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "paramApiOauth2Scope", HelpText = "Parametrize API OAuth2 scope values")]
         public string ParamApiOauth2Scope { get; set; }
 
+        [Option(longName: "extractSecrets", HelpText = "Exrtact secrets from the services if applies")]
+        public string ExtractSecrets { get; set; }
+
         /// <summary>
         /// Api parameter properties for overriding Api OAuth2 scope or/and Service urloverride. Available via extractor-config file only.
         /// </summary>
-        public Dictionary<string, ApiParameterProperty> ApiParameters { get; set; }
-
-        [Option(longName: "extractSecrets", HelpText = "Exrtact secrets from the services if applies")]
-        public string ExctractSecrets { get; set; }
-        
+        public Dictionary<string, ApiParameterProperty> ApiParameters { get; set; }        
     }
 }

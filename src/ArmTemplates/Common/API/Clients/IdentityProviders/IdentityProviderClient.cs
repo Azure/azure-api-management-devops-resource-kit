@@ -16,6 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public class IdentityProviderClient : ApiClientBase, IIdentityProviderClient
     {
         const string GetAllIdentityProvidersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/identityProviders?api-version={4}";
+        const string ListIdentyProviderSecret = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/identityProviders/{4}/listSecrets?api-version={5}";
 
         readonly IIdentityProviderProcessor identityProviderProcessor;
 
@@ -34,6 +35,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var identityProviderTemplates = await this.GetPagedResponseAsync<IdentityProviderResource>(azToken, requestUrl);
             this.identityProviderProcessor.ProcessData(identityProviderTemplates, extractorParameters);
 
+            return identityProviderTemplates;
+        }
+
+        public async Task<IdentityProviderSecret> ListIdentityProviderSecrets(string identityProviderName, ExtractorParameters extractorParameters)
+        {
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
+
+            string requestUrl = string.Format(ListIdentyProviderSecret,
+               this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, identityProviderName, GlobalConstants.ApiVersion);
+
+            var identityProviderTemplates = await this.GetResponseAsync<IdentityProviderSecret>(azToken, requestUrl, false, "post");
+            
             return identityProviderTemplates;
         }
     }

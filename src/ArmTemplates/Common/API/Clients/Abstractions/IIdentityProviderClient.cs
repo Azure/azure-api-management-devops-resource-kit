@@ -13,5 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public interface IIdentityProviderClient
     {
         Task<List<IdentityProviderResource>> GetAllAsync(ExtractorParameters extractorParameters);
+
+        Task<IdentityProviderSecret> ListIdentityProviderSecrets(string identityProviderName, ExtractorParameters extractorParameters);
     }
 }

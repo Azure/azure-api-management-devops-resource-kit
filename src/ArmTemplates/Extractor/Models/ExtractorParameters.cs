@@ -121,7 +121,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ApiParameters = extractorConfig.ApiParameters;
             this.ParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.ServiceUrl is not null));
             this.ParametrizeApiOauth2Scope = (extractorConfig.ParamApiOauth2Scope != null && extractorConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase)) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.Oauth2Scope is not null));
-            this.ExtractSecrets = extractorConfig.ExctractSecrets != null && extractorConfig.ExctractSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ExtractSecrets = extractorConfig.ExtractSecrets != null && extractorConfig.ExtractSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
 
         public ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)
