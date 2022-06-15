@@ -407,6 +407,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             LoggerTemplateResources loggerResources,
             BackendTemplateResources backendResources,
             NamedValuesResources namedValuesResources,
+            IdentityProviderResources identityProviderResources,
             string baseFilesGenerationDirectory)
         {
             this.logger.LogInformation("Started generation of parameters template...");
@@ -417,6 +418,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 loggerResources,
                 backendResources,
                 namedValuesResources,
+                identityProviderResources,
                 this.extractorParameters);
 
             if (!templateParameters.Parameters.IsNullOrEmpty())
@@ -445,7 +447,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
            NamedValuesResources namedValuesTemplateResources = null,
            TagTemplateResources tagTemplateResources = null,
            GroupTemplateResources groupTemplateResources = null,
-           IdentityProviderTemplateResources identityProviderTemplateResources = null)
+           IdentityProviderResources identityProviderTemplateResources = null)
         {
             if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
             {
@@ -675,7 +677,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// </summary>
         /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
         /// <returns>generated identity provider template</returns>
-        public async Task<Template<IdentityProviderTemplateResources>> GenerateIdentityProviderTemplateAsync(string baseFilesGenerationDirectory)
+        public async Task<Template<IdentityProviderResources>> GenerateIdentityProviderTemplateAsync(string baseFilesGenerationDirectory)
         {
             this.logger.LogInformation("Started generation of identity provider template...");
 
@@ -907,7 +909,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var groupTemplate = await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
-            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, baseFilesGenerationDirectory);
+            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
             await this.GenerateMasterTemplateAsync(
                 baseFilesGenerationDirectory,

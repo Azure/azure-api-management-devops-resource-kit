@@ -9,9 +9,9 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders
 {
-    public class IdentityProviderTemplateResources : TemplateResourcesBase, ITemplateResources
+    public class IdentityProviderResources : TemplateResourcesBase, ITemplateResources
     {
-        public List<IdentityProviderTemplateResource> IdentityProviders { get; set; } = new();
+        public List<IdentityProviderResource> IdentityProviders { get; set; } = new();
 
         public TemplateResource[] BuildTemplateResources()
         {

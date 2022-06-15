@@ -9,6 +9,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.IdentityProviders
 {
@@ -16,15 +17,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllIdentityProvidersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/identityProviders?api-version={4}";
 
-        public async Task<List<IdentityProviderTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
+        readonly IIdentityProviderProcessor identityProviderProcessor;
+
+        public IdentityProviderClient(IIdentityProviderProcessor identityProviderProcessor)
+        {
+            this.identityProviderProcessor = identityProviderProcessor;
+        }
+
+        public async Task<List<IdentityProviderResource>> GetAllAsync(ExtractorParameters extractorParameters)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format(GetAllIdentityProvidersRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<IdentityProviderTemplateResource>(azToken, requestUrl);
+            var identityProviderTemplates = await this.GetPagedResponseAsync<IdentityProviderResource>(azToken, requestUrl);
+            this.identityProviderProcessor.ProcessData(identityProviderTemplates, extractorParameters);
 
+            return identityProviderTemplates;
         }
     }
 }

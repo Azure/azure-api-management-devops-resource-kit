@@ -55,13 +55,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             NamedValuesResources namedValuesTemplateResources = null,
             TagTemplateResources tagTemplateResources = null,
             GroupTemplateResources groupTemplateResources = null,
-            IdentityProviderTemplateResources identityProviderTemplateResources = null)
+            IdentityProviderResources identityProviderTemplateResources = null)
         {
             var masterTemplate = this.templateBuilder
                                         .GenerateEmptyTemplate()
                                         .Build<MasterTemplateResources>();
-            masterTemplate.Parameters = this.CreateMasterTemplateParameters(extractorParameters);
-            this.AddSecretValueParametersToMasterTemplate(masterTemplate.Parameters, identityProviderTemplateResources);
+            masterTemplate.Parameters = this.CreateMasterTemplateParameters(extractorParameters, identityProviderTemplateResources);
 
             var masterResources = masterTemplate.TypedResources;
             var fileNames = extractorParameters.FileNames;
@@ -251,7 +250,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 const string IdentityProvidersTemplate = "identityProvidersTemplate";
 
                 var identityProviderUri = this.GenerateLinkedTemplateUri(fileNames.IdentityProviders, extractorParameters);
-                var identityProviderDeployment = CreateLinkedMasterTemplateResource(IdentityProvidersTemplate, identityProviderUri, Array.Empty<string>());
+                var identityProviderDeployment = CreateLinkedMasterTemplateResourceForIdentityProviderTemplate(IdentityProvidersTemplate, identityProviderUri, Array.Empty<string>());
 
                 masterResources.DeploymentResources.Add(identityProviderDeployment);
             }
@@ -331,6 +330,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return masterResourceTemplate;
         }
 
+        static MasterTemplateResource CreateLinkedMasterTemplateResourceForIdentityProviderTemplate(string name, string uriLink, string[] dependsOn)
+        {
+            MasterTemplateResource masterResourceTemplate = CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
+            masterResourceTemplate.Properties.Parameters.Add(ParameterNames.SecretValues, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.SecretValues}')]" });
+            return masterResourceTemplate;
+        }
+
         static MasterTemplateResource CreateLinkedMasterTemplateResource(string name, string uriLink, string[] dependsOn)
         {
             // create deployment resource with provided arguments
@@ -362,7 +368,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return masterTemplateResource;
         }
 
-        Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(ExtractorParameters extractorParameters)
+        Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(ExtractorParameters extractorParameters, params ITemplateResources[] templateResources)
         {
             // used to create the parameter metatadata, etc (not value) for use in file with resources
             // add parameters with metatdata properties
@@ -456,17 +462,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     new TemplateParameterProperties(metadataDescription: "The settings for the APIs Oauth2 Scope values", type: "object"));
             }
 
-            return parameters;
-        }
-
-        void AddSecretValueParametersToMasterTemplate(Dictionary<string, TemplateParameterProperties> masterParameters, IdentityProviderTemplateResources identityProviderTemplateResources)
-        {
-            if (identityProviderTemplateResources.HasContent())
+            foreach(var templateResource in templateResources)
             {
-                masterParameters.Add(
-                    ParameterNames.SecretValues,
-                    new TemplateParameterProperties(metadataDescription: "Secret values for services", type: "object"));
+                if (templateResource.HasContent())
+                {
+                    parameters.Add(
+                        ParameterNames.SecretValues,
+                        new TemplateParameterProperties(metadataDescription: "Secret values for services", type: "object"));
+                    break;
+                }
             }
+
+            return parameters;
         }
 
         string GenerateLinkedTemplateUri(string fileName, ExtractorParameters extractorParameters)

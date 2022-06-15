@@ -5,7 +5,7 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders
 {
-    public class IdentityProviderTemplateProperties
+    public class IdentityProviderProperties
     {
         public string AllowedTenants { get; set; }
         public string Authority { get; set; }

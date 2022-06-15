@@ -34,12 +34,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.identityProviderClient = identityProviderClient;
         }
 
-        public async Task<Template<IdentityProviderTemplateResources>> GenerateIdentityProvidersTemplateAsync(ExtractorParameters extractorParameters)
+        public async Task<Template<IdentityProviderResources>> GenerateIdentityProvidersTemplateAsync(ExtractorParameters extractorParameters)
         {
             var identityProviderTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
                                         .AddParametrizedIdentityProvidersSecrets()
-                                        .Build<IdentityProviderTemplateResources>();
+                                        .Build<IdentityProviderResources>();
             var identityProvideres = await this.identityProviderClient.GetAllAsync(extractorParameters);
 
             if (identityProvideres.IsNullOrEmpty())
@@ -51,25 +51,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             foreach (var identityProvider in identityProvideres)
             {
                 identityProvider.Type = ResourceTypeConstants.IdentityProviders;
-                identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').identityProviders.{NamingHelper.GenerateValidParameterName(identityProvider.Name, ParameterPrefix.Property)}]";
+                identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').identityProviders.{NamingHelper.GenerateValidParameterName(identityProvider.Name, ParameterPrefix.Property).ToLower()}]";
                 identityProvider.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{identityProvider.Name}')]";
                 identityProvider.ApiVersion = GlobalConstants.ApiVersion;
                 identityProviderTemplate.TypedResources.IdentityProviders.Add(identityProvider);
             }
 
             return identityProviderTemplate;
-        }
-
-        async Task PopulateClientSecretsValue(IdentityProviderTemplateResource identityProvider, ExtractorParameters extractorParameters)
-        {
-            if (extractorParameters.ExtractSecrets)
-            {
-                
-            }
-            else
-            {
-
-            }
         }
     }
 }

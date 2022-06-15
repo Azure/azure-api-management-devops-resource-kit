@@ -4,11 +4,15 @@
 // --------------------------------------------------------------------------
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders
 {
-    public class IdentityProviderTemplateResource : TemplateResource
+    public class IdentityProviderResource : TemplateResource
     {
-        public IdentityProviderTemplateProperties Properties { get; set; }
+        [JsonIgnore]
+        public string OriginalName { get; set; }
+
+        public IdentityProviderProperties Properties { get; set; }
     }
 }

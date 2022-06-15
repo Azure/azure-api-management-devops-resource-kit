@@ -38,6 +38,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
            NamedValuesResources namedValuesTemplateResources = null,
            TagTemplateResources tagTemplateResources = null,
            GroupTemplateResources groupTemplateResources = null,
-           IdentityProviderTemplateResources identityProviderTemplateResources = null);
+           IdentityProviderResources identityProviderTemplateResources = null);
     }
 }
