@@ -17,6 +17,7 @@ using Xunit;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -27,9 +28,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         {
         }
 
-        ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null) 
+        ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null) 
         {
-            var parametersExtractor = new ParametersExtractor(new TemplateBuilder(), apisClient);
+            var parametersExtractor = new ParametersExtractor(new TemplateBuilder(), apisClient, identityProviderClient);
 
             var loggerExtractor = new LoggerExtractor(
                 this.GetTestLogger<LoggerExtractor>(),
@@ -62,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -87,7 +88,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
             
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -111,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters, apisClient: MockApisClient.GetMockedApiClientWithDefaultValues());
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string>{ "api-name-1", "api-name-2" }, null, null, null, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string>{ "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -138,7 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters, apisClient: mockedApiClient);
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string> { "api-name-1", "api-name-2" }, null, null, null, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string> { "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 

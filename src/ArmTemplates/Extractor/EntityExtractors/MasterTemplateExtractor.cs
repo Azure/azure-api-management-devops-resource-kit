@@ -464,7 +464,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             foreach(var templateResource in templateResources)
             {
-                if (templateResource.HasContent())
+                if (templateResource is not null && templateResource.HasContent())
                 {
                     parameters.Add(
                         ParameterNames.SecretValues,
