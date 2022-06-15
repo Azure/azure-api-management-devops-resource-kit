@@ -51,9 +51,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             foreach (var identityProvider in identityProvideres)
             {
                 identityProvider.Type = ResourceTypeConstants.IdentityProviders;
-                identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').identityProviders.{NamingHelper.GenerateValidParameterName(identityProvider.Name, ParameterPrefix.Property).ToLower()}]";
                 identityProvider.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{identityProvider.Name}')]";
                 identityProvider.ApiVersion = GlobalConstants.ApiVersion;
+                identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').{ParameterNames.IdentityProvidersSecretValues}.{NamingHelper.GenerateValidParameterName(identityProvider.OriginalName, ParameterPrefix.Property).ToLower()}]";
+
                 identityProviderTemplate.TypedResources.IdentityProviders.Add(identityProvider);
             }
 

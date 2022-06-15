@@ -27,6 +27,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         protected Dictionary<string, HttpMethod> httpMethodsMap;
 
+        public const string HTTP_GET_METHOD = "get";
+        public const string HTTP_POST_METHOD = "post";
+
         public ApiClientBase(string baseUrl = null) 
         {
             if (!string.IsNullOrEmpty(baseUrl))
@@ -35,11 +38,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             }
 
             this.httpMethodsMap = new Dictionary<string, HttpMethod>();
-            this.httpMethodsMap.Add("get", HttpMethod.Get);
-            this.httpMethodsMap.Add("post", HttpMethod.Post);
+            this.httpMethodsMap.Add(HTTP_GET_METHOD, HttpMethod.Get);
+            this.httpMethodsMap.Add(HTTP_POST_METHOD, HttpMethod.Post);
         }
 
-        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, string method = "get")
+        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, string method = HTTP_GET_METHOD)
         {
             if (useCache && this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {

@@ -219,7 +219,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     identityProviderParameteres.Add(identityProviderNameKey, identityProviderParameterValue);
                 }
 
-                secretValuesParameteres.Add("identityProviders", identityProviderParameteres);
+                secretValuesParameteres.Add(ParameterNames.IdentityProvidersSecretValues, identityProviderParameteres);
                 parameters.Add(ParameterNames.SecretValues, new TemplateObjectParameterProperties() { Value = secretValuesParameteres });
             }
 

@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(ListIdentyProviderSecret,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, identityProviderName, GlobalConstants.ApiVersion);
 
-            var identityProviderTemplates = await this.GetResponseAsync<IdentityProviderSecret>(azToken, requestUrl, false, "post");
+            var identityProviderTemplates = await this.GetResponseAsync<IdentityProviderSecret>(azToken, requestUrl, useCache: false, method: HTTP_POST_METHOD);
             
             return identityProviderTemplates;
         }
