@@ -18,6 +18,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abs
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.IdentityProviderClients;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -150,6 +151,71 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiOauth2ScopeSettingsValue.Count.Should().Be(1);
             apiOauth2ScopeSettingsValue.Should().ContainKey("apiname2");
             apiOauth2ScopeSettingsValue["apiname2"].Should().BeEquivalentTo("scope-default-value-2");
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ProperlyLaysTheInformation_IdentityProviderSecrets_EmptyValues()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_IdentityProviderSecrets_EmptyValues));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var identityProviderResources = new IdentityProviderResources();
+            identityProviderResources.IdentityProviders.Add(new IdentityProviderResource() {
+                OriginalName = "originalName"
+            });
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, identityProviderResources, currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.SecretValues);
+            var secretValuesParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.SecretValues];
+            var secretValueParameterValues = (Dictionary<string, Dictionary<string, string>>)secretValuesParameters.Value;
+
+            secretValueParameterValues.Count.Should().Be(1);
+            secretValueParameterValues.Should().ContainKey(ParameterNames.IdentityProvidersSecretValues);
+            secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues].Should().ContainKey("originalName");
+            secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues]["originalName"].Should().Be(string.Empty);
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ProperlyLaysTheInformation_IdentityProviderSecrets_FilledValues()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_IdentityProviderSecrets_FilledValues));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(extractSecrets: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var identityProviderMockClient = MockIdentityProviderClient.GetMockedIdentityProviderClient(new List<string>()
+            {
+                "originalName"
+            });
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null, identityProviderClient: identityProviderMockClient);
+
+            var identityProviderResources = new IdentityProviderResources();
+            identityProviderResources.IdentityProviders.Add(new IdentityProviderResource()
+            {
+                OriginalName = "originalName"
+            });
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, identityProviderResources, currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.SecretValues);
+            var secretValuesParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.SecretValues];
+            var secretValueParameterValues = (Dictionary<string, Dictionary<string, string>>)secretValuesParameters.Value;
+
+            secretValueParameterValues.Count.Should().Be(1);
+            secretValueParameterValues.Should().ContainKey(ParameterNames.IdentityProvidersSecretValues);
+            secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues].Should().ContainKey("originalName");
+            secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues]["originalName"].Should().Be(MockIdentityProviderClient.ClientSecretDefaultValue);
         }
     }
 }
