@@ -15,13 +15,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
     {
         public const string TemplateType = "Microsoft.ApiManagement/service/identityProviders";
         public const string ClientSecretDefaultValue = "clientSecretValue";
-        public static IdentityProviderProperties GetMockedIdentityProviderProperties()
+        public static IdentityProviderProperties GetMockedIdentityProviderProperties(string identityProviderName)
         {
             return new IdentityProviderProperties
             {
                 ClientId = "clientid",
                 ClientSecret = null,
-                Type = "facebook"
+                Type = $"type{identityProviderName}"
             };
         }
 
@@ -30,9 +30,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
             var identityProviderList = new List<IdentityProviderResource>();
             foreach(var identityProvideName in identityProviderNames)
             {
-                var properties = GetMockedIdentityProviderProperties();
+                var properties = GetMockedIdentityProviderProperties(identityProvideName);
                 identityProviderList.Add(new IdentityProviderResource
                 {
+                    OriginalName = identityProvideName,
                     Name = identityProvideName,
                     Type = TemplateType,
                     Properties = properties
