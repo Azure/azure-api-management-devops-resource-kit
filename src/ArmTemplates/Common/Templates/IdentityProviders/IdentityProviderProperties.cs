@@ -8,14 +8,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
     public class IdentityProviderProperties
     {
         public string[] AllowedTenants { get; set; }
+
         public string Authority { get; set; }
+
         public string ClientId { get; set; }
+
         public string ClientSecret { get; set; }
+
         public string PasswordResetPolicyName { get; set; }
+
         public string ProfileEditingPolicyName { get; set; }
+
         public string SigninPolicyName { get; set; }
+
         public string SigninTenant { get; set; }
+
         public string SignupPolicyName { get; set; }
+
         public string Type { get; set; }
     }
 }

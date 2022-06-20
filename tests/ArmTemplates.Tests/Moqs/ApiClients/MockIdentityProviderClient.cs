@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
             {
                 ClientId = "clientid",
                 ClientSecret = null,
-                Type = $"type{identityProviderName}"
+                Type = IdentityProviderType.AAD
             };
         }
 
@@ -46,7 +46,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
         public static IIdentityProviderClient GetMockedIdentityProviderClient(List<string> identityProviderNames)
         {
             var mockServiceIdentityProviderApiClient = new Mock<IIdentityProviderClient>(MockBehavior.Strict);
-
 
             mockServiceIdentityProviderApiClient
                 .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))

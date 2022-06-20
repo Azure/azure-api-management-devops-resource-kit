@@ -20,7 +20,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         readonly ILogger<IdentityProviderExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
-
         readonly IIdentityProviderClient identityProviderClient;
 
         public IdentityProviderExtractor(
@@ -30,7 +29,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
-
             this.identityProviderClient = identityProviderClient;
         }
 
@@ -53,7 +51,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 identityProvider.Type = ResourceTypeConstants.IdentityProviders;
                 identityProvider.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{identityProvider.Name}')]";
                 identityProvider.ApiVersion = GlobalConstants.ApiVersion;
-                identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').{ParameterNames.IdentityProvidersSecretValues}.{NamingHelper.GenerateValidParameterName(identityProvider.OriginalName, ParameterPrefix.Property).ToLower()}]";
+
+                if (IdentityProviderType.IsIdentityProviderSupportsClientSecret(identityProvider.Properties.Type))
+                {
+                    identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').{ParameterNames.IdentityProvidersSecretValues}.{NamingHelper.GenerateValidParameterName(identityProvider.OriginalName, ParameterPrefix.Property).ToLower()}]";
+                }
 
                 identityProviderTemplate.TypedResources.IdentityProviders.Add(identityProvider);
             }

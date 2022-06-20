@@ -445,7 +445,7 @@ You have two choices when specifying your settings:
 | overrideProductGuids | No | Set to true will override the product id in output template in case it does not match with system predefined values. |
 | paramApiOauth2Scope | No | Set to true will parametrize the scope values for APIs in which User authorization setting set to OAuth 2.0. |
 | apiParameters  | No                    | Parameterize api parameters (Oauth2 Scope/Service Url) values for APIs in advance.  |
-| exctractSecrets  | No                    | By default false. If set to "true" secrets will be extracted as well. Currently applies to identityProvider service.  |
+| exctractSecrets  | No                    | By default false. If set to "true" secrets will be extracted as well and parameters templated will be supplied with actual secret values. Currently applies to identityProvider service.  |
 
 
 #### Note

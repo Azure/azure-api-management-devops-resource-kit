@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -45,9 +46,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(ListIdentyProviderSecret,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, identityProviderName, GlobalConstants.ApiVersion);
 
-            var identityProviderTemplates = await this.GetResponseAsync<IdentityProviderSecret>(azToken, requestUrl, useCache: false, method: HTTP_POST_METHOD);
-            
-            return identityProviderTemplates;
+            return await this.GetResponseAsync<IdentityProviderSecret>(azToken, requestUrl, useCache: false, method: ClientHttpMethod.POST);
         }
     }
 }
