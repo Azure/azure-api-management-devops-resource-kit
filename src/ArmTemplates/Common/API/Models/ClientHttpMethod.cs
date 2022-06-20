@@ -5,6 +5,9 @@
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Models
 {
+    /// <summary>
+    /// ClientHttpMethod represents HttpMethod type. The class is stored in a separate enum-type to not include System.Web.Mvc to the application.
+    /// </summary>
     public enum ClientHttpMethod
     {
         GET,

@@ -52,7 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 identityProvider.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{identityProvider.Name}')]";
                 identityProvider.ApiVersion = GlobalConstants.ApiVersion;
 
-                if (IdentityProviderType.IsIdentityProviderSupportsClientSecret(identityProvider.Properties.Type))
+                if (IdentityProviderType.HasClientSecret(identityProvider.Properties.Type))
                 {
                     identityProvider.Properties.ClientSecret = $"[parameters('{ParameterNames.SecretValues}').{ParameterNames.IdentityProvidersSecretValues}.{NamingHelper.GenerateValidParameterName(identityProvider.OriginalName, ParameterPrefix.Property).ToLower()}]";
                 }

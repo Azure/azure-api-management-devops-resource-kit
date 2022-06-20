@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public const string Microsoft = "microsoft";
         public const string Twitter = "twitter";
 
-        public static HashSet<string> ClientSecretSupportedIdentityProviders = new() {
+        static HashSet<string> ClientSecretSupportedIdentityProviders = new() {
             AAD,
             AADB2C,
             Facebook,
@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             Twitter
         };
 
-        public static bool IsIdentityProviderSupportsClientSecret(string identityProviderType) {
+        public static bool HasClientSecret(string identityProviderType) {
             return ClientSecretSupportedIdentityProviders.Contains(identityProviderType);
         }
     }
