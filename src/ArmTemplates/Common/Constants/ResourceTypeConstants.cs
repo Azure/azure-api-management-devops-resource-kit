@@ -34,5 +34,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string Gateway = "Microsoft.ApiManagement/service/gateways";
         public const string GatewayApi = "Microsoft.ApiManagement/service/gateways/apis";
         public const string ArmDeployments = "Microsoft.Resources/deployments";
+        public const string IdentityProviders = "Microsoft.ApiManagement/service/identityProviders";
     }
 }

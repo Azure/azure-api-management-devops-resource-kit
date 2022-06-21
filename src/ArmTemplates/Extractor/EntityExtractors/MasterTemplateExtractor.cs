@@ -24,6 +24,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Log
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -53,13 +54,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             AuthorizationServerTemplateResources authorizationServersTemplateResources = null,
             NamedValuesResources namedValuesTemplateResources = null,
             TagTemplateResources tagTemplateResources = null,
-            GroupTemplateResources groupTemplateResources = null)
+            GroupTemplateResources groupTemplateResources = null,
+            IdentityProviderResources identityProviderTemplateResources = null)
         {
             var masterTemplate = this.templateBuilder
                                         .GenerateEmptyTemplate()
                                         .Build<MasterTemplateResources>();
-            masterTemplate.Parameters = this.CreateMasterTemplateParameters(extractorParameters);
-            
+            masterTemplate.Parameters = this.CreateMasterTemplateParameters(extractorParameters, identityProviderTemplateResources);
+
             var masterResources = masterTemplate.TypedResources;
             var fileNames = extractorParameters.FileNames;
 
@@ -242,6 +244,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 masterResources.DeploymentResources.Add(groupsDeployment);
             }
 
+            if (identityProviderTemplateResources?.HasContent() == true)
+            {
+                this.logger.LogDebug("Adding identity providers to master template");
+                const string IdentityProvidersTemplate = "identityProvidersTemplate";
+
+                var identityProviderUri = this.GenerateLinkedTemplateUri(fileNames.IdentityProviders, extractorParameters);
+                var identityProviderDeployment = CreateLinkedMasterTemplateResourceForIdentityProviderTemplate(IdentityProvidersTemplate, identityProviderUri, Array.Empty<string>());
+
+                masterResources.DeploymentResources.Add(identityProviderDeployment);
+            }
+
             return masterTemplate;
         }
 
@@ -317,6 +330,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return masterResourceTemplate;
         }
 
+        static MasterTemplateResource CreateLinkedMasterTemplateResourceForIdentityProviderTemplate(string name, string uriLink, string[] dependsOn)
+        {
+            MasterTemplateResource masterResourceTemplate = CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
+            masterResourceTemplate.Properties.Parameters.Add(ParameterNames.SecretValues, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.SecretValues}')]" });
+            return masterResourceTemplate;
+        }
+
         static MasterTemplateResource CreateLinkedMasterTemplateResource(string name, string uriLink, string[] dependsOn)
         {
             // create deployment resource with provided arguments
@@ -335,7 +355,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     },
                     Parameters = new Dictionary<string, TemplateParameterProperties>
                     {
-                        { ParameterNames.ApimServiceName, new TemplateParameterProperties(){ Value = $"[parameters('{ParameterNames.ApimServiceName}')]" } }
+                        { 
+                            ParameterNames.ApimServiceName, new TemplateParameterProperties()
+                            {
+                                Value = $"[parameters('{ParameterNames.ApimServiceName}')]" 
+                            }
+                        }
                     }
                 },
                 DependsOn = dependsOn
@@ -343,7 +368,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return masterTemplateResource;
         }
 
-        Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(ExtractorParameters extractorParameters)
+        Dictionary<string, TemplateParameterProperties> CreateMasterTemplateParameters(ExtractorParameters extractorParameters, params ITemplateResources[] templateResources)
         {
             // used to create the parameter metatadata, etc (not value) for use in file with resources
             // add parameters with metatdata properties
@@ -435,6 +460,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 parameters.Add(
                     ParameterNames.ApiOauth2ScopeSettings,
                     new TemplateParameterProperties(metadataDescription: "The settings for the APIs Oauth2 Scope values", type: "object"));
+            }
+
+            foreach(var templateResource in templateResources)
+            {
+                if (templateResource is not null && templateResource.HasContent())
+                {
+                    parameters.Add(
+                        ParameterNames.SecretValues,
+                        new TemplateParameterProperties(metadataDescription: "Secret values for services", type: "object"));
+                    break;
+                }
             }
 
             return parameters;
