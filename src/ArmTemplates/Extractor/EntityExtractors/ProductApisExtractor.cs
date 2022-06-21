@@ -99,17 +99,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             this.logger.LogInformation("Processing {0} api-names...", multipleApiNames.Count);
 
-            string[] dependsOn = Array.Empty<string>();
             var templateResources = new List<ProductApiTemplateResource>();
             foreach (string apiName in multipleApiNames)
             {
-                var productApiTemplateResources = await this.GenerateProductApiTemplateResourcesAsync(apiName, extractorParameters, dependsOn);
+                var productApiTemplateResources = await this.GenerateProductApiTemplateResourcesAsync(apiName, extractorParameters, null);
                 
                 if (!productApiTemplateResources.IsNullOrEmpty())
                 {
                     templateResources.AddRange(productApiTemplateResources);
-                    string apiProductName = templateResources.Last().Name.Split('/', 3)[1];
-                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiProductName}', '{apiName}')]" };
                 }
             }
 
@@ -119,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         async Task<List<ProductApiTemplateResource>> GenerateProductApiTemplateResourcesAsync(
             string apiName, 
             ExtractorParameters extractorParameters, 
-            string[] dependsOn)
+            string[] dependsOn = null)
         {
             var productApiResources = new List<ProductApiTemplateResource>();
             this.logger.LogInformation("Extracting products from {0} API:", apiName);
@@ -128,7 +125,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 var productApis = await this.productsClient.GetAllLinkedToApiAsync(apiName, extractorParameters);
 
-                string lastProductAPIName = null;
                 foreach (var productApi in productApis)
                 {
                     this.logger.LogInformation("'{0}' Product association found", productApi.OriginalName);
@@ -138,11 +134,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     productApi.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productApi.NewName}/{apiName}')]";
                     productApi.ApiVersion = GlobalConstants.ApiVersion;
                     productApi.Scale = null;
-                    productApi.DependsOn = lastProductAPIName != null ? new string[] { lastProductAPIName } : dependsOn;
-
+                    if (!dependsOn.IsNullOrEmpty())
+                    {
+                        productApi.DependsOn = dependsOn;
+                    }
+                    
                     productApiResources.Add(productApi);
 
-                    lastProductAPIName = $"[resourceId('Microsoft.ApiManagement/service/products/apis', parameters('{ParameterNames.ApimServiceName}'), '{productApi.NewName}', '{apiName}')]";
                 }
             }
             catch (Exception ex) 
