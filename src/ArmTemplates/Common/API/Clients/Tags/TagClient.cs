@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
@@ -18,6 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetAllTagsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/tags?api-version={5}&format=rawxml";
         const string GetAllTagsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/tags?$skip={4}&api-version={5}";
         const string GetTagsLinkedToApiOperationRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/tags?api-version={6}&format=rawxml";
+        const string GetAllTagsLinkedToProduct = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/tags?api-version={5}";
 
         readonly IApisClient apisClient;
 
@@ -58,20 +58,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         public async Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
         {
-            var apisLinkedToProduct = await this.apisClient.GetAllLinkedToProductAsync(productName, extractorParameters);
+            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
 
-            var tagTemplateResources = new List<TagTemplateResource>();
-            foreach (var productApi in apisLinkedToProduct)
-            {
-                var apiTags = await this.GetAllTagsLinkedToApiAsync(productApi.Name, extractorParameters);
+            string requestUrl = string.Format(GetAllTagsLinkedToProduct,
+               this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
-                if (!apiTags.IsNullOrEmpty())
-                {
-                    tagTemplateResources.AddRange(apiTags);
-                }
-            }
-
-            return tagTemplateResources;
+            return await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
         }
     }
 }
