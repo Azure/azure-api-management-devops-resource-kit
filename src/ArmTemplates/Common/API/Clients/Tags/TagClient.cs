@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         public async Task<List<TagTemplateResource>> GetAllTagsLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format(GetAllTagsLinkedToApiRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         public async Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
         {
-            (string azToken, string azSubId) = await this.Auth.GetAccessToken();
+            var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
             string requestUrl = string.Format(GetAllTagsLinkedToProduct,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
