@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             if (!string.IsNullOrEmpty(singleApiName))
             {
-                tagApiTemplate.TypedResources = await this.GenerateSingleApiTagResourceAsync(singleApiName, extractorParameters, Array.Empty<string>());
+                tagApiTemplate.TypedResources = await this.GenerateSingleApiTagResourceAsync(singleApiName, extractorParameters);
             }
             else if (!multipleApiNames.IsNullOrEmpty())
             {
@@ -73,30 +73,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.logger.LogDebug("Processing {0} api-names...", multipleApiNames.Count);
 
             var overallResources = new TagApiTemplateResources();
-            string[] dependsOn = Array.Empty<string>();
             foreach (string apiName in multipleApiNames)
             {
-                var tagApiResources = await this.GenerateSingleApiTagResourceAsync(apiName, extractorParameters, dependsOn);
+                var tagApiResources = await this.GenerateSingleApiTagResourceAsync(apiName, extractorParameters);
 
                 if (tagApiResources.HasContent())
                 {
                     overallResources.AddDataResources(tagApiResources);
-
-                    // Extract the tag name from the last resource
-                    string[] lastTagName = tagApiResources.Tags.Last().Name.Replace("')]", "").Split('/');
-                    dependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{lastTagName[2]}')]" };
                 }
             }
 
             return overallResources;
         }
 
-        async Task<TagApiTemplateResources> GenerateSingleApiTagResourceAsync(string apiName, ExtractorParameters extractorParameters, string[] dependsOn)
+        async Task<TagApiTemplateResources> GenerateSingleApiTagResourceAsync(string apiName, ExtractorParameters extractorParameters)
         {
             var templateResources = new TagApiTemplateResources();
 
             var apiTags = await this.tagClient.GetAllTagsLinkedToApiAsync(apiName, extractorParameters);
-            var dependencyChain = dependsOn;
             foreach (var apiTag in apiTags)
             {
                 var apiTagOriginalName = apiTag.Name;
@@ -104,9 +98,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiTagOriginalName}')]";
                 apiTag.ApiVersion = GlobalConstants.ApiVersion;
                 apiTag.Scale = null;
-                apiTag.DependsOn = dependencyChain;
-                dependencyChain = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/tags', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{apiTagOriginalName}')]" };
-
                 templateResources.Tags.Add(apiTag);
             }
 

@@ -72,7 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             resources.Tags.Any(x => x.Name.Contains(MockTagClient.TagName1)).Should().BeTrue();
             resources.Tags.Any(x => x.Name.Contains(MockTagClient.TagName2)).Should().BeTrue();
             resources.Tags.All(x => x.ApiVersion == GlobalConstants.ApiVersion).Should().BeTrue();
-            resources.Tags.All(x => !x.DependsOn.IsNullOrEmpty() && !string.IsNullOrEmpty(x.DependsOn.First())).Should().BeTrue();
+            resources.Tags.All(x => x.DependsOn.IsNullOrEmpty()).Should().BeTrue();
         }
     }
 }
