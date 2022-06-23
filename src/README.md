@@ -46,7 +46,6 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | linkedTemplatesBaseUrl| string                | No                    | Location that stores linked templates. Required if 'linked' is set to true. |
 | linkedTemplatesUrlQueryString| string                | No                    | Query string appended to linked templates uris that enables retrieval from private storage. |
 | tags                   | Array<[TagConfiguration](#tagConfiguration)>      | No                   | List of Tags configurations.                                |
-| subscriptionKeyParameterNames | APITemplateSubscriptionKeyParameterNames      | No                   | subscription key parameter name.                    |
 | baseFileName | string      | No                   | base file name for the templates file               |
 | serviceUrlParameters | Array<[ServiceUrlProperty](#ServiceUrlProperty)> | No                   | List of parameterized ServiceUrl.                    |
 
@@ -64,6 +63,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | policy                | string                | No                    | Location of the API policy XML file. Can be url or local file.                          |
 | suffix                | string                | Yes                    | Relative URL uniquely identifying this API and all of its resource paths within the API Management service instance. It is appended to the API endpoint base URL specified during the service instance creation to form a public URL for this API.                       |
 | subscriptionRequired  | boolean               | No                    | Specifies whether an API or Product subscription is required for accessing the API.                         |
+| subscriptionKeyParameterNames | APITemplateSubscriptionKeyParameterNames      | No                   | subscription key parameter name.                    |
 | isCurrent             | boolean               | No                    | Indicates if API revision is current api revision.    |
 | apiVersion            | string                | No                    | Indicates the Version identifier of the API if the API is versioned.                         |
 | apiVersionDescription | string                | No                    | Description of the API Version.                   |
