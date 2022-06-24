@@ -909,6 +909,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var groupTemplate = await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
+            await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
             await this.GenerateMasterTemplateAsync(
