@@ -39,5 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         TemplateBuilder AddParameterizedBackendSettings(ExtractorParameters extractorParameters);
 
         TemplateBuilder AddParameterizedLogResourceIdProperty(ExtractorParameters extractorParameters);
+
+        TemplateBuilder AddParametrizedIdentityProvidersSecrets();
     }
 }

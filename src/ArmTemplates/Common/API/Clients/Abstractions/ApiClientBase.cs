@@ -3,6 +3,7 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -32,14 +33,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             }
         }
 
-        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl)
+        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
         {
-            if (this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
+            if (useCache && this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {
                 return cachedResponseBody;
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            var httpMethod = method switch
+            {
+                ClientHttpMethod.GET => HttpMethod.Get,
+                ClientHttpMethod.POST => HttpMethod.Post,
+                _ => throw new NotImplementedException("Method not supported")
+            };
+
+            var request = new HttpRequestMessage(httpMethod, requestUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", azToken);
             request.Headers.UserAgent.TryParseAdd($"{Application.Name}/{Application.BuildVersion}");
 
@@ -47,14 +55,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            this.cache.Set(requestUrl, responseBody);
+            if (useCache)
+            {
+                this.cache.Set(requestUrl, responseBody);
+            }
 
             return responseBody;
         }
 
-        protected async Task<TResponse> GetResponseAsync<TResponse>(string azToken, string requestUrl)
+        protected async Task<TResponse> GetResponseAsync<TResponse>(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
         {
-            var stringResponse = await this.CallApiManagementAsync(azToken, requestUrl);
+            var stringResponse = await this.CallApiManagementAsync(azToken, requestUrl, useCache, method);
             return stringResponse.Deserialize<TResponse>();
         }
 

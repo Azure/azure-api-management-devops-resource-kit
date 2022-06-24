@@ -4,7 +4,6 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -12,6 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
@@ -24,13 +24,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         readonly ITemplateBuilder templateBuilder;
         readonly IApisClient apisClient;
+        readonly IIdentityProviderClient identityProviderClient;
 
         public ParametersExtractor(
             ITemplateBuilder templateBuilder,
-            IApisClient apisClient)
+            IApisClient apisClient,
+            IIdentityProviderClient identityProviderClient)
         {
             this.templateBuilder = templateBuilder;
             this.apisClient = apisClient;
+            this.identityProviderClient = identityProviderClient;
         }
 
         public async Task<Template> CreateMasterTemplateParameterValues(
@@ -39,6 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             LoggerTemplateResources loggerTemplateResources,
             BackendTemplateResources backendResources,
             NamedValuesResources namedValuesResources,
+            IdentityProviderResources identityProviderResources,
             ExtractorParameters extractorParameters)
         {
             // used to create the parameter values for use in parameters file
@@ -55,6 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             AddNamedValuesParameters();
             await AddServiceUrlParameterAsync();
             await AddApiOauth2ScopeParameterAsync();
+            await AddSecretValuesParameters();
 
             void AddLinkedUrlParameters()
             {
@@ -188,6 +193,34 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 parameters.Add(ParameterNames.NamedValues, new TemplateObjectParameterProperties() { Value = namedValuesParameters });
                 parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateObjectParameterProperties() { Value = keyVaultNamedValues });
+            }
+
+            async Task AddSecretValuesParameters()
+            {
+                var secretValuesParameteres = new Dictionary<string, Dictionary<string, string>>();
+
+                if (!identityProviderResources.HasContent())
+                {
+                    return;
+                }
+
+                var identityProviderParameteres = new Dictionary<string, string>();
+
+                foreach (var identityProvider in identityProviderResources.IdentityProviders)
+                {
+                    var identityProviderNameKey = NamingHelper.GenerateValidParameterName(identityProvider.OriginalName, ParameterPrefix.Property);
+                    var identityProviderParameterValue = string.Empty;
+                    if (extractorParameters.ExtractSecrets)
+                    {
+                        var identityProviderSecret = await this.identityProviderClient.ListIdentityProviderSecrets(identityProvider.OriginalName, extractorParameters);
+                        identityProviderParameterValue = identityProviderSecret.ClientSecret;
+                    }
+
+                    identityProviderParameteres.Add(identityProviderNameKey, identityProviderParameterValue);
+                }
+
+                secretValuesParameteres.Add(ParameterNames.IdentityProvidersSecretValues, identityProviderParameteres);
+                parameters.Add(ParameterNames.SecretValues, new TemplateObjectParameterProperties() { Value = secretValuesParameteres });
             }
 
             if (extractorParameters.ParameterizeApiLoggerId)
