@@ -33,6 +33,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.TemplateCrea
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.IdentityProviders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiManagementService;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -66,6 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IProductDataProcessor, ProductDataProcessor>();
             services.AddScoped<IProductApiDataProcessor, ProductApiDataProcessor>();
             services.AddScoped<IIdentityProviderProcessor, IdentityProviderProcessor>();
+            services.AddScoped<IApiManagementServiceProcessor, ApiManagementServiceProcessor>();
         }
 
         static void SetupCommands(IServiceCollection services)
@@ -129,6 +131,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IGatewayApiExtractor, GatewayApiExtractor>();
             services.AddScoped<IParametersExtractor, ParametersExtractor>();
             services.AddScoped<IIdentityProviderExtractor, IdentityProviderExtractor>();
+            services.AddScoped<IApiManagementServiceExtractor, ApiManagementServiceExtractor>();
         }
 
         static void SetupApiClients(IServiceCollection services)
@@ -149,6 +152,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<INamedValuesClient, NamedValuesClient>();
             services.AddScoped<IBackendClient, BackendClient>();
             services.AddScoped<IIdentityProviderClient, IdentityProviderClient>();
+            services.AddScoped<IApiManagementServiceClient, ApiManagementServiceClient>();
         }
     }
 }

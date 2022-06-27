@@ -35,6 +35,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 
         public string IdentityProviders { get; set; }
 
+        public string ApiManagementService { get; set; }
+
         public string Parameters { get; set; }
         
         // linked property outputs 1 master template
