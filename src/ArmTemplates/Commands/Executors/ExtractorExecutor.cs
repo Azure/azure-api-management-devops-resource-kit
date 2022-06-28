@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
@@ -733,6 +734,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             return gatewayApiTemplate;
         }
 
+        public async Task<Template<ApiManagementServiceResources>> GenerateApiManagementServiceTemplate(string baseFilesGenerationDirectory)
+        {
+            var apiManagementServiceTemplate = await this.apiManagementServiceExtractor.GenerateApiManagementServicesTemplateAsync(this.extractorParameters);
+
+            if (apiManagementServiceTemplate?.HasResources() == true)
+            {
+                this.logger.LogInformation("Started generation of ApiManagement service template...");
+
+                await FileWriter.SaveAsJsonAsync(
+                    apiManagementServiceTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.ApiManagementService);
+
+                this.logger.LogInformation("Finished generation of identity providers template...");
+            }
+
+            return apiManagementServiceTemplate;
+        }
+
         /// <summary>
         /// Generates split api templates / folders for each api in this sourceApim 
         /// </summary>
@@ -837,23 +857,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             await this.GenerateTemplates(groupApiFolder, multipleApiNames: this.extractorParameters.MultipleApiNames);
 
             this.logger.LogInformation($@"Finished extracting mutiple APIs");
-        }
-
-        async Task GenerateApiManagementServiceTemplate(string baseFilesGenerationDirectory)
-        {
-            var apiManagementServiceTemplate = await this.apiManagementServiceExtractor.GenerateApiManagementServicesTemplateAsync(this.extractorParameters);
-
-            if (apiManagementServiceTemplate?.HasResources() == true)
-            {
-                this.logger.LogInformation("Started generation of ApiManagement service template...");
-
-                await FileWriter.SaveAsJsonAsync(
-                    apiManagementServiceTemplate,
-                    directory: baseFilesGenerationDirectory,
-                    fileName: this.extractorParameters.FileNames.ApiManagementService);
-                
-                this.logger.LogInformation("Finished generation of identity providers template...");
-            }
         }
 
         async Task GenerateSingleAPIWithRevisionsTemplates()
