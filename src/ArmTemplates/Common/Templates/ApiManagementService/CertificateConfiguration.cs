@@ -3,7 +3,6 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
-
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService
 {
     public class CertificateConfiguration
