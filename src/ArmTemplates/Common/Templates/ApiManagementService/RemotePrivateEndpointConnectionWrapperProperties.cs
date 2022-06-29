@@ -14,6 +14,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public PrivateLinkServiceConnectionState PrivateLinkServiceConnectionState { get; set; }
 
         public string ProvisioningState { get; set; }
-
     }
 }
