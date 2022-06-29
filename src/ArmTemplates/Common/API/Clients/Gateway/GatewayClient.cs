@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -23,8 +24,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         readonly IApisClient apisClient;
 
         public GatewayClient(
+            IHttpClientFactory httpClientFactory,
             ILogger<GatewayClient> logger,
-            IApisClient apisClient)
+            IApisClient apisClient
+            ): base(httpClientFactory)
         {
             this.logger = logger;
             this.apisClient = apisClient;
