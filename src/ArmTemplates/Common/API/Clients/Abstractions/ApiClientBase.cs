@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         protected string BaseUrl { get; private set; } = GlobalConstants.BaseManagementAzureUrl;
 
-        protected AzureCliAuthenticator Auth { get; private set; } = new AzureCliAuthenticator();
+        protected virtual AzureCliAuthenticator Auth { get; private set; } = new AzureCliAuthenticator();
 
         public ApiClientBase(IHttpClientFactory httpClientFactory)
         {

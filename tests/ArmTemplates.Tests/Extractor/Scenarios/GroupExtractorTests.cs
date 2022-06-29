@@ -66,5 +66,33 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 templateResource.Properties.Should().NotBeNull();
             }
         }
+
+        [Fact]
+        public async Task GenerateGroupsTemplates_ProperlyParsesResponse()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGroupsTemplates_ProperlyParsesResponse));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var mockedGroupsClient = await MockGroupsClient.GetMockedHttpGroupClient("ApiManagementListGroups_success_response.json");
+            var groupExtractor = new GroupExtractor(this.GetTestLogger<GroupExtractor>(), new TemplateBuilder(), mockedGroupsClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                groupExtractor: groupExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var groupTemplate = await extractorExecutor.GenerateGroupsTemplateAsync(currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Groups)).Should().BeTrue();
+
+            groupTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            groupTemplate.TypedResources.Groups.Count().Should().Be(4);
+            groupTemplate.TypedResources.Groups.First(x => x.Properties.DisplayName.Equals("AwesomeGroup for test")).Should().NotBeNull();
+        }
     }
 }
