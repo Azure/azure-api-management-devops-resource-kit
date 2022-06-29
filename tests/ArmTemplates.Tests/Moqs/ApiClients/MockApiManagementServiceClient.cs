@@ -4,10 +4,18 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiManagementService;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 using Moq;
+using Moq.Protected;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
 {
@@ -33,6 +41,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             return mockApiManagementServiceClient.Object;
+        }
+
+        public static IApiManagementServiceClient GetMockedApiManagementServiceClientWithJsonResponse(string jsonResponse)
+        {
+            var mockedProcessor = new Mock<IApiManagementServiceProcessor>(MockBehavior.Loose).Object;
+
+            var mockApiManagementServiceClient = new Mock<ApiManagementServiceClient>(MockBehavior.Strict, mockedProcessor) { CallBase = true };
+            mockApiManagementServiceClient.Protected()
+                .Setup<Task<string>>("CallApiManagementAsync", ItExpr.IsAny<string>(), ItExpr.IsAny<string>(), ItExpr.IsAny<bool>(), ItExpr.IsAny<ClientHttpMethod>())
+                .ReturnsAsync(jsonResponse);
+
+            mockApiManagementServiceClient.Protected()
+                .Setup<AzureCliAuthenticator>("Auth").Returns(GetMockedAzureClient());
+
+            return mockApiManagementServiceClient.Object;
+        }
+
+        public static AzureCliAuthenticator GetMockedAzureClient()
+        {
+            var mockedZureClientAuth = new Mock<AzureCliAuthenticator>(MockBehavior.Strict);
+            mockedZureClientAuth.Setup(x => x.GetAccessToken()).ReturnsAsync(() => ("val1", "val2"));
+            return mockedZureClientAuth.Object;
         }
     }
 }

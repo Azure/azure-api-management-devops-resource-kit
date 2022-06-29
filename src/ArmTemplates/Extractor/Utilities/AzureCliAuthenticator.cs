@@ -19,7 +19,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
         string internalAzToken;
         string internalAzSubscriptionId;
 
-        public async Task<(string azToken, string azSubscriptionId)> GetAccessToken()
+        public virtual async Task<(string azToken, string azSubscriptionId)> GetAccessToken()
         {
             var tokenTimeout = DateTime.Now;
 

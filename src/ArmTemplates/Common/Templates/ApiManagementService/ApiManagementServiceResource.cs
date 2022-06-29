@@ -13,6 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
     {
         [JsonIgnore]
         public string OriginalName { get; set; }
+
         public ApiManagementServiceIdentity Identity { get; set; }
 
         public string Location { get; set; }

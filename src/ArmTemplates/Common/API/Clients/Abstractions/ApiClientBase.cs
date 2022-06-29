@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         protected string BaseUrl { get; private set; } = GlobalConstants.BaseManagementAzureUrl;
 
-        protected AzureCliAuthenticator Auth { get; private set; } = new AzureCliAuthenticator();
+        protected virtual AzureCliAuthenticator Auth { get; private set; } = new AzureCliAuthenticator();
 
         public ApiClientBase(string baseUrl = null) 
         {
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             }
         }
 
-        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
+        protected virtual async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
         {
             if (useCache && this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {

@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Xunit;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
@@ -54,6 +57,51 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiManagementServiceTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
             apiManagementServiceTemplate.Resources.Count().Should().Be(1);
             apiManagementServiceTemplate.TypedResources.ApiManagementServices.Count().Should().Be(1);
+        }
+
+        [Fact]
+        public async Task GenerateApiManagementService_ProperlyParsesJsonResponse()
+        {
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateApiManagementService_ProperlyParsesJsonResponse));
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            FileReader fileReader = new FileReader();
+            string fileLocation = Path.Combine("Resources", "ApiClientJsonResponses", "api_management_success_response.json");
+            var jsonResponse = await fileReader.RetrieveFileContentsAsync(fileLocation);
+
+            var expectedApiManagementService = jsonResponse.Deserialize<ApiManagementServiceResource>();
+
+            var mockedApiManagementServiceClient = MockApiManagementServiceClient.GetMockedApiManagementServiceClientWithJsonResponse(jsonResponse);
+
+            var mockedApiManagementServiceExtractor = new ApiManagementServiceExtractor(this.GetTestLogger<ApiManagementServiceExtractor>(), new TemplateBuilder(), mockedApiManagementServiceClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                apiManagementServiceExtractor: mockedApiManagementServiceExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var apiManagementServiceTemplate = await extractorExecutor.GenerateApiManagementServiceTemplate(currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ApiManagementService)).Should().BeTrue();
+
+            apiManagementServiceTemplate.Parameters.Should().NotBeNull();
+            apiManagementServiceTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            apiManagementServiceTemplate.Resources.Count().Should().Be(1);
+            apiManagementServiceTemplate.TypedResources.ApiManagementServices.Count().Should().Be(1);
+
+            var apiManagementService = apiManagementServiceTemplate.TypedResources.ApiManagementServices[0];
+
+            apiManagementService.Properties.PublisherEmail.Should().Be(expectedApiManagementService.Properties.PublisherEmail);
+            apiManagementService.Properties.DisableGateway.Should().Be(expectedApiManagementService.Properties.DisableGateway);
+            apiManagementService.Properties.EnableClientCertificate.Should().Be(expectedApiManagementService.Properties.EnableClientCertificate);
+            apiManagementService.Properties.NotificationSenderEmail.Should().Be(expectedApiManagementService.Properties.NotificationSenderEmail);
+            apiManagementService.Properties.PlatformVersion.Should().Be(expectedApiManagementService.Properties.PlatformVersion);
+            apiManagementService.Properties.ProvisioningState.Should().Be(expectedApiManagementService.Properties.ProvisioningState);
+            apiManagementService.Properties.PublisherName.Should().Be(expectedApiManagementService.Properties.PublisherName);
+            apiManagementService.Properties.TargetProvisioningState.Should().Be(expectedApiManagementService.Properties.TargetProvisioningState);
         }
     }
 }
