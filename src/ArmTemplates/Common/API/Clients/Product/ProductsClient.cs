@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -22,7 +23,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         readonly IProductDataProcessor productDataProcessor;
         readonly IProductApiDataProcessor productApiDataProcessor;
 
-        public ProductsClient(IProductDataProcessor productDataProcessor, IProductApiDataProcessor productApiDataProcessor)
+        public ProductsClient(
+            IHttpClientFactory httpClientFactory,
+            IProductDataProcessor productDataProcessor,
+            IProductApiDataProcessor productApiDataProcessor): base(httpClientFactory)
         {
             this.productDataProcessor = productDataProcessor;
             this.productApiDataProcessor = productApiDataProcessor;

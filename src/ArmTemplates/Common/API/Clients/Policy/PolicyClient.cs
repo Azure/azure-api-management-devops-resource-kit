@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -18,6 +19,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetPolicyLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies?api-version={5}&format=rawxml";
         const string GetPolicyLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/policies?api-version={5}&format=rawxml";
         const string GetPolicyLinkedToApiOperationRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/policies?api-version={6}&format=rawxml";
+
+        public PolicyClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        {
+        }
 
         public async Task<PolicyTemplateResource> GetGlobalServicePolicyAsync(ExtractorParameters extractorParameters)
         {

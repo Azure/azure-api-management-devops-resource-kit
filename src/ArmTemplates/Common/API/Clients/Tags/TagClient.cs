@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -21,7 +22,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         readonly IApisClient apisClient;
 
-        public TagClient(IApisClient apisClient)
+        public TagClient(IHttpClientFactory httpClientFactory, IApisClient apisClient): base(httpClientFactory)
         {
             this.apisClient = apisClient;
         }
