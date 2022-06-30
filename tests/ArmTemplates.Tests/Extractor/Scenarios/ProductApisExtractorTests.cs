@@ -67,20 +67,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             productApisTemplate.TypedResources.ProductApis.Count().Should().Be(2);
             productApisTemplate.Resources.Count().Should().Be(2);
 
-            var productApi1 = productApisTemplate.TypedResources.ProductApis.First();
-            productApi1.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
-            productApi1.Name.Should().NotBeNullOrEmpty();
-            productApi1.Type.Should().Be(ResourceTypeConstants.ProductApi);
-            productApi1.Properties.DisplayName.Should().NotBeNullOrEmpty();
-            productApi1.Properties.Description.Should().NotBeNullOrEmpty();
-
-            var productApi2 = productApisTemplate.TypedResources.ProductApis.Last();
-            productApi2.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
-            productApi2.Name.Should().NotBeNullOrEmpty();
-            productApi2.Type.Should().Be(ResourceTypeConstants.ProductApi);
-            productApi2.Properties.DisplayName.Should().NotBeNullOrEmpty();
-            productApi2.Properties.Description.Should().NotBeNullOrEmpty();
-            productApi2.DependsOn.Should().NotBeNullOrEmpty();
+            foreach (var productApi in productApisTemplate.TypedResources.ProductApis)
+            {
+                productApi.ApiVersion.Should().Be(GlobalConstants.ApiVersion);
+                productApi.Name.Should().NotBeNullOrEmpty();
+                productApi.Type.Should().Be(ResourceTypeConstants.ProductApi);
+                productApi.Properties.DisplayName.Should().NotBeNullOrEmpty();
+                productApi.Properties.Description.Should().NotBeNullOrEmpty();
+                productApi.DependsOn.Should().BeNullOrEmpty();
+            }
         }
     }
 }
