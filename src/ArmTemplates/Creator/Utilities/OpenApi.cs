@@ -62,7 +62,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Utilitie
             {
                 // include StringEscaping to ensure single quotes are escaped
                 return JsonConvert.SerializeObject(this.definition_, settings: new JsonSerializerSettings { 
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
                     StringEscapeHandling = StringEscapeHandling.EscapeHtml 
                 });
             }

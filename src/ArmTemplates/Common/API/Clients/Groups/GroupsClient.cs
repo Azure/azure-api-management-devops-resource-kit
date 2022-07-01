@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -20,7 +21,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         readonly IGroupDataProcessor groupDataProcessor;
 
-        public GroupsClient(IGroupDataProcessor groupDataProcessor)
+        public GroupsClient(
+            IHttpClientFactory httpClientFactory,
+            IGroupDataProcessor groupDataProcessor): base(httpClientFactory)
         {
             this.groupDataProcessor = groupDataProcessor;
         }

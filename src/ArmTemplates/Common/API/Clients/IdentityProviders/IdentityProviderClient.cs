@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Models;
@@ -21,7 +22,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         readonly IIdentityProviderProcessor identityProviderProcessor;
 
-        public IdentityProviderClient(IIdentityProviderProcessor identityProviderProcessor)
+        public IdentityProviderClient(
+            IHttpClientFactory httpClientFactory, 
+            IIdentityProviderProcessor identityProviderProcessor): base(httpClientFactory)
         {
             this.identityProviderProcessor = identityProviderProcessor;
         }

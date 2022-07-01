@@ -3,6 +3,7 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -18,7 +19,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         IApiManagementServiceProcessor apiManagementServiceProcessor;
 
-        public ApiManagementServiceClient(IApiManagementServiceProcessor apiManagementServiceProcessor)
+        public ApiManagementServiceClient(
+            IHttpClientFactory httpClientFactory, 
+            IApiManagementServiceProcessor apiManagementServiceProcessor): base(httpClientFactory)
         {
             this.apiManagementServiceProcessor = apiManagementServiceProcessor;
         }

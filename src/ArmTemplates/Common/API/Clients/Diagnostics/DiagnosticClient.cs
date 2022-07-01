@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -16,6 +17,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllDiagnosticsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/diagnostics?api-version={4}";
         const string GetDiagnosticsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/diagnostics?api-version={5}";
+
+        public DiagnosticClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        {
+        }
 
         public async Task<List<DiagnosticTemplateResource>> GetApiDiagnosticsAsync(string apiName, ExtractorParameters extractorParameters)
         {

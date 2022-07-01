@@ -19,21 +19,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public abstract class ApiClientBase
     {
         readonly IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-        readonly HttpClient httpClient = new HttpClient();
+        readonly HttpClient httpClient;
 
         protected string BaseUrl { get; private set; } = GlobalConstants.BaseManagementAzureUrl;
 
         protected virtual AzureCliAuthenticator Auth { get; private set; } = new AzureCliAuthenticator();
 
-        public ApiClientBase(string baseUrl = null) 
+        public ApiClientBase(IHttpClientFactory httpClientFactory)
         {
-            if (!string.IsNullOrEmpty(baseUrl))
-            {
-                this.BaseUrl = baseUrl;
-            }
+            this.httpClient = httpClientFactory.CreateClient();
         }
 
-        protected virtual async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
+        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
         {
             if (useCache && this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {

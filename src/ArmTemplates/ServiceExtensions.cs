@@ -34,6 +34,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiManagementService;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Http;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -51,7 +53,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             });
 
             services.AddScoped<FileReader>();
-
+            services.AddHttpClient();
+            services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
             SetupCommands(services);
             SetupExecutors(services);
             SetupApiClients(services);

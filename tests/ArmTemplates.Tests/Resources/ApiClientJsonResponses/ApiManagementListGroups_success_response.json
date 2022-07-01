@@ -1,0 +1,50 @@
+{
+  "value": [
+    {
+      "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/groups/Administrators",
+      "type": "Microsoft.ApiManagement/service/groups",
+      "name": "Administrators",
+      "properties": {
+        "displayName": "Administrators",
+        "description": "Administrators is a built-in group. Its membership is managed by the system. Microsoft Azure subscription administrators fall into this group.",
+        "builtIn": true,
+        "type": "system"
+      }
+    },
+    {
+      "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/groups/AwesomeGroup",
+      "type": "Microsoft.ApiManagement/service/groups",
+      "name": "AwesomeGroup",
+      "properties": {
+        "displayName": "AwesomeGroup for test",
+        "description": "awesome group of people",
+        "builtIn": false,
+        "type": "external",
+        "externalId": "externalId"
+      }
+    },
+    {
+      "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/groups/Developers",
+      "type": "Microsoft.ApiManagement/service/groups",
+      "name": "Developers",
+      "properties": {
+        "displayName": "Developers",
+        "description": "Developers is a built-in group. Its membership is managed by the system. Signed-in users fall into this group.",
+        "builtIn": true,
+        "type": "system"
+      }
+    },
+    {
+      "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/groups/Guests",
+      "type": "Microsoft.ApiManagement/service/groups",
+      "name": "Guests",
+      "properties": {
+        "displayName": "Guests",
+        "description": "Guests is a built-in group. Its membership is managed by the system. Unauthenticated users visiting the developer portal fall into this group.",
+        "builtIn": true,
+        "type": "system"
+      }
+    }
+  ],
+  "count": 4
+}

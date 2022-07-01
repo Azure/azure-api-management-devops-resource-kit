@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
@@ -15,6 +16,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public class LoggerClient : ApiClientBase, ILoggerClient
     {
         const string GetAllLoggersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers?api-version={4}";
+
+        public LoggerClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        {
+        }
 
         public async Task<List<LoggerTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
         {
