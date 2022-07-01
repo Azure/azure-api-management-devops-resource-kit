@@ -736,20 +736,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
         public async Task<Template<ApiManagementServiceResources>> GenerateApiManagementServiceTemplate(string baseFilesGenerationDirectory)
         {
+            this.logger.LogInformation("Started generation of ApiManagement service template...");
             var apiManagementServiceTemplate = await this.apiManagementServiceExtractor.GenerateApiManagementServicesTemplateAsync(this.extractorParameters);
 
             if (apiManagementServiceTemplate?.HasResources() == true)
             {
-                this.logger.LogInformation("Started generation of ApiManagement service template...");
 
                 await FileWriter.SaveAsJsonAsync(
                     apiManagementServiceTemplate,
                     directory: baseFilesGenerationDirectory,
                     fileName: this.extractorParameters.FileNames.ApiManagementService);
-
-                this.logger.LogInformation("Finished generation of identity providers template...");
             }
-
+            
+            this.logger.LogInformation("Finished generation of identity providers template...");
             return apiManagementServiceTemplate;
         }
 

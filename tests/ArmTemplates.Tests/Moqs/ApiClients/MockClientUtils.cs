@@ -7,6 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
 using Moq;
@@ -23,10 +24,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockedZureClientAuth.Object;
         }
 
-        public static async Task<IHttpClientFactory> GenerateMockedIHttpClientFactoryWithResponse(string jsonFileName)
+        public static async Task<string> GetFileContent(string fileLocation)
         {
             var fileReader = new FileReader();
-            var fileLocation = Path.Combine("Resources", "ApiClientJsonResponses", jsonFileName);
+            return await fileReader.RetrieveFileContentsAsync(fileLocation);
+        }
+
+        public static async Task<T> DeserializeFileContent<T>(string fileLocation)
+        {
+            var fileContent = await GetFileContent(fileLocation);
+            return fileContent.Deserialize<T>();
+        }
+
+        public static async Task<IHttpClientFactory> GenerateMockedIHttpClientFactoryWithResponse(string fileLocation)
+        {
+            var fileReader = new FileReader();
+            
             var jsonResponse = await fileReader.RetrieveFileContentsAsync(fileLocation);
 
             var httpMessageHandlerMock = new Mock<HttpMessageHandler>();
@@ -39,8 +52,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(response);
             var httpClient = new HttpClient(httpMessageHandlerMock.Object);
 
-            var httpResponseMessage = new HttpResponseMessage();
-            httpResponseMessage.Content = new StringContent(jsonFileName);
             var httpClientFactory = new Mock<IHttpClientFactory>();
             httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 

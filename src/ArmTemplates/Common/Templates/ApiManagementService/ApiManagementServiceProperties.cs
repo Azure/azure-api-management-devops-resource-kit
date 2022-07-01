@@ -21,9 +21,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public bool? EnableClientCertificate { get; set; }
         
-        //TODO check possibility to avoid error with Proxy type
-        //public HostnameConfiguration[] HostnameConfigurations { get; set; }
-
         public string NotificationSenderEmail { get; set; }
 
         public string PlatformVersion { get; set; }

@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetApiManagementServiceByName = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}?api-version={4}";
 
-        IApiManagementServiceProcessor apiManagementServiceProcessor;
+        readonly IApiManagementServiceProcessor apiManagementServiceProcessor;
 
         public ApiManagementServiceClient(
             IHttpClientFactory httpClientFactory, 
