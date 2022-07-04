@@ -91,10 +91,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockGroupsClient.Object;
         }
 
-        public static async Task<IGroupsClient> GetMockedHttpGroupClient(string jsonFileName)
+        public static async Task<IGroupsClient> GetMockedHttpGroupClient(string responseFileLocation)
         {
             var mockedProcessor = new Mock<IGroupDataProcessor>(MockBehavior.Loose).Object;
-            var mockGroupsClient = new Mock<GroupsClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(jsonFileName) , mockedProcessor);
+            var mockGroupsClient = new Mock<GroupsClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation) , mockedProcessor);
             mockGroupsClient.Protected()
                 .Setup<AzureCliAuthenticator>("Auth").Returns(MockClientUtils.GetMockedAzureClient());
 

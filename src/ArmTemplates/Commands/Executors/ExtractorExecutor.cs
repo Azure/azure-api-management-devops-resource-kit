@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
@@ -62,6 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IGatewayExtractor gatewayExtractor;
         readonly IGatewayApiExtractor gatewayApiExtractor;
         readonly IIdentityProviderExtractor identityProviderExtractor;
+        readonly IApiManagementServiceExtractor apiManagementServiceExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -83,7 +85,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IApiRevisionExtractor apiRevisionExtractor,
             IGatewayExtractor gatewayExtractor,
             IGatewayApiExtractor gatewayApiExtractor,
-            IIdentityProviderExtractor identityProviderExtractor)
+            IIdentityProviderExtractor identityProviderExtractor,
+            IApiManagementServiceExtractor apiManagementServiceExtractor)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -105,6 +108,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.gatewayExtractor = gatewayExtractor;
             this.gatewayApiExtractor = gatewayApiExtractor;
             this.identityProviderExtractor = identityProviderExtractor;
+            this.apiManagementServiceExtractor = apiManagementServiceExtractor;
         }
 
         /// <summary>
@@ -131,7 +135,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IApiRevisionExtractor apiRevisionExtractor = null,
             IGatewayExtractor gatewayExtractor = null,
             IGatewayApiExtractor gatewayApiExtractor = null,
-            IIdentityProviderExtractor identityProviderExtractor = null)
+            IIdentityProviderExtractor identityProviderExtractor = null,
+            IApiManagementServiceExtractor apiManagementServiceExtractor = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -152,7 +157,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 apiRevisionExtractor,
                 gatewayExtractor,
                 gatewayApiExtractor,
-                identityProviderExtractor);
+                identityProviderExtractor,
+                apiManagementServiceExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -728,6 +734,23 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             return gatewayApiTemplate;
         }
 
+        public async Task<Template<ApiManagementServiceResources>> GenerateApiManagementServiceTemplate(string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of ApiManagement service template...");
+            var apiManagementServiceTemplate = await this.apiManagementServiceExtractor.GenerateApiManagementServicesTemplateAsync(this.extractorParameters);
+
+            if (apiManagementServiceTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    apiManagementServiceTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.ApiManagementService);
+            }
+            
+            this.logger.LogInformation("Finished generation of identity providers template...");
+            return apiManagementServiceTemplate;
+        }
+
         /// <summary>
         /// Generates split api templates / folders for each api in this sourceApim 
         /// </summary>
@@ -910,6 +933,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
+            await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
             await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
             await this.GenerateMasterTemplateAsync(

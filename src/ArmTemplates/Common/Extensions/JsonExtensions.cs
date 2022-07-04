@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions
 {
-    static class JsonExtensions
+    public static class JsonExtensions
     {
         static readonly JsonSerializerSettings DefaultJsonSerializationSettings = new JsonSerializerSettings
         {
