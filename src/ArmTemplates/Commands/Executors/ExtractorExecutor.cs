@@ -12,6 +12,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiSchemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
@@ -25,6 +26,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Nam
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.TagApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
@@ -64,6 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IGatewayApiExtractor gatewayApiExtractor;
         readonly IIdentityProviderExtractor identityProviderExtractor;
         readonly IApiManagementServiceExtractor apiManagementServiceExtractor;
+        readonly ISchemaExtractor schemaExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -86,7 +89,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IGatewayExtractor gatewayExtractor,
             IGatewayApiExtractor gatewayApiExtractor,
             IIdentityProviderExtractor identityProviderExtractor,
-            IApiManagementServiceExtractor apiManagementServiceExtractor)
+            IApiManagementServiceExtractor apiManagementServiceExtractor,
+            ISchemaExtractor schemaExtractor)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -109,6 +113,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.gatewayApiExtractor = gatewayApiExtractor;
             this.identityProviderExtractor = identityProviderExtractor;
             this.apiManagementServiceExtractor = apiManagementServiceExtractor;
+            this.schemaExtractor = schemaExtractor;
         }
 
         /// <summary>
@@ -136,7 +141,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IGatewayExtractor gatewayExtractor = null,
             IGatewayApiExtractor gatewayApiExtractor = null,
             IIdentityProviderExtractor identityProviderExtractor = null,
-            IApiManagementServiceExtractor apiManagementServiceExtractor = null)
+            IApiManagementServiceExtractor apiManagementServiceExtractor = null,
+            ISchemaExtractor schemaExtractor = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -158,7 +164,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 gatewayExtractor,
                 gatewayApiExtractor,
                 identityProviderExtractor,
-                apiManagementServiceExtractor);
+                apiManagementServiceExtractor,
+                schemaExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -752,6 +759,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         }
 
         /// <summary>
+        /// Generates schema templates in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated schemas template</returns>
+        public async Task<Template<SchemaTemplateResources>> GenerateSchemasTemplateAsync(string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of schemas template...");
+
+            var schemasTemplate = await this.schemaExtractor.GenerateSchemasTemplateAsync(this.extractorParameters);
+
+            if (schemasTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    schemasTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.Schema);
+            }
+
+            this.logger.LogInformation("Finished generation of schemas template...");
+            return schemasTemplate;
+        }
+
+        /// <summary>
         /// Generates split api templates / folders for each api in this sourceApim 
         /// </summary>
         /// <returns></returns>
@@ -931,6 +961,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
             var groupTemplate = await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
+            var schemasTempate = await this.GenerateSchemasTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
