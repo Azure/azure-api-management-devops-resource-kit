@@ -17,6 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 {
     public class MockClientUtils
     {
+        public const string ResourcesPath = "Resources";
         public static AzureCliAuthenticator GetMockedAzureClient()
         {
             var mockedZureClientAuth = new Mock<AzureCliAuthenticator>(MockBehavior.Strict);
@@ -27,7 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         public static async Task<string> GetFileContent(string fileLocation)
         {
             var fileReader = new FileReader();
-            return await fileReader.RetrieveFileContentsAsync(fileLocation);
+            return await fileReader.RetrieveFileContentsAsync(Path.Combine(ResourcesPath, fileLocation));
         }
 
         public static async Task<T> DeserializeFileContent<T>(string fileLocation)
@@ -38,9 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
         public static async Task<IHttpClientFactory> GenerateMockedIHttpClientFactoryWithResponse(string fileLocation)
         {
-            var fileReader = new FileReader();
-            
-            var jsonResponse = await fileReader.RetrieveFileContentsAsync(fileLocation);
+            var jsonResponse = await GetFileContent(fileLocation);
 
             var httpMessageHandlerMock = new Mock<HttpMessageHandler>();
 

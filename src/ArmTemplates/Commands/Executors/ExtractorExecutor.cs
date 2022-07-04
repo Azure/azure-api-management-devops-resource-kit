@@ -741,7 +741,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             if (apiManagementServiceTemplate?.HasResources() == true)
             {
-
                 await FileWriter.SaveAsJsonAsync(
                     apiManagementServiceTemplate,
                     directory: baseFilesGenerationDirectory,

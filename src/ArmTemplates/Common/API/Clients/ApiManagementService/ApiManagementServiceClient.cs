@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             this.apiManagementServiceProcessor = apiManagementServiceProcessor;
         }
 
-        public async Task<ApiManagementServiceResource> GetApiManagementService(ExtractorParameters extractorParameters)
+        public async Task<ApiManagementServiceResource> GetApiManagementServiceAsync(ExtractorParameters extractorParameters)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
 

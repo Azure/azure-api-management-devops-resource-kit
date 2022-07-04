@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                                         .GenerateTemplateWithApimServiceNameProperty()
                                         .Build<ApiManagementServiceResources>();
 
-            var apiManagementService = await this.apiManagementServiceClient.GetApiManagementService(extractorParameters);
+            var apiManagementService = await this.apiManagementServiceClient.GetApiManagementServiceAsync(extractorParameters);
 
             if (apiManagementService is null)
             {

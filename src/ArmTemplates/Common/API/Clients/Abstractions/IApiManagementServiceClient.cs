@@ -11,6 +11,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 {
     public interface IApiManagementServiceClient
     {
-        Task<ApiManagementServiceResource> GetApiManagementService(ExtractorParameters extractorParameters);
+        Task<ApiManagementServiceResource> GetApiManagementServiceAsync(ExtractorParameters extractorParameters);
     }
 }

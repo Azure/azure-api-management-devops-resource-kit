@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             var mockApiManagementServiceClient = new Mock<IApiManagementServiceClient>(MockBehavior.Strict);
 
             mockApiManagementServiceClient
-                .Setup(x => x.GetApiManagementService(It.IsAny<ExtractorParameters>()))
+                .Setup(x => x.GetApiManagementServiceAsync(It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((ExtractorParameters _) => new ApiManagementServiceResource
                 {
                     OriginalName = ServiceName,
