@@ -16,12 +16,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
     {
         public const string TagName1 = "tag-1";
         public const string TagName2 = "tag-2";
+        public const string OperationTagName1 = "operation-tag-1";
+        public const string OperationTagName2 = "operation-tag-2";
 
         public static ITagClient GetMockedApiClientWithDefaultValues()
         {
-            var mockGroupsClient = new Mock<ITagClient>(MockBehavior.Strict);
+            var mockTagsClient = new Mock<ITagClient>(MockBehavior.Strict);
 
-            mockGroupsClient
+            mockTagsClient
                 .Setup(x => x.GetTagsLinkedToApiOperationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new List<TagTemplateResource>
                 {
@@ -38,7 +40,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     }
                 });
 
-            mockGroupsClient
+            mockTagsClient
                 .Setup(x => x.GetAllTagsLinkedToApiAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new List<TagTemplateResource>
                 {
@@ -55,24 +57,51 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     }
                 });
 
-            mockGroupsClient
+            mockTagsClient
                 .Setup(x => x.GetAllTagsLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new List<TagTemplateResource>
                 {
                     new TagTemplateResource
                     {
                         Name = TagName1,
-                        Type = ResourceTypeConstants.ProductTag
+                        Type = ResourceTypeConstants.APITag
                     },
 
                     new TagTemplateResource
                     {
                         Name = TagName2,
-                        Type = ResourceTypeConstants.ProductTag
+                        Type = ResourceTypeConstants.APITag
                     }
                 });
 
-            return mockGroupsClient.Object;
+            mockTagsClient
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>(), It.IsAny<int>()))
+                .ReturnsAsync(new List<TagTemplateResource>
+                {
+                    new TagTemplateResource
+                    {
+                        Name = TagName1,
+                        Type = ResourceTypeConstants.APITag
+                    },
+
+                    new TagTemplateResource
+                    {
+                        Name = TagName2,
+                        Type = ResourceTypeConstants.APITag
+                    },
+                    new TagTemplateResource
+                    {
+                        Name = OperationTagName1,
+                        Type = ResourceTypeConstants.APITag
+                    },
+                    new TagTemplateResource
+                    {
+                        Name = OperationTagName2,
+                        Type = ResourceTypeConstants.APITag
+                    }
+                });
+
+            return mockTagsClient.Object;
         }
     }
 }
