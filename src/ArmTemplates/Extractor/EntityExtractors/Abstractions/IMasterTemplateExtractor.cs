@@ -16,6 +16,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Nam
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.TagApi;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -38,6 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
            NamedValuesResources namedValuesTemplateResources = null,
            TagTemplateResources tagTemplateResources = null,
            GroupTemplateResources groupTemplateResources = null,
-           IdentityProviderResources identityProviderTemplateResources = null);
+           IdentityProviderResources identityProviderTemplateResources = null,
+           SchemaTemplateResources schemaTemplateResources = null);
     }
 }

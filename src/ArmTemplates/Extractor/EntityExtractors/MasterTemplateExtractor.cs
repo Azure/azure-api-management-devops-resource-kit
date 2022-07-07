@@ -25,6 +25,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Bac
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -55,7 +56,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             NamedValuesResources namedValuesTemplateResources = null,
             TagTemplateResources tagTemplateResources = null,
             GroupTemplateResources groupTemplateResources = null,
-            IdentityProviderResources identityProviderTemplateResources = null)
+            IdentityProviderResources identityProviderTemplateResources = null,
+            SchemaTemplateResources schemaTemplateResources = null)
         {
             var masterTemplate = this.templateBuilder
                                         .GenerateEmptyTemplate()
@@ -196,6 +198,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var authorizationServersDeployment = CreateLinkedMasterTemplateResource(AuthorizationServersTemplate, authorizationServersUri, dependsOnNamedValues);
 
                 masterResources.DeploymentResources.Add(authorizationServersDeployment);
+            }
+
+            if (schemaTemplateResources?.HasContent() == true)
+            {
+                this.logger.LogDebug("Adding schemas to master template");
+                const string SchemasTemplate = "schemasTemplate";
+
+                apiDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{SchemasTemplate}')]");
+                var schemasUri = this.GenerateLinkedTemplateUri(fileNames.Schema, extractorParameters);
+                var schemasDeployment = CreateLinkedMasterTemplateResource(SchemasTemplate, schemasUri, Array.Empty<string>());
+
+                masterResources.DeploymentResources.Add(schemasDeployment);
             }
 
             if (apiTemplateResources?.HasContent() == true)

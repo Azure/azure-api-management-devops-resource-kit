@@ -37,6 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 IdentityProviders = $@"{baseFileName}identity-providers.template.json",
                 ApiManagementService = $@"{baseFileName}api-management-service.template.json",
                 TagApi = $@"{baseFileName}apiTags.template.json",
+                Schema = $@"{baseFileName}schemas.template.json",
                 Parameters = $@"{baseFileName}parameters.json",
                 LinkedMaster = $@"{baseFileName}master.template.json",
                 Apis = "/Apis",
