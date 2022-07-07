@@ -18,6 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
     public class MockClientUtils
     {
         public const string ResourcesPath = "Resources";
+        public const string ApiClientJsonResponsesPath = "ApiClientJsonResponses";
         public static AzureCliAuthenticator GetMockedAzureClient()
         {
             var mockedZureClientAuth = new Mock<AzureCliAuthenticator>(MockBehavior.Strict);

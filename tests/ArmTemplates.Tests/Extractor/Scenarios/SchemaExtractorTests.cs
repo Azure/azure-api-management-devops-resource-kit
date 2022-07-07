@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
             var extractorParameters = new ExtractorParameters(extractorConfig);
-            var fileLocation = Path.Combine("ApiClientJsonResponses", "ApiManagementListSchemas_success_response.json");
+            var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListSchemas_success_response.json");
             var mockedSchemaClient = await MockSchemaClient.GetMockedHttpSchemaClient(fileLocation);
             var schemaExtractor = new SchemaExtractor(this.GetTestLogger<SchemaExtractor>(), new TemplateBuilder(), mockedSchemaClient);
 
