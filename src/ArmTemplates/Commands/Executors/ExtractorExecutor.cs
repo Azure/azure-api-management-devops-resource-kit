@@ -12,7 +12,6 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiSchemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
@@ -460,7 +459,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
            NamedValuesResources namedValuesTemplateResources = null,
            TagTemplateResources tagTemplateResources = null,
            GroupTemplateResources groupTemplateResources = null,
-           IdentityProviderResources identityProviderTemplateResources = null)
+           IdentityProviderResources identityProviderTemplateResources = null,
+           SchemaTemplateResources schemaTemplateResources = null)
         {
             if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
             {
@@ -474,7 +474,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 this.extractorParameters, apiTemplateResources, policyTemplateResources, apiVersionSetTemplateResources,
                 productsTemplateResources, productApisTemplateResources, apiTagsTemplateResources, loggersTemplateResources,
                 backendsTemplateResources, authorizationServersTemplateResources, namedValuesTemplateResources, tagTemplateResources, 
-                groupTemplateResources, identityProviderTemplateResources);
+                groupTemplateResources, identityProviderTemplateResources, schemaTemplateResources);
 
             if (masterTemplate?.HasResources() == true)
             {
@@ -981,7 +981,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 namedValuesTemplateResources: namedValueTemplate.TypedResources,
                 tagTemplateResources: tagTemplate.TypedResources,
                 groupTemplateResources: groupTemplate.TypedResources,
-                identityProviderTemplateResources: identityProviderTemplate.TypedResources);
+                identityProviderTemplateResources: identityProviderTemplate.TypedResources,
+                schemaTemplateResources: schemasTempate.TypedResources);
         }
 
 

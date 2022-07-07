@@ -3,11 +3,8 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
@@ -20,6 +17,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
 using Xunit;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -112,12 +110,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 }
             };
 
+            var schemaResources = new SchemaTemplateResources()
+            {
+                Schemas = new()
+                {
+                    new SchemaTemplateResource()
+                    {
+                        OriginalName = "originalName",
+                    }
+                }
+            };
+
             // act
             var masterTemplate = await extractorExecutor.GenerateMasterTemplateAsync(
                 currentTestDirectory,
                 tagTemplateResources: tagTemplateResources,
                 groupTemplateResources: groupTemplateResources,
-                identityProviderTemplateResources: identityProviderResources);
+                identityProviderTemplateResources: identityProviderResources,
+                schemaTemplateResources: schemaResources);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.LinkedMaster)).Should().BeTrue();
 
@@ -136,8 +146,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.ApiOauth2ScopeSettings);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.SecretValues);
 
-            masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(3);
-            masterTemplate.Resources.Should().HaveCount(3);
+            masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(4);
+            masterTemplate.Resources.Should().HaveCount(4);
 
             foreach(var deploymentResource in masterTemplate.TypedResources.DeploymentResources) {
                 deploymentResource.Type.Should().Be(ResourceTypeConstants.ArmDeployments);
