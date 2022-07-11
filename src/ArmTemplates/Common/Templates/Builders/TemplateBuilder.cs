@@ -145,7 +145,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
             return this;
         }
 
-        public TemplateBuilder AddParametrizedIdentityProvidersSecrets()
+        public TemplateBuilder AddParametrizedSecrets()
         {
             var secretValuesProperty = new TemplateParameterProperties()
             {

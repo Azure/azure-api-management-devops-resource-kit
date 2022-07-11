@@ -42,6 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string ApiOauth2ScopeSettings = "apiOauth2ScopeSettings";
         public const string SecretValues = "secretValues";
         public const string IdentityProvidersSecretValues = "identityProviders";
+        public const string OpenIdConnectProvidersSecretValues = "openIdConnectProviders";
     }
 
     public static class ParameterPrefix
