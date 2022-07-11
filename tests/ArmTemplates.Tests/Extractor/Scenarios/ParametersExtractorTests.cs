@@ -19,6 +19,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.IdentityProviderClients;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -29,9 +30,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         {
         }
 
-        ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null) 
+        ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null, IOpenIdConnectProvidersClient openIdConnectProviderClient = null) 
         {
-            var parametersExtractor = new ParametersExtractor(new TemplateBuilder(), apisClient, identityProviderClient);
+            var parametersExtractor = new ParametersExtractor(new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient);
 
             var loggerExtractor = new LoggerExtractor(
                 this.GetTestLogger<LoggerExtractor>(),
@@ -64,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -89,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
             
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -113,7 +114,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters, apisClient: MockApisClient.GetMockedApiClientWithDefaultValues());
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string>{ "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string>{ "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -140,7 +141,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters, apisClient: mockedApiClient);
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string> { "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string> { "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -169,7 +170,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             });
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, identityProviderResources, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, identityProviderResources, new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -204,7 +205,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             });
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, identityProviderResources, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, identityProviderResources, new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 

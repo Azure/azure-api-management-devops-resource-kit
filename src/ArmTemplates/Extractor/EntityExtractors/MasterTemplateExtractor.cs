@@ -26,6 +26,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Nam
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -57,12 +58,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             TagTemplateResources tagTemplateResources = null,
             GroupTemplateResources groupTemplateResources = null,
             IdentityProviderResources identityProviderTemplateResources = null,
-            SchemaTemplateResources schemaTemplateResources = null)
+            SchemaTemplateResources schemaTemplateResources = null,
+            OpenIdConnectProviderResources openIdConnectProviderResources = null)
         {
             var masterTemplate = this.templateBuilder
                                         .GenerateEmptyTemplate()
                                         .Build<MasterTemplateResources>();
-            masterTemplate.Parameters = this.CreateMasterTemplateParameters(extractorParameters, identityProviderTemplateResources);
+            masterTemplate.Parameters = this.CreateMasterTemplateParameters(extractorParameters, identityProviderTemplateResources, openIdConnectProviderResources);
 
             var masterResources = masterTemplate.TypedResources;
             var fileNames = extractorParameters.FileNames;
@@ -264,9 +266,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 const string IdentityProvidersTemplate = "identityProvidersTemplate";
 
                 var identityProviderUri = this.GenerateLinkedTemplateUri(fileNames.IdentityProviders, extractorParameters);
-                var identityProviderDeployment = CreateLinkedMasterTemplateResourceForIdentityProviderTemplate(IdentityProvidersTemplate, identityProviderUri, Array.Empty<string>());
+                var identityProviderDeployment = CreateLinkedMasterTemplateResourceWithSecrets(IdentityProvidersTemplate, identityProviderUri, Array.Empty<string>());
 
                 masterResources.DeploymentResources.Add(identityProviderDeployment);
+            }
+
+            if (openIdConnectProviderResources?.HasContent() == true)
+            {
+                this.logger.LogDebug("Adding openId connect providers to master template");
+                const string OpenIdConnectProvidersTemplate = "openIdConnectProvidersTemplate";
+
+                var openIdConnectProviderUri = this.GenerateLinkedTemplateUri(fileNames.OpenIdConnectProviders, extractorParameters);
+                var openIdConnectProviderDeployment = CreateLinkedMasterTemplateResourceWithSecrets(OpenIdConnectProvidersTemplate, openIdConnectProviderUri, Array.Empty<string>());
+
+                masterResources.DeploymentResources.Add(openIdConnectProviderDeployment);
             }
 
             return masterTemplate;
@@ -344,7 +357,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return masterResourceTemplate;
         }
 
-        static MasterTemplateResource CreateLinkedMasterTemplateResourceForIdentityProviderTemplate(string name, string uriLink, string[] dependsOn)
+        static MasterTemplateResource CreateLinkedMasterTemplateResourceWithSecrets(string name, string uriLink, string[] dependsOn)
         {
             MasterTemplateResource masterResourceTemplate = CreateLinkedMasterTemplateResource(name, uriLink, dependsOn);
             masterResourceTemplate.Properties.Parameters.Add(ParameterNames.SecretValues, new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.SecretValues}')]" });

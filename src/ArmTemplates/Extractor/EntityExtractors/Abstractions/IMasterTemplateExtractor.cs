@@ -13,6 +13,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Ide
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
@@ -40,6 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
            TagTemplateResources tagTemplateResources = null,
            GroupTemplateResources groupTemplateResources = null,
            IdentityProviderResources identityProviderTemplateResources = null,
-           SchemaTemplateResources schemaTemplateResources = null);
+           SchemaTemplateResources schemaTemplateResources = null,
+           OpenIdConnectProviderResources openIdConnectProviderResources = null);
     }
 }

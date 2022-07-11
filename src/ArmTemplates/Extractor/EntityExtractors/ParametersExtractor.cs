@@ -15,6 +15,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Ide
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
@@ -25,15 +26,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly ITemplateBuilder templateBuilder;
         readonly IApisClient apisClient;
         readonly IIdentityProviderClient identityProviderClient;
+        readonly IOpenIdConnectProvidersClient openIdConnectProviderClient;
 
         public ParametersExtractor(
             ITemplateBuilder templateBuilder,
             IApisClient apisClient,
-            IIdentityProviderClient identityProviderClient)
+            IIdentityProviderClient identityProviderClient,
+            IOpenIdConnectProvidersClient openIdConnectProviderClient)
         {
             this.templateBuilder = templateBuilder;
             this.apisClient = apisClient;
             this.identityProviderClient = identityProviderClient;
+            this.openIdConnectProviderClient = openIdConnectProviderClient;
         }
 
         public async Task<Template> CreateMasterTemplateParameterValues(
@@ -43,6 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             BackendTemplateResources backendResources,
             NamedValuesResources namedValuesResources,
             IdentityProviderResources identityProviderResources,
+            OpenIdConnectProviderResources openIdConnectProviderResources,
             ExtractorParameters extractorParameters)
         {
             // used to create the parameter values for use in parameters file
@@ -199,28 +204,51 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 var secretValuesParameteres = new Dictionary<string, Dictionary<string, string>>();
 
-                if (!identityProviderResources.HasContent())
+                if (identityProviderResources.HasContent())
                 {
-                    return;
-                }
+                    var identityProviderParameteres = new Dictionary<string, string>();
 
-                var identityProviderParameteres = new Dictionary<string, string>();
-
-                foreach (var identityProvider in identityProviderResources.IdentityProviders)
-                {
-                    var identityProviderNameKey = NamingHelper.GenerateValidParameterName(identityProvider.OriginalName, ParameterPrefix.Property);
-                    var identityProviderParameterValue = string.Empty;
-                    if (extractorParameters.ExtractSecrets)
+                    foreach (var identityProvider in identityProviderResources.IdentityProviders)
                     {
-                        var identityProviderSecret = await this.identityProviderClient.ListIdentityProviderSecrets(identityProvider.OriginalName, extractorParameters);
-                        identityProviderParameterValue = identityProviderSecret.ClientSecret;
+                        var identityProviderNameKey = NamingHelper.GenerateValidParameterName(identityProvider.OriginalName, ParameterPrefix.Property);
+                        var identityProviderParameterValue = string.Empty;
+                        if (extractorParameters.ExtractSecrets)
+                        {
+                            var identityProviderSecret = await this.identityProviderClient.ListIdentityProviderSecrets(identityProvider.OriginalName, extractorParameters);
+                            identityProviderParameterValue = identityProviderSecret.ClientSecret;
+                        }
+
+                        identityProviderParameteres.Add(identityProviderNameKey, identityProviderParameterValue);
                     }
 
-                    identityProviderParameteres.Add(identityProviderNameKey, identityProviderParameterValue);
+                    secretValuesParameteres.Add(ParameterNames.IdentityProvidersSecretValues, identityProviderParameteres);
                 }
 
-                secretValuesParameteres.Add(ParameterNames.IdentityProvidersSecretValues, identityProviderParameteres);
-                parameters.Add(ParameterNames.SecretValues, new TemplateObjectParameterProperties() { Value = secretValuesParameteres });
+                if (openIdConnectProviderResources.HasContent())
+                {
+                    var openIdConnectProvidersParameters = new Dictionary<string, string>();
+
+                    foreach (var openIdConnectProvider in openIdConnectProviderResources.OpenIdConnectProviders)
+                    {
+                        var openIdConnectProviderKeyName = NamingHelper.GenerateValidParameterName(openIdConnectProvider.OriginalName, ParameterPrefix.Property);
+                        var openIdConnectProviderParameterValue = string.Empty;
+
+                        if (extractorParameters.ExtractSecrets)
+                        {
+                            var openIdConnectProviderSecret = await this.openIdConnectProviderClient.ListOpenIdConnectProviderSecrets(openIdConnectProvider.OriginalName, extractorParameters);
+                            openIdConnectProviderParameterValue = openIdConnectProviderSecret.ClientSecret;
+                        }
+
+                        openIdConnectProvidersParameters.Add(openIdConnectProviderKeyName, openIdConnectProviderParameterValue);
+                    }
+
+                    secretValuesParameteres.Add(ParameterNames.OpenIdConnectProvidersSecretValues, openIdConnectProvidersParameters);
+                }
+
+                if (!secretValuesParameteres.IsNullOrEmpty())
+                {
+                    parameters.Add(ParameterNames.SecretValues, new TemplateObjectParameterProperties() { Value = secretValuesParameteres });
+                }
             }
 
             if (extractorParameters.ParameterizeApiLoggerId)
