@@ -218,5 +218,112 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues].Should().ContainKey("originalName");
             secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues]["originalName"].Should().Be(MockIdentityProviderClient.ClientSecretDefaultValue);
         }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ProperlyLaysTheInformation_OpenIdConnectProviderSecrets_EmptyValues()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_OpenIdConnectProviderSecrets_EmptyValues));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var openIdConnectProviderResources = new OpenIdConnectProviderResources();
+            openIdConnectProviderResources.OpenIdConnectProviders.Add(new OpenIdConnectProviderResource()
+            {
+                OriginalName = "originalName"
+            });
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), openIdConnectProviderResources, currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.SecretValues);
+            var secretValuesParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.SecretValues];
+            var secretValueParameterValues = (Dictionary<string, Dictionary<string, string>>)secretValuesParameters.Value;
+
+            secretValueParameterValues.Count.Should().Be(1);
+            secretValueParameterValues.Should().ContainKey(ParameterNames.OpenIdConnectProvidersSecretValues);
+            secretValueParameterValues[ParameterNames.OpenIdConnectProvidersSecretValues].Should().ContainKey("originalName");
+            secretValueParameterValues[ParameterNames.OpenIdConnectProvidersSecretValues]["originalName"].Should().Be(string.Empty);
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ProperlyLaysTheInformation_OpenIdConnectProviderSecrets_FilledValues()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_OpenIdConnectProviderSecrets_FilledValues));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(extractSecrets: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var openIdConnectProviderMockClient = MockOpenIdConnectProviderClient.GetMockedOpenIdConnectProviderClient(new List<string>()
+            {
+                "originalName"
+            });
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null, openIdConnectProviderClient: openIdConnectProviderMockClient);
+
+            var openIdConnectProviderResources = new OpenIdConnectProviderResources();
+            openIdConnectProviderResources.OpenIdConnectProviders.Add(new OpenIdConnectProviderResource()
+            {
+                OriginalName = "originalName"
+            });
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), openIdConnectProviderResources, currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.SecretValues);
+            var secretValuesParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.SecretValues];
+            var secretValueParameterValues = (Dictionary<string, Dictionary<string, string>>)secretValuesParameters.Value;
+
+            secretValueParameterValues.Count.Should().Be(1);
+            secretValueParameterValues.Should().ContainKey(ParameterNames.OpenIdConnectProvidersSecretValues);
+            secretValueParameterValues[ParameterNames.OpenIdConnectProvidersSecretValues].Should().ContainKey("originalName");
+            secretValueParameterValues[ParameterNames.OpenIdConnectProvidersSecretValues]["originalName"].Should().Be(MockOpenIdConnectProviderClient.ClientSecretDefaultValue);
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ProperlyLaysTheInformation_ProviderSecrets_GeneratedForOpenIdConnect_Identity_Providers()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ProperlyLaysTheInformation_ProviderSecrets_GeneratedForOpenIdConnect_Identity_Providers));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var openIdConnectProviderResources = new OpenIdConnectProviderResources();
+            openIdConnectProviderResources.OpenIdConnectProviders.Add(new OpenIdConnectProviderResource()
+            {
+                OriginalName = "originalNameOpenIdConnectProvider"
+            });
+
+            var identityProviderResources = new IdentityProviderResources();
+            identityProviderResources.IdentityProviders.Add(new IdentityProviderResource()
+            {
+                OriginalName = "originalNameIdentityProvider"
+            });
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, identityProviderResources, openIdConnectProviderResources, currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.SecretValues);
+            var secretValuesParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.SecretValues];
+            var secretValueParameterValues = (Dictionary<string, Dictionary<string, string>>)secretValuesParameters.Value;
+
+            secretValueParameterValues.Count.Should().Be(2);
+            secretValueParameterValues.Should().ContainKey(ParameterNames.OpenIdConnectProvidersSecretValues);
+            secretValueParameterValues[ParameterNames.OpenIdConnectProvidersSecretValues].Should().ContainKey("originalNameOpenIdConnectProvider");
+            secretValueParameterValues[ParameterNames.OpenIdConnectProvidersSecretValues]["originalNameOpenIdConnectProvider"].Should().Be(string.Empty);
+
+            secretValueParameterValues.Should().ContainKey(ParameterNames.IdentityProvidersSecretValues);
+            secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues].Should().ContainKey("originalNameIdentityProvider");
+            secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues]["originalNameIdentityProvider"].Should().Be(string.Empty);
+        }
     }
 }
