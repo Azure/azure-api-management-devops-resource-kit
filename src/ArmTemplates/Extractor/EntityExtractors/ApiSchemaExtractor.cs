@@ -6,7 +6,6 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiSchemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -36,7 +35,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 var apiSchemaOriginalName = apiSchema.Name;
 
-                apiSchema.Properties.Document.Value = this.GetSchemaValueBasedOnContentType(apiSchema.Properties);
                 apiSchema.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiSchemaOriginalName}')]";
                 apiSchema.Type = ResourceTypeConstants.APISchema;
                 apiSchema.ApiVersion = GlobalConstants.ApiVersion;
@@ -46,36 +44,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             return apiSchemaResources;
-        }
-
-        string GetSchemaValueBasedOnContentType(ApiSchemaProperties schemaTemplateProperties)
-        {
-            if (schemaTemplateProperties is null)
-            {
-                return string.Empty;
-            }
-
-            var contentType = schemaTemplateProperties.ContentType.ToLowerInvariant();
-            if (contentType.Equals("application/vnd.oai.openapi.components+json"))
-            {
-                // for OpenAPI "value" is not used, but "components" which is resolved during json deserialization
-                return null;
-            }
-
-            var schemaValue = contentType switch
-            {
-                "application/vnd.ms-azure-apim.swagger.definitions+json" => schemaTemplateProperties?.Document?.Definitions?.Serialize(),
-                "application/vnd.ms-azure-apim.xsd+xml" => schemaTemplateProperties?.Document?.Definitions?.Serialize(),
-                "application/vnd.ms-azure-apim.graphql.schema" => schemaTemplateProperties?.Document?.Value?.ToString(),
-                _ => string.Empty
-            };
-
-            if (string.IsNullOrEmpty(schemaValue) && schemaTemplateProperties.Document is not null)
-            {
-                return schemaTemplateProperties.Document.Serialize();
-            }
-
-            return schemaValue;
         }
     }
 }
