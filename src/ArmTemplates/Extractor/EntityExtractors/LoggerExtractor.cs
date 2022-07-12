@@ -48,6 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var loggerTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
+                                        .AddParameterizedLogResourceIdProperty(extractorParameters)
                                         .Build<LoggerTemplateResources>();
 
             if (extractorParameters.ParameterizeApiLoggerId)
