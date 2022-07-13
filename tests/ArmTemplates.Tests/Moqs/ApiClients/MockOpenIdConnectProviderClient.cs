@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
                 .ReturnsAsync((ExtractorParameters _) => GenerateMockedIdentityProviderList(providerNames));
 
             mockServiceProviderApiClient
-                .Setup(x => x.ListOpenIdConnectProviderSecrets(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .Setup(x => x.ListOpenIdConnectProviderSecretsAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((string _, ExtractorParameters _) => new OpenIdConnectProviderSecret() 
                 {
                     ClientSecret = ClientSecretDefaultValue

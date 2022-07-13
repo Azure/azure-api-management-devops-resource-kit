@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
@@ -15,6 +14,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         Task<List<OpenIdConnectProviderResource>> GetAllAsync(ExtractorParameters extractorParameters);
 
-        Task<OpenIdConnectProviderSecret> ListOpenIdConnectProviderSecrets(string openIdConnectProviderName, ExtractorParameters extractorParameters);
+        Task<OpenIdConnectProviderSecret> ListOpenIdConnectProviderSecretsAsync(string openIdConnectProviderName, ExtractorParameters extractorParameters);
     }
 }

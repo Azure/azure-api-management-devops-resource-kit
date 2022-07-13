@@ -235,7 +235,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                         if (extractorParameters.ExtractSecrets)
                         {
-                            var openIdConnectProviderSecret = await this.openIdConnectProviderClient.ListOpenIdConnectProviderSecrets(openIdConnectProvider.OriginalName, extractorParameters);
+                            var openIdConnectProviderSecret = await this.openIdConnectProviderClient.ListOpenIdConnectProviderSecretsAsync(openIdConnectProvider.OriginalName, extractorParameters);
                             openIdConnectProviderParameterValue = openIdConnectProviderSecret.ClientSecret;
                         }
 

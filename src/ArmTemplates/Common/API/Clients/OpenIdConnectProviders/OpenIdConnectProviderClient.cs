@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return openIdConnectProviderResources;
         }
 
-        public async Task<OpenIdConnectProviderSecret> ListOpenIdConnectProviderSecrets(string openIdConnectProviderName, ExtractorParameters extractorParameters)
+        public async Task<OpenIdConnectProviderSecret> ListOpenIdConnectProviderSecretsAsync(string openIdConnectProviderName, ExtractorParameters extractorParameters)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
 
