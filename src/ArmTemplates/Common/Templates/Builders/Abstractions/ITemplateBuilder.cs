@@ -40,6 +40,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         TemplateBuilder AddParameterizedLogResourceIdProperty(ExtractorParameters extractorParameters);
 
-        TemplateBuilder AddParametrizedIdentityProvidersSecrets();
+        TemplateBuilder AddParametrizedSecrets();
     }
 }

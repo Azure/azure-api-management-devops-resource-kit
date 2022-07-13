@@ -22,6 +22,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Ide
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Master;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
@@ -66,6 +67,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IIdentityProviderExtractor identityProviderExtractor;
         readonly IApiManagementServiceExtractor apiManagementServiceExtractor;
         readonly ISchemaExtractor schemaExtractor;
+        readonly IOpenIdConnectProviderExtractor openIdConnectProviderExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -89,7 +91,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IGatewayApiExtractor gatewayApiExtractor,
             IIdentityProviderExtractor identityProviderExtractor,
             IApiManagementServiceExtractor apiManagementServiceExtractor,
-            ISchemaExtractor schemaExtractor)
+            ISchemaExtractor schemaExtractor,
+            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -113,6 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.identityProviderExtractor = identityProviderExtractor;
             this.apiManagementServiceExtractor = apiManagementServiceExtractor;
             this.schemaExtractor = schemaExtractor;
+            this.openIdConnectProviderExtractor = openIdConnectProviderExtractor;
         }
 
         /// <summary>
@@ -141,7 +145,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IGatewayApiExtractor gatewayApiExtractor = null,
             IIdentityProviderExtractor identityProviderExtractor = null,
             IApiManagementServiceExtractor apiManagementServiceExtractor = null,
-            ISchemaExtractor schemaExtractor = null)
+            ISchemaExtractor schemaExtractor = null,
+            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -164,7 +169,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 gatewayApiExtractor,
                 identityProviderExtractor,
                 apiManagementServiceExtractor,
-                schemaExtractor);
+                schemaExtractor,
+                openIdConnectProviderExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -420,6 +426,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             BackendTemplateResources backendResources,
             NamedValuesResources namedValuesResources,
             IdentityProviderResources identityProviderResources,
+            OpenIdConnectProviderResources openIdConnectProviderResources,
             string baseFilesGenerationDirectory)
         {
             this.logger.LogInformation("Started generation of parameters template...");
@@ -431,6 +438,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 backendResources,
                 namedValuesResources,
                 identityProviderResources,
+                openIdConnectProviderResources,
                 this.extractorParameters);
 
             if (!templateParameters.Parameters.IsNullOrEmpty())
@@ -460,7 +468,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
            TagTemplateResources tagTemplateResources = null,
            GroupTemplateResources groupTemplateResources = null,
            IdentityProviderResources identityProviderTemplateResources = null,
-           SchemaTemplateResources schemaTemplateResources = null)
+           SchemaTemplateResources schemaTemplateResources = null,
+           OpenIdConnectProviderResources openIdConnectProviderResources = null)
         {
             if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
             {
@@ -474,7 +483,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 this.extractorParameters, apiTemplateResources, policyTemplateResources, apiVersionSetTemplateResources,
                 productsTemplateResources, productApisTemplateResources, apiTagsTemplateResources, loggersTemplateResources,
                 backendsTemplateResources, authorizationServersTemplateResources, namedValuesTemplateResources, tagTemplateResources, 
-                groupTemplateResources, identityProviderTemplateResources, schemaTemplateResources);
+                groupTemplateResources, identityProviderTemplateResources, schemaTemplateResources, openIdConnectProviderResources);
 
             if (masterTemplate?.HasResources() == true)
             {
@@ -706,6 +715,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             this.logger.LogInformation("Finished generation of identity providers template...");
             return identityProviderTemplate;
+        }
+
+        /// <summary>
+        /// Generates openId connect providers template in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated openId connect provider template</returns>
+        public async Task<Template<OpenIdConnectProviderResources>> GenerateOpenIdConnectProviderTemplateAsync(string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of openId connect provider template...");
+
+            var openIdConnectProviderTemplate = await this.openIdConnectProviderExtractor.GenerateOpenIdConnectProvidersTemplateAsync(this.extractorParameters);
+
+            if (openIdConnectProviderTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    openIdConnectProviderTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.OpenIdConnectProviders);
+            }
+
+            this.logger.LogInformation("Finished generation of openId connect providers template...");
+            return openIdConnectProviderTemplate;
         }
 
         /// <summary>
@@ -961,11 +993,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
             var groupTemplate = await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
+            var openIdConnectProviderTemplate = await this.GenerateOpenIdConnectProviderTemplateAsync(baseFilesGenerationDirectory);
             var schemasTempate = await this.GenerateSchemasTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
-            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, baseFilesGenerationDirectory);
+            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, openIdConnectProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
             await this.GenerateMasterTemplateAsync(
                 baseFilesGenerationDirectory,
@@ -982,7 +1015,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 tagTemplateResources: tagTemplate.TypedResources,
                 groupTemplateResources: groupTemplate.TypedResources,
                 identityProviderTemplateResources: identityProviderTemplate.TypedResources,
-                schemaTemplateResources: schemasTempate.TypedResources);
+                schemaTemplateResources: schemasTempate.TypedResources,
+                openIdConnectProviderResources: openIdConnectProviderTemplate.TypedResources);
         }
 
 

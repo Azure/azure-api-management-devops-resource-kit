@@ -35,6 +35,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 
         public string IdentityProviders { get; set; }
 
+        public string OpenIdConnectProviders { get; set; }
+
         public string ApiManagementService { get; set; }
 
         public string Schema { get; set; }

@@ -11,6 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Ide
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger.Cache;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions
@@ -24,6 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             BackendTemplateResources backendResources,
             NamedValuesResources namedValuesResources,
             IdentityProviderResources identityProviderResources,
+            OpenIdConnectProviderResources openIdConnectProviderResources,
             ExtractorParameters extractorParameters);
     }
 }

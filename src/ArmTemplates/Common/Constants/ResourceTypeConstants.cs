@@ -37,5 +37,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string IdentityProviders = "Microsoft.ApiManagement/service/identityProviders";
         public const string ApiManagementService = "Microsoft.ApiManagement/service";
         public const string Schema = "Microsoft.ApiManagement/service/schemas";
+        public const string OpenIdConnectProvider = "Microsoft.ApiManagement/service/openidConnectProviders";
     }
 }

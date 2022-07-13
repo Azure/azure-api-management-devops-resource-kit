@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var identityProviderTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
-                                        .AddParametrizedIdentityProvidersSecrets()
+                                        .AddParametrizedSecrets()
                                         .Build<IdentityProviderResources>();
             var identityProvideres = await this.identityProviderClient.GetAllAsync(extractorParameters);
 
