@@ -131,5 +131,42 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 loggerExtractor.Cache.ApiDiagnosticLoggerBindings[apiName].First().Equals(diagnosticLoggerBindings.First()).Should().BeTrue();
             }
         }
+
+        [Fact]
+        public async Task GenerateLoggersTemplates_ContainsLoggerResourceParameter_GivenParamLogResourceIdIsTrue()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateLoggersTemplates_ContainsLoggerResourceParameter_GivenParamLogResourceIdIsTrue));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(paramLogResourceId: "true", paramApiLoggerId: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var mockedLoggerClient = MockLoggerClient.GetMockedClientWithDiagnosticDependentValues();
+            var mockedDiagnosticClient = MockDiagnosticClient.GetMockedApiClientWithDefaultValues();
+            var loggerExtractor = new LoggerExtractor(
+                this.GetTestLogger<LoggerExtractor>(),
+                new TemplateBuilder(),
+                mockedLoggerClient,
+                mockedDiagnosticClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                loggerExtractor: loggerExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var loggerTemplate = await extractorExecutor.GenerateLoggerTemplateAsync(
+                new List<string> { MockApiName },
+                It.IsAny<List<PolicyTemplateResource>>(),
+                currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Loggers)).Should().BeTrue();
+
+            loggerTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            loggerTemplate.Parameters.Should().ContainKey(ParameterNames.LoggerResourceId);
+            loggerTemplate.TypedResources.Loggers.Should().HaveCount(1);
+            loggerTemplate.Resources.Should().NotBeNullOrEmpty();
+        }
     }
 }
