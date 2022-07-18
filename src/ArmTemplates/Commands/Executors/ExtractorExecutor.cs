@@ -11,6 +11,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiReleases;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
@@ -68,6 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IApiManagementServiceExtractor apiManagementServiceExtractor;
         readonly ISchemaExtractor schemaExtractor;
         readonly IOpenIdConnectProviderExtractor openIdConnectProviderExtractor;
+        readonly IApiReleaseExtractor apiReleaseExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -92,7 +94,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IIdentityProviderExtractor identityProviderExtractor,
             IApiManagementServiceExtractor apiManagementServiceExtractor,
             ISchemaExtractor schemaExtractor,
-            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor)
+            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor,
+            IApiReleaseExtractor apiReleaseExtractor)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -117,6 +120,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.apiManagementServiceExtractor = apiManagementServiceExtractor;
             this.schemaExtractor = schemaExtractor;
             this.openIdConnectProviderExtractor = openIdConnectProviderExtractor;
+            this.apiReleaseExtractor = apiReleaseExtractor;
         }
 
         /// <summary>
@@ -146,7 +150,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IIdentityProviderExtractor identityProviderExtractor = null,
             IApiManagementServiceExtractor apiManagementServiceExtractor = null,
             ISchemaExtractor schemaExtractor = null,
-            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null)
+            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null,
+            IApiReleaseExtractor apiReleaseExtractor = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -170,7 +175,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 identityProviderExtractor,
                 apiManagementServiceExtractor,
                 schemaExtractor,
-                openIdConnectProviderExtractor);
+                openIdConnectProviderExtractor,
+                apiReleaseExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -814,6 +820,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         }
 
         /// <summary>
+        /// Generates api release template in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated api release template</returns>
+        public async Task<Template<ApiReleaseTemplateResources>> GenerateApiReleaseTemplateAsync(string apiName, string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of api release template...");
+
+            var apiReleaseTemplate = this.apiReleaseExtractor.GenerateSingleApiReleaseTemplate(apiName, this.extractorParameters);
+
+            if (apiReleaseTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    apiReleaseTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.ApiRelease);
+            }
+
+            this.logger.LogInformation("Finished generation of apiRelease template...");
+            return apiReleaseTemplate;
+        }
+
+        /// <summary>
         /// Generates split api templates / folders for each api in this sourceApim 
         /// </summary>
         /// <returns></returns>
@@ -924,14 +953,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.logger.LogInformation("Extracting singleAPI {0} with revisions", this.extractorParameters.SingleApiName);
 
             string currentRevision = null;
+            bool generateApiReleaseTemplate;
             List<string> revList = new List<string>();
 
             await foreach (var apiRevision in this.apiRevisionExtractor.GetApiRevisionsAsync(this.extractorParameters.SingleApiName, this.extractorParameters))
             {
+                generateApiReleaseTemplate = false;
                 var apiRevisionName = apiRevision.ApiId.Split("/")[2];
                 if (apiRevision.IsCurrent)
                 {
                     currentRevision = apiRevisionName;
+                    generateApiReleaseTemplate = true;
                 }
 
                 // creating a folder for this api revision
@@ -939,7 +971,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 Directory.CreateDirectory(revFileFolder);
                 revList.Add(apiRevisionName);
 
-                await this.GenerateTemplates(revFileFolder, singleApiName: apiRevisionName);
+                await this.GenerateTemplates(revFileFolder, singleApiName: apiRevisionName, generateApiReleaseTemplate: generateApiReleaseTemplate);
             }
 
             if (currentRevision is null)
@@ -970,7 +1002,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             string baseFilesGenerationDirectory,
             string singleApiName = null,
             List<string> multipleApiNames = null,
-            Template<ApiTemplateResources> apiTemplate = null)
+            Template<ApiTemplateResources> apiTemplate = null,
+            bool generateApiReleaseTemplate = false)
         {
             if (!string.IsNullOrEmpty(singleApiName) && !multipleApiNames.IsNullOrEmpty())
             {
@@ -981,6 +1014,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             // generate different templates using extractors and write to output
             apiTemplate = apiTemplate ?? await this.GenerateApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
+            
+            if (generateApiReleaseTemplate == true)
+            {
+                await this.GenerateApiReleaseTemplateAsync(singleApiName, baseFilesGenerationDirectory);
+            }
+
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.ApiProducts);

@@ -108,7 +108,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
 
                 this.logger.LogInformation("{0} API data found ...", singleApiName);
-                this.SetArmTemplateValuesToApiTemplateResource(apiResource, extractorParameters);
+                this.SetArmTemplateValuesToApiTemplateResource(singleApiName, apiResource, extractorParameters);
                 apiTemplateResources.Apis.Add(apiResource);
             }
             catch (Exception ex)
@@ -132,24 +132,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return generalApiTemplateResourcesStorage;
         }
 
-        void SetArmTemplateValuesToApiTemplateResource(ApiTemplateResource apiResource, ExtractorParameters extractorParameters)
+        void SetArmTemplateValuesToApiTemplateResource(string apiName, ApiTemplateResource apiResource, ExtractorParameters extractorParameters)
         {
-            var originalServiceApiName = apiResource.Name;
-
-            apiResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalServiceApiName}')]";
+            apiResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}')]";
             apiResource.ApiVersion = GlobalConstants.ApiVersion;
             apiResource.Scale = null;
 
             if (extractorParameters.ParameterizeServiceUrl)
             {
-                apiResource.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{NamingHelper.GenerateValidParameterName(originalServiceApiName, ParameterPrefix.Api)}]";
+                apiResource.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
             }
 
             if (extractorParameters.ParametrizeApiOauth2Scope)
             {
                 if (apiResource.Properties.AuthenticationSettings?.OAuth2?.Scope is not null)
                 {
-                    apiResource.Properties.AuthenticationSettings.OAuth2.Scope = $"[parameters('{ParameterNames.ApiOauth2ScopeSettings}').{NamingHelper.GenerateValidParameterName(originalServiceApiName, ParameterPrefix.ApiOauth2Scope)}]";
+                    apiResource.Properties.AuthenticationSettings.OAuth2.Scope = $"[parameters('{ParameterNames.ApiOauth2ScopeSettings}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.ApiOauth2Scope)}]";
                 }
             }
 

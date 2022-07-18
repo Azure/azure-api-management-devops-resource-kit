@@ -12,6 +12,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
     {
         static readonly Regex ExcludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
         static readonly Regex ExcludeOtherFromAlphaNumericsAndHyphensRegex = new Regex("[^a-zA-Z0-9-]");
+        static readonly Regex ValidDeploymentNameRegEx = new Regex("[^-\\w\\._\\(\\)]");
 
         public static string GetSubstringBetweenTwoCharacters(char left, char right, string fullString)
         {
@@ -59,6 +60,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
         public static string GenerateParametrizedResourceName(string parameterName, string resourceName)
         {
             return $"[concat(parameters('{parameterName}'), '/{resourceName}')]";
+        }
+
+        public static string GenerateValidDeploymentFileName(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return string.Empty;
+            }
+
+            var resourceName = ValidDeploymentNameRegEx.Replace(fileName, "-");
+            return resourceName;
         }
     }
 }

@@ -141,6 +141,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IApiManagementServiceExtractor, ApiManagementServiceExtractor>();
             services.AddScoped<ISchemaExtractor, SchemaExtractor>();
             services.AddScoped<IOpenIdConnectProviderExtractor, OpenIdConnectProviderExtractor>();
+            services.AddScoped<IApiReleaseExtractor, ApiReleaseExtractor>();
         }
 
         static void SetupApiClients(IServiceCollection services)
