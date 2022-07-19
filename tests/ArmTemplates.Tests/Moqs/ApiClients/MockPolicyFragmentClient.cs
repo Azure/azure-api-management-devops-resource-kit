@@ -5,22 +5,20 @@
 
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Schemas;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.PolicyFragments;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Moq;
-using Moq.Protected;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
 {
-    class MockSchemaClient
+    class MockPolicyFragmentClient
     {
-        public static async Task<ISchemasClient> GetMockedHttpSchemaClient(string responseFileLocation)
+        public static async Task<IPolicyFragmentsClient> GetMockedHttpPolicyFragmentClient(string responseFileLocation)
         {
-            var dataProcessor = new SchemaDataProcessor();
-            var mockedClient = new Mock<SchemasClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation) , dataProcessor);
+            var mockedProcessor = new PolicyFragmentDataProcessor();
+            var mockedClient = new Mock<PolicyFragmentsClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation) , mockedProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
-
+            
             return mockedClient.Object;
         }
     }
