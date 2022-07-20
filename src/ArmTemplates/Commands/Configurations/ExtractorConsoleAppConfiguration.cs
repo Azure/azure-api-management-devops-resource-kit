@@ -103,6 +103,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "extractSecrets", HelpText = "Extract secrets from the services if applies")]
         public string ExtractSecrets { get; set; }
 
+        [Option(longName: "extractIdentityProviders", HelpText = "Extract identity providers from the service if applies")]
+        public string ExtractIdentityProviders { get; set; }
+
         /// <summary>
         /// Api parameter properties for overriding Api OAuth2 scope or/and Service urloverride. Available via extractor-config file only.
         /// </summary>

@@ -88,6 +88,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool ExtractSecrets { get; set; }
 
+        public bool ExtractIdentityProviders { get; set; }
+
         public Dictionary<string, ApiParameterProperty> ApiParameters { get; private set; }
 
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
@@ -122,6 +124,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ParameterizeServiceUrl = extractorConfig.ParamServiceUrl != null && extractorConfig.ParamServiceUrl.Equals("true", StringComparison.OrdinalIgnoreCase) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.ServiceUrl is not null));
             this.ParametrizeApiOauth2Scope = (extractorConfig.ParamApiOauth2Scope != null && extractorConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase)) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.Oauth2Scope is not null));
             this.ExtractSecrets = extractorConfig.ExtractSecrets != null && extractorConfig.ExtractSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ExtractIdentityProviders = extractorConfig.ExtractIdentityProviders != null && extractorConfig.ExtractIdentityProviders.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
 
         public ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)
@@ -155,6 +158,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.IncludeAllRevisions = !string.IsNullOrEmpty(overridingConfig.IncludeAllRevisions) ? overridingConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase) : this.IncludeAllRevisions;
             this.ExtractGateways = !string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractGateways;
             this.ParametrizeApiOauth2Scope = !string.IsNullOrEmpty(overridingConfig.ParamApiOauth2Scope) ? overridingConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParametrizeApiOauth2Scope;
+            this.ExtractIdentityProviders = !string.IsNullOrEmpty(overridingConfig.ExtractIdentityProviders) ? overridingConfig.ExtractIdentityProviders.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractIdentityProviders;
 
             if (!string.IsNullOrEmpty(overridingConfig.BaseFileName))
             {

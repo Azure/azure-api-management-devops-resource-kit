@@ -204,7 +204,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 var secretValuesParameteres = new Dictionary<string, Dictionary<string, string>>();
 
-                if (identityProviderResources.HasContent())
+                if (identityProviderResources?.HasContent() == true)
                 {
                     var identityProviderParameteres = new Dictionary<string, string>();
 
