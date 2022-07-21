@@ -38,6 +38,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Schemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.OpenIdConnectProviders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.PolicyFragments;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
 {
@@ -75,6 +76,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IApiManagementServiceProcessor, ApiManagementServiceProcessor>();
             services.AddScoped<ISchemaDataProcessor, SchemaDataProcessor>();
             services.AddScoped<IOpenIdConnectProviderProcessor, OpenIdConnectProviderProcessor>();
+            services.AddScoped<IPolicyFragmentDataProcessor, PolicyFragmentDataProcessor>();
         }
 
         static void SetupCommands(IServiceCollection services)
@@ -141,6 +143,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IApiManagementServiceExtractor, ApiManagementServiceExtractor>();
             services.AddScoped<ISchemaExtractor, SchemaExtractor>();
             services.AddScoped<IOpenIdConnectProviderExtractor, OpenIdConnectProviderExtractor>();
+            services.AddScoped<IPolicyFragmentsExtractor, PolicyFragmentsExtractor>();
             services.AddScoped<IApiReleaseExtractor, ApiReleaseExtractor>();
         }
 
@@ -165,6 +168,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IApiManagementServiceClient, ApiManagementServiceClient>();
             services.AddScoped<ISchemasClient, SchemasClient>();
             services.AddScoped<IOpenIdConnectProvidersClient, OpenIdConnectProviderClient>();
+            services.AddScoped<IPolicyFragmentsClient, PolicyFragmentsClient>();
         }
     }
 }

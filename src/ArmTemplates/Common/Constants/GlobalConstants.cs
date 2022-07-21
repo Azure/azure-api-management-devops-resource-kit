@@ -16,6 +16,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string ExtractDescription = "Extract an existing API Management instance";
 
         public const string ApiVersion = "2021-08-01";
+        public const string ApiVersionPreview = "2021-12-01-preview";
         public const string ArmApiVersion = "2022-01-01";
         public const int NumOfRecords = 100;
 

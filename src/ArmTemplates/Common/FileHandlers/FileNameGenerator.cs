@@ -41,6 +41,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 ApiManagementService = $@"{baseFileName}api-management-service.template.json",
                 TagApi = $@"{baseFileName}apiTags.template.json",
                 Schema = $@"{baseFileName}schemas.template.json",
+                PolicyFragments = $@"{baseFileName}policy-fragments.template.json",
                 ApiRelease = $@"{baseFileName}api-release.template.json",
                 Parameters = $@"{baseFileName}parameters.json",
                 LinkedMaster = $@"{baseFileName}master.template.json",

@@ -10,10 +10,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.G
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 using Moq;
-using Moq.Protected;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
 {
@@ -95,8 +93,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         {
             var mockedProcessor = new Mock<IGroupDataProcessor>(MockBehavior.Loose).Object;
             var mockGroupsClient = new Mock<GroupsClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation) , mockedProcessor);
-            mockGroupsClient.Protected()
-                .Setup<AzureCliAuthenticator>("Auth").Returns(MockClientUtils.GetMockedAzureClient());
+            MockClientUtils.MockAuthOfApiClient(mockGroupsClient);
 
             return mockGroupsClient.Object;
         }

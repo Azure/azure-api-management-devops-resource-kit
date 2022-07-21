@@ -9,11 +9,9 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
 using Moq;
-using Moq.Protected;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.IdentityProviderClients
 {
@@ -71,8 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
         {
             var mockedProcessor = new Mock<IOpenIdConnectProviderProcessor>(MockBehavior.Loose).Object;
             var mockedClient = new Mock<OpenIdConnectProviderClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), mockedProcessor);
-            mockedClient.Protected()
-                .Setup<AzureCliAuthenticator>("Auth").Returns(MockClientUtils.GetMockedAzureClient());
+            MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;
         }

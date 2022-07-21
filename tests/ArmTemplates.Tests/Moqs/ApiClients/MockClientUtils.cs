@@ -7,6 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
@@ -56,6 +57,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
             return httpClientFactory.Object;
+        }
+
+        public static void MockAuthOfApiClient<T>(Mock<T> mockedClient) where T: ApiClientBase
+        {
+            mockedClient.Protected()
+                .Setup<AzureCliAuthenticator>("Auth").Returns(GetMockedAzureClient());
         }
     }
 }
