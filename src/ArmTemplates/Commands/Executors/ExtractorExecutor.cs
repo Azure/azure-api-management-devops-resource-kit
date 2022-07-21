@@ -24,6 +24,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Mas
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.PolicyFragments;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
@@ -68,6 +69,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         readonly IApiManagementServiceExtractor apiManagementServiceExtractor;
         readonly ISchemaExtractor schemaExtractor;
         readonly IOpenIdConnectProviderExtractor openIdConnectProviderExtractor;
+        readonly IPolicyFragmentsExtractor policyFragmentsExtractor;
 
         public ExtractorExecutor(
             ILogger<ExtractorExecutor> logger,
@@ -92,7 +94,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IIdentityProviderExtractor identityProviderExtractor,
             IApiManagementServiceExtractor apiManagementServiceExtractor,
             ISchemaExtractor schemaExtractor,
-            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor)
+            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor,
+            IPolicyFragmentsExtractor policyFragmentsExtractor)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -117,6 +120,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.apiManagementServiceExtractor = apiManagementServiceExtractor;
             this.schemaExtractor = schemaExtractor;
             this.openIdConnectProviderExtractor = openIdConnectProviderExtractor;
+            this.policyFragmentsExtractor = policyFragmentsExtractor;
         }
 
         /// <summary>
@@ -146,7 +150,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             IIdentityProviderExtractor identityProviderExtractor = null,
             IApiManagementServiceExtractor apiManagementServiceExtractor = null,
             ISchemaExtractor schemaExtractor = null,
-            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null)
+            IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null,
+            IPolicyFragmentsExtractor policyFragmentsExtractor = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -170,7 +175,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 identityProviderExtractor,
                 apiManagementServiceExtractor,
                 schemaExtractor,
-                openIdConnectProviderExtractor);
+                openIdConnectProviderExtractor,
+                policyFragmentsExtractor);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -469,7 +475,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
            GroupTemplateResources groupTemplateResources = null,
            IdentityProviderResources identityProviderTemplateResources = null,
            SchemaTemplateResources schemaTemplateResources = null,
-           OpenIdConnectProviderResources openIdConnectProviderResources = null)
+           OpenIdConnectProviderResources openIdConnectProviderResources = null,
+           PolicyFragmentsResources policyFragmentsResources = null)
         {
             if (string.IsNullOrEmpty(this.extractorParameters.LinkedTemplatesBaseUrl))
             {
@@ -483,7 +490,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 this.extractorParameters, apiTemplateResources, policyTemplateResources, apiVersionSetTemplateResources,
                 productsTemplateResources, productApisTemplateResources, apiTagsTemplateResources, loggersTemplateResources,
                 backendsTemplateResources, authorizationServersTemplateResources, namedValuesTemplateResources, tagTemplateResources, 
-                groupTemplateResources, identityProviderTemplateResources, schemaTemplateResources, openIdConnectProviderResources);
+                groupTemplateResources, identityProviderTemplateResources, schemaTemplateResources, openIdConnectProviderResources, policyFragmentsResources);
 
             if (masterTemplate?.HasResources() == true)
             {
@@ -820,6 +827,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         }
 
         /// <summary>
+        /// Generates policy fragments templates in the desired folder
+        /// </summary>
+        /// <param name="baseFilesGenerationDirectory">name of base folder where to save output files</param>
+        /// <returns>generated policy fragments template</returns>
+        public async Task<Template<PolicyFragmentsResources>> GeneratePolicyFragmentsTemplateAsync(List<PolicyTemplateResource> apiPolicies, string baseFilesGenerationDirectory)
+        {
+            this.logger.LogInformation("Started generation of policy fragments template...");
+
+            var policyFragmentTemplate = await this.policyFragmentsExtractor.GeneratePolicyFragmentsTemplateAsync(apiPolicies, this.extractorParameters);
+
+            if (policyFragmentTemplate?.HasResources() == true)
+            {
+                await FileWriter.SaveAsJsonAsync(
+                    policyFragmentTemplate,
+                    directory: baseFilesGenerationDirectory,
+                    fileName: this.extractorParameters.FileNames.PolicyFragments);
+            }
+
+            this.logger.LogInformation("Finished generation of policy fragments template...");
+            return policyFragmentTemplate;
+        }
+
+        /// <summary>
         /// Generates split api templates / folders for each api in this sourceApim 
         /// </summary>
         /// <returns></returns>
@@ -1001,6 +1031,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
             var openIdConnectProviderTemplate = await this.GenerateOpenIdConnectProviderTemplateAsync(baseFilesGenerationDirectory);
             var schemasTempate = await this.GenerateSchemasTemplateAsync(baseFilesGenerationDirectory);
+            var policyFragmentTemplate = await this.GeneratePolicyFragmentsTemplateAsync(apiTemplate.TypedResources.GetAllPolicies(), baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
@@ -1022,7 +1053,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 groupTemplateResources: groupTemplate.TypedResources,
                 identityProviderTemplateResources: identityProviderTemplate?.TypedResources,
                 schemaTemplateResources: schemasTempate.TypedResources,
-                openIdConnectProviderResources: openIdConnectProviderTemplate.TypedResources);
+                openIdConnectProviderResources: openIdConnectProviderTemplate.TypedResources,
+                policyFragmentsResources: policyFragmentTemplate.TypedResources);
         }
 
 

@@ -38,5 +38,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string ApiManagementService = "Microsoft.ApiManagement/service";
         public const string Schema = "Microsoft.ApiManagement/service/schemas";
         public const string OpenIdConnectProvider = "Microsoft.ApiManagement/service/openidConnectProviders";
+        public const string PolicyFragments = "Microsoft.ApiManagement/service/policyFragments";
     }
 }

@@ -18,6 +18,10 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abst
 using Xunit;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.PolicyFragments;
+using System.Linq;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -121,13 +125,47 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 }
             };
 
+            var policyFragmentResources = new PolicyFragmentsResources()
+            {
+                PolicyFragments = new()
+                {
+                    new PolicyFragmentsResource()
+                    {
+                        OriginalName = "originalName",
+                    }
+                }
+            };
+
+            var apisResources = new ApiTemplateResources()
+            {
+                Apis = new()
+                {
+                    new ApiTemplateResource()
+                    {
+                        Name = "originalName",
+                    }
+                }
+            };
+
+            var globalPolicyTemplate = new PolicyTemplateResources()
+            {
+                GlobalServicePolicy = new()
+                {
+                        Name = "originalName",
+                }
+            };
+
             // act
             var masterTemplate = await extractorExecutor.GenerateMasterTemplateAsync(
                 currentTestDirectory,
                 tagTemplateResources: tagTemplateResources,
                 groupTemplateResources: groupTemplateResources,
                 identityProviderTemplateResources: identityProviderResources,
-                schemaTemplateResources: schemaResources);
+                schemaTemplateResources: schemaResources,
+                policyFragmentsResources: policyFragmentResources,
+                apiTemplateResources: apisResources,
+                policyTemplateResources: globalPolicyTemplate
+                );
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.LinkedMaster)).Should().BeTrue();
 
@@ -146,13 +184,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.ApiOauth2ScopeSettings);
             masterTemplate.Parameters.Should().ContainKey(ParameterNames.SecretValues);
 
-            masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(4);
-            masterTemplate.Resources.Should().HaveCount(4);
+            masterTemplate.TypedResources.DeploymentResources.Should().HaveCount(7);
+            masterTemplate.Resources.Should().HaveCount(7);
 
             foreach(var deploymentResource in masterTemplate.TypedResources.DeploymentResources) {
                 deploymentResource.Type.Should().Be(ResourceTypeConstants.ArmDeployments);
                 deploymentResource.Properties.Should().NotBeNull();
             }
+
+            //verify depends on values
+            var apiDeployment = masterTemplate.TypedResources.DeploymentResources.Single(x => x.Name == "apisTemplate");
+            apiDeployment.DependsOn.Single(x => x.Contains("policyFragmentsTemplate")).Should().NotBeNull();
+            apiDeployment.DependsOn.Single(x => x.Contains("globalServicePolicyTemplate")).Should().NotBeNull();
+
+            var globalPolicyDeployment = masterTemplate.TypedResources.DeploymentResources.Single(x => x.Name == "globalServicePolicyTemplate");
+            globalPolicyDeployment.DependsOn.Single(x => x.Contains("policyFragmentsTemplate")).Should().NotBeNull();
         }
     }
 }

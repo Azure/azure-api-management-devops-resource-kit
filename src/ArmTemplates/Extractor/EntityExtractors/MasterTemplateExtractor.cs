@@ -27,6 +27,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gro
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.PolicyFragments;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -59,7 +60,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             GroupTemplateResources groupTemplateResources = null,
             IdentityProviderResources identityProviderTemplateResources = null,
             SchemaTemplateResources schemaTemplateResources = null,
-            OpenIdConnectProviderResources openIdConnectProviderResources = null)
+            OpenIdConnectProviderResources openIdConnectProviderResources = null,
+            PolicyFragmentsResources policyFragmentsResources = null)
         {
             var masterTemplate = this.templateBuilder
                                         .GenerateEmptyTemplate()
@@ -76,6 +78,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var apiDependsOn = new List<string>();
             var productApiDependsOn = new List<string>();
             var apiTagDependsOn = new List<string>();
+            var globalPolicyDependsOn = new List<string>();
 
             if (namedValuesTemplateResources?.HasContent() == true)
             {
@@ -83,6 +86,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 const string NamedValuesTemplateName = "namedValuesTemplate";
 
                 dependsOnNamedValues = new string[] { $"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{NamedValuesTemplateName}')]" };
+                globalPolicyDependsOn.AddRange(dependsOnNamedValues);
                 apiDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{NamedValuesTemplateName}')]");
                 var namedValuesUri = this.GenerateLinkedTemplateUri(fileNames.NamedValues, extractorParameters);
                 var namedValuesDeployment = CreateLinkedMasterTemplateResourceForPropertyTemplate(
@@ -92,6 +96,19 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     extractorParameters);
 
                 masterResources.DeploymentResources.Add(namedValuesDeployment);
+            }
+
+            if (policyFragmentsResources?.HasContent() == true)
+            {
+                this.logger.LogDebug("Adding policy fragments to master template");
+                const string PolicyFragmentsTemplate = "policyFragmentsTemplate";
+
+                var policyFragmentUri = this.GenerateLinkedTemplateUri(fileNames.PolicyFragments, extractorParameters);
+                var policyFragmentDeployment = CreateLinkedMasterTemplateResource(PolicyFragmentsTemplate, policyFragmentUri, Array.Empty<string>());
+
+                masterResources.DeploymentResources.Add(policyFragmentDeployment);
+                apiDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{PolicyFragmentsTemplate}')]");
+                globalPolicyDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{PolicyFragmentsTemplate}')]");
             }
 
             if (policyTemplateResources?.HasContent() == true)
@@ -104,7 +121,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var policyDeployment = CreateLinkedMasterTemplateResourceWithPolicyToken(
                     GlobalServicePolicyTemplate,
                     globalServicePolicyUri,
-                    dependsOnNamedValues,
+                    globalPolicyDependsOn.ToArray(),
                     extractorParameters);
 
                 masterResources.DeploymentResources.Add(policyDeployment);
