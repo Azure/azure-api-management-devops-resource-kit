@@ -15,6 +15,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Mas
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.PolicyFragments;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Products;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
@@ -42,6 +43,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
            GroupTemplateResources groupTemplateResources = null,
            IdentityProviderResources identityProviderTemplateResources = null,
            SchemaTemplateResources schemaTemplateResources = null,
-           OpenIdConnectProviderResources openIdConnectProviderResources = null);
+           OpenIdConnectProviderResources openIdConnectProviderResources = null,
+           PolicyFragmentsResources policyFragmentsResources = null);
     }
 }
