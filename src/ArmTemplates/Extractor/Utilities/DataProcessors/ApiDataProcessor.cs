@@ -34,11 +34,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 
             if (api.Properties.LocalIsCurrent == true && !string.IsNullOrEmpty(api.Properties.ApiRevision))
             {
-                if (!api.Properties.ApiRevision.Equals("1") && !api.Name.Contains($";rev={api.Properties.ApiRevision}"))
+                api.ApiNameWithRevision = $"{api.Name};rev={api.Properties.ApiRevision}";
+                if (!api.Name.Contains($";rev={api.Properties.ApiRevision}"))
                 {
                     api.Name = $"{api.Name};rev={api.Properties.ApiRevision}";
                 }
             }
+
         }
     }
 }

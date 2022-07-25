@@ -4,6 +4,8 @@
 // --------------------------------------------------------------------------
 
 using System;
+using System.Threading.Tasks;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiReleases;
@@ -18,13 +20,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         readonly ILogger<ApiReleaseExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
+        readonly IApisClient apisClient;
 
         public ApiReleaseExtractor(
             ILogger<ApiReleaseExtractor> logger,
-            ITemplateBuilder templateBuilder)
+            ITemplateBuilder templateBuilder,
+            IApisClient apisClient
+            )
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
+            this.apisClient = apisClient;
         }
 
         public Template<ApiReleaseTemplateResources> GenerateSingleApiReleaseTemplate(string apiName, ExtractorParameters extractorParameters)
@@ -32,9 +38,34 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var apiReleaseTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
                                         .Build<ApiReleaseTemplateResources>();
-            var currentDatetime = DateTime.Now.ToString("hhmmssddMMyy");
-            var apiReleaseName = $"{currentDatetime}release";
 
+            var apiReleaseResource = this.GenerateReleaseResource(apiName);
+            apiReleaseTemplate.TypedResources.ApiReleases.Add(apiReleaseResource);
+            
+            return apiReleaseTemplate;
+        }
+
+
+        public async Task<Template<ApiReleaseTemplateResources>> GenerateCurrentApiReleaseTemplate(ExtractorParameters extractorParameters)
+        {
+            var apiReleasesTemplate = this.templateBuilder
+                                        .GenerateTemplateWithApimServiceNameProperty()
+                                        .Build<ApiReleaseTemplateResources>();
+
+            var apis = await this.apisClient.GetAllCurrentAsync(extractorParameters);
+
+            foreach (var api in apis)
+            {
+                var apiReleaseResource = this.GenerateReleaseResource(api.ApiNameWithRevision);
+                apiReleasesTemplate.TypedResources.ApiReleases.Add(apiReleaseResource);
+            }
+            
+            return apiReleasesTemplate;
+        }
+
+        ApiReleaseTemplateResource GenerateReleaseResource(string apiName)
+        {
+            var apiReleaseName = $"{Guid.NewGuid()}";
             var apiReleaseResource = new ApiReleaseTemplateResource
             {
                 Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiReleaseName}')]",
@@ -45,9 +76,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     ApiId = $"/apis/{apiName}"
                 }
             };
-            apiReleaseTemplate.TypedResources.ApiReleases.Add(apiReleaseResource);
-            
-            return apiReleaseTemplate;
+
+            return apiReleaseResource;
         }
     }
 }

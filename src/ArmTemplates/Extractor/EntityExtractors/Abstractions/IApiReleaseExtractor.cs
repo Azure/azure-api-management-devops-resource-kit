@@ -3,6 +3,7 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiReleases;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -12,5 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     public interface IApiReleaseExtractor
     {
         Template<ApiReleaseTemplateResources> GenerateSingleApiReleaseTemplate(string apiName, ExtractorParameters extractorParameters);
+        
+        Task<Template<ApiReleaseTemplateResources>> GenerateCurrentApiReleaseTemplate(ExtractorParameters extractorParameters);
     }
 }
