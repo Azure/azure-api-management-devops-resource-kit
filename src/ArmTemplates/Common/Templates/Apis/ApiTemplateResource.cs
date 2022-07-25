@@ -4,11 +4,15 @@
 // --------------------------------------------------------------------------
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis
 {
     public class ApiTemplateResource : TemplateResource
     {
+        [JsonIgnore]
+        public string OriginalName { get; set; }
+
         public ApiProperties Properties { get; set; }
     }
 }

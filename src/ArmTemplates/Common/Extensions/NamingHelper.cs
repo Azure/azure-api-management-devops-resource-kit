@@ -5,6 +5,7 @@
 
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions
 {
@@ -71,6 +72,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
 
             var resourceName = ValidDeploymentNameRegEx.Replace(fileName, "-");
             return resourceName;
+        }
+
+        public static string GenerateApisResourceId(string apiName)
+        {
+            return $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]";
         }
     }
 }

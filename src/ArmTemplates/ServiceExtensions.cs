@@ -77,6 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<ISchemaDataProcessor, SchemaDataProcessor>();
             services.AddScoped<IOpenIdConnectProviderProcessor, OpenIdConnectProviderProcessor>();
             services.AddScoped<IPolicyFragmentDataProcessor, PolicyFragmentDataProcessor>();
+            services.AddScoped<IApiDataProcessor, ApiDataProcessor>();
         }
 
         static void SetupCommands(IServiceCollection services)

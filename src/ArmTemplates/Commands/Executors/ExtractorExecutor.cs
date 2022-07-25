@@ -48,6 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
         readonly ILogger<ExtractorExecutor> logger;
         readonly IApisClient apisClient;
+        readonly IApiRevisionClient apiRevisionClient;
 
         readonly IApiExtractor apiExtractor;
         readonly IApiVersionSetExtractor apiVersionSetExtractor;
@@ -98,7 +99,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ISchemaExtractor schemaExtractor,
             IOpenIdConnectProviderExtractor openIdConnectProviderExtractor,
             IPolicyFragmentsExtractor policyFragmentsExtractor,
-            IApiReleaseExtractor apiReleaseExtractor)
+            IApiReleaseExtractor apiReleaseExtractor,
+            IApiRevisionClient apiRevisionClient)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -125,6 +127,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.openIdConnectProviderExtractor = openIdConnectProviderExtractor;
             this.policyFragmentsExtractor = policyFragmentsExtractor;
             this.apiReleaseExtractor = apiReleaseExtractor;
+            this.apiRevisionClient = apiRevisionClient;
         }
 
         /// <summary>
@@ -156,7 +159,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ISchemaExtractor schemaExtractor = null,
             IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null,
             IPolicyFragmentsExtractor policyFragmentsExtractor = null,
-            IApiReleaseExtractor apiReleaseExtractor = null)
+            IApiReleaseExtractor apiReleaseExtractor = null,
+            IApiRevisionClient apiRevisionClient = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -182,7 +186,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 schemaExtractor,
                 openIdConnectProviderExtractor,
                 policyFragmentsExtractor,
-                apiReleaseExtractor);
+                apiReleaseExtractor,
+                apiRevisionClient);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -1040,7 +1045,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             }
 
             var apisToExtract = await this.GetApiNamesToExtract(singleApiName, multipleApiNames);
-
             // generate different templates using extractors and write to output
             apiTemplate = apiTemplate ?? await this.GenerateApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             

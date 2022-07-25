@@ -21,8 +21,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public string ApiVersion { get; set; }
 
-        [JsonIgnore]
         public bool? IsCurrent { get; set; }
+
+        [JsonIgnore]
+        public bool? LocalIsCurrent { get; set; }
 
         public string ApiRevisionDescription { get; set; }
 

@@ -16,6 +16,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         Task<List<ApiTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
 
+        Task<List<ApiTemplateResource>> GetAllCurrentAsync(ExtractorParameters extractorParameters);
+
         Task<List<ApiTemplateResource>> GetAllLinkedToProductAsync(string productName, ExtractorParameters extractorParameters);
 
         Task<List<ApiTemplateResource>> GetAllLinkedToGatewayAsync(string gatewayName, ExtractorParameters extractorParameters);

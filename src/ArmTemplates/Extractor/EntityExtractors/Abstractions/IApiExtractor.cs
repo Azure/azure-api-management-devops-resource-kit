@@ -15,8 +15,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
     {
         Task<Template<ApiTemplateResources>> GenerateApiTemplateAsync(string singleApiName, List<string> multipleApiNames, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);
 
-        Task<ApiTemplateResources> GenerateSingleApiTemplateResourcesAsync(string singleApiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);
+        Task<ApiTemplateResources> GenerateSingleApiTemplateResourcesAsync(string singleApiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters, string apiDepends = null);
 
         Task<ApiTemplateResources> GetApiRelatedTemplateResourcesAsync(string apiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters);
+
+        Task<Dictionary<string, string>> GenerateApiRevisionDependencyStructure(ExtractorParameters extractorParameters);
     }
 }
