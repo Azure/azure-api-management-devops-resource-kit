@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiOperation.ApiVersion = GlobalConstants.ApiVersion;
                 apiOperation.Scale = null;
 
-                var operationDependsOn = new List<string>() { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
+                var operationDependsOn = new List<string>() { NamingHelper.GenerateApisResourceId(apiName) };
                 if (apiOperation.Properties?.Request?.Representations?.IsNullOrEmpty() == false)
                 {
                     foreach (var requestRepresentation in apiOperation.Properties.Request.Representations)

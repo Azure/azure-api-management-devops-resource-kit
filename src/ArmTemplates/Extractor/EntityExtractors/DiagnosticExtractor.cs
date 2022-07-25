@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiDiagnostic.Type = ResourceTypeConstants.APIDiagnostic;
                 apiDiagnostic.ApiVersion = GlobalConstants.ApiVersion;
                 apiDiagnostic.Scale = null;
-                apiDiagnostic.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
+                apiDiagnostic.DependsOn = new string[] { NamingHelper.GenerateApisResourceId(apiName) };
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {

@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     var apiResources = await this.apiExtractor.GenerateSingleApiTemplateResourcesAsync(curApi, baseFilesGenerationDirectory, extractorParameters);
                     var apiResource = apiResources.Apis.FirstOrDefault();
-                    apiResource.DependsOn = new[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{extractorParameters.SingleApiName}')]" };
+                    apiResource.DependsOn = new[] { NamingHelper.GenerateApisResourceId(extractorParameters.SingleApiName) };
 
                     apiRevisionTemplate.TypedResources.AddResourcesData(apiResources);
                 }

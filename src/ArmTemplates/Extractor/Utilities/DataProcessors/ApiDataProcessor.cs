@@ -40,7 +40,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                     api.Name = $"{api.Name};rev={api.Properties.ApiRevision}";
                 }
             }
-
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             // mocked extractors
-            var apiReleaseExtractor = new ApiReleaseExtractor(this.GetTestLogger<ApiReleaseExtractor>(), new TemplateBuilder());
+            var apiReleaseExtractor = new ApiReleaseExtractor(this.GetTestLogger<ApiReleaseExtractor>(), new TemplateBuilder(), null);
             
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),

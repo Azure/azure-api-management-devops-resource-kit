@@ -83,7 +83,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 this.logger.LogInformation("{0} Product API found ...", singleApiName);
                 var dependsOnParameter = addDependsOnParameter
-                    ? new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{singleApiName}')]" }
+                    ? new string[] { NamingHelper.GenerateApisResourceId(singleApiName) }
                     : Array.Empty<string>();
 
                 return await this.GenerateProductApiTemplateResourcesAsync(singleApiName, extractorParameters, dependsOnParameter);
