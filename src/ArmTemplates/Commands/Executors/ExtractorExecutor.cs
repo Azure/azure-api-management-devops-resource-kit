@@ -708,10 +708,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// <returns>generated identity provider template</returns>
         public async Task<Template<IdentityProviderResources>> GenerateIdentityProviderTemplateAsync(string baseFilesGenerationDirectory)
         {
-            if (this.extractorParameters.ExtractIdentityProviders == false)
+            if (!this.extractorParameters.ExtractIdentityProviders)
             {
                 this.logger.LogInformation($"Skipping identityProvider extraction due to the setting parameter");
-                return null;
+                return Template<IdentityProviderResources>.Empty;
             }
 
             this.logger.LogInformation("Started generation of identity provider template...");
@@ -1035,7 +1035,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
-            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate?.TypedResources, openIdConnectProviderTemplate.TypedResources, baseFilesGenerationDirectory);
+            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, openIdConnectProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
             await this.GenerateMasterTemplateAsync(
                 baseFilesGenerationDirectory,
@@ -1051,7 +1051,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 namedValuesTemplateResources: namedValueTemplate.TypedResources,
                 tagTemplateResources: tagTemplate.TypedResources,
                 groupTemplateResources: groupTemplate.TypedResources,
-                identityProviderTemplateResources: identityProviderTemplate?.TypedResources,
+                identityProviderTemplateResources: identityProviderTemplate.TypedResources,
                 schemaTemplateResources: schemasTempate.TypedResources,
                 openIdConnectProviderResources: openIdConnectProviderTemplate.TypedResources,
                 policyFragmentsResources: policyFragmentTemplate.TypedResources);

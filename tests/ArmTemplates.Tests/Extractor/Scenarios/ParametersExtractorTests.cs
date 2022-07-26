@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, null, new OpenIdConnectProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -90,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters);
             
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, null, new OpenIdConnectProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -114,7 +114,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters, apisClient: MockApisClient.GetMockedApiClientWithDefaultValues());
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string>{ "api-name-1", "api-name-2" }, null, null, null, null, new OpenIdConnectProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string>{ "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -141,7 +141,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorExecutor = this.GetExtractorInstance(extractorParameters, apisClient: mockedApiClient);
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string> { "api-name-1", "api-name-2" }, null, null, null, null, new OpenIdConnectProviderResources(), currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(new List<string> { "api-name-1", "api-name-2" }, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -236,7 +236,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             });
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, null, openIdConnectProviderResources, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), openIdConnectProviderResources, currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
@@ -271,7 +271,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             });
 
             // act
-            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, null, openIdConnectProviderResources, currentTestDirectory);
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), openIdConnectProviderResources, currentTestDirectory);
 
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
 
