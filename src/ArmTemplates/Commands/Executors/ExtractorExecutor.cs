@@ -1011,17 +1011,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.logger.LogInformation("Extracting singleAPI {0} with revisions", this.extractorParameters.SingleApiName);
 
             string currentRevision = null;
-            bool generateApiReleaseTemplate;
+            bool generateSingleApiReleaseTemplate;
             List<string> revList = new List<string>();
 
             await foreach (var apiRevision in this.apiRevisionExtractor.GetApiRevisionsAsync(this.extractorParameters.SingleApiName, this.extractorParameters))
             {
-                generateApiReleaseTemplate = false;
+                generateSingleApiReleaseTemplate = false;
                 var apiRevisionName = apiRevision.ApiId.Split("/")[2];
                 if (apiRevision.IsCurrent)
                 {
                     currentRevision = apiRevisionName;
-                    generateApiReleaseTemplate = true;
+                    generateSingleApiReleaseTemplate = true;
                 }
 
                 // creating a folder for this api revision
@@ -1029,7 +1029,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 Directory.CreateDirectory(revFileFolder);
                 revList.Add(apiRevisionName);
 
-                await this.GenerateTemplates(revFileFolder, singleApiName: apiRevisionName, generateApiReleaseTemplate: generateApiReleaseTemplate);
+                await this.GenerateTemplates(revFileFolder, singleApiName: apiRevisionName, generateSingleApiReleaseTemplate: generateSingleApiReleaseTemplate);
             }
 
             if (currentRevision is null)
@@ -1061,7 +1061,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             string singleApiName = null,
             List<string> multipleApiNames = null,
             Template<ApiTemplateResources> apiTemplate = null,
-            bool generateApiReleaseTemplate = false)
+            bool generateSingleApiReleaseTemplate = false)
         {
             if (!string.IsNullOrEmpty(singleApiName) && !multipleApiNames.IsNullOrEmpty())
             {
@@ -1072,7 +1072,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             // generate different templates using extractors and write to output
             apiTemplate = apiTemplate ?? await this.GenerateApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             
-            if (generateApiReleaseTemplate == true)
+            if (generateSingleApiReleaseTemplate == true)
             {
                 await this.GenerateApiReleaseTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             }

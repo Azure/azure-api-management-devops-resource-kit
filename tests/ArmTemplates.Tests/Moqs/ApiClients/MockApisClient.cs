@@ -4,9 +4,12 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
@@ -145,6 +148,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             return mockedApisClient.Object;
+        }
+
+        public static async Task<IApisClient> GetMockedHttpApiClient(string responseFileLocation)
+        {
+            var apiDataProcessor = new ApiDataProcessor();
+            var mockedClient = new Mock<ApisClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), apiDataProcessor);
+            MockClientUtils.MockAuthOfApiClient(mockedClient);
+
+            return mockedClient.Object;
         }
     }
 }

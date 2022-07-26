@@ -12,7 +12,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 {
     public class ApiDataProcessor : IApiDataProcessor
     {
-
         public void ProcessData(List<ApiTemplateResource> apis)
         {
             if (apis.IsNullOrEmpty())
