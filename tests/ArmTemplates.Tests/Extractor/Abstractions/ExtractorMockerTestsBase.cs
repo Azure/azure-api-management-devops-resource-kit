@@ -111,7 +111,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                string overrideProductGuids = null,
                string paramApiOauth2Scope = null,
                Dictionary<string, ApiParameterProperty> apiParameters = null,
-               string extractSecrets = null
+               string extractSecrets = null,
+               string extractIdentityProviders = null
          )
         {
 
@@ -146,7 +147,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 OverrideProductGuids = overrideProductGuids,
                 ParamApiOauth2Scope = paramApiOauth2Scope,
                 ApiParameters = apiParameters,
-                ExtractSecrets = extractSecrets
+                ExtractSecrets = extractSecrets,
+                ExtractIdentityProviders = extractIdentityProviders
             };
         }
     }
