@@ -36,5 +36,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
             return this.TypedResources.HasContent();
         }
+
+        public static Template<TTemplateResources> Empty => new Template<TTemplateResources>()
+        {
+            TypedResources = new TTemplateResources()
+        };
     }
 }

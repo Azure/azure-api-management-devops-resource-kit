@@ -446,6 +446,7 @@ You have two choices when specifying your settings:
 | paramApiOauth2Scope | No | Set to true will parametrize the scope values for APIs in which User authorization setting set to OAuth 2.0. |
 | apiParameters  | No                    | Parameterize api parameters (Oauth2 Scope/Service Url) values for APIs in advance.  |
 | exctractSecrets  | No                    | By default false. If set to "true" secrets will be extracted as well and parameters templated will be supplied with actual secret values. Currently applies to identityProvider service.  |
+| extractIdentityProviders | No | By default false. Set to true will attempt to extract the identity providers from service. |
 
 
 #### Note

@@ -32,7 +32,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // arrange
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateIdentityProviderTemplates_ProperlyLaysTheInformation));
 
-            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                extractIdentityProviders: "true");
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
             var identityProviderNames = new List<string>()

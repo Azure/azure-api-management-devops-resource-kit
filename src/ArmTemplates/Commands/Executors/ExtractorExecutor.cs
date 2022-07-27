@@ -708,6 +708,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// <returns>generated identity provider template</returns>
         public async Task<Template<IdentityProviderResources>> GenerateIdentityProviderTemplateAsync(string baseFilesGenerationDirectory)
         {
+            if (!this.extractorParameters.ExtractIdentityProviders)
+            {
+                this.logger.LogInformation($"Skipping identityProvider extraction due to the setting parameter");
+                return Template<IdentityProviderResources>.Empty;
+            }
+
             this.logger.LogInformation("Started generation of identity provider template...");
 
             var identityProviderTemplate = await this.identityProviderExtractor.GenerateIdentityProvidersTemplateAsync(this.extractorParameters);
