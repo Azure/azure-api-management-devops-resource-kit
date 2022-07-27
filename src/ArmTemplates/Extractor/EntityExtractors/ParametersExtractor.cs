@@ -268,5 +268,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             return parametersTemplate;
         }
+
+        public Template CreateResourceTemplateParameterTemplate(Template resourceTemplate, Template mainParameterTemplate)
+        {
+            var parametersTemplate = this.templateBuilder
+                .GenerateEmptyTemplate()
+                .Build();
+            parametersTemplate.Parameters = new();
+            var parameters = parametersTemplate.Parameters;
+
+            if (resourceTemplate?.Parameters.IsNullOrEmpty() != true)
+            {
+                foreach (var parameterKey in resourceTemplate.Parameters.Keys)
+                {
+                    var parameterValue = mainParameterTemplate.Parameters[parameterKey];
+                    parameters.Add(parameterKey, parameterValue);
+                }
+            }
+            
+            return parametersTemplate;
+        }
     }
 }

@@ -27,5 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             IdentityProviderResources identityProviderResources,
             OpenIdConnectProviderResources openIdConnectProviderResources,
             ExtractorParameters extractorParameters);
+
+        Template CreateResourceTemplateParameterTemplate(Template resourceTemplate, Template mainParametersTemplate);
     }
 }

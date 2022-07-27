@@ -459,6 +459,67 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             return templateParameters;
         }
 
+        public async Task GenerateResourceParametersFiles(
+            string baseFilesGenerationDirectory,
+            Template mainParametersTemplate,
+            Template<ApiTemplateResources> apiTemplate = null,
+            Template<PolicyTemplateResources> policyTemplate = null,
+            Template<ApiVersionSetTemplateResources> apiVersionSetTemplate = null,
+            Template<ProductTemplateResources> productsTemplate = null,
+            Template<ProductApiTemplateResources> productApisTemplate = null,
+            Template<TagApiTemplateResources> apiTagsTemplate = null,
+            Template<LoggerTemplateResources> loggersTemplate = null,
+            Template<BackendTemplateResources> backendsTemplate = null,
+            Template<AuthorizationServerTemplateResources> authorizationServersTemplate = null,
+            Template<NamedValuesResources> namedValuesTemplate = null,
+            Template<TagTemplateResources> tagTemplate = null,
+            Template<GroupTemplateResources> groupTemplate = null,
+            Template<IdentityProviderResources> identityProviderTemplate = null,
+            Template<SchemaTemplateResources> schemaTemplate = null,
+            Template<OpenIdConnectProviderResources> openIdConnectProviderTemplate = null,
+            Template<PolicyFragmentsResources> policyFragmentsTemplate = null
+            )
+        {
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, apiTemplate.TypedResources.FileName, apiTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.GlobalServicePolicyParameters , policyTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ApiVersionSetsParameters, apiVersionSetTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ProductsParameters, productsTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ProductAPIsParameters, productApisTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.TagApiParameters, apiTagsTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.LoggersParameters, loggersTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.BackendsParameters, backendsTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.AuthorizationServersParameters, authorizationServersTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.NamedValuesParameters, namedValuesTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.TagsParameters, tagTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.GroupsParameters, groupTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.IdentityProvidersParameters, identityProviderTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.SchemaParameters, schemaTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.OpenIdConnectProvidersParameters, openIdConnectProviderTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.PolicyFragmentsParameters, policyFragmentsTemplate, mainParametersTemplate);
+        }
+
+        public async Task GenerateResourceParametersFile<TTemplateResource>(string baseFilesGenerationDirectory, string fileName, Template<TTemplateResource> resourceTemplate, Template mainParametersTemplate) where TTemplateResource : ITemplateResources, new()
+        {
+            if (string.IsNullOrEmpty(fileName) || string.IsNullOrEmpty(baseFilesGenerationDirectory))
+            {
+                this.logger.LogWarning("Filename or directory for parameters file generation is null or empty, skipping the generation");
+                return;
+            }
+
+            if (resourceTemplate?.TypedResources?.HasContent() == true)
+            {
+                var parametersTemplate = this.parametersExtractor.CreateResourceTemplateParameterTemplate(resourceTemplate, mainParametersTemplate);
+
+                if (!parametersTemplate.Parameters.IsNullOrEmpty())
+                {
+                    await FileWriter.SaveAsJsonAsync(
+                    parametersTemplate,
+                    directory: Path.Combine(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ParametersDirectory),
+                    fileName: fileName);
+                }
+            }
+        }
+
         public async Task<Template<MasterTemplateResources>> GenerateMasterTemplateAsync(
            string baseFilesGenerationDirectory,
            ApiTemplateResources apiTemplateResources = null,
@@ -1035,8 +1096,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
-            await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, openIdConnectProviderTemplate.TypedResources, baseFilesGenerationDirectory);
+            var parametersTemplate = await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, openIdConnectProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
+            await this.GenerateResourceParametersFiles(
+                baseFilesGenerationDirectory, 
+                parametersTemplate, 
+                apiTemplate: apiTemplate,
+                policyTemplate: globalServicePolicyTemplate,
+                productApisTemplate: productApiTemplate,
+                productsTemplate: productTemplate,
+                apiVersionSetTemplate: apiVersionSetTemplate,
+                authorizationServersTemplate: authorizationServerTemplate,
+                tagTemplate: tagTemplate,
+                apiTagsTemplate: apiTagTemplate,
+                loggersTemplate: loggerTemplate,
+                namedValuesTemplate: namedValueTemplate,
+                backendsTemplate: backendTemplate,
+                groupTemplate: groupTemplate,
+                identityProviderTemplate: identityProviderTemplate,
+                openIdConnectProviderTemplate: openIdConnectProviderTemplate,
+                schemaTemplate: schemasTempate,
+                policyFragmentsTemplate: policyFragmentTemplate);
+
             await this.GenerateMasterTemplateAsync(
                 baseFilesGenerationDirectory,
                 apiTemplateResources: apiTemplate.TypedResources,
