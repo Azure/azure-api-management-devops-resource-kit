@@ -327,50 +327,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         }
 
         [Fact]
-        public async Task GenerateResourceParametersFile_ProperlyGeneratesTemplate()
-        {
-            // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateResourceParametersFile_ProperlyGeneratesTemplate));
-            var parameterFileName = "filename.json";
-
-            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
-            var extractorParameters = new ExtractorParameters(extractorConfig);
-            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
-
-            var resourceTemplate = new Template<OpenIdConnectProviderResources>()
-            {
-                Parameters = new Dictionary<string, TemplateParameterProperties>() {
-                    { "parameter1", new () },
-                    { "parameter2", new () }
-                },
-                TypedResources = new OpenIdConnectProviderResources()
-                {
-                    OpenIdConnectProviders = new List<OpenIdConnectProviderResource>() 
-                    {
-                        new(),
-                        new(),
-                    }
-                }
-            };
-
-            var mainParameterTemplate = new Template()
-            {
-                Parameters = new Dictionary<string, TemplateParameterProperties>() {
-                    { "parameter1", new () },
-                    { "parameter2", new () },
-                    { "parameter3", new () },
-                    { "parameter4", new () },
-                    { "parameter5", new () },
-                }
-            };
-
-            // act
-            await extractorExecutor.GenerateResourceParametersFile(currentTestDirectory, parameterFileName, resourceTemplate, mainParameterTemplate);
-
-            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ParametersDirectory, parameterFileName)).Should().BeTrue();
-        }
-
-        [Fact]
         public async Task GenerateResourceParametersFiles_ProperlyGeneratesRenmaesAndCreatesNewDirectoryWithParameterFile_GivenItsCalledTwice()
         {
             // arrange
@@ -421,7 +377,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         public async Task GenerateResourceParametersFile_DoesNotRaiseException_GivenNullFilenames()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateResourceParametersFile_ProperlyGeneratesTemplate));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateResourceParametersFile_DoesNotRaiseException_GivenNullFilenames));
             var parameterFileName = "filename.json";
 
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
