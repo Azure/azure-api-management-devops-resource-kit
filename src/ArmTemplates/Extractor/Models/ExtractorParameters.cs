@@ -90,6 +90,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool ExtractIdentityProviders { get; set; }
 
+        public string ParametersOutputDirectoryName { get; set; }
+
         public Dictionary<string, ApiParameterProperty> ApiParameters { get; private set; }
 
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
@@ -125,6 +127,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ParametrizeApiOauth2Scope = (extractorConfig.ParamApiOauth2Scope != null && extractorConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase)) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.Oauth2Scope is not null));
             this.ExtractSecrets = extractorConfig.ExtractSecrets != null && extractorConfig.ExtractSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ExtractIdentityProviders = extractorConfig.ExtractIdentityProviders != null && extractorConfig.ExtractIdentityProviders.Equals("true", StringComparison.OrdinalIgnoreCase);
+            
+            this.ParametersOutputDirectoryName = extractorConfig.ParametersOutputDirectoryName;
+            if (!string.IsNullOrEmpty(extractorConfig.ParametersOutputDirectoryName))
+            {
+                this.FileNames.ParametersDirectory = extractorConfig.ParametersOutputDirectoryName;
+            }
         }
 
         public ExtractorParameters OverrideConfiguration(ExtractorConsoleAppConfiguration overridingConfig)

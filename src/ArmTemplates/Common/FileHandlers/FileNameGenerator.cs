@@ -24,38 +24,38 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             return new FileNames
             {
                 ApiVersionSets = $@"{baseFileName}apiVersionSets.template.json",
-                ApiVersionSetsParameters = $@"{baseFileName}apiVersionSets.parameters.json",
+                ApiVersionSetsParameters = "apiVersionSets.parameters.json",
                 AuthorizationServers = $@"{baseFileName}authorizationServers.template.json",
-                AuthorizationServersParameters = $@"{baseFileName}authorizationServers.parameters.json",
+                AuthorizationServersParameters = "authorizationServers.parameters.json",
                 Backends = $@"{baseFileName}backends.template.json",
-                BackendsParameters = $@"{baseFileName}backends.parameters.json",
+                BackendsParameters = "backends.parameters.json",
                 GlobalServicePolicy = $@"{baseFileName}globalServicePolicy.template.json",
-                GlobalServicePolicyParameters = $@"{baseFileName}globalServicePolicy.parameters.json",
+                GlobalServicePolicyParameters = "globalServicePolicy.parameters.json",
                 Loggers = $@"{baseFileName}loggers.template.json",
-                LoggersParameters = $@"{baseFileName}loggers.parameters.json",
+                LoggersParameters = "loggers.parameters.json",
                 NamedValues = $@"{baseFileName}namedValues.template.json",
-                NamedValuesParameters = $@"{baseFileName}namedValues.parameters.json",
+                NamedValuesParameters = "namedValues.parameters.json",
                 Tags = $@"{baseFileName}tags.template.json",
-                TagsParameters = $@"{baseFileName}tags.parameters.json",
+                TagsParameters = "tags.parameters.json",
                 Products = $@"{baseFileName}products.template.json",
-                ProductsParameters = $@"{baseFileName}products.parameters.json",
+                ProductsParameters = "products.parameters.json",
                 ProductAPIs = $@"{baseFileName}productAPIs.template.json",
-                ProductAPIsParameters = $@"{baseFileName}productAPIs.parameters.json",
+                ProductAPIsParameters = "productAPIs.parameters.json",
                 Gateway = $@"{baseFileName}gateways.template.json",
-                GatewayParameters = $@"{baseFileName}gateways.parameters.json",
+                GatewayParameters = "gateways.parameters.json",
                 GatewayApi = $@"{baseFileName}gateways-apis.template.json",
-                GatewayApiParameters = $@"{baseFileName}gateways-apis.parameters.json",
+                GatewayApiParameters = "gateways-apis.parameters.json",
                 IdentityProviders = $@"{baseFileName}identity-providers.template.json",
-                IdentityProvidersParameters = $@"{baseFileName}identity-providers.parameters.json",
+                IdentityProvidersParameters = "identity-providers.parameters.json",
                 OpenIdConnectProviders = $@"{baseFileName}openid-connect-providers.template.json",
-                OpenIdConnectProvidersParameters = $@"{baseFileName}openid-connect-providers.parameters.json",
+                OpenIdConnectProvidersParameters = "openid-connect-providers.parameters.json",
                 ApiManagementService = $@"{baseFileName}api-management-service.template.json",
                 TagApi = $@"{baseFileName}apiTags.template.json",
-                TagApiParameters = $@"{baseFileName}apiTags.parameters.json",
+                TagApiParameters = "apiTags.parameters.json",
                 Schema = $@"{baseFileName}schemas.template.json",
-                SchemaParameters = $@"{baseFileName}schemas.parameters.json",
+                SchemaParameters = "schemas.parameters.json",
                 PolicyFragments = $@"{baseFileName}policy-fragments.template.json",
-                PolicyFragmentsParameters = $@"{baseFileName}policy-fragments.parameters.json",
+                PolicyFragmentsParameters = "policy-fragments.parameters.json",
                 Parameters = $@"{baseFileName}parameters.json",
                 LinkedMaster = $@"{baseFileName}master.template.json",
                 Apis = "/Apis",
@@ -64,8 +64,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 RevisionMasterFolder = "/RevisionMasterFolder",
                 GroupAPIsMasterFolder = "/MultipleApisMasterFolder",
                 Groups = $"{baseFileName}groups.template.json",
-                GroupsParameters = $"{baseFileName}groups.parameters.json",
-                ParametersDirectory = "parameters",
+                GroupsParameters = "groups.parameters.json",
+                ParametersDirectory = $"{baseFileName}parameters",
                 BaseFileName = baseFileName
             };
         }
@@ -87,7 +87,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 
         public static string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
-            return singleAPIName == null ? $@"{baseFileName}apis.template.json" : $@"{baseFileName}{singleAPIName}-api.template.json";
+            return $@"{baseFileName}{GenerateApiFileNameBase(singleAPIName)}.template.json";
+        }
+
+        public static string GenerateExtractorAPIParametersFileName(string singleAPIName)
+        {
+            return $@"{GenerateApiFileNameBase(singleAPIName)}.parameters.json";
+        }
+
+        public static string GenerateApiFileNameBase(string singleAPIName) {
+            return singleAPIName == null ? "apis" : $"{singleAPIName}-api";
         }
 
         public static string GenerateOriginalAPIName(string apiName)

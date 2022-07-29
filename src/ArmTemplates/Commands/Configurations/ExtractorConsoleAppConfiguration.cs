@@ -106,6 +106,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "extractIdentityProviders", HelpText = "Extract identity providers from the service if applies")]
         public string ExtractIdentityProviders { get; set; }
 
+        [Option(longName: "parametersOutputDirectoryName ", HelpText = "Parameters output directory parameter, by default its parameters")]
+        public string ParametersOutputDirectoryName { get; set; }
+
         /// <summary>
         /// Api parameter properties for overriding Api OAuth2 scope or/and Service urloverride. Available via extractor-config file only.
         /// </summary>

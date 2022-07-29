@@ -410,6 +410,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             if (apiTemplate?.HasResources() == true)
             {
                 apiTemplate.TypedResources.FileName = FileNameGenerator.GenerateExtractorAPIFileName(singleApiName, this.extractorParameters.FileNames.BaseFileName);
+                apiTemplate.TypedResources.ParametersFileName = FileNameGenerator.GenerateExtractorAPIParametersFileName(singleApiName);
 
                 await FileWriter.SaveAsJsonAsync(
                     apiTemplate,
@@ -480,7 +481,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             Template<PolicyFragmentsResources> policyFragmentsTemplate = null
             )
         {
-            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, apiTemplate.TypedResources.FileName, apiTemplate, mainParametersTemplate);
+
+            this.RenameExistingParametersDirectory(baseFilesGenerationDirectory);
+
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, apiTemplate?.TypedResources.ParametersFileName, apiTemplate, mainParametersTemplate);
             await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.GlobalServicePolicyParameters , policyTemplate, mainParametersTemplate);
             await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ApiVersionSetsParameters, apiVersionSetTemplate, mainParametersTemplate);
             await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ProductsParameters, productsTemplate, mainParametersTemplate);
@@ -517,6 +521,17 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                     directory: Path.Combine(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ParametersDirectory),
                     fileName: fileName);
                 }
+            }
+        }
+
+        void RenameExistingParametersDirectory(string baseDirectoryLocation)
+        {
+            var parametersLocation = Path.Combine(baseDirectoryLocation, this.extractorParameters.FileNames.ParametersDirectory);
+            if (Directory.Exists(parametersLocation))
+            {
+                var creationDateTime = Directory.GetCreationTime(parametersLocation).ToString("yyyyMMddHHmmss");
+                var newParameterDirectory = $"{this.extractorParameters.FileNames.ParametersDirectory}{creationDateTime}";
+                Directory.Move(parametersLocation, Path.Combine(baseDirectoryLocation, newParameterDirectory));
             }
         }
 
