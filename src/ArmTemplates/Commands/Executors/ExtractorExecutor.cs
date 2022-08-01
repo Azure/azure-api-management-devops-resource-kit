@@ -478,10 +478,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             Template<IdentityProviderResources> identityProviderTemplate = null,
             Template<SchemaTemplateResources> schemaTemplate = null,
             Template<OpenIdConnectProviderResources> openIdConnectProviderTemplate = null,
-            Template<PolicyFragmentsResources> policyFragmentsTemplate = null
-            )
+            Template<PolicyFragmentsResources> policyFragmentsTemplate = null)
         {
-
             this.RenameExistingParametersDirectory(baseFilesGenerationDirectory);
 
             await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, apiTemplate?.TypedResources.ParametersFileName, apiTemplate, mainParametersTemplate);

@@ -106,7 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "extractIdentityProviders", HelpText = "Extract identity providers from the service if applies")]
         public string ExtractIdentityProviders { get; set; }
 
-        [Option(longName: "parametersOutputDirectoryName ", HelpText = "Parameters output directory parameter, by default its parameters")]
+        [Option(longName: "parametersOutputDirectoryName ", HelpText = "Parameters output directory name, by default it is \"parameters\"")]
         public string ParametersOutputDirectoryName { get; set; }
 
         /// <summary>
