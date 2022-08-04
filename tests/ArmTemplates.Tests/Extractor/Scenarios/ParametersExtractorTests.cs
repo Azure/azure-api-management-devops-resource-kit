@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
         ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null, IOpenIdConnectProvidersClient openIdConnectProviderClient = null) 
         {
-            var parametersExtractor = new ParametersExtractor(new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient);
+            var parametersExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient);
 
             var loggerExtractor = new LoggerExtractor(
                 this.GetTestLogger<LoggerExtractor>(),
@@ -403,7 +403,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         {
             // arrange
 
-            var parameterExtractor = new ParametersExtractor(new TemplateBuilder(), default, default, default);
+            var parameterExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), default, default, default);
 
             var resourceTemplate = new Template<OpenIdConnectProviderResources>()
             {
