@@ -1035,7 +1035,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 Directory.CreateDirectory(revFileFolder);
                 revList.Add(apiRevisionName);
 
-                await this.GenerateTemplates(revFileFolder, singleApiName: apiRevisionName, generateSingleApiReleaseTemplate: generateSingleApiReleaseTemplate);
+                await this.GenerateTemplates(revFileFolder, singleApiName: apiRevisionName);
+                
+                if (generateSingleApiReleaseTemplate == true)
+                {
+                    await this.GenerateApiReleaseTemplateAsync(apiRevisionName, revFileFolder);
+                }
             }
 
             if (currentRevision is null)
@@ -1066,8 +1071,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             string baseFilesGenerationDirectory,
             string singleApiName = null,
             List<string> multipleApiNames = null,
-            Template<ApiTemplateResources> apiTemplate = null,
-            bool generateSingleApiReleaseTemplate = false)
+            Template<ApiTemplateResources> apiTemplate = null)
         {
             if (!string.IsNullOrEmpty(singleApiName) && !multipleApiNames.IsNullOrEmpty())
             {
@@ -1078,11 +1082,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             // generate different templates using extractors and write to output
             apiTemplate = apiTemplate ?? await this.GenerateApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             
-            if (generateSingleApiReleaseTemplate == true)
-            {
-                await this.GenerateApiReleaseTemplateAsync(singleApiName, baseFilesGenerationDirectory);
-            }
-
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.ApiProducts);

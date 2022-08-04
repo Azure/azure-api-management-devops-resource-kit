@@ -57,10 +57,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             apiTemplates.ElementAt(0).Name.Should().BeEquivalentTo("api1;rev=1");
             apiTemplates.ElementAt(0).ApiNameWithRevision.Should().BeEquivalentTo("api1;rev=1");
-            apiTemplates.ElementAt(0).Properties.LocalIsCurrent.Should().BeTrue();
 
             apiTemplates.ElementAt(1).Name.Should().BeEquivalentTo("api1;rev=2");
-            apiTemplates.ElementAt(1).Properties.LocalIsCurrent.Should().BeNull();
         }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiReleases;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders.Abstractions;
@@ -53,6 +54,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                                         .Build<ApiReleaseTemplateResources>();
 
             var apis = await this.apisClient.GetAllCurrentAsync(extractorParameters);
+
+            if (apis.IsNullOrEmpty())
+            {
+                this.logger.LogWarning($"No current apis were found for '{extractorParameters.SourceApimName}' at '{extractorParameters.ResourceGroup}'");
+                return apiReleasesTemplate;
+            }
 
             foreach (var api in apis)
             {

@@ -13,7 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
     {
         static readonly Regex ExcludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
         static readonly Regex ExcludeOtherFromAlphaNumericsAndHyphensRegex = new Regex("[^a-zA-Z0-9-]");
-        static readonly Regex ValidDeploymentNameRegEx = new Regex("[^-\\w\\._\\(\\)]");
+        static readonly Regex ExcludeOtherFromValidDeploymentNameCharsRegex = new Regex(@"[^-\w\._\(\)]");
 
         public static string GetSubstringBetweenTwoCharacters(char left, char right, string fullString)
         {
@@ -70,13 +70,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
                 return string.Empty;
             }
 
-            var resourceName = ValidDeploymentNameRegEx.Replace(fileName, "-");
+            var resourceName = ExcludeOtherFromValidDeploymentNameCharsRegex.Replace(fileName, "-");
             return resourceName;
         }
 
         public static string GenerateApisResourceId(string apiName)
         {
-            return $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]";
+            return $"[resourceId('{ResourceTypeConstants.API}', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]";
         }
     }
 }

@@ -127,16 +127,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var generalApiTemplateResourcesStorage = new ApiTemplateResources();
 
-            var apiDependencies = new Dictionary<string, string>();
-            if (string.IsNullOrEmpty(extractorParameters.SingleApiName) && extractorParameters.MultipleApiNames.IsNullOrEmpty())
-            {
-                apiDependencies = await this.GenerateApiRevisionDependencyStructure(extractorParameters);
-            }
+            var apiDependencies = await this.GenerateApiRevisionsDependenciesAsync(extractorParameters);
 
             foreach (var apiName in multipleApiNames)
             {
-                string apiDependsOn;
-                apiDependencies.TryGetValue(apiName, out apiDependsOn);
+                apiDependencies.TryGetValue(apiName, out var apiDependsOn);
 
                 var specificApiTemplateResources = await this.GenerateSingleApiTemplateResourcesAsync(apiName, baseFilesGenerationDirectory, extractorParameters, apiDependsOn);
                 generalApiTemplateResourcesStorage.AddResourcesData(specificApiTemplateResources);
@@ -250,11 +245,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         /// Generates dictionary with api and api revisions dependency. 
         /// </summary>
         /// <returns></returns>
-        public async Task<Dictionary<string, string>> GenerateApiRevisionDependencyStructure(ExtractorParameters extractorParameters)
+        async Task<Dictionary<string, string>> GenerateApiRevisionsDependenciesAsync(ExtractorParameters extractorParameters)
         {
-            var apis = await this.apisClient.GetAllCurrentAsync(extractorParameters);
             var apiDependency = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(extractorParameters.SingleApiName) || !extractorParameters.MultipleApiNames.IsNullOrEmpty())
+            {
+                return apiDependency;
+            }
 
+            var apis = await this.apisClient.GetAllCurrentAsync(extractorParameters);
+            
             foreach (var api in apis)
             {
                 string apiName = api.OriginalName;
