@@ -24,22 +24,38 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
             return new FileNames
             {
                 ApiVersionSets = $@"{baseFileName}apiVersionSets.template.json",
+                ApiVersionSetsParameters = "apiVersionSets.parameters.json",
                 AuthorizationServers = $@"{baseFileName}authorizationServers.template.json",
+                AuthorizationServersParameters = "authorizationServers.parameters.json",
                 Backends = $@"{baseFileName}backends.template.json",
+                BackendsParameters = "backends.parameters.json",
                 GlobalServicePolicy = $@"{baseFileName}globalServicePolicy.template.json",
+                GlobalServicePolicyParameters = "globalServicePolicy.parameters.json",
                 Loggers = $@"{baseFileName}loggers.template.json",
+                LoggersParameters = "loggers.parameters.json",
                 NamedValues = $@"{baseFileName}namedValues.template.json",
+                NamedValuesParameters = "namedValues.parameters.json",
                 Tags = $@"{baseFileName}tags.template.json",
+                TagsParameters = "tags.parameters.json",
                 Products = $@"{baseFileName}products.template.json",
+                ProductsParameters = "products.parameters.json",
                 ProductAPIs = $@"{baseFileName}productAPIs.template.json",
+                ProductAPIsParameters = "productAPIs.parameters.json",
                 Gateway = $@"{baseFileName}gateways.template.json",
+                GatewayParameters = "gateways.parameters.json",
                 GatewayApi = $@"{baseFileName}gateways-apis.template.json",
+                GatewayApiParameters = "gateways-apis.parameters.json",
                 IdentityProviders = $@"{baseFileName}identity-providers.template.json",
+                IdentityProvidersParameters = "identity-providers.parameters.json",
                 OpenIdConnectProviders = $@"{baseFileName}openid-connect-providers.template.json",
+                OpenIdConnectProvidersParameters = "openid-connect-providers.parameters.json",
                 ApiManagementService = $@"{baseFileName}api-management-service.template.json",
                 TagApi = $@"{baseFileName}apiTags.template.json",
+                TagApiParameters = "apiTags.parameters.json",
                 Schema = $@"{baseFileName}schemas.template.json",
+                SchemaParameters = "schemas.parameters.json",
                 PolicyFragments = $@"{baseFileName}policy-fragments.template.json",
+                PolicyFragmentsParameters = "policy-fragments.parameters.json",
                 Parameters = $@"{baseFileName}parameters.json",
                 LinkedMaster = $@"{baseFileName}master.template.json",
                 Apis = "/Apis",
@@ -48,6 +64,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 RevisionMasterFolder = "/RevisionMasterFolder",
                 GroupAPIsMasterFolder = "/MultipleApisMasterFolder",
                 Groups = $"{baseFileName}groups.template.json",
+                GroupsParameters = "groups.parameters.json",
+                ParametersDirectory = $"{baseFileName}parameters",
                 BaseFileName = baseFileName
             };
         }
@@ -69,7 +87,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 
         public static string GenerateExtractorAPIFileName(string singleAPIName, string baseFileName)
         {
-            return singleAPIName == null ? $@"{baseFileName}apis.template.json" : $@"{baseFileName}{singleAPIName}-api.template.json";
+            return $@"{baseFileName}{GenerateApiFileNameBase(singleAPIName)}.template.json";
+        }
+
+        public static string GenerateExtractorAPIParametersFileName(string singleAPIName)
+        {
+            return $@"{GenerateApiFileNameBase(singleAPIName)}.parameters.json";
+        }
+
+        public static string GenerateApiFileNameBase(string singleAPIName) {
+            return singleAPIName == null ? "apis" : $"{singleAPIName}-api";
         }
 
         public static string GenerateOriginalAPIName(string apiName)
