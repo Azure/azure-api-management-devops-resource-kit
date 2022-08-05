@@ -18,6 +18,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Nam
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors
 {
@@ -27,13 +28,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly IApisClient apisClient;
         readonly IIdentityProviderClient identityProviderClient;
         readonly IOpenIdConnectProvidersClient openIdConnectProviderClient;
+        readonly ILogger<ParametersExtractor> logger;
 
         public ParametersExtractor(
+            ILogger<ParametersExtractor> logger,
             ITemplateBuilder templateBuilder,
             IApisClient apisClient,
             IIdentityProviderClient identityProviderClient,
             IOpenIdConnectProvidersClient openIdConnectProviderClient)
         {
+            this.logger = logger;
             this.templateBuilder = templateBuilder;
             this.apisClient = apisClient;
             this.identityProviderClient = identityProviderClient;
@@ -266,6 +270,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 parameters.Add(ParameterNames.BackendSettings, new TemplateObjectParameterProperties() { Value = backendResources.BackendNameParametersCache });
             }
 
+            return parametersTemplate;
+        }
+
+        public Template CreateResourceTemplateParameterTemplate(Template resourceTemplate, Template mainParameterTemplate)
+        {
+            var parametersTemplate = this.templateBuilder
+                .GenerateEmptyTemplate()
+                .Build();
+            parametersTemplate.Parameters = new();
+            var parameters = parametersTemplate.Parameters;
+
+            if (resourceTemplate?.Parameters.IsNullOrEmpty() != true)
+            {
+                foreach (var parameterKey in resourceTemplate.Parameters.Keys)
+                {
+                    if (!mainParameterTemplate.Parameters.ContainsKey(parameterKey)) 
+                    {
+                        this.logger.LogWarning($"Parameter {parameterKey} were not found in main parameters template");
+                        continue;
+                    }
+                    
+                    var parameterValue = mainParameterTemplate.Parameters[parameterKey];
+                    parameters.Add(parameterKey, parameterValue);
+                }
+            }
+            
             return parametersTemplate;
         }
     }

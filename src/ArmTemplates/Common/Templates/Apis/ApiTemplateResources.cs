@@ -19,6 +19,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
     {
         public string FileName { get; set; }
 
+        public string ParametersFileName { get; set; }
+
         public List<ApiTemplateResource> Apis { get; set; } = new();
 
         public List<ApiSchemaTemplateResource> ApiSchemas { get; set; } = new();

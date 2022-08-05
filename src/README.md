@@ -447,6 +447,7 @@ You have two choices when specifying your settings:
 | apiParameters  | No                    | Parameterize api parameters (Oauth2 Scope/Service Url) values for APIs in advance.  |
 | exctractSecrets  | No                    | By default false. If set to "true" secrets will be extracted as well and parameters templated will be supplied with actual secret values. Currently applies to identityProvider service.  |
 | extractIdentityProviders | No | By default false. Set to true will attempt to extract the identity providers from service. |
+| parametersOutputDirectoryName | No | If set will redefine the output folder name for parameters. By default will be equal to {service-name}-parameters |
 
 
 #### Note

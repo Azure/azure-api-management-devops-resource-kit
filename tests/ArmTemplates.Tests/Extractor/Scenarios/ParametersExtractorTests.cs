@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
         ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null, IOpenIdConnectProvidersClient openIdConnectProviderClient = null) 
         {
-            var parametersExtractor = new ParametersExtractor(new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient);
+            var parametersExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient);
 
             var loggerExtractor = new LoggerExtractor(
                 this.GetTestLogger<LoggerExtractor>(),
@@ -324,6 +324,113 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             secretValueParameterValues.Should().ContainKey(ParameterNames.IdentityProvidersSecretValues);
             secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues].Should().ContainKey("originalNameIdentityProvider");
             secretValueParameterValues[ParameterNames.IdentityProvidersSecretValues]["originalNameIdentityProvider"].Should().Be(string.Empty);
+        }
+
+        [Fact]
+        public async Task GenerateResourceParametersFiles_ProperlyGeneratesRenmaesAndCreatesNewDirectoryWithParameterFile_GivenItsCalledTwice()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateResourceParametersFiles_ProperlyGeneratesRenmaesAndCreatesNewDirectoryWithParameterFile_GivenItsCalledTwice));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var resourceTemplate = new Template<OpenIdConnectProviderResources>()
+            {
+                Parameters = new Dictionary<string, TemplateParameterProperties>() {
+                    { "parameter1", new () },
+                    { "parameter2", new () }
+                },
+                TypedResources = new OpenIdConnectProviderResources()
+                {
+                    OpenIdConnectProviders = new List<OpenIdConnectProviderResource>()
+                    {
+                        new(),
+                        new(),
+                    }
+                }
+            };
+
+            var mainParameterTemplate = new Template()
+            {
+                Parameters = new Dictionary<string, TemplateParameterProperties>() {
+                    { "parameter1", new () },
+                    { "parameter2", new () },
+                    { "parameter3", new () },
+                    { "parameter4", new () },
+                    { "parameter5", new () },
+                }
+            };
+
+            // act
+            await extractorExecutor.GenerateResourceParametersFiles(currentTestDirectory, mainParameterTemplate, openIdConnectProviderTemplate: resourceTemplate);
+            Directory.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ParametersDirectory)).Should().BeTrue();
+            var creationDateTime = Directory.GetCreationTime(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ParametersDirectory)).ToString("yyyyMMddHHmmss");
+
+            await extractorExecutor.GenerateResourceParametersFiles(currentTestDirectory, mainParameterTemplate, openIdConnectProviderTemplate: resourceTemplate);
+            Directory.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ParametersDirectory)).Should().BeTrue();
+            Directory.Exists(Path.Combine(currentTestDirectory, $"{extractorParameters.FileNames.ParametersDirectory}{creationDateTime}")).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GenerateResourceParametersFile_DoesNotRaiseException_GivenNullFilenames()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateResourceParametersFile_DoesNotRaiseException_GivenNullFilenames));
+            var parameterFileName = "filename.json";
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var resourceTemplate = new Template<OpenIdConnectProviderResources>()
+            {
+                Parameters = new Dictionary<string, TemplateParameterProperties>() {
+                    { "parameter1", new () },
+                    { "parameter2", new () }
+                }
+            };
+
+            // act
+            await extractorExecutor.GenerateResourceParametersFile(parameterFileName, null, resourceTemplate, null);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ParametersDirectory, parameterFileName)).Should().BeFalse();
+        }
+
+        [Fact]
+        public void CreateResourceTemplateParameterTemplate_ProperlyGeneratesTemplate_WithFilteredParameters()
+        {
+            // arrange
+
+            var parameterExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), default, default, default);
+
+            var resourceTemplate = new Template<OpenIdConnectProviderResources>()
+            {
+                Parameters = new Dictionary<string, TemplateParameterProperties>() {
+                    { "parameter1", new () },
+                    { "parameter2", new () }
+                }
+            };
+
+            var mainParameterTemplate = new Template()
+            {
+                Parameters = new Dictionary<string, TemplateParameterProperties>() {
+                    { "parameter1", new () },
+                    { "parameter2", new () },
+                    { "parameter3", new () },
+                    { "parameter4", new () },
+                    { "parameter5", new () },
+                }
+            };
+
+            // act
+            var resourceTemplateParameterTemplate = parameterExtractor.CreateResourceTemplateParameterTemplate(resourceTemplate, mainParameterTemplate);
+
+            // assert
+            resourceTemplateParameterTemplate.Parameters.Should().HaveCount(2);
+            resourceTemplateParameterTemplate.Parameters["parameter1"].Should().NotBeNull();
+            resourceTemplateParameterTemplate.Parameters["parameter2"].Should().NotBeNull();
         }
     }
 }
