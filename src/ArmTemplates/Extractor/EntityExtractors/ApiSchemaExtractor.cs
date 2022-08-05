@@ -6,6 +6,7 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiSchemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -38,7 +39,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiSchema.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiSchemaOriginalName}')]";
                 apiSchema.Type = ResourceTypeConstants.APISchema;
                 apiSchema.ApiVersion = GlobalConstants.ApiVersion;
-                apiSchema.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
+                apiSchema.DependsOn = new string[] { NamingHelper.GenerateApisResourceId(apiName) };
 
                 apiSchemaResources.ApiSchemas.Add(apiSchema);
             }

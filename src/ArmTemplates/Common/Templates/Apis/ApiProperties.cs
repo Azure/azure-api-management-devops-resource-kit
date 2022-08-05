@@ -3,6 +3,8 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using Newtonsoft.Json;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis
 {
     public class ApiProperties
@@ -20,6 +22,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public string ApiVersion { get; set; }
 
         public bool? IsCurrent { get; set; }
+
+        public bool? IsOnline { get; set; }
 
         public string ApiRevisionDescription { get; set; }
 

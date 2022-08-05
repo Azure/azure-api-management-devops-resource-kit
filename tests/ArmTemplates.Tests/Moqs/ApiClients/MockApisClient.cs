@@ -4,9 +4,12 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
@@ -58,12 +61,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
         public static IApisClient GetMockedApiClientWithDefaultValues()
         {
-            var mockServiceApiProductsApiClient = new Mock<IApisClient>(MockBehavior.Strict);
+            var mockedApisClient = new Mock<IApisClient>(MockBehavior.Strict);
 
             var serviceProperties1 = GetMockedServiceApiProperties1();
             var serviceProperties2 = GetMockedServiceApiProperties2();
 
-            mockServiceApiProductsApiClient
+            mockedApisClient
                 .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((ExtractorParameters _) => new List<ApiTemplateResource>
                 {
@@ -82,7 +85,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     },
                 });
 
-            mockServiceApiProductsApiClient
+            mockedApisClient
+                .Setup(x => x.GetAllCurrentAsync(It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((ExtractorParameters _) => new List<ApiTemplateResource>
+                {
+                });
+
+            mockedApisClient
                 .Setup(x => x.GetAllLinkedToGatewayAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((string gatewayName, ExtractorParameters _) => new List<ApiTemplateResource>
                 {
@@ -101,7 +110,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     },
                 });
 
-            mockServiceApiProductsApiClient
+            mockedApisClient
                 .Setup(x => x.GetSingleAsync(It.Is<string>((o => o.Equals(ServiceApiName1))), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((string _, ExtractorParameters _) => new ApiTemplateResource
                 {
@@ -110,7 +119,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     Properties = serviceProperties1
                 });
 
-            mockServiceApiProductsApiClient
+            mockedApisClient
                 .Setup(x => x.GetSingleAsync(It.Is<string>((o => o.Equals(ServiceApiName2))), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((string _, ExtractorParameters _) => new ApiTemplateResource
                 {
@@ -119,7 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     Properties = serviceProperties2
                 });
 
-            mockServiceApiProductsApiClient
+            mockedApisClient
                 .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((string productName, ExtractorParameters _) => new List<ApiTemplateResource>
                 {
@@ -138,7 +147,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     }
                 });
 
-            return mockServiceApiProductsApiClient.Object;
+            return mockedApisClient.Object;
+        }
+
+        public static async Task<IApisClient> GetMockedHttpApiClient(string responseFileLocation)
+        {
+            var apiDataProcessor = new ApiDataProcessor();
+            var mockedClient = new Mock<ApisClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), apiDataProcessor);
+            MockClientUtils.MockAuthOfApiClient(mockedClient);
+
+            return mockedClient.Object;
         }
     }
 }

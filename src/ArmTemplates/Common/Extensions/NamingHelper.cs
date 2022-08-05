@@ -5,6 +5,7 @@
 
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions
 {
@@ -12,6 +13,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
     {
         static readonly Regex ExcludeOtherFromLettersAndDigitsRegex = new Regex("[^a-zA-Z0-9]");
         static readonly Regex ExcludeOtherFromAlphaNumericsAndHyphensRegex = new Regex("[^a-zA-Z0-9-]");
+
+        // ValidDeployment name is the string following the pattern: '^[-\w\._\(\)]+$'. https://docs.microsoft.com/en-us/rest/api/resources/deployments/create-or-update?tabs=HTTP#uri-parameters
+        // ExcludeOtherFromValidDeploymentNameCharsRegex matches any character other than [alphanumerics + '-' + '.' + '(' + ')' + '_'];
+        // Example: 'template;rev=1.json' string will match the ';' and '=' chars
+        static readonly Regex ExcludeOtherFromValidDeploymentNameCharsRegex = new Regex(@"[^-\w\._\(\)]"); 
 
         public static string GetSubstringBetweenTwoCharacters(char left, char right, string fullString)
         {
@@ -59,6 +65,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extension
         public static string GenerateParametrizedResourceName(string parameterName, string resourceName)
         {
             return $"[concat(parameters('{parameterName}'), '/{resourceName}')]";
+        }
+
+        public static string GenerateValidDeploymentFileName(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return string.Empty;
+            }
+
+            var resourceName = ExcludeOtherFromValidDeploymentNameCharsRegex.Replace(fileName, "-");
+            return resourceName;
+        }
+
+        public static string GenerateApisResourceId(string apiName)
+        {
+            return $"[resourceId('{ResourceTypeConstants.API}', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]";
         }
     }
 }

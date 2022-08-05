@@ -80,7 +80,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiTagOriginalName}')]";
                 apiTag.ApiVersion = GlobalConstants.ApiVersion;
                 apiTag.Scale = null;
-                apiTag.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
+                apiTag.DependsOn = new string[] { NamingHelper.GenerateApisResourceId(apiName) };
 
                 templateResources.Add(apiTag);
             }

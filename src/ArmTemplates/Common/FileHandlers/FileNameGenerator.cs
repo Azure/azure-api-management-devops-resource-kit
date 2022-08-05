@@ -3,6 +3,8 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers
 {
     public static class FileNameGenerator
@@ -56,6 +58,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 SchemaParameters = "schemas.parameters.json",
                 PolicyFragments = $@"{baseFileName}policy-fragments.template.json",
                 PolicyFragmentsParameters = "policy-fragments.parameters.json",
+                ApiRelease = $@"{baseFileName}api-release.template.json",
+                ApiReleaseParameters = $@"api-release.parameters.json",
                 Parameters = $@"{baseFileName}parameters.json",
                 LinkedMaster = $@"{baseFileName}master.template.json",
                 Apis = "/Apis",
@@ -96,7 +100,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
         }
 
         public static string GenerateApiFileNameBase(string singleAPIName) {
-            return singleAPIName == null ? "apis" : $"{singleAPIName}-api";
+            return singleAPIName == null ? "apis" : $"{NamingHelper.GenerateValidDeploymentFileName(singleAPIName)}-api";
         }
 
         public static string GenerateOriginalAPIName(string apiName)

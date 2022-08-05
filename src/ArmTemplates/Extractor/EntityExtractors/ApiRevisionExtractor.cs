@@ -25,7 +25,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly ILogger<ApiRevisionExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
 
-        readonly IApisClient apisClient;
         readonly IApiRevisionClient apiRevisionClient;
 
         readonly IApiExtractor apiExtractor;
@@ -34,13 +33,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             ILogger<ApiRevisionExtractor> logger,
             ITemplateBuilder templateBuilder,
             IApiExtractor apiExtractor,
-            IApisClient apisClient,
             IApiRevisionClient apiRevisionClient)
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
 
-            this.apisClient = apisClient;
             this.apiRevisionClient = apiRevisionClient;
 
             this.apiExtractor = apiExtractor;
@@ -84,59 +81,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     var apiResources = await this.apiExtractor.GenerateSingleApiTemplateResourcesAsync(curApi, baseFilesGenerationDirectory, extractorParameters);
                     var apiResource = apiResources.Apis.FirstOrDefault();
-                    apiResource.DependsOn = new[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{extractorParameters.SingleApiName}')]" };
+                    apiResource.DependsOn = new[] { NamingHelper.GenerateApisResourceId(extractorParameters.SingleApiName) };
 
                     apiRevisionTemplate.TypedResources.AddResourcesData(apiResources);
                 }
             }
 
             return apiRevisionTemplate;
-        }
-
-        async Task<ApiTemplateResources> GenerateCurrentRevisionApiTemplateResourcesAsync(string apiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters)
-        {
-            var apiTemplateResources = new ApiTemplateResources();
-
-            // gets the current revision of this api and will remove "isCurrent" paramter
-            var versionedApiResource = await this.GenerateApiTemplateResourceAsVersioned(apiName, extractorParameters);
-
-            apiTemplateResources.Apis.Add(versionedApiResource);
-            var relatedTemplateResources = await this.apiExtractor.GetApiRelatedTemplateResourcesAsync(apiName, baseFilesGenerationDirectory, extractorParameters);
-            apiTemplateResources.AddResourcesData(relatedTemplateResources);
-
-            return apiTemplateResources;
-        }
-
-        async Task<ApiTemplateResource> GenerateApiTemplateResourceAsVersioned(string apiName, ExtractorParameters extractorParameters)
-        {
-            var apiDetails = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
-
-            apiDetails.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}')]";
-            apiDetails.ApiVersion = GlobalConstants.ApiVersion;
-            apiDetails.Scale = null;
-            apiDetails.Properties.IsCurrent = null;
-
-            if (extractorParameters.ParameterizeServiceUrl)
-            {
-                apiDetails.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
-            }
-
-            if (apiDetails.Properties.ApiVersionSetId != null)
-            {
-                apiDetails.DependsOn = Array.Empty<string>();
-
-                string versionSetName = apiDetails.Properties.ApiVersionSetId;
-                int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
-
-                versionSetName = versionSetName.Substring(versionSetPosition, versionSetName.Length - versionSetPosition);
-                apiDetails.Properties.ApiVersionSetId = $"[concat(resourceId('Microsoft.ApiManagement/service', parameters('{ParameterNames.ApimServiceName}')), '/{versionSetName}')]";
-            }
-            else
-            {
-                apiDetails.DependsOn = Array.Empty<string>();
-            }
-
-            return apiDetails;
         }
     }
 }

@@ -139,7 +139,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             apiPolicy.ApiVersion = GlobalConstants.ApiVersion;
             apiPolicy.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiPolicyOriginalName}')]";
-            apiPolicy.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis', parameters('{ParameterNames.ApimServiceName}'), '{apiName}')]" };
+            apiPolicy.DependsOn = new string[] { NamingHelper.GenerateApisResourceId(apiName) };
 
             // write policy xml content to file and point to it if policyXMLBaseUrl is provided
             if (extractorParameters.PolicyXMLBaseUrl is not null)

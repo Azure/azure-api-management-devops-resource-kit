@@ -33,6 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly IProductApisExtractor productApisExtractor;
         readonly ITagExtractor tagExtractor;
         readonly IApiOperationExtractor apiOperationExtractor;
+        readonly IApiRevisionClient apiRevisionClient;
 
         public ApiExtractor(
             ILogger<ApiExtractor> logger,
@@ -43,7 +44,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             IPolicyExtractor policyExtractor,
             IProductApisExtractor productApisExtractor,
             ITagExtractor tagExtractor,
-            IApiOperationExtractor apiOperationExtractor)
+            IApiOperationExtractor apiOperationExtractor,
+            IApiRevisionClient apiRevisionClient)
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
@@ -56,6 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             this.productApisExtractor = productApisExtractor;
             this.tagExtractor = tagExtractor;
             this.apiOperationExtractor = apiOperationExtractor;
+            this.apiRevisionClient = apiRevisionClient;
         }
 
         public async Task<Template<ApiTemplateResources>> GenerateApiTemplateAsync(
@@ -94,7 +97,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return apiTemplate;
         }
 
-        public async Task<ApiTemplateResources> GenerateSingleApiTemplateResourcesAsync(string singleApiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters)
+        public async Task<ApiTemplateResources> GenerateSingleApiTemplateResourcesAsync(string singleApiName, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters, string apiDepends = null)
         {
             var apiTemplateResources = await this.GetApiRelatedTemplateResourcesAsync(singleApiName, baseFilesGenerationDirectory, extractorParameters);
 
@@ -108,7 +111,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
 
                 this.logger.LogInformation("{0} API data found ...", singleApiName);
-                this.SetArmTemplateValuesToApiTemplateResource(apiResource, extractorParameters);
+                this.SetArmTemplateValuesToApiTemplateResource(singleApiName, apiResource, extractorParameters, apiDepends);
                 apiTemplateResources.Apis.Add(apiResource);
             }
             catch (Exception ex)
@@ -123,50 +126,55 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         async Task<ApiTemplateResources> GenerateMultipleApisTemplateAsync(List<string> multipleApiNames, string baseFilesGenerationDirectory, ExtractorParameters extractorParameters)
         {
             var generalApiTemplateResourcesStorage = new ApiTemplateResources();
+
+            var apiDependencies = await this.GenerateApiRevisionsDependenciesAsync(extractorParameters);
+
             foreach (var apiName in multipleApiNames)
             {
-                var specificApiTemplateResources = await this.GenerateSingleApiTemplateResourcesAsync(apiName, baseFilesGenerationDirectory, extractorParameters);
+                apiDependencies.TryGetValue(apiName, out var apiDependsOn);
+
+                var specificApiTemplateResources = await this.GenerateSingleApiTemplateResourcesAsync(apiName, baseFilesGenerationDirectory, extractorParameters, apiDependsOn);
                 generalApiTemplateResourcesStorage.AddResourcesData(specificApiTemplateResources);
             }
 
             return generalApiTemplateResourcesStorage;
         }
 
-        void SetArmTemplateValuesToApiTemplateResource(ApiTemplateResource apiResource, ExtractorParameters extractorParameters)
+        void SetArmTemplateValuesToApiTemplateResource(string apiName, ApiTemplateResource apiResource, ExtractorParameters extractorParameters, string apiDepends = null)
         {
-            var originalServiceApiName = apiResource.Name;
-
-            apiResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalServiceApiName}')]";
+            apiResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}')]";
             apiResource.ApiVersion = GlobalConstants.ApiVersion;
             apiResource.Scale = null;
+            apiResource.DependsOn = Array.Empty<string>();
+            var apiResourceDepends = new List<string>();
+
+            if (!string.IsNullOrEmpty(apiDepends)) {
+                apiResourceDepends.Add(NamingHelper.GenerateApisResourceId(apiDepends));
+            }
 
             if (extractorParameters.ParameterizeServiceUrl)
             {
-                apiResource.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{NamingHelper.GenerateValidParameterName(originalServiceApiName, ParameterPrefix.Api)}]";
+                apiResource.Properties.ServiceUrl = $"[parameters('{ParameterNames.ServiceUrl}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}]";
             }
 
             if (extractorParameters.ParametrizeApiOauth2Scope)
             {
                 if (apiResource.Properties.AuthenticationSettings?.OAuth2?.Scope is not null)
                 {
-                    apiResource.Properties.AuthenticationSettings.OAuth2.Scope = $"[parameters('{ParameterNames.ApiOauth2ScopeSettings}').{NamingHelper.GenerateValidParameterName(originalServiceApiName, ParameterPrefix.ApiOauth2Scope)}]";
+                    apiResource.Properties.AuthenticationSettings.OAuth2.Scope = $"[parameters('{ParameterNames.ApiOauth2ScopeSettings}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.ApiOauth2Scope)}]";
                 }
             }
 
             if (apiResource.Properties.ApiVersionSetId != null)
             {
-                apiResource.DependsOn = Array.Empty<string>();
-
                 string versionSetName = apiResource.Properties.ApiVersionSetId;
                 int versionSetPosition = versionSetName.IndexOf("apiVersionSets/");
 
                 versionSetName = versionSetName.Substring(versionSetPosition, versionSetName.Length - versionSetPosition);
                 apiResource.Properties.ApiVersionSetId = $"[concat(resourceId('Microsoft.ApiManagement/service', parameters('{ParameterNames.ApimServiceName}')), '/{versionSetName}')]";
             }
-            else
-            {
-                apiResource.DependsOn = Array.Empty<string>();
-            }
+
+            apiResource.DependsOn = apiResourceDepends.ToArray();
         }
 
         /// <summary>
@@ -231,6 +239,45 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             return apiTemplateResources;
+        }
+
+        /// <summary>
+        /// Generates dictionary with api and api revisions dependency. 
+        /// </summary>
+        /// <returns></returns>
+        async Task<Dictionary<string, string>> GenerateApiRevisionsDependenciesAsync(ExtractorParameters extractorParameters)
+        {
+            var apiDependency = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(extractorParameters.SingleApiName) || !extractorParameters.MultipleApiNames.IsNullOrEmpty())
+            {
+                return apiDependency;
+            }
+
+            var apis = await this.apisClient.GetAllCurrentAsync(extractorParameters);
+
+            if (apis.IsNullOrEmpty())
+            {
+                this.logger.LogWarning($"No current apis were found for '{extractorParameters.SourceApimName}' at '{extractorParameters.ResourceGroup}'");
+                return apiDependency;
+            }
+
+            foreach (var api in apis)
+            {
+                string apiName = api.OriginalName;
+                var apiRevisions = await this.apiRevisionClient.GetApiRevisionsAsync(apiName, extractorParameters);
+
+                foreach (var apiRevision in apiRevisions)
+                {
+                    if (apiRevision.IsCurrent)
+                    {
+                        continue;
+                    }
+
+                    apiDependency.Add(apiRevision.ApiId.Split("/")[2], api.Name);
+                }
+            }
+
+            return apiDependency;
         }
     }
 }

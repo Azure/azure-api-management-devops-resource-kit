@@ -66,6 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var mockedTagClient = MockTagClient.GetMockedApiClientWithDefaultValues();
             var mockedApiOperationClient = MockApiOperationClient.GetMockedApiClientWithDefaultValues();
             var mockedDiagnosticClient = MockDiagnosticClient.GetMockedClientWithApiDependentValues();
+            var mockedRevisionClient = MockApisRevisionsClient.GetMockedApiRevisionClientWithDefaultValues();
 
             // mocked extractors
             var mockedDiagnosticExtractor = new DiagnosticExtractor(this.GetTestLogger<DiagnosticExtractor>(), mockedDiagnosticClient);
@@ -84,7 +85,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 mockedPolicyExtractor,
                 mockedProductApisExtractor,
                 mockedTagExtractor,
-                mockedApiOperationExtractor);
+                mockedApiOperationExtractor,
+                mockedRevisionClient
+                );
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
@@ -184,6 +187,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var mockedTagClient = MockTagClient.GetMockedApiClientWithDefaultValues();
             var mockedApiOperationClient = MockApiOperationClient.GetMockedApiClientWithDefaultValues();
             var mockedDiagnosticClient = MockDiagnosticClient.GetMockedClientWithApiDependentValues();
+            var mockedRevisionClient = MockApisRevisionsClient.GetMockedApiRevisionClientWithDefaultValues();
 
             // mocked extractors
             var mockedDiagnosticExtractor = new DiagnosticExtractor(this.GetTestLogger<DiagnosticExtractor>(), mockedDiagnosticClient);
@@ -202,7 +206,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 mockedPolicyExtractor,
                 mockedProductApisExtractor,
                 mockedTagExtractor,
-                mockedApiOperationExtractor);
+                mockedApiOperationExtractor,
+                mockedRevisionClient);
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),

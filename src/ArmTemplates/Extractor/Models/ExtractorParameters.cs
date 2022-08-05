@@ -107,7 +107,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.PolicyXMLBaseUrl = extractorConfig.PolicyXMLBaseUrl;
             this.PolicyXMLSasToken = extractorConfig.PolicyXMLSasToken;
             this.ApiVersionSetName = extractorConfig.ApiVersionSetName;
-            this.IncludeAllRevisions = extractorConfig.IncludeAllRevisions != null && extractorConfig.IncludeAllRevisions.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ParameterizeNamedValue = extractorConfig.ParamNamedValue != null && extractorConfig.ParamNamedValue.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ParameterizeApiLoggerId = extractorConfig.ParamApiLoggerId != null && extractorConfig.ParamApiLoggerId.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ParameterizeLogResourceId = extractorConfig.ParamLogResourceId != null && extractorConfig.ParamLogResourceId.Equals("true", StringComparison.OrdinalIgnoreCase);
