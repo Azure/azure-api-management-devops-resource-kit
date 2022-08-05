@@ -484,7 +484,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             Template<IdentityProviderResources> identityProviderTemplate = null,
             Template<SchemaTemplateResources> schemaTemplate = null,
             Template<OpenIdConnectProviderResources> openIdConnectProviderTemplate = null,
-            Template<PolicyFragmentsResources> policyFragmentsTemplate = null)
+            Template<PolicyFragmentsResources> policyFragmentsTemplate = null,
+            Template<ApiReleaseTemplateResources> apiReleaseTemplate = null)
         {
             this.RenameExistingParametersDirectory(baseFilesGenerationDirectory);
 
@@ -504,6 +505,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.SchemaParameters, schemaTemplate, mainParametersTemplate);
             await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.OpenIdConnectProvidersParameters, openIdConnectProviderTemplate, mainParametersTemplate);
             await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.PolicyFragmentsParameters, policyFragmentsTemplate, mainParametersTemplate);
+            await this.GenerateResourceParametersFile(baseFilesGenerationDirectory, this.extractorParameters.FileNames.ApiReleaseParameters, apiReleaseTemplate, mainParametersTemplate);
         }
 
         public async Task GenerateResourceParametersFile<TTemplateResource>(string baseFilesGenerationDirectory, string fileName, Template<TTemplateResource> resourceTemplate, Template mainParametersTemplate) where TTemplateResource : ITemplateResources, new()
@@ -1171,10 +1173,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var openIdConnectProviderTemplate = await this.GenerateOpenIdConnectProviderTemplateAsync(baseFilesGenerationDirectory);
             var schemasTempate = await this.GenerateSchemasTemplateAsync(baseFilesGenerationDirectory);
             var policyFragmentTemplate = await this.GeneratePolicyFragmentsTemplateAsync(apiTemplate.TypedResources.GetAllPolicies(), baseFilesGenerationDirectory);
+            var apiReleasesTemplate = await this.GenerateApiReleasesTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
-            await this.GenerateApiReleasesTemplateAsync(baseFilesGenerationDirectory);
+            
             var parametersTemplate = await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, openIdConnectProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
             await this.GenerateResourceParametersFiles(
@@ -1195,7 +1198,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 identityProviderTemplate: identityProviderTemplate,
                 openIdConnectProviderTemplate: openIdConnectProviderTemplate,
                 schemaTemplate: schemasTempate,
-                policyFragmentsTemplate: policyFragmentTemplate);
+                policyFragmentsTemplate: policyFragmentTemplate,
+                apiReleaseTemplate: apiReleasesTemplate);
 
             await this.GenerateMasterTemplateAsync(
                 baseFilesGenerationDirectory,

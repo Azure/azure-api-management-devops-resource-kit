@@ -59,6 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 PolicyFragments = $@"{baseFileName}policy-fragments.template.json",
                 PolicyFragmentsParameters = "policy-fragments.parameters.json",
                 ApiRelease = $@"{baseFileName}api-release.template.json",
+                ApiReleaseParameters = $@"api-release.parameters.json",
                 Parameters = $@"{baseFileName}parameters.json",
                 LinkedMaster = $@"{baseFileName}master.template.json",
                 Apis = "/Apis",

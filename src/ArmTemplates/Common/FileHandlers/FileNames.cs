@@ -79,6 +79,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 
         public string ApiRelease { get; set; }
 
+        public string ApiReleaseParameters { get; set; }
+
         public string Parameters { get; set; }
         
         // linked property outputs 1 master template
