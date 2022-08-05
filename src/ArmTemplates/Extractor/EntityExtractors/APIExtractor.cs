@@ -254,7 +254,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             var apis = await this.apisClient.GetAllCurrentAsync(extractorParameters);
-            
+
+            if (apis.IsNullOrEmpty())
+            {
+                this.logger.LogWarning($"No current apis were found for '{extractorParameters.SourceApimName}' at '{extractorParameters.ResourceGroup}'");
+                return apiDependency;
+            }
+
             foreach (var api in apis)
             {
                 string apiName = api.OriginalName;

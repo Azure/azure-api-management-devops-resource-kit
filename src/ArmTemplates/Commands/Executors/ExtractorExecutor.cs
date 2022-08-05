@@ -1037,7 +1037,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
                 await this.GenerateTemplates(revFileFolder, singleApiName: apiRevisionName);
                 
-                if (generateSingleApiReleaseTemplate == true)
+                if (generateSingleApiReleaseTemplate)
                 {
                     await this.GenerateApiReleaseTemplateAsync(apiRevisionName, revFileFolder);
                 }

@@ -28,10 +28,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
         public void ProcessSingleData(ApiTemplateResource api)
         {
             api.OriginalName = api.Name;
-            var isCurent = api.Properties.IsCurrent;
+            var isCurrent = api.Properties.IsCurrent;
             api.Properties.IsCurrent = null;
 
-            if (isCurent == true && !string.IsNullOrEmpty(api.Properties.ApiRevision))
+            if (isCurrent == true && !string.IsNullOrEmpty(api.Properties.ApiRevision))
             {
                 api.ApiNameWithRevision = $"{api.Name};rev={api.Properties.ApiRevision}";
                 if (!api.Name.Contains($";rev={api.Properties.ApiRevision}"))
