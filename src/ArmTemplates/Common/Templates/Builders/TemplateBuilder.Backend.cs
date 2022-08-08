@@ -21,6 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
                     Type = "object"
                 };
                 this.template.Parameters.Add(ParameterNames.BackendSettings, extractBackendParametersProperties);
+                this.template.Parameters.Add(ParameterNames.BackendProxy, extractBackendParametersProperties);
             }
 
             return this;
