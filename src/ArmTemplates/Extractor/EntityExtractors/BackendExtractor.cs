@@ -142,7 +142,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         
                         if (!backendTemplate.TypedResources.BackendProxyParametersCache.ContainsKey(backendProxyParameterName))
                         {
-                            var backendProxyParameters = new BackendProxyParameters()
+                            var backendProxyParameters = new BackendProxyParameters
                             {
                                 Url = backendResource.Properties.Proxy.Url,
                                 Username = backendResource.Properties.Proxy.Username,
