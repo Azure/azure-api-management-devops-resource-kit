@@ -25,14 +25,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
             };
         }
 
-        public void ProcessData(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters)
+        public void ProcessDataAllGroups(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters)
+        {
+            this.OverrideNames(groupTemplates, extractorParameters);
+            if (extractorParameters.ExcludeBuildInGroups)
+            {
+                groupTemplates.RemoveAll(x => x.Properties.BuiltIn);
+            }
+        }
+
+        public void ProcessDataProductLinkedGroups(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters)
+        {
+            this.OverrideNames(groupTemplates, extractorParameters);
+        }
+
+        void OverrideNames(List<GroupTemplateResource> groupTemplates, ExtractorParameters extractorParameters)
         {
             if (groupTemplates.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var groupTemplate in groupTemplates) 
+            foreach (var groupTemplate in groupTemplates)
             {
                 groupTemplate.OriginalName = groupTemplate.Name;
                 groupTemplate.NewName = groupTemplate.Name;
@@ -44,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
             }
         }
 
-        public void OverrideName(GroupTemplateResource template)
+        void OverrideName(GroupTemplateResource template)
         {
             if (this.OverrideRules.IsNullOrEmpty())
             {

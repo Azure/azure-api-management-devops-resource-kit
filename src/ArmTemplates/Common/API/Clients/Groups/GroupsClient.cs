@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var groupTemplates = await this.GetPagedResponseAsync<GroupTemplateResource>(azToken, requestUrl);
-            this.groupDataProcessor.ProcessData(groupTemplates, extractorParameters);
+            this.groupDataProcessor.ProcessDataAllGroups(groupTemplates, extractorParameters);
 
             return groupTemplates;
         }
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
             var groupTemplates = await this.GetPagedResponseAsync<GroupTemplateResource>(azToken, requestUrl);
-            this.groupDataProcessor.ProcessData(groupTemplates, extractorParameters);
+            this.groupDataProcessor.ProcessDataProductLinkedGroups(groupTemplates, extractorParameters);
 
             return groupTemplates;
         }

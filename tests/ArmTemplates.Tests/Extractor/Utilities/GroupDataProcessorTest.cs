@@ -49,7 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         }
 
         [Fact]
-        public void TestOverrideName()
+        public void TestProcessDataAllGroups_OverrideName()
         {
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupGuids: "true");
             var extractorParameters = new ExtractorParameters(extractorConfig);
@@ -58,14 +58,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             var groupDataProcessor = new GroupDataProcessor();
 
-            groupDataProcessor.ProcessData(groupTemplates, extractorParameters);
+            groupDataProcessor.ProcessDataAllGroups(groupTemplates, extractorParameters);
 
             groupTemplates.ElementAt(0).Name.Should().BeEquivalentTo("administrators");
             groupTemplates.ElementAt(1).Name.Should().BeEquivalentTo("developers");
         }
 
         [Fact]
-        public void TestSkipOverrideName()
+        public void TestProcessDataAllGroups_SkipOverrideName()
         {
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupGuids: "false");
             var extractorParameters = new ExtractorParameters(extractorConfig);
@@ -73,10 +73,55 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var groupDataProcessor = new GroupDataProcessor();
             
             var groupTemplates = this.GetMockGroupTemplates();
-            groupDataProcessor.ProcessData(groupTemplates, extractorParameters);
+            groupDataProcessor.ProcessDataAllGroups(groupTemplates, extractorParameters);
 
             groupTemplates.ElementAt(0).Name.Should().BeEquivalentTo("guid-administrators");
             groupTemplates.ElementAt(1).Name.Should().BeEquivalentTo("guid-developers");
+        }
+
+        [Fact]
+        public void TestProcessDataProductLinkedGroups_OverrideName()
+        {
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupGuids: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var groupTemplates = this.GetMockGroupTemplates();
+
+            var groupDataProcessor = new GroupDataProcessor();
+
+            groupDataProcessor.ProcessDataAllGroups(groupTemplates, extractorParameters);
+
+            groupTemplates.ElementAt(0).Name.Should().BeEquivalentTo("administrators");
+            groupTemplates.ElementAt(1).Name.Should().BeEquivalentTo("developers");
+        }
+
+        [Fact]
+        public void TestProcessDataProductLinkedGroups_SkipOverrideName()
+        {
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(overrideGroupGuids: "false");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var groupDataProcessor = new GroupDataProcessor();
+
+            var groupTemplates = this.GetMockGroupTemplates();
+            groupDataProcessor.ProcessDataAllGroups(groupTemplates, extractorParameters);
+
+            groupTemplates.ElementAt(0).Name.Should().BeEquivalentTo("guid-administrators");
+            groupTemplates.ElementAt(1).Name.Should().BeEquivalentTo("guid-developers");
+        }
+
+        [Fact]
+        public void TestExcludeBuiltInGroups()
+        {
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(excludeBuildInGroups: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var groupDataProcessor = new GroupDataProcessor();
+
+            var groupTemplates = this.GetMockGroupTemplates();
+            groupDataProcessor.ProcessDataAllGroups(groupTemplates, extractorParameters);
+
+            groupTemplates.Count.Should().Be(0);
         }
     }
 }

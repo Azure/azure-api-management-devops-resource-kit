@@ -109,6 +109,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "parametersOutputDirectoryName ", HelpText = "Parameters output directory name, by default it is \"parameters\"")]
         public string ParametersOutputDirectoryName { get; set; }
 
+        [Option(longName: "excludeBuildInGroups ", HelpText = "Excludes built-in groups from generated template if set to \"true\"")]
+        public string ExcludeBuildInGroups { get; set; }
+
         /// <summary>
         /// Api parameter properties for overriding Api OAuth2 scope or/and Service urloverride. Available via extractor-config file only.
         /// </summary>

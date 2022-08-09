@@ -11,8 +11,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
 {
     public interface IGroupDataProcessor
     {
-        void ProcessData(List<GroupTemplateResource> templates, ExtractorParameters extractorParameters);
+        void ProcessDataProductLinkedGroups(List<GroupTemplateResource> templates, ExtractorParameters extractorParameters);
 
-        void OverrideName(GroupTemplateResource template);
+        void ProcessDataAllGroups(List<GroupTemplateResource> templates, ExtractorParameters extractorParameters);
     }
 }

@@ -90,6 +90,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public bool ExtractIdentityProviders { get; set; }
 
+        public bool ExcludeBuildInGroups { get; set; }
+
         public string ParametersOutputDirectoryName { get; set; }
 
         public Dictionary<string, ApiParameterProperty> ApiParameters { get; private set; }
@@ -126,7 +128,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ParametrizeApiOauth2Scope = (extractorConfig.ParamApiOauth2Scope != null && extractorConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase)) || (extractorConfig.ApiParameters != null && extractorConfig.ApiParameters.Any(x => x.Value.Oauth2Scope is not null));
             this.ExtractSecrets = extractorConfig.ExtractSecrets != null && extractorConfig.ExtractSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ExtractIdentityProviders = extractorConfig.ExtractIdentityProviders != null && extractorConfig.ExtractIdentityProviders.Equals("true", StringComparison.OrdinalIgnoreCase);
-            
+            this.ExcludeBuildInGroups = extractorConfig.ExcludeBuildInGroups != null && extractorConfig.ExcludeBuildInGroups.Equals("true", StringComparison.OrdinalIgnoreCase);
+
             this.ParametersOutputDirectoryName = extractorConfig.ParametersOutputDirectoryName;
             if (!string.IsNullOrEmpty(extractorConfig.ParametersOutputDirectoryName))
             {
@@ -166,6 +169,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ExtractGateways = !string.IsNullOrEmpty(overridingConfig.ExtractGateways) ? overridingConfig.ExtractGateways.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractGateways;
             this.ParametrizeApiOauth2Scope = !string.IsNullOrEmpty(overridingConfig.ParamApiOauth2Scope) ? overridingConfig.ParamApiOauth2Scope.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ParametrizeApiOauth2Scope;
             this.ExtractIdentityProviders = !string.IsNullOrEmpty(overridingConfig.ExtractIdentityProviders) ? overridingConfig.ExtractIdentityProviders.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExtractIdentityProviders;
+            this.ExcludeBuildInGroups = !string.IsNullOrEmpty(overridingConfig.ExcludeBuildInGroups) ? overridingConfig.ExcludeBuildInGroups.Equals("true", StringComparison.OrdinalIgnoreCase) : this.ExcludeBuildInGroups;
 
             if (!string.IsNullOrEmpty(overridingConfig.BaseFileName))
             {

@@ -112,7 +112,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                string paramApiOauth2Scope = null,
                Dictionary<string, ApiParameterProperty> apiParameters = null,
                string extractSecrets = null,
-               string extractIdentityProviders = null
+               string extractIdentityProviders = null,
+               string excludeBuildInGroups = null
          )
         {
 
@@ -148,7 +149,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 ParamApiOauth2Scope = paramApiOauth2Scope,
                 ApiParameters = apiParameters,
                 ExtractSecrets = extractSecrets,
-                ExtractIdentityProviders = extractIdentityProviders
+                ExtractIdentityProviders = extractIdentityProviders,
+                ExcludeBuildInGroups = excludeBuildInGroups
             };
         }
     }
