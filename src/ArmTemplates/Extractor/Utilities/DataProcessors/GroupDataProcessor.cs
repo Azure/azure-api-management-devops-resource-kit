@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
             this.OverrideNames(groupTemplates, extractorParameters);
             if (extractorParameters.ExcludeBuildInGroups)
             {
-                groupTemplates.RemoveAll(x => x.Properties.BuiltIn);
+                groupTemplates?.RemoveAll(x => x.Properties.BuiltIn);
             }
         }
 
