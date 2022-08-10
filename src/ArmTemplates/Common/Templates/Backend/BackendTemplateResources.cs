@@ -15,6 +15,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public IDictionary<string, BackendApiParameters> BackendNameParametersCache { get; set; } = new Dictionary<string, BackendApiParameters>();
 
+        public IDictionary<string, BackendProxyParameters> BackendProxyParametersCache { get; set; } = new Dictionary<string, BackendProxyParameters>();
+
         public TemplateResource[] BuildTemplateResources()
         {
             return this.Backends.ToArray();

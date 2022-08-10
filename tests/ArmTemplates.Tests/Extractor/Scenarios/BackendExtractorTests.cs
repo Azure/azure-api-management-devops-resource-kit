@@ -72,6 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             backendTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
             backendTemplate.Parameters.Should().ContainKey(ParameterNames.BackendSettings);
+            backendTemplate.Parameters.Should().ContainKey(ParameterNames.BackendProxy);
 
             backendTemplate.TypedResources.Backends.Should().HaveCount(1);
             backendTemplate.Resources.Should().HaveCount(1);
@@ -83,6 +84,61 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             backendProperties.Should().NotBeNull();
             backendProperties.Url.Should().Contain(ParameterNames.BackendSettings);
             backendProperties.Protocol.Should().Contain(ParameterNames.BackendSettings);
+
+            backendProperties.Proxy.Password.Should().Contain(ParameterNames.BackendProxy);
+            backendProperties.Proxy.Username.Should().Contain(ParameterNames.BackendProxy);
+            backendProperties.Proxy.Url.Should().Contain(ParameterNames.BackendProxy);
+        }
+
+        [Fact]
+        public async Task GenerateBackendTemplate_ProperlyParsesAndGeneratesTemplate()
+        {
+            // arrange
+            var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListBackends_success_response.json");
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateBackendTemplate_ProperlyParsesAndGeneratesTemplate));
+
+            var mockedClient = await MockBackendClient.GetMockedHttpApiClient(responseFileLocation);
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: string.Empty,
+                paramBackend: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            // mocked extractors
+            var backendExtractor = new BackendExtractor(
+               this.GetTestLogger<BackendExtractor>(),
+               new TemplateBuilder(),
+               null,
+               mockedClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                backendExtractor: backendExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(null, null, null, currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Backends)).Should().BeTrue();
+            
+            backendTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            backendTemplate.Parameters.Should().ContainKey(ParameterNames.BackendSettings);
+            backendTemplate.Parameters.Should().ContainKey(ParameterNames.BackendProxy);
+
+
+            backendTemplate.TypedResources.Backends.Count().Should().Be(3);
+            backendTemplate.TypedResources.Backends.All(x => x.Type.Equals(ResourceTypeConstants.Backend)).Should().BeTrue();
+
+            var proxyBackend1 = backendTemplate.TypedResources.Backends.First(x => x.Name.Contains("proxybackend1"));
+            proxyBackend1.Properties.Proxy.Password.Should().Contain(ParameterNames.BackendProxy);
+            proxyBackend1.Properties.Proxy.Username.Should().Contain(ParameterNames.BackendProxy);
+            proxyBackend1.Properties.Proxy.Url.Should().Contain(ParameterNames.BackendProxy);
+
+            var proxyBackend2 = backendTemplate.TypedResources.Backends.First(x => x.Name.Contains("proxybackend2"));
+            proxyBackend2.Properties.Proxy.Password.Should().Contain(ParameterNames.BackendProxy);
+            proxyBackend2.Properties.Proxy.Username.Should().Contain(ParameterNames.BackendProxy);
+            proxyBackend2.Properties.Proxy.Url.Should().Contain(ParameterNames.BackendProxy);
         }
     }
 }

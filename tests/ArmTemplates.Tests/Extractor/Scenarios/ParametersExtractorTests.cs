@@ -20,6 +20,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClient
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.IdentityProviderClients;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -431,6 +432,64 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             resourceTemplateParameterTemplate.Parameters.Should().HaveCount(2);
             resourceTemplateParameterTemplate.Parameters["parameter1"].Should().NotBeNull();
             resourceTemplateParameterTemplate.Parameters["parameter2"].Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task CreateResourceTemplateParameterTemplate_ProperlyGeneratesTemplate_WithBackendProxySettings()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(CreateResourceTemplateParameterTemplate_ProperlyGeneratesTemplate_WithBackendProxySettings));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(paramBackend: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var backends = new BackendTemplateResources()
+            {
+                BackendNameParametersCache = new Dictionary<string, BackendApiParameters>()
+                {
+                    { "key1", new BackendApiParameters() { Protocol = "protocol", ResourceId = "resourceId", Url = "url" } }
+                },
+                BackendProxyParametersCache = new Dictionary<string, BackendProxyParameters>()
+                {
+                    { "key1", new BackendProxyParameters() { Username = "username", Url = "url" } }
+                },
+                Backends = new List<BackendTemplateResource>()
+                {
+                    {
+                        new BackendTemplateResource
+                        {
+                            Name = "test"
+                        }
+                    }
+                }
+            };
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, backends, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.BackendProxy);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.BackendSettings);
+
+            var backendProxyParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.BackendProxy];
+            var backendProxyParameterValues = (Dictionary<string, BackendProxyParameters>)backendProxyParameters.Value;
+
+            backendProxyParameterValues.Should().NotBeNull();
+            backendProxyParameterValues.ContainsKey("key1").Should().BeTrue();
+            backendProxyParameterValues["key1"].Username.Should().Be("username");
+            backendProxyParameterValues["key1"].Url.Should().Be("url");
+
+
+            var backendSettingsParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.BackendSettings];
+            var backendSettingsParameterValues = (Dictionary<string, BackendApiParameters>)backendSettingsParameters.Value;
+
+            backendSettingsParameterValues.Should().NotBeNull();
+            backendSettingsParameterValues.ContainsKey("key1").Should().BeTrue();
+            backendSettingsParameterValues["key1"].Protocol.Should().Be("protocol");
+            backendSettingsParameterValues["key1"].ResourceId.Should().Be("resourceId");
+            backendSettingsParameterValues["key1"].Url.Should().Be("url");
         }
     }
 }

@@ -202,6 +202,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     backendsDeployment.Properties.Parameters.Add(ParameterNames.BackendSettings,
                         new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.BackendSettings}')]" });
+
+                    backendsDeployment.Properties.Parameters.Add(ParameterNames.BackendProxy,
+                        new TemplateParameterProperties() { Value = $"[parameters('{ParameterNames.BackendProxy}')]" });
                 }
 
                 masterResources.DeploymentResources.Add(backendsDeployment);
@@ -497,6 +500,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 parameters.Add(
                     ParameterNames.BackendSettings,
                     new TemplateParameterProperties(metadataDescription: "The settings for the Backends", type: "object"));
+
+                parameters.Add(
+                    ParameterNames.BackendProxy,
+                    new TemplateParameterProperties(metadataDescription: "The proxies for the Backends", type: "object"));
             }
 
             if (extractorParameters.ParametrizeApiOauth2Scope)

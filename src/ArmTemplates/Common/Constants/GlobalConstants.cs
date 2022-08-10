@@ -44,6 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string SecretValues = "secretValues";
         public const string IdentityProvidersSecretValues = "identityProviders";
         public const string OpenIdConnectProvidersSecretValues = "openIdConnectProviders";
+        public const string BackendProxy = "backendProxy";
     }
 
     public static class ParameterPrefix
@@ -54,5 +55,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants
         public const string LogResourceId = "LogResourceId";
         public const string Backend = "Backend";
         public const string ApiOauth2Scope = "ApiOauth2Scope";
+        public const string BackendProxy = "BackendProxy";
     }
 }

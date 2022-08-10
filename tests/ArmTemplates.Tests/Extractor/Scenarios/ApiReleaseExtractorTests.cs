@@ -91,7 +91,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiReleasesTemplate.TypedResources.ApiReleases.Any(x => x.Properties.ApiId.Contains($"/apis/echo-api;rev=1")).Should().BeTrue();
             apiReleasesTemplate.TypedResources.ApiReleases.Any(x => x.Properties.ApiId.Contains($"/apis/5a7390baa5816a110435aee0;rev=1")).Should().BeTrue();
             apiReleasesTemplate.TypedResources.ApiReleases.Any(x => x.Properties.ApiId.Contains($"/apis/5a73933b8f27f7cc82a2d533;rev=1")).Should().BeTrue();
-
         }
     }
 }

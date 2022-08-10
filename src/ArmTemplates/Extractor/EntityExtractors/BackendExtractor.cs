@@ -134,6 +134,27 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     {
                         backendTemplate.TypedResources.BackendNameParametersCache.Add(backendValidName, backendApiParameters);
                     }
+
+                    if (backendResource.Properties.Proxy != null)
+                    {
+                        var proxyUniqueId = $"{backendResource.Properties.Proxy.Url}_{backendResource.Properties.Proxy.Username}";
+                        var backendProxyParameterName = NamingHelper.GenerateValidParameterName(proxyUniqueId, ParameterPrefix.BackendProxy);
+                        
+                        if (!backendTemplate.TypedResources.BackendProxyParametersCache.ContainsKey(backendProxyParameterName))
+                        {
+                            var backendProxyParameters = new BackendProxyParameters
+                            {
+                                Url = backendResource.Properties.Proxy.Url,
+                                Username = backendResource.Properties.Proxy.Username,
+                                Password = backendResource.Properties.Proxy.Password
+                            };
+                            backendTemplate.TypedResources.BackendProxyParametersCache.Add(backendProxyParameterName, backendProxyParameters);
+                        }
+
+                        backendResource.Properties.Proxy.Url = $"[parameters('{ParameterNames.BackendProxy}').{backendProxyParameterName}.url]";
+                        backendResource.Properties.Proxy.Username = $"[parameters('{ParameterNames.BackendProxy}').{backendProxyParameterName}.username]";
+                        backendResource.Properties.Proxy.Password = $"[parameters('{ParameterNames.BackendProxy}').{backendProxyParameterName}.password]";
+                    }
                 }
             }
 

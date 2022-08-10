@@ -268,6 +268,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (extractorParameters.ParameterizeBackend)
             {
                 parameters.Add(ParameterNames.BackendSettings, new TemplateObjectParameterProperties() { Value = backendResources.BackendNameParametersCache });
+                parameters.Add(ParameterNames.BackendProxy, new TemplateObjectParameterProperties() { Value = backendResources.BackendProxyParametersCache });
             }
 
             return parametersTemplate;
