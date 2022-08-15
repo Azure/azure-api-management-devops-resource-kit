@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiOperations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiOperations
 {
@@ -17,8 +18,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetOperationsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations?api-version={5}";
 
-        public ApiOperationClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        readonly IApiOperationDataProcessor apiOperationDataProcessor;
+        public ApiOperationClient(
+            IHttpClientFactory httpClientFactory,
+            IApiOperationDataProcessor apiOperationDataProcessor) : base(httpClientFactory)
         {
+            this.apiOperationDataProcessor = apiOperationDataProcessor;
         }
 
         public async Task<List<ApiOperationTemplateResource>> GetOperationsLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
@@ -28,7 +33,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetOperationsLinkedToApiRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<ApiOperationTemplateResource>(azToken, requestUrl);
+            var apiOperations = await this.GetPagedResponseAsync<ApiOperationTemplateResource>(azToken, requestUrl);
+            this.apiOperationDataProcessor.ProcessData(apiOperations, extractorParameters);
+            return apiOperations;
         }
     }
 }
