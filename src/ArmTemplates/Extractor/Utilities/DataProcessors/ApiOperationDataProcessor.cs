@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilit
                 foreach (var exampleValue in representation.Examples.Values)
                 {
                     // Documentation on escaping characters https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-expressions#escape-characters
-                    if (exampleValue.Value.GetType() == typeof(string) && exampleValue.Value.ToString().StartsWith("[") && exampleValue.Value.ToString().EndsWith("]"))
+                    if (exampleValue.Value is string && exampleValue.Value.ToString().StartsWith("[") && exampleValue.Value.ToString().EndsWith("]"))
                     {
                         exampleValue.Value = $"[{exampleValue.Value}";
                     }
