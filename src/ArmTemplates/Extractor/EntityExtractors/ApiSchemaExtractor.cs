@@ -34,9 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             foreach (var apiSchema in apiSchemas)
             {
-                var apiSchemaOriginalName = apiSchema.Name;
-
-                apiSchema.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiSchemaOriginalName}')]";
+                apiSchema.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiSchema.OriginalName}')]";
                 apiSchema.Type = ResourceTypeConstants.APISchema;
                 apiSchema.ApiVersion = GlobalConstants.ApiVersion;
                 apiSchema.DependsOn = new string[] { NamingHelper.GenerateApisResourceId(apiName) };

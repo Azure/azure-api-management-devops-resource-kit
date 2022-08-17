@@ -10,15 +10,19 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiSchemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiSchemas
 {
     public class ApiSchemaClient : ApiClientBase, IApiSchemaClient
     {
         const string GetAllApiSchemasRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/schemas?api-version={5}";
+        
+        readonly ICommonTemplateResourceDataProcessor<ApiSchemaTemplateResource> commonTemplateResourceDataProcessor;
 
-        public ApiSchemaClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        public ApiSchemaClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<ApiSchemaTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
         {
+            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
         }
 
         public async Task<List<ApiSchemaTemplateResource>> GetApiSchemasAsync(string apiName, ExtractorParameters extractorParameters)
@@ -28,7 +32,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var requestUrl = string.Format(GetAllApiSchemasRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<ApiSchemaTemplateResource>(azToken, requestUrl);
+            var apiSchemaTemplateResources = await this.GetPagedResponseAsync<ApiSchemaTemplateResource>(azToken, requestUrl);
+            this.commonTemplateResourceDataProcessor.ProcessData(apiSchemaTemplateResources);
+            return apiSchemaTemplateResources;
         }
     }
 }

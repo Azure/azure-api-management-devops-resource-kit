@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Diagnostics
 {
@@ -18,8 +19,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetAllDiagnosticsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/diagnostics?api-version={4}";
         const string GetDiagnosticsLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/diagnostics?api-version={5}";
 
-        public DiagnosticClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        readonly ICommonTemplateResourceDataProcessor<DiagnosticTemplateResource> commonTemplateResourceDataProcessor;
+
+        public DiagnosticClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<DiagnosticTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
         {
+            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
         }
 
         public async Task<List<DiagnosticTemplateResource>> GetApiDiagnosticsAsync(string apiName, ExtractorParameters extractorParameters)
@@ -29,7 +33,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetDiagnosticsLinkedToApiRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<DiagnosticTemplateResource>(azToken, requestUrl);
+            var diagnosticTemplateResources = await this.GetPagedResponseAsync<DiagnosticTemplateResource>(azToken, requestUrl);
+            this.commonTemplateResourceDataProcessor.ProcessData(diagnosticTemplateResources);
+            return diagnosticTemplateResources;
         }
 
         public async Task<List<DiagnosticTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -39,7 +45,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var requestUrl = string.Format(GetAllDiagnosticsRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<DiagnosticTemplateResource>(azToken, requestUrl);
+            var diagnosticTemplateResources = await this.GetPagedResponseAsync<DiagnosticTemplateResource>(azToken, requestUrl);
+            this.commonTemplateResourceDataProcessor.ProcessData(diagnosticTemplateResources);
+            return diagnosticTemplateResources;
         }
     }
 }

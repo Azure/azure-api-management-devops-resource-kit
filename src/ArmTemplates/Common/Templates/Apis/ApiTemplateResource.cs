@@ -11,9 +11,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
     public class ApiTemplateResource : TemplateResource
     {
         [JsonIgnore]
-        public string OriginalName { get; set; }
-
-        [JsonIgnore]
         public string ApiNameWithRevision { get; set; }
 
         public ApiProperties Properties { get; set; }

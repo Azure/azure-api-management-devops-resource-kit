@@ -10,15 +10,18 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.NamedValues
 {
     public class NamedValuesClient : ApiClientBase, INamedValuesClient
     {
         const string GetNamedValuesRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues?api-version={4}";
+        readonly ICommonTemplateResourceDataProcessor<NamedValueTemplateResource> commonTemplateResourceDataProcessor;
 
-        public NamedValuesClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        public NamedValuesClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<NamedValueTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
         {
+            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
         }
 
         public async Task<List<NamedValueTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -28,7 +31,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var requestUrl = string.Format(GetNamedValuesRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<NamedValueTemplateResource>(azToken, requestUrl);
+            var namedValuesTemplateResources = await this.GetPagedResponseAsync<NamedValueTemplateResource>(azToken, requestUrl);
+            this.commonTemplateResourceDataProcessor.ProcessData(namedValuesTemplateResources);
+            return namedValuesTemplateResources;
         }
     }
 }

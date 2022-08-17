@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Logger;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Loggers
 {
@@ -17,8 +18,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllLoggersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/loggers?api-version={4}";
 
-        public LoggerClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        readonly ICommonTemplateResourceDataProcessor<LoggerTemplateResource> commonTemplateResourceDataProcessor;
+        public LoggerClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<LoggerTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
         {
+            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
         }
 
         public async Task<List<LoggerTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -28,8 +31,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllLoggersRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<LoggerTemplateResource>(azToken, requestUrl);
-
+            var loggerTemplateResources = await this.GetPagedResponseAsync<LoggerTemplateResource>(azToken, requestUrl);
+            this.commonTemplateResourceDataProcessor.ProcessData(loggerTemplateResources);
+            return loggerTemplateResources;
         }
     }
 }

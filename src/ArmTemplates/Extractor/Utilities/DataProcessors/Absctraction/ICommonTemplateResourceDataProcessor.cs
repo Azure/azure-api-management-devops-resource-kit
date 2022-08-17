@@ -3,12 +3,14 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 
-namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.PolicyFragments
+namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction
 {
-    public class PolicyFragmentsResource : TemplateResource
+    public interface ICommonTemplateResourceDataProcessor<T> where T : TemplateResource
     {
-        public PolicyFragmentsProperties Properties { get; set; }
+        void ProcessData(List<T> templateResources);
+        void ProcessSingleData(T templateResource);
     }
 }

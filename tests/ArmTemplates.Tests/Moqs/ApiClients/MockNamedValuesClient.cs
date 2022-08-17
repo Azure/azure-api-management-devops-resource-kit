@@ -26,6 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new NamedValueTemplateResource
                     {
+                        OriginalName = NamedValueName,
                         Name = NamedValueName,
                         Properties = new()
                         {

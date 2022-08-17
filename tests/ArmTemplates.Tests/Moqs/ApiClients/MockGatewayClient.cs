@@ -27,6 +27,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new GatewayTemplateResource
                     {
+                        OriginalName = GatewayName1,
                         Name = GatewayName1,
                         Type = ResourceTypeConstants.Gateway,
                         Properties = new GatewayProperties
@@ -44,6 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
                     new GatewayTemplateResource
                     {
+                        OriginalName=GatewayName2,
                         Name = GatewayName2,
                         Type = ResourceTypeConstants.Gateway,
                         Properties = new GatewayProperties

@@ -41,8 +41,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             foreach (var apiOperation in apiOperations)
             {
-                apiOperation.OriginalName = apiOperation.Name;
-
                 apiOperation.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiOperation.OriginalName}')]";
                 apiOperation.ApiVersion = GlobalConstants.ApiVersion;
                 apiOperation.Scale = null;

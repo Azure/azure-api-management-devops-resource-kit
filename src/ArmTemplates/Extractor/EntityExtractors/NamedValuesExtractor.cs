@@ -71,18 +71,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             
             foreach (var namedValueResource in namedValues)
             {
-                var originalNamedValueName = namedValueResource.Name;
-
                 // convert returned named value to template resource class
-                namedValueResource.OriginalName = originalNamedValueName;
-                namedValueResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalNamedValueName}')]";
+                namedValueResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{namedValueResource.OriginalName}')]";
                 namedValueResource.Type = ResourceTypeConstants.NamedValues;
                 namedValueResource.ApiVersion = GlobalConstants.ApiVersion;
                 namedValueResource.Scale = null;
 
                 if (extractorParameters.ParameterizeNamedValue)
                 {
-                    namedValueResource.Properties.Value = $"[parameters('{ParameterNames.NamedValues}').{NamingHelper.GenerateValidParameterName(originalNamedValueName, ParameterPrefix.Property)}]";
+                    namedValueResource.Properties.Value = $"[parameters('{ParameterNames.NamedValues}').{NamingHelper.GenerateValidParameterName(namedValueResource.OriginalName, ParameterPrefix.Property)}]";
                 }
 
                 //Hide the value field if it is a keyvault named value
@@ -93,7 +90,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (namedValueResource.Properties.KeyVault != null && extractorParameters.ParamNamedValuesKeyVaultSecrets)
                 {
-                    namedValueResource.Properties.KeyVault.SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{NamingHelper.GenerateValidParameterName(originalNamedValueName, ParameterPrefix.Property)}]";
+                    namedValueResource.Properties.KeyVault.SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{NamingHelper.GenerateValidParameterName(namedValueResource.OriginalName, ParameterPrefix.Property)}]";
                 }
 
                 if (string.IsNullOrEmpty(singleApiName))
@@ -104,22 +101,22 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 {
                     // if the user is executing a single api, extract all the named values used in the template resources
                     var foundInPolicy = this.DoesPolicyReferenceNamedValue(
-                        apiPolicies, 
-                        originalNamedValueName, 
+                        apiPolicies,
+                        namedValueResource.OriginalName, 
                         namedValueResource, 
                         baseFilesGenerationDirectory);
 
                     var foundInBackEnd = await this.backendExtractor.IsNamedValueUsedInBackends(
                         singleApiName,
                         apiPolicies,
-                        originalNamedValueName,
+                        namedValueResource.OriginalName,
                         namedValueResource.Properties.DisplayName,
                         extractorParameters,
                         baseFilesGenerationDirectory);
 
                     var foundInLogger = this.DoesLoggerReferenceNamedValue(
                         loggerResources,
-                        originalNamedValueName, 
+                        namedValueResource.OriginalName, 
                         namedValueResource);
 
                     if (foundInPolicy || foundInBackEnd || foundInLogger)

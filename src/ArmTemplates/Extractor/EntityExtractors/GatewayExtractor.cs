@@ -47,10 +47,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             foreach (var gateway in gateways)
             {
-                var gatewayOriginalName = gateway.Name;
-
                 // convert returned backend to template resource class
-                gateway.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{gatewayOriginalName}')]";
+                gateway.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{gateway.OriginalName}')]";
                 gateway.ApiVersion = GlobalConstants.ApiVersion;
                 gateway.Type = ResourceTypeConstants.Gateway;
 
@@ -61,7 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
                 else
                 {
-                    var doesApiReferenceGateway = await this.gatewayClient.DoesApiReferenceGatewayAsync(singleApiName, gatewayOriginalName, extractorParameters);
+                    var doesApiReferenceGateway = await this.gatewayClient.DoesApiReferenceGatewayAsync(singleApiName, gateway.OriginalName, extractorParameters);
                     if (doesApiReferenceGateway)
                     {
                         gatewayTemplate.TypedResources.Gateways.Add(gateway);

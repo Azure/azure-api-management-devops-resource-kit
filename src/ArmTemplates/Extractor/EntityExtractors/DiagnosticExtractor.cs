@@ -42,9 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var templateResources = new List<DiagnosticTemplateResource>();
             foreach (var apiDiagnostic in apiDiagnostics)
             {
-                var apiDiagnosticOriginalName = apiDiagnostic.Name;
-
-                apiDiagnostic.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiDiagnosticOriginalName}')]";
+                apiDiagnostic.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiDiagnostic.OriginalName}')]";
                 apiDiagnostic.Type = ResourceTypeConstants.APIDiagnostic;
                 apiDiagnostic.ApiVersion = GlobalConstants.ApiVersion;
                 apiDiagnostic.Scale = null;
@@ -52,10 +50,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {
-                    apiDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{NamingHelper.GenerateValidParameterName(apiDiagnosticOriginalName, ParameterPrefix.Diagnostic)}]";
+                    apiDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{NamingHelper.GenerateValidParameterName(apiName, ParameterPrefix.Api)}.{NamingHelper.GenerateValidParameterName(apiDiagnostic.OriginalName, ParameterPrefix.Diagnostic)}]";
                 }
 
-                if (!apiDiagnosticOriginalName.Contains("applicationinsights"))
+                if (!apiDiagnostic.OriginalName.Contains("applicationinsights"))
                 {
                     // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
                     apiDiagnostic.Properties.EnableHttpCorrelationHeaders = null;
@@ -85,9 +83,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             foreach (var serviceDiagnostic in serviceDiagnostics)
             {
                 this.logger.LogDebug("Found {0} diagnostic setting...", serviceDiagnostic.Name);
-                var originalDiagnosticName = serviceDiagnostic.Name;
 
-                serviceDiagnostic.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalDiagnosticName}')]";
+                serviceDiagnostic.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{serviceDiagnostic.OriginalName}')]";
                 serviceDiagnostic.Type = ResourceTypeConstants.APIServiceDiagnostic;
                 serviceDiagnostic.ApiVersion = GlobalConstants.ApiVersion;
                 serviceDiagnostic.Scale = null;
@@ -95,10 +92,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (extractorParameters.ParameterizeApiLoggerId)
                 {
-                    serviceDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{NamingHelper.GenerateValidParameterName(originalDiagnosticName, ParameterPrefix.Diagnostic)}]";
+                    serviceDiagnostic.Properties.LoggerId = $"[parameters('{ParameterNames.ApiLoggerId}').{NamingHelper.GenerateValidParameterName(serviceDiagnostic.OriginalName, ParameterPrefix.Diagnostic)}]";
                 }
 
-                if (!originalDiagnosticName.Contains("applicationinsights"))
+                if (!serviceDiagnostic.OriginalName.Contains("applicationinsights"))
                 {
                     // enableHttpCorrelationHeaders only works for application insights, causes errors otherwise
                     //TODO: Check this settings still valid?

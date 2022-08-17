@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiVersionSet;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiVersionSet
 {
@@ -17,8 +18,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllVersionSetsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apiVersionSets?api-version={4}";
 
-        public ApiVersionSetClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        readonly ICommonTemplateResourceDataProcessor<ApiVersionSetTemplateResource> commonTemplateResourceDataProcessor;
+
+        public ApiVersionSetClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<ApiVersionSetTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
         {
+            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
         }
 
         public async Task<List<ApiVersionSetTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -28,7 +32,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllVersionSetsRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<ApiVersionSetTemplateResource>(azToken, requestUrl);
+            var apiVersionSetTemplateresources = await this.GetPagedResponseAsync<ApiVersionSetTemplateResource>(azToken, requestUrl);
+            this.commonTemplateResourceDataProcessor.ProcessData(apiVersionSetTemplateresources);
+            return apiVersionSetTemplateresources;
         }
     }
 }

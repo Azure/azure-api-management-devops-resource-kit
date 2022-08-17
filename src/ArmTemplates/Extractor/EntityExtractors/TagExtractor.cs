@@ -49,9 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var templateResources = new List<TagTemplateResource>();
             foreach (var apiOperationTag in apiOperationTags)
             {
-                var apiOperationTagOriginalName = apiOperationTag.Name;
-
-                apiOperationTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{operationName}/{apiOperationTagOriginalName}')]";
+                apiOperationTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{operationName}/{apiOperationTag.OriginalName}')]";
                 apiOperationTag.ApiVersion = GlobalConstants.ApiVersion;
                 apiOperationTag.Scale = null;
                 apiOperationTag.DependsOn = new string[] { $"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{operationName}')]" };
@@ -75,9 +73,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var templateResources = new List<TagTemplateResource>();
             foreach (var apiTag in apiTags)
             {
-                var apiTagOriginalName = apiTag.Name;
-
-                apiTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiTagOriginalName}')]";
+                apiTag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{apiName}/{apiTag.OriginalName}')]";
                 apiTag.ApiVersion = GlobalConstants.ApiVersion;
                 apiTag.Scale = null;
                 apiTag.DependsOn = new string[] { NamingHelper.GenerateApisResourceId(apiName) };
@@ -110,9 +106,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var tags = await this.tagClient.GetAllAsync(extractorParameters);
             foreach (var tag in tags)
             {
-                var tagOriginalName = tag.Name;
-
-                tag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tagOriginalName}')]";
+                tag.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{tag.OriginalName}')]";
                 tag.Type = ResourceTypeConstants.Tag;
                 tag.ApiVersion = GlobalConstants.ApiVersion;
                 tag.Scale = null;
@@ -122,10 +116,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 // or if it is found in tags associated with the api
                 // or if it is found in tags associated with the products associated with the api
                 if (string.IsNullOrEmpty(singleApiName)
-                        || apiOperationTagResources.Any(t => t.Name.Contains($"/{tagOriginalName}'"))
-                        || apiTemplateResources.Tags.Any(t => t.Name.Contains($"/{tagOriginalName}'"))
+                        || apiOperationTagResources.Any(t => t.Name.Contains($"/{tag.OriginalName}'"))
+                        || apiTemplateResources.Tags.Any(t => t.Name.Contains($"/{tag.OriginalName}'"))
                         || productAPIResources.Any(t => t.Name.Contains($"/{singleApiName}"))
-                            && productTagResources.Any(t => t.Name.Contains($"/{tagOriginalName}'")))
+                            && productTagResources.Any(t => t.Name.Contains($"/{tag.OriginalName}'")))
                 {
                     tagTemplate.TypedResources.Tags.Add(tag);
                 }

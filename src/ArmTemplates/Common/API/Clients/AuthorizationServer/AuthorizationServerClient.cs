@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.AuthorizationServer;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.AuthorizationServer
 {
@@ -17,8 +18,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllAuthorizationServersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/authorizationServers?api-version={4}";
 
-        public AuthorizationServerClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+        readonly ICommonTemplateResourceDataProcessor<AuthorizationServerTemplateResource> commonTemplateResourceDataProcessor;
+
+        public AuthorizationServerClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<AuthorizationServerTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
         {
+            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
         }
 
         public async Task<List<AuthorizationServerTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -28,7 +32,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var requestUrl = string.Format(GetAllAuthorizationServersRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<AuthorizationServerTemplateResource>(azToken, requestUrl);
+            var authServerTemplateResources = await this.GetPagedResponseAsync<AuthorizationServerTemplateResource>(azToken, requestUrl);
+            this.commonTemplateResourceDataProcessor.ProcessData(authServerTemplateResources);
+            return authServerTemplateResources;
         }
     }
 }
