@@ -130,7 +130,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             resources.Tags.Any(x => x.Name.Contains(MockTagClient.OperationTagName2)).Should().BeTrue();
         }
 
-
         [Fact]
         public async Task GenerateTagTemplates_GetApiRelatedTags_ProperlyLaysTheInformation()
         {
