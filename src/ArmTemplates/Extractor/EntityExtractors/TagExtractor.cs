@@ -123,6 +123,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 // or if it is found in tags associated with the products associated with the api
                 if (string.IsNullOrEmpty(singleApiName)
                         || apiOperationTagResources.Any(t => t.Name.Contains($"/{tagOriginalName}'"))
+                        || apiTemplateResources.Tags.Any(t => t.Name.Contains($"/{tagOriginalName}'"))
                         || productAPIResources.Any(t => t.Name.Contains($"/{singleApiName}"))
                             && productTagResources.Any(t => t.Name.Contains($"/{tagOriginalName}'")))
                 {
