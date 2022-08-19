@@ -129,5 +129,74 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             resources.Tags.Any(x => x.Name.Contains(MockTagClient.OperationTagName1)).Should().BeTrue();
             resources.Tags.Any(x => x.Name.Contains(MockTagClient.OperationTagName2)).Should().BeTrue();
         }
+
+        [Fact]
+        public async Task GenerateTagTemplates_GetApiRelatedTags_ProperlyLaysTheInformation()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateTagTemplates_GetApiRelatedTags_ProperlyLaysTheInformation));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var mockedTagClient = MockTagClient.GetMockedApiClientWithDefaultValues();
+            var tagExtractor = new TagExtractor(
+                this.GetTestLogger<TagExtractor>(),
+                mockedTagClient,
+                new TemplateBuilder());
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                tagExtractor: tagExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            var apiTemplateResources = new ApiTemplateResources
+            {
+                Tags = new List<TagTemplateResource>
+                {
+                    new TagTemplateResource
+                    {
+                        Name = $"parameters'/{MockTagClient.TagName1}'"
+                    },
+                    new TagTemplateResource
+                    {
+                        Name = $"parameters/{MockTagClient.TagName2}'"
+                    }
+                },
+                ApiOperationsTags = new List<TagTemplateResource>
+                {
+                    new TagTemplateResource
+                    {
+                        Name = $"parameters'/{MockTagClient.OperationTagName1}'"
+                    },
+                    new TagTemplateResource
+                    {
+                        Name = $"parameters/{MockTagClient.OperationTagName2}'"
+                    }
+                }
+            };
+            var productTemplateResources = new ProductTemplateResources();
+
+            var tagTemplate = await extractorExecutor.GenerateTagTemplateAsync(
+                "apiName1",
+                apiTemplateResources,
+                productTemplateResources,
+                currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Tags)).Should().BeTrue();
+
+            tagTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            tagTemplate.TypedResources.Tags.Count().Should().Be(4);
+            tagTemplate.Resources.Count().Should().Be(4);
+
+            var resources = tagTemplate.TypedResources;
+
+            resources.Tags.Any(x => x.Name.Contains($"/{MockTagClient.OperationTagName1}'")).Should().BeTrue();
+            resources.Tags.Any(x => x.Name.Contains($"/{MockTagClient.OperationTagName2}'")).Should().BeTrue();
+            resources.Tags.Any(x => x.Name.Contains($"/{MockTagClient.TagName1}'")).Should().BeTrue();
+            resources.Tags.Any(x => x.Name.Contains($"/{MockTagClient.TagName2}'")).Should().BeTrue();
+        }
+
     }
 }
