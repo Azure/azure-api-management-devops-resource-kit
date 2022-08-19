@@ -37,7 +37,20 @@
       "properties": {
         "displayName": "GetOrder",
         "method": "POST",
-        "urlTemplate": "/?soapAction=http://tempuri.org/IFazioService/GetOrder"
+        "urlTemplate": "/?soapAction=http://tempuri.org/IFazioService/GetOrder",
+        "request": {
+          "description": "description",
+          "representations": [
+            {
+              "contentType": "application/json",
+              "examples": {
+                "default": {
+                  "description": "exampleDescription"
+                }
+              }
+            }
+          ]
+        }
       }
     },
     {
