@@ -150,32 +150,32 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 tagExtractor: tagExtractor);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
-            ApiTemplateResources apiTemplateResources = new ApiTemplateResources()
+            var apiTemplateResources = new ApiTemplateResources
             {
-                Tags = new List<TagTemplateResource>()
+                Tags = new List<TagTemplateResource>
                 {
-                    new TagTemplateResource()
+                    new TagTemplateResource
                     {
                         Name = $"parameters'/{MockTagClient.TagName1}'"
                     },
-                    new TagTemplateResource()
+                    new TagTemplateResource
                     {
                         Name = $"parameters/{MockTagClient.TagName2}'"
                     }
                 },
-                ApiOperationsTags = new List<TagTemplateResource>()
+                ApiOperationsTags = new List<TagTemplateResource>
                 {
-                    new TagTemplateResource()
+                    new TagTemplateResource
                     {
                         Name = $"parameters'/{MockTagClient.OperationTagName1}'"
                     },
-                    new TagTemplateResource()
+                    new TagTemplateResource
                     {
                         Name = $"parameters/{MockTagClient.OperationTagName2}'"
                     }
                 }
             };
-            ProductTemplateResources productTemplateResources = new ProductTemplateResources();
+            var productTemplateResources = new ProductTemplateResources();
 
             var tagTemplate = await extractorExecutor.GenerateTagTemplateAsync(
                 "apiName1",
