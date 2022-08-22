@@ -30,13 +30,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     new TagTemplateResource
                     {
                         Name = TagName1,
-                        Type = ResourceTypeConstants.ProductTag
+                        Type = ResourceTypeConstants.APIOperationTag
                     },
 
                     new TagTemplateResource
                     {
                         Name = TagName2,
-                        Type = ResourceTypeConstants.ProductTag
+                        Type = ResourceTypeConstants.APIOperationTag
                     }
                 });
 
@@ -47,13 +47,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     new TagTemplateResource
                     {
                         Name = TagName1,
-                        Type = ResourceTypeConstants.ProductTag
+                        Type = ResourceTypeConstants.APITag
                     },
 
                     new TagTemplateResource
                     {
                         Name = TagName2,
-                        Type = ResourceTypeConstants.ProductTag
+                        Type = ResourceTypeConstants.APITag
                     }
                 });
 
@@ -64,13 +64,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                     new TagTemplateResource
                     {
                         Name = TagName1,
-                        Type = ResourceTypeConstants.APITag
+                        Type = ResourceTypeConstants.ProductTag
                     },
 
                     new TagTemplateResource
                     {
                         Name = TagName2,
-                        Type = ResourceTypeConstants.APITag
+                        Type = ResourceTypeConstants.ProductTag
                     }
                 });
 

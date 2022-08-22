@@ -64,8 +64,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.TagApi)).Should().BeTrue();
 
             tagApiTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
-            tagApiTemplate.TypedResources.Tags.Count().Should().Be(4);
-            tagApiTemplate.Resources.Count().Should().Be(4);
+            tagApiTemplate.TypedResources.Tags.Count().Should().Be(6);
+            tagApiTemplate.Resources.Count().Should().Be(6);
 
             var resources = tagApiTemplate.TypedResources;
 

@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             // assert
             File.Exists(Path.Combine(currentTestDirectory, apiTemplate.TypedResources.FileName)).Should().BeTrue();
-            Directory.GetFiles(Path.Combine(currentTestDirectory, PolicyExtractor.PoliciesDirectoryName)).Count().Should().Be(4);
+            Directory.GetFiles(Path.Combine(currentTestDirectory, PolicyExtractor.PoliciesDirectoryName)).Count().Should().Be(6);
 
             apiTemplate.Parameters.Should().NotBeNull();
             apiTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
@@ -110,34 +110,34 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiTemplate.Parameters.Should().ContainKey(ParameterNames.ApiLoggerId);
             apiTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             apiTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
-            apiTemplate.Resources.Count().Should().Be(23);
+            apiTemplate.Resources.Count().Should().Be(33);
 
             // apis
-            apiTemplate.TypedResources.Apis.Count().Should().Be(2);
+            apiTemplate.TypedResources.Apis.Count().Should().Be(3);
             apiTemplate.TypedResources.Apis.All(x => x.Type == ResourceTypeConstants.API).Should().BeTrue();
             apiTemplate.TypedResources.Apis.All(x => x.Properties is not null).Should().BeTrue();
 
             // api schemas
-            apiTemplate.TypedResources.ApiSchemas.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiSchemas.Count().Should().Be(3);
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Type == ResourceTypeConstants.APISchema).Should().BeTrue();
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties is not null).Should().BeTrue();
 
             // diagnostics
-            apiTemplate.TypedResources.Diagnostics.Count().Should().Be(3);
+            apiTemplate.TypedResources.Diagnostics.Count().Should().Be(4);
             apiTemplate.TypedResources.Diagnostics.All(x => x.Type == ResourceTypeConstants.APIServiceDiagnostic || x.Type == ResourceTypeConstants.APIDiagnostic).Should().BeTrue();
             apiTemplate.TypedResources.Diagnostics.All(x => x.Properties is not null).Should().BeTrue();
 
             // tags
-            apiTemplate.TypedResources.Tags.Count().Should().Be(4);
-            apiTemplate.TypedResources.Tags.All(x => x.Type == ResourceTypeConstants.ProductTag).Should().BeTrue();
+            apiTemplate.TypedResources.Tags.Count().Should().Be(6);
+            apiTemplate.TypedResources.Tags.All(x => x.Type == ResourceTypeConstants.APITag).Should().BeTrue();
 
             // api products
-            apiTemplate.TypedResources.ApiProducts.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiProducts.Count().Should().Be(3);
             apiTemplate.TypedResources.ApiProducts.All(x => x.Type == ResourceTypeConstants.ProductApi).Should().BeTrue();
             apiTemplate.TypedResources.ApiProducts.All(x => x.Properties is not null).Should().BeTrue();
 
             // api policies
-            apiTemplate.TypedResources.ApiPolicies.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiPolicies.Count().Should().Be(3);
             apiTemplate.TypedResources.ApiPolicies.All(x => x.Properties is not null).Should().BeTrue();
 
             // api operations
@@ -152,12 +152,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiTemplate.TypedResources.ApiOperations.All(x => x.Properties.Request.Representations.All(o => o.Examples.ContainsKey("default"))).Should().BeTrue();
 
             // api operations policies
-            apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(3);
             apiTemplate.TypedResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
 
             // api operations tags
-            apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(2);
-            apiTemplate.TypedResources.ApiOperations.All(x => x.Properties is not null).Should().BeTrue();
+            apiTemplate.TypedResources.ApiOperationsTags.Count().Should().Be(6);
+            apiTemplate.TypedResources.ApiOperationsTags.All(x => x.Type == ResourceTypeConstants.APIOperationTag).Should().BeTrue();
         }
 
         [Fact]
@@ -227,11 +227,76 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             string schemaContentType = "application/vnd.ms-azure-apim.graphql.schema";
 
             // api schemas
-            apiTemplate.TypedResources.ApiSchemas.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiSchemas.Count().Should().Be(3);
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Type == ResourceTypeConstants.APISchema).Should().BeTrue();
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties is not null).Should().BeTrue();
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties.Document.Value.ToString().Equals(fileReadingTask.Result.ToString())).Should().BeTrue();
             apiTemplate.TypedResources.ApiSchemas.All(x => x.Properties.ContentType.Equals(schemaContentType)).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GenerateApiTemplateAsync_WebsocketApiTypeOperationsNotGenerated()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateApiTemplateAsync_WebsocketApiTypeOperationsNotGenerated));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+               sourceApimName: string.Empty,
+               destinationApimName: string.Empty,
+               resourceGroup: string.Empty,
+               fileFolder: string.Empty,
+               apiName: string.Empty);
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            // mocked clients
+            var mockedApiClient = MockApisClient.GetMockedApiClientWithDefaultValues();
+            var mockedProductClient = MockProductsClient.GetMockedApiClientWithDefaultValues();
+            var mockedApiSchemaClient = MockApiSchemaClient.GetMockedApiClientWithGraphQLSchemaValues();
+            var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithDefaultValues();
+            var mockedTagClient = MockTagClient.GetMockedApiClientWithDefaultValues();
+            var mockedApiOperationClient = MockApiOperationClient.GetMockedApiClientWithDefaultValues();
+            var mockedDiagnosticClient = MockDiagnosticClient.GetMockedClientWithApiDependentValues();
+            var mockedRevisionClient = MockApisRevisionsClient.GetMockedApiRevisionClientWithDefaultValues();
+
+            // mocked extractors
+            var mockedDiagnosticExtractor = new DiagnosticExtractor(this.GetTestLogger<DiagnosticExtractor>(), mockedDiagnosticClient);
+            var mockedApiSchemaExtractor = new ApiSchemaExtractor(this.GetTestLogger<ApiSchemaExtractor>(), mockedApiSchemaClient);
+            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
+            var mockedProductApisExtractor = new ProductApisExtractor(this.GetTestLogger<ProductApisExtractor>(), mockedProductClient, mockedApiClient, new TemplateBuilder());
+            var mockedTagExtractor = new TagExtractor(this.GetTestLogger<TagExtractor>(), mockedTagClient, new TemplateBuilder());
+            var mockedApiOperationExtractor = new ApiOperationExtractor(this.GetTestLogger<ApiOperationExtractor>(), mockedApiOperationClient);
+
+            var apiExtractor = new ApiExtractor(
+                this.GetTestLogger<ApiExtractor>(),
+                new TemplateBuilder(),
+                mockedApiClient,
+                mockedDiagnosticExtractor,
+                mockedApiSchemaExtractor,
+                mockedPolicyExtractor,
+                mockedProductApisExtractor,
+                mockedTagExtractor,
+                mockedApiOperationExtractor,
+                mockedRevisionClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                apiExtractor: apiExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var apiTemplate = await extractorExecutor.GenerateApiTemplateAsync(
+                singleApiName: It.IsAny<string>(),
+                multipleApiNames: It.IsAny<List<string>>(),
+                currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, apiTemplate.TypedResources.FileName)).Should().BeTrue();
+
+            // api operation resources
+            apiTemplate.TypedResources.ApiOperations.Count().Should().Be(2);
+            apiTemplate.TypedResources.ApiOperations.Any(x => x.Name.Contains("websocket-api")).Should().BeFalse();
+            apiTemplate.TypedResources.ApiOperationsTags.Count().Should().Be(6);
+            apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(3);
         }
     }
 }

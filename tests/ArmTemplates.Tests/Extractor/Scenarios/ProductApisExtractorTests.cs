@@ -64,8 +64,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.ProductAPIs)).Should().BeTrue();
 
             productApisTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
-            productApisTemplate.TypedResources.ProductApis.Count().Should().Be(2);
-            productApisTemplate.Resources.Count().Should().Be(2);
+            productApisTemplate.TypedResources.ProductApis.Count().Should().Be(3);
+            productApisTemplate.Resources.Count().Should().Be(3);
 
             foreach (var productApi in productApisTemplate.TypedResources.ProductApis)
             {
