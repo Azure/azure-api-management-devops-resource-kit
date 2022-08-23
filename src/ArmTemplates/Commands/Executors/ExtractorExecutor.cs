@@ -968,7 +968,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         {
             this.logger.LogInformation("Started generation of policy fragments template...");
 
-            var policyFragmentTemplate = await this.policyFragmentsExtractor.GeneratePolicyFragmentsTemplateAsync(apiPolicies, this.extractorParameters);
+            var policyFragmentTemplate = await this.policyFragmentsExtractor.GeneratePolicyFragmentsTemplateAsync(apiPolicies, this.extractorParameters, baseFilesGenerationDirectory);
 
             if (policyFragmentTemplate?.HasResources() == true)
             {

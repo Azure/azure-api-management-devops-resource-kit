@@ -3,7 +3,9 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Policy;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
@@ -73,6 +75,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             return mockPolicyApiClient.Object;
+        }
+
+        public static async Task<IPolicyClient> GetMockedHttpPolicyFragmentClient(string responseFileLocation)
+        {
+            var mockedClient = new Mock<PolicyClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation));
+            MockClientUtils.MockAuthOfApiClient(mockedClient);
+
+            return mockedClient.Object;
         }
     }
 }

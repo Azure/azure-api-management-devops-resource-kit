@@ -24,18 +24,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly ILogger<PolicyFragmentsExtractor> logger;
         readonly IPolicyFragmentsClient policyFragmentsClient;
         readonly ITemplateBuilder templateBuilder;
+        readonly IPolicyExtractor policyExtractor;
 
         public PolicyFragmentsExtractor(
             ILogger<PolicyFragmentsExtractor> logger,
             ITemplateBuilder templateBuilder,
-            IPolicyFragmentsClient policyFragmentsClient)
+            IPolicyFragmentsClient policyFragmentsClient,
+            IPolicyExtractor policyExtractor)
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
             this.policyFragmentsClient = policyFragmentsClient;
+            this.policyExtractor = policyExtractor;
         }
 
-        public async Task<Template<PolicyFragmentsResources>> GeneratePolicyFragmentsTemplateAsync(List<PolicyTemplateResource> apiTemplatePolicies, ExtractorParameters extractorParameters)
+        public async Task<Template<PolicyFragmentsResources>> GeneratePolicyFragmentsTemplateAsync(List<PolicyTemplateResource> apiTemplatePolicies, ExtractorParameters extractorParameters, string baseFilesGenerationDirectory)
         {
             var policyFragmentsTemplate = this.templateBuilder
                                         .GenerateTemplateWithApimServiceNameProperty()
@@ -61,8 +64,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 else
                 {
                     var policyFragmentReferenceString = $"fragment-id=\"{policyFragment.OriginalName}\"";
-                    var isReferencedInPolicy = apiTemplatePolicies?.Any(x => x.Properties.PolicyContent.Contains(policyFragmentReferenceString));
-                    if (isReferencedInPolicy == true)
+                    var isReferencedInPolicy = this.DoesPolicyReferencePolicyFragment(apiTemplatePolicies, policyFragmentReferenceString, baseFilesGenerationDirectory);
+                    
+                    if (isReferencedInPolicy)
                     {
                         policyFragmentsTemplate.TypedResources.PolicyFragments.Add(policyFragment);
                     }
@@ -70,6 +74,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             }
 
             return policyFragmentsTemplate;
+        }
+
+        bool DoesPolicyReferencePolicyFragment(
+            List<PolicyTemplateResource> apiPolicies,
+            string policyFragmentReferenceString,
+            string baseFilesGenerationDirectory)
+        {
+            if (apiPolicies.IsNullOrEmpty())
+            {
+                return false;
+            }
+
+            foreach (var policyTemplateResource in apiPolicies)
+            {
+                var policyContent = this.policyExtractor.GetCachedPolicyContent(policyTemplateResource, baseFilesGenerationDirectory);
+
+                if (policyContent.Contains(policyFragmentReferenceString))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

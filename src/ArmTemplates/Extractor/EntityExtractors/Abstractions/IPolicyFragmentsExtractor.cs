@@ -14,6 +14,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 {
     public interface IPolicyFragmentsExtractor
     {
-        Task<Template<PolicyFragmentsResources>> GeneratePolicyFragmentsTemplateAsync(List<PolicyTemplateResource> apiTemplatePolicies, ExtractorParameters extractorParameters);
+        Task<Template<PolicyFragmentsResources>> GeneratePolicyFragmentsTemplateAsync(List<PolicyTemplateResource> apiTemplatePolicies, ExtractorParameters extractorParameters, string baseFilesGenerationDirectory);
     }
 }
