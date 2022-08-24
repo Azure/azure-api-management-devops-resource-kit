@@ -112,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configu
         [Option(longName: "excludeBuildInGroups ", HelpText = "Excludes built-in groups from generated template if set to \"true\"")]
         public string ExcludeBuildInGroups { get; set; }
         
-        [Option(longName: "excludeGlobalPolicy", HelpText = "Excludes built-in products from generated template if set to \"true\"")]
+        [Option(longName: "excludeGlobalPolicy", HelpText = "Excludes All APIs (global policy) from generated template if set to \"true\"")]
         public string ExcludeGlobalPolicy { get; set; }
 
         /// <summary>
