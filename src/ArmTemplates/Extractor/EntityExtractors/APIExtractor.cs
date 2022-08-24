@@ -112,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 this.logger.LogInformation("{0} API data found ...", singleApiName);
                 this.SetArmTemplateValuesToApiTemplateResource(singleApiName, apiResource, extractorParameters, apiDepends);
-                this.ValidateOutputApiTemplateResource(singleApiName, apiResource, apiTemplateResources);
+                this.SanitizeOutputApiTemplateResource(singleApiName, apiResource, apiTemplateResources);
                 apiTemplateResources.Apis.Add(apiResource);
             }
             catch (Exception ex)
@@ -281,7 +281,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             return apiDependency;
         }
 
-        void ValidateOutputApiTemplateResource(string apiName, ApiTemplateResource apiResource, ApiTemplateResources apiTemplateResources)
+        void SanitizeOutputApiTemplateResource(string apiName, ApiTemplateResource apiResource, ApiTemplateResources apiTemplateResources)
         {
             //remove api operation if websocket type & change dependencies to api, since api operation for websocket type is created automatically and it is not allowed to update it (built-in operation)
             if (apiResource.Properties.Type == ApiTypeConstants.WebSocket)
