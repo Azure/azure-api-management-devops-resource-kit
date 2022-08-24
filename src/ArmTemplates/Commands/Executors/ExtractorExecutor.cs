@@ -243,6 +243,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// <returns>generated global service policy template</returns>
         public async Task<Template<PolicyTemplateResources>> GeneratePolicyTemplateAsync(string baseFilesGenerationDirectory)
         {
+            if (this.extractorParameters.ExcludeGlobalPolicy)
+            {
+                this.logger.LogInformation("Skipping global policy template generation because of configuration parameter");
+                return null;
+            }
+
             this.logger.LogInformation("Started generation of policy template...");
 
             var globalServicePolicyTemplate = await this.policyExtractor.GenerateGlobalServicePolicyTemplateAsync(
@@ -1204,7 +1210,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             await this.GenerateMasterTemplateAsync(
                 baseFilesGenerationDirectory,
                 apiTemplateResources: apiTemplate.TypedResources,
-                policyTemplateResources: globalServicePolicyTemplate.TypedResources,
+                policyTemplateResources: globalServicePolicyTemplate?.TypedResources,
                 apiVersionSetTemplateResources: apiVersionSetTemplate.TypedResources,
                 productsTemplateResources: productTemplate.TypedResources,
                 productApisTemplateResources: productApiTemplate.TypedResources,

@@ -91,7 +91,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
         public bool ExtractIdentityProviders { get; set; }
 
         public bool ExcludeBuildInGroups { get; set; }
-
+        
+        public bool ExcludeGlobalPolicy { get; set; }
+        
         public string ParametersOutputDirectoryName { get; set; }
 
         public Dictionary<string, ApiParameterProperty> ApiParameters { get; private set; }
@@ -129,6 +131,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
             this.ExtractSecrets = extractorConfig.ExtractSecrets != null && extractorConfig.ExtractSecrets.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ExtractIdentityProviders = extractorConfig.ExtractIdentityProviders != null && extractorConfig.ExtractIdentityProviders.Equals("true", StringComparison.OrdinalIgnoreCase);
             this.ExcludeBuildInGroups = extractorConfig.ExcludeBuildInGroups != null && extractorConfig.ExcludeBuildInGroups.Equals("true", StringComparison.OrdinalIgnoreCase);
+            this.ExcludeGlobalPolicy = extractorConfig.ExcludeGlobalPolicy != null && extractorConfig.ExcludeGlobalPolicy.Equals("true", StringComparison.OrdinalIgnoreCase);
 
             this.ParametersOutputDirectoryName = extractorConfig.ParametersOutputDirectoryName;
             if (!string.IsNullOrEmpty(extractorConfig.ParametersOutputDirectoryName))
