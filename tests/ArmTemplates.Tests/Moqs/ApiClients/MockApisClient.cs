@@ -20,6 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         
         public const string ServiceApiName1 = "api-name-1";
         public const string ServiceApiName2 = "api-name-2";
+        public const string ServiceApiName3 = "websocket-api";
 
         public static ApiProperties GetMockedServiceApiProperties2()
         { 
@@ -59,12 +60,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             };
         }
 
+        public static ApiProperties GetMockedServiceApiPropertiesWebsocket()
+        {
+            return new ApiProperties
+            {
+                DisplayName = "websocket-api-display-name-3",
+                ApiRevision = "1",
+                Description = "api-description-3",
+                SubscriptionRequired = true,
+                ServiceUrl = "ws://host",
+                Type = "websocket",
+                Path = "path-3",
+                IsCurrent = true,
+            };
+        }
+
         public static IApisClient GetMockedApiClientWithDefaultValues()
         {
             var mockedApisClient = new Mock<IApisClient>(MockBehavior.Strict);
 
             var serviceProperties1 = GetMockedServiceApiProperties1();
             var serviceProperties2 = GetMockedServiceApiProperties2();
+            var serviceProperties3 = GetMockedServiceApiPropertiesWebsocket();
 
             mockedApisClient
                 .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
@@ -82,6 +99,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = ServiceApiName2,
                         Type = TemplateType,
                         Properties = serviceProperties2
+                    },
+
+                    new ApiTemplateResource
+                    {
+                        Name = ServiceApiName3,
+                        Type = TemplateType,
+                        Properties = serviceProperties3
                     },
                 });
 
@@ -129,6 +153,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             mockedApisClient
+                .Setup(x => x.GetSingleAsync(It.Is<string>((o => o.Equals(ServiceApiName3))), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string _, ExtractorParameters _) => new ApiTemplateResource
+                {
+                    Name = ServiceApiName3,
+                    Type = TemplateType,
+                    Properties = serviceProperties3
+                });
+
+            mockedApisClient
                 .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync((string productName, ExtractorParameters _) => new List<ApiTemplateResource>
                 {
@@ -144,6 +177,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                         Name = ServiceApiName2,
                         Type = TemplateType,
                         Properties = serviceProperties2
+                    },
+
+                    new ApiTemplateResource
+                    {
+                        Name = ServiceApiName3,
+                        Type = TemplateType,
+                        Properties = serviceProperties3
                     }
                 });
 
