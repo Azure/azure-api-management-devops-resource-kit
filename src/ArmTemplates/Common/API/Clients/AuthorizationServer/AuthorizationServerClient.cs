@@ -18,11 +18,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllAuthorizationServersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/authorizationServers?api-version={4}";
 
-        readonly ICommonTemplateResourceDataProcessor<AuthorizationServerTemplateResource> commonTemplateResourceDataProcessor;
+        readonly ITemplateResourceDataProcessor<AuthorizationServerTemplateResource> templateResourceDataProcessor;
 
-        public AuthorizationServerClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<AuthorizationServerTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
+        public AuthorizationServerClient(IHttpClientFactory httpClientFactory, ITemplateResourceDataProcessor<AuthorizationServerTemplateResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<AuthorizationServerTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var authServerTemplateResources = await this.GetPagedResponseAsync<AuthorizationServerTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(authServerTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(authServerTemplateResources);
             return authServerTemplateResources;
         }
     }

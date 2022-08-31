@@ -72,14 +72,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IGroupDataProcessor, GroupDataProcessor>();
             services.AddScoped<IProductDataProcessor, ProductDataProcessor>();
             services.AddScoped<IProductApiDataProcessor, ProductApiDataProcessor>();
-            services.AddScoped<IIdentityProviderProcessor, IdentityProviderProcessor>();
-            services.AddScoped<IApiManagementServiceProcessor, ApiManagementServiceProcessor>();
-            services.AddScoped<ISchemaDataProcessor, SchemaDataProcessor>();
-            services.AddScoped<IOpenIdConnectProviderProcessor, OpenIdConnectProviderProcessor>();
-            services.AddScoped<IPolicyFragmentDataProcessor, PolicyFragmentDataProcessor>();
             services.AddScoped<IApiDataProcessor, ApiDataProcessor>();
             services.AddScoped<IApiOperationDataProcessor, ApiOperationDataProcessor>();
-            services.AddScoped(typeof(ICommonTemplateResourceDataProcessor<>), typeof(CommonTemplateResourceDataProcessor<>));
+            services.AddScoped(typeof(ITemplateResourceDataProcessor<>), typeof(TemplateResourceDataProcessor<>));
         }
 
         static void SetupCommands(IServiceCollection services)

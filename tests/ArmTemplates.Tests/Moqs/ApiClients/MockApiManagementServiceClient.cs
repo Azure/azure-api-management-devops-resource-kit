@@ -4,14 +4,13 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiManagementService;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Moq;
 using Moq.Protected;
 
@@ -43,8 +42,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
         public static async Task<IApiManagementServiceClient> GetMockedHttpApiManagementServiceClient(string responseFileLocation)
         {
-            var mockedProcessor = new Mock<IApiManagementServiceProcessor>(MockBehavior.Loose).Object;
-            var mockedClient = new Mock<ApiManagementServiceClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), mockedProcessor);
+            var dataProcessor = new TemplateResourceDataProcessor<ApiManagementServiceResource>();
+            var mockedClient = new Mock<ApiManagementServiceClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), dataProcessor);
             mockedClient.Protected()
                 .Setup<AzureCliAuthenticator>("Auth").Returns(MockClientUtils.GetMockedAzureClient());
 

@@ -20,13 +20,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetAllIdentityProvidersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/identityProviders?api-version={4}";
         const string ListIdentyProviderSecret = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/identityProviders/{4}/listSecrets?api-version={5}";
 
-        readonly IIdentityProviderProcessor identityProviderProcessor;
+        readonly ITemplateResourceDataProcessor<IdentityProviderResource> templateResourceDataProcessor;
 
         public IdentityProviderClient(
             IHttpClientFactory httpClientFactory, 
-            IIdentityProviderProcessor identityProviderProcessor): base(httpClientFactory)
+            ITemplateResourceDataProcessor<IdentityProviderResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.identityProviderProcessor = identityProviderProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<IdentityProviderResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var identityProviderTemplates = await this.GetPagedResponseAsync<IdentityProviderResource>(azToken, requestUrl);
-            this.identityProviderProcessor.ProcessData(identityProviderTemplates, extractorParameters);
+            this.templateResourceDataProcessor.ProcessData(identityProviderTemplates);
 
             return identityProviderTemplates;
         }

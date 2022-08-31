@@ -18,11 +18,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllVersionSetsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apiVersionSets?api-version={4}";
 
-        readonly ICommonTemplateResourceDataProcessor<ApiVersionSetTemplateResource> commonTemplateResourceDataProcessor;
+        readonly ITemplateResourceDataProcessor<ApiVersionSetTemplateResource> templateResourceDataProcessor;
 
-        public ApiVersionSetClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<ApiVersionSetTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
+        public ApiVersionSetClient(IHttpClientFactory httpClientFactory, ITemplateResourceDataProcessor<ApiVersionSetTemplateResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<ApiVersionSetTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var apiVersionSetTemplateresources = await this.GetPagedResponseAsync<ApiVersionSetTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(apiVersionSetTemplateresources);
+            this.templateResourceDataProcessor.ProcessData(apiVersionSetTemplateresources);
             return apiVersionSetTemplateresources;
         }
     }

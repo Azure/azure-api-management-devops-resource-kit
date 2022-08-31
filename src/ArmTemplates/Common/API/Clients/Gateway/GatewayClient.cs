@@ -23,18 +23,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         readonly ILogger<GatewayClient> logger;
         readonly IApisClient apisClient;
-        readonly ICommonTemplateResourceDataProcessor<GatewayTemplateResource> commonTemplateResourceDataProcessor;
+        readonly ITemplateResourceDataProcessor<GatewayTemplateResource> templateResourceDataProcessor;
 
         public GatewayClient(
             IHttpClientFactory httpClientFactory,
             ILogger<GatewayClient> logger,
             IApisClient apisClient,
-            ICommonTemplateResourceDataProcessor<GatewayTemplateResource> commonTemplateResourceDataProcessor
+            ITemplateResourceDataProcessor<GatewayTemplateResource> templateResourceDataProcessor
             ) : base(httpClientFactory)
         {
             this.logger = logger;
             this.apisClient = apisClient;
-            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<GatewayTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var gatewatTemplateResources = await this.GetPagedResponseAsync<GatewayTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(gatewatTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(gatewatTemplateResources);
             return gatewatTemplateResources;
         }
 

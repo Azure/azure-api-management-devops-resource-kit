@@ -17,11 +17,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public class NamedValuesClient : ApiClientBase, INamedValuesClient
     {
         const string GetNamedValuesRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/namedValues?api-version={4}";
-        readonly ICommonTemplateResourceDataProcessor<NamedValueTemplateResource> commonTemplateResourceDataProcessor;
+        readonly ITemplateResourceDataProcessor<NamedValueTemplateResource> templateResourceDataProcessor;
 
-        public NamedValuesClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<NamedValueTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
+        public NamedValuesClient(IHttpClientFactory httpClientFactory, ITemplateResourceDataProcessor<NamedValueTemplateResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<NamedValueTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var namedValuesTemplateResources = await this.GetPagedResponseAsync<NamedValueTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(namedValuesTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(namedValuesTemplateResources);
             return namedValuesTemplateResources;
         }
     }

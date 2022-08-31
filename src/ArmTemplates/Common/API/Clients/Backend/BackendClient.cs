@@ -18,11 +18,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllBackendsRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/backends?api-version={4}";
 
-        readonly ICommonTemplateResourceDataProcessor<BackendTemplateResource> commonTemplateResourceDataProcessor;
+        readonly ITemplateResourceDataProcessor<BackendTemplateResource> templateResourceDataProcessor;
 
-        public BackendClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<BackendTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
+        public BackendClient(IHttpClientFactory httpClientFactory, ITemplateResourceDataProcessor<BackendTemplateResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<BackendTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var backendTemplateResources = await this.GetPagedResponseAsync<BackendTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(backendTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(backendTemplateResources);
 
             return backendTemplateResources;
         }

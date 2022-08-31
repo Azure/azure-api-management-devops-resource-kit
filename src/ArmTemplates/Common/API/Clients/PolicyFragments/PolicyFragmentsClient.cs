@@ -18,13 +18,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/policyFragments?api-version={4}&format=rawxml";
 
-        readonly IPolicyFragmentDataProcessor policyFragmentDataProcessor;
+        readonly ITemplateResourceDataProcessor<PolicyFragmentsResource> templateResourceDataProcessor;
 
         public PolicyFragmentsClient(
             IHttpClientFactory httpClientFactory,
-            IPolicyFragmentDataProcessor policyFragmentDataProcessor): base(httpClientFactory)
+            ITemplateResourceDataProcessor<PolicyFragmentsResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.policyFragmentDataProcessor = policyFragmentDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<PolicyFragmentsResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersionPreview);
 
             var policyFragments = await this.GetPagedResponseAsync<PolicyFragmentsResource>(azToken, requestUrl);
-            this.policyFragmentDataProcessor.ProcessData(policyFragments, extractorParameters);
+            this.templateResourceDataProcessor.ProcessData(policyFragments);
 
             return policyFragments;
         }

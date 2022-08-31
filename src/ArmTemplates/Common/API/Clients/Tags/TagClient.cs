@@ -21,11 +21,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetTagsLinkedToApiOperationRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/tags?api-version={6}&format=rawxml";
         const string GetAllTagsLinkedToProduct = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/tags?api-version={5}";
 
-        readonly ICommonTemplateResourceDataProcessor<TagTemplateResource> commonTemplateResourceDataProcessor;
+        readonly ITemplateResourceDataProcessor<TagTemplateResource> templateResourceDataProcessor;
 
-        public TagClient(IHttpClientFactory httpClientFactory, ICommonTemplateResourceDataProcessor<TagTemplateResource> commonTemplateResourceDataProcessor) : base(httpClientFactory)
+        public TagClient(IHttpClientFactory httpClientFactory, ITemplateResourceDataProcessor<TagTemplateResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.commonTemplateResourceDataProcessor = commonTemplateResourceDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<TagTemplateResource>> GetTagsLinkedToApiOperationAsync(string apiName, string operationName, ExtractorParameters extractorParameters)
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, operationName, GlobalConstants.ApiVersion);
 
             var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(tagTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
             return tagTemplateResources;
         }
 
@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, skipAmountOfRecords, GlobalConstants.ApiVersion);
 
             var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(tagTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
             return tagTemplateResources;
         }
 
@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
             var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(tagTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
             return tagTemplateResources;
         }
 
@@ -72,7 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
             var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
-            this.commonTemplateResourceDataProcessor.ProcessData(tagTemplateResources);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
             return tagTemplateResources;
         }
     }
