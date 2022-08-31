@@ -11,9 +11,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
     public class GroupTemplateResource : TemplateResource
     {
         [JsonIgnore]
-        public string OriginalName { get; set; }
-
-        [JsonIgnore]
         public string NewName { get; set; }
 
         public GroupProperties Properties { get; set; }

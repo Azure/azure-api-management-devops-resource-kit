@@ -66,9 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
             foreach (var backendResource in backends)
             {
-                var originalBackendName = backendResource.Name;
-
-                backendResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalBackendName}')]";
+                backendResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{backendResource.OriginalName}')]";
                 backendResource.Type = ResourceTypeConstants.Backend;
                 backendResource.ApiVersion = GlobalConstants.ApiVersion;
 
@@ -89,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     {
                         var policyContent = this.policyExtractor.GetCachedPolicyContent(policyTemplateResource, baseFilesGenerationDirectory);
 
-                        if (this.DoesPolicyReferenceBackend(policyContent, namedValues, originalBackendName, backendResource))
+                        if (this.DoesPolicyReferenceBackend(policyContent, namedValues, backendResource.OriginalName, backendResource))
                         {
                             // backend was used in policy, extract it
                             backendTemplate.TypedResources.Backends.Add(backendResource);
@@ -110,7 +108,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     }
 
                     var backendApiParameters = new BackendApiParameters();
-                    var backendValidName = NamingHelper.GenerateValidParameterName(originalBackendName, ParameterPrefix.Backend).ToLower();
+                    var backendValidName = NamingHelper.GenerateValidParameterName(backendResource.OriginalName, ParameterPrefix.Backend).ToLower();
 
                     if (!string.IsNullOrEmpty(backendResource.Properties.ResourceId))
                     {

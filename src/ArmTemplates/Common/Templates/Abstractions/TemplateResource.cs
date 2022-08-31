@@ -9,6 +9,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public class TemplateResource
     {
+        [JsonIgnore]
+        public string OriginalName { get; set; }
+
         [JsonProperty(Order = -10)]
         public string ApiVersion { get; set; }
 

@@ -9,6 +9,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
@@ -27,6 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new BackendTemplateResource
                     {
+                        OriginalName = BackendName,
                         Name = BackendName,
                         Properties = new BackendTemplateProperties
                         {
@@ -48,7 +50,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
         public static async Task<IBackendClient> GetMockedHttpApiClient(string responseFileLocation)
         {
-            var mockedClient = new Mock<BackendClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation));
+            var mockedClient = new Mock<BackendClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), new TemplateResourceDataProcessor<BackendTemplateResource>());
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;

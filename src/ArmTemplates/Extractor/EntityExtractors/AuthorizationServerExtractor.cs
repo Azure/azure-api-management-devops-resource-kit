@@ -48,8 +48,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var authorizationServers = await this.authorizationServerClient.GetAllAsync(extractorParameters);
             foreach (var authorizationServer in authorizationServers)
             {
-                var originalAuthServerName = authorizationServer.Name;
-
                 authorizationServer.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{authorizationServer.Name}')]";
                 authorizationServer.Type = ResourceTypeConstants.AuthorizationServer;
                 authorizationServer.ApiVersion = GlobalConstants.ApiVersion;
@@ -60,12 +58,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     apiResource.Properties.AuthenticationSettings != null &&
                     apiResource.Properties.AuthenticationSettings.OAuth2 != null &&
                     apiResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId != null &&
-                    apiResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId.Contains(originalAuthServerName)
+                    apiResource.Properties.AuthenticationSettings.OAuth2.AuthorizationServerId.Contains(authorizationServer.OriginalName)
                 ) is not null;
                 
                 if (string.IsNullOrEmpty(singleApiName) || isReferencedByApi)
                 {
-                    this.logger.LogDebug("'{0}' Authorization server found", originalAuthServerName);
+                    this.logger.LogDebug("'{0}' Authorization server found", authorizationServer.OriginalName);
                     authorizationServerTemplate.TypedResources.AuthorizationServers.Add(authorizationServer);
                 }
             }

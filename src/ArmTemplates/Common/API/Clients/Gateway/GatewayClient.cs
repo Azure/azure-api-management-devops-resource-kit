@@ -12,6 +12,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gateway;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Gateway
@@ -22,15 +23,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
         readonly ILogger<GatewayClient> logger;
         readonly IApisClient apisClient;
+        readonly ITemplateResourceDataProcessor<GatewayTemplateResource> templateResourceDataProcessor;
 
         public GatewayClient(
             IHttpClientFactory httpClientFactory,
             ILogger<GatewayClient> logger,
-            IApisClient apisClient
-            ): base(httpClientFactory)
+            IApisClient apisClient,
+            ITemplateResourceDataProcessor<GatewayTemplateResource> templateResourceDataProcessor
+            ) : base(httpClientFactory)
         {
             this.logger = logger;
             this.apisClient = apisClient;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<GatewayTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -40,7 +44,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllGatewaysRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<GatewayTemplateResource>(azToken, requestUrl);
+            var gatewatTemplateResources = await this.GetPagedResponseAsync<GatewayTemplateResource>(azToken, requestUrl);
+            this.templateResourceDataProcessor.ProcessData(gatewatTemplateResources);
+            return gatewatTemplateResources;
         }
 
         /// <summary>

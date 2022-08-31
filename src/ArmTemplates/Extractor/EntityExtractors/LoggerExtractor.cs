@@ -59,9 +59,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             var loggers = await this.loggerClient.GetAllAsync(extractorParameters);
             foreach (var logger in loggers)
             {
-                var originalLoggerName = logger.Name;
-
-                logger.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{originalLoggerName}')]";
+                logger.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{logger.OriginalName}')]";
                 logger.Type = ResourceTypeConstants.Logger;
                 logger.ApiVersion = GlobalConstants.ApiVersion;
                 logger.Scale = null;
@@ -74,7 +72,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 else
                 {
                     // if the user is extracting a single api, extract the loggers referenced by its diagnostics and api policies
-                    var isReferencedInPolicy = apiPolicies?.Any(x => x.Properties.PolicyContent.Contains(originalLoggerName));
+                    var isReferencedInPolicy = apiPolicies?.Any(x => x.Properties.PolicyContent.Contains(logger.OriginalName));
                     
                     bool isReferencedInDiagnostic = false;
                     var validApiName = NamingHelper.GenerateValidParameterName(apisToExtract.First(), ParameterPrefix.Api);

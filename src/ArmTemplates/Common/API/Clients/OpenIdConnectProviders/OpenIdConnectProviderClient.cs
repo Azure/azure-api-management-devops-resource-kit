@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.IdentityProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
@@ -20,13 +21,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetAllOpenIdConnectProvidersProvidersRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/openidConnectProviders?api-version={4}";
         const string ListOpenIdConnectProviderSecret = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/openidConnectProviders/{4}/listSecrets?api-version={5}";
 
-        readonly IOpenIdConnectProviderProcessor openIdConnectProviderProcessor;
+        readonly ITemplateResourceDataProcessor<OpenIdConnectProviderResource> templateResourceDataProcessor;
 
         public OpenIdConnectProviderClient(
             IHttpClientFactory httpClientFactory,
-            IOpenIdConnectProviderProcessor openIdConnectProviderProcessor) : base(httpClientFactory)
+            ITemplateResourceDataProcessor<OpenIdConnectProviderResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.openIdConnectProviderProcessor = openIdConnectProviderProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<OpenIdConnectProviderResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -37,7 +38,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var openIdConnectProviderResources = await this.GetPagedResponseAsync<OpenIdConnectProviderResource>(azToken, requestUrl);
-            this.openIdConnectProviderProcessor.ProcessData(openIdConnectProviderResources, extractorParameters);
+            this.templateResourceDataProcessor.ProcessData(openIdConnectProviderResources);
 
             return openIdConnectProviderResources;
         }

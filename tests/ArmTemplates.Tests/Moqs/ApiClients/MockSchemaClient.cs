@@ -6,6 +6,7 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Schemas;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Schemas;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Moq;
@@ -17,7 +18,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
     {
         public static async Task<ISchemasClient> GetMockedHttpSchemaClient(string responseFileLocation)
         {
-            var dataProcessor = new SchemaDataProcessor();
+            var dataProcessor = new TemplateResourceDataProcessor<SchemaTemplateResource>();
             var mockedClient = new Mock<SchemasClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation) , dataProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 

@@ -18,13 +18,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetAllRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/schemas?api-version={4}";
 
-        readonly ISchemaDataProcessor schemaProcessor;
+        readonly ITemplateResourceDataProcessor<SchemaTemplateResource> templateResourceDataProcessor;
 
         public SchemasClient(
             IHttpClientFactory httpClientFactory,
-            ISchemaDataProcessor schemaDataProcessor): base(httpClientFactory)
+            ITemplateResourceDataProcessor<SchemaTemplateResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.schemaProcessor = schemaDataProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<SchemaTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var schemaTemplates = await this.GetPagedResponseAsync<SchemaTemplateResource>(azToken, requestUrl);
-            this.schemaProcessor.ProcessData(schemaTemplates, extractorParameters);
+            this.templateResourceDataProcessor.ProcessData(schemaTemplates);
 
             return schemaTemplates;
         }

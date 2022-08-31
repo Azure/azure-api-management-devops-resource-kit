@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Tags;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Tags
 {
@@ -20,11 +21,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
         const string GetTagsLinkedToApiOperationRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/tags?api-version={6}&format=rawxml";
         const string GetAllTagsLinkedToProduct = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/tags?api-version={5}";
 
-        readonly IApisClient apisClient;
+        readonly ITemplateResourceDataProcessor<TagTemplateResource> templateResourceDataProcessor;
 
-        public TagClient(IHttpClientFactory httpClientFactory, IApisClient apisClient): base(httpClientFactory)
+        public TagClient(IHttpClientFactory httpClientFactory, ITemplateResourceDataProcessor<TagTemplateResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.apisClient = apisClient;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<List<TagTemplateResource>> GetTagsLinkedToApiOperationAsync(string apiName, string operationName, ExtractorParameters extractorParameters)
@@ -34,7 +35,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetTagsLinkedToApiOperationRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, operationName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
+            return tagTemplateResources;
         }
 
         public async Task<List<TagTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters, int skipAmountOfRecords = 0)
@@ -44,7 +47,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             var requestUrl = string.Format(GetAllTagsRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, skipAmountOfRecords, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
+            return tagTemplateResources;
         }
 
         public async Task<List<TagTemplateResource>> GetAllTagsLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
@@ -54,7 +59,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllTagsLinkedToApiRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
+            return tagTemplateResources;
         }
 
         public async Task<List<TagTemplateResource>> GetAllTagsLinkedToProductAsync(string productName, ExtractorParameters extractorParameters)
@@ -64,7 +71,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetAllTagsLinkedToProduct,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
-            return await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            var tagTemplateResources = await this.GetPagedResponseAsync<TagTemplateResource>(azToken, requestUrl);
+            this.templateResourceDataProcessor.ProcessData(tagTemplateResources);
+            return tagTemplateResources;
         }
     }
 }

@@ -4,13 +4,13 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.PolicyFragments;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction
 {
-    public interface IPolicyFragmentDataProcessor
+    public interface ITemplateResourceDataProcessor<T> where T : TemplateResource
     {
-        void ProcessData(List<PolicyFragmentsResource> templates, ExtractorParameters extractorParameters);
+        void ProcessData(List<T> templateResources);
+        void ProcessSingleData(T templateResource);
     }
 }

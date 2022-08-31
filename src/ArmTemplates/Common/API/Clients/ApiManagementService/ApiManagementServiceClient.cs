@@ -17,13 +17,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         const string GetApiManagementServiceByName = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}?api-version={4}";
 
-        readonly IApiManagementServiceProcessor apiManagementServiceProcessor;
+        readonly ITemplateResourceDataProcessor<ApiManagementServiceResource> templateResourceDataProcessor;
 
         public ApiManagementServiceClient(
-            IHttpClientFactory httpClientFactory, 
-            IApiManagementServiceProcessor apiManagementServiceProcessor): base(httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            ITemplateResourceDataProcessor<ApiManagementServiceResource> templateResourceDataProcessor) : base(httpClientFactory)
         {
-            this.apiManagementServiceProcessor = apiManagementServiceProcessor;
+            this.templateResourceDataProcessor = templateResourceDataProcessor;
         }
 
         public async Task<ApiManagementServiceResource> GetApiManagementServiceAsync(ExtractorParameters extractorParameters)
@@ -34,7 +34,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
 
             var apiManagementServiceResource = await this.GetResponseAsync<ApiManagementServiceResource>(azToken, requestUrl);
-            this.apiManagementServiceProcessor.ProcessSingleInstanceData(apiManagementServiceResource, extractorParameters);
+            this.templateResourceDataProcessor.ProcessSingleData(apiManagementServiceResource);
 
             return apiManagementServiceResource;
         }

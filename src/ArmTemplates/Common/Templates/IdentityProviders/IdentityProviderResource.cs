@@ -10,9 +10,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public class IdentityProviderResource : TemplateResource
     {
-        [JsonIgnore]
-        public string OriginalName { get; set; }
-
         public IdentityProviderProperties Properties { get; set; }
     }
 }

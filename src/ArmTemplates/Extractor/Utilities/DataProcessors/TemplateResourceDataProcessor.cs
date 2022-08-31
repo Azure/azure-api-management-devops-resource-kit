@@ -5,25 +5,34 @@
 
 using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.PolicyFragments;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors
 {
-    public class PolicyFragmentDataProcessor: IPolicyFragmentDataProcessor
+    public class TemplateResourceDataProcessor<T>: ITemplateResourceDataProcessor<T> where T : TemplateResource
     {
-        public void ProcessData(List<PolicyFragmentsResource> policyFragmentResources, ExtractorParameters extractorParameters)
+        public void ProcessData(List<T> templateResources)
         {
-            if (policyFragmentResources.IsNullOrEmpty())
+            if (templateResources.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var policyFragment in policyFragmentResources)
+            foreach (var templateResource in templateResources)
             {
-                policyFragment.OriginalName = policyFragment.Name;
+                this.ProcessSingleData(templateResource);
             }
+        }
+
+        public void ProcessSingleData(T templateResource)
+        {
+            if (templateResource == null)
+            {
+                return;
+            }
+            
+            templateResource.OriginalName = templateResource.Name;
         }
     }
 }

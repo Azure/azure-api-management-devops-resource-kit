@@ -29,12 +29,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new TagTemplateResource
                     {
+                        OriginalName = TagName1,
                         Name = TagName1,
                         Type = ResourceTypeConstants.APIOperationTag
                     },
 
                     new TagTemplateResource
                     {
+                        OriginalName = TagName2,
                         Name = TagName2,
                         Type = ResourceTypeConstants.APIOperationTag
                     }
@@ -46,12 +48,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new TagTemplateResource
                     {
+                        OriginalName = TagName1,
                         Name = TagName1,
                         Type = ResourceTypeConstants.APITag
                     },
 
                     new TagTemplateResource
                     {
+                        OriginalName = TagName2,
                         Name = TagName2,
                         Type = ResourceTypeConstants.APITag
                     }
@@ -63,12 +67,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new TagTemplateResource
                     {
+                        OriginalName = TagName1,
                         Name = TagName1,
                         Type = ResourceTypeConstants.ProductTag
                     },
 
                     new TagTemplateResource
                     {
+                        OriginalName = TagName2,
                         Name = TagName2,
                         Type = ResourceTypeConstants.ProductTag
                     }
@@ -80,22 +86,26 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new TagTemplateResource
                     {
+                        OriginalName = TagName1,
                         Name = TagName1,
                         Type = ResourceTypeConstants.APITag
                     },
 
                     new TagTemplateResource
                     {
+                        OriginalName = TagName2,
                         Name = TagName2,
                         Type = ResourceTypeConstants.APITag
                     },
                     new TagTemplateResource
                     {
+                        OriginalName = OperationTagName1,
                         Name = OperationTagName1,
                         Type = ResourceTypeConstants.APITag
                     },
                     new TagTemplateResource
                     {
+                        OriginalName = OperationTagName2,
                         Name = OperationTagName2,
                         Type = ResourceTypeConstants.APITag
                     }

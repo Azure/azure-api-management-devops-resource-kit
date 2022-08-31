@@ -26,6 +26,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new LoggerTemplateResource
                     {
+                        OriginalName = LoggerName,
                         Name = LoggerName,
                         Type = ResourceTypeConstants.Logger,
                         Properties = new()

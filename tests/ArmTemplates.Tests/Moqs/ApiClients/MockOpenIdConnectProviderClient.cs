@@ -9,7 +9,7 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.A
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
 using Moq;
 
@@ -67,8 +67,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
 
         public static async Task<IOpenIdConnectProvidersClient> GetMockedHttpOpenIdConnectProviderClient(string responseFileLocation)
         {
-            var mockedProcessor = new Mock<IOpenIdConnectProviderProcessor>(MockBehavior.Loose).Object;
-            var mockedClient = new Mock<OpenIdConnectProviderClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), mockedProcessor);
+            var dataProcessor = new TemplateResourceDataProcessor<OpenIdConnectProviderResource>();
+            var mockedClient = new Mock<OpenIdConnectProviderClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), dataProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;

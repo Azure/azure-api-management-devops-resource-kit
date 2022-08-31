@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.TemplateModels;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
@@ -27,6 +29,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new DiagnosticTemplateResource
                     {
+                        OriginalName = DiagnosticName,
                         Name = DiagnosticName,
                         Properties = new DiagnosticTemplateProperties()
                         {
@@ -41,6 +44,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new DiagnosticTemplateResource
                     {
+                        OriginalName= $"{apiName}-{DiagnosticName}",
                         Name = $"{apiName}-{DiagnosticName}",
                         Properties = new DiagnosticTemplateProperties()
                         {
@@ -62,6 +66,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new DiagnosticTemplateResource
                     {
+                        OriginalName = DefaultDiagnosticName,
                         Name = DefaultDiagnosticName,
                         Properties = new DiagnosticTemplateProperties()
                         {
@@ -76,6 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 {
                     new DiagnosticTemplateResource
                     {
+                        OriginalName = DefaultDiagnosticName,
                         Name = DefaultDiagnosticName,
                         Properties = new DiagnosticTemplateProperties()
                         {
