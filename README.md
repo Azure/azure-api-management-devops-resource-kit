@@ -72,7 +72,7 @@ You can report bugs or submit feature requests in the [repository's Issues secti
 
 Azure API Management DevOps resource kit has limited "assited support". You can use [GitHub Discussions](https://github.com/Azure/azure-api-management-devops-resource-kit/discussions/new) or [Stack Overflow](https://stackoverflow.com/questions/tagged/azure-api-management-devops-resource-kit) with the `azure-api-management-devops-resource-kit` tag.
 
-We welcome and appreciate community contributions. Refer to the [contribution guidelines](https://github.com/Azure/azure-api-management-devops-resource-kit#contributing) for more information.
+We welcome and appreciate community contributions. Refer to the [contribution guidelines](https://github.com/Azure/azure-api-management-devops-resource-kit/blob/main/CONTRIBUTING.md) for more information.
 
 ## Contributing
 
