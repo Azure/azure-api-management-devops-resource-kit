@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/apim-devops/ARM-template-generator/_apis/build/status/Scheduled?branchName=master)](https://dev.azure.com/apim-devops/ARM-template-generator/_build/latest?definitionId=4&branchName=master)
+[![Build Status](https://dev.azure.com/devdiv/DevDiv/_apis/build/status/Azure.azure-api-management-devops-resource-kit?branchName=refs%2Fpull%2F814%2Fmerge)](https://dev.azure.com/devdiv/DevDiv/_build/latest?definitionId=15827&branchName=main)
 
 # Azure API Management DevOps Resource Kit
 
@@ -51,11 +51,6 @@ We realize our customers bring a wide range of engineering cultures and existing
 
 If you have any questions or feedback, please raise issues in the repository or email us at apimgmt at microsoft. We also started an [FAQ page](./FAQ.md) to answer most common questions.
 
-## Alternatives
-
-* For customers who are just starting out or have simple scenarios, they may not necessarily need to use the tools we provided and may find it easier to begin with the boilerplate templates we provided in the [example](./example/) folder.
-* Customers can also run [PowerShell](https://docs.microsoft.com/powershell/module/az.apimanagement) scripts as part of their release process to deploy APIs to API Management.
-
 ## Kudos
 
 This project was inspired by Mattias Lögdberg's [API Management ARM Template Creator](http://mlogdberg.com/apimanagement/arm-template-creator) and Eldert Grootenboer's [series of blog posts](https://blog.eldert.net/api-management-ci-cd-using-arm-templates-api-management-instance/) on CI/CD with API Management. We have also received feedback from many members in our community. Thank you to all who have contributed in the project!
@@ -66,6 +61,12 @@ This project is licensed under [the MIT License](LICENSE)
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+## Support
+
+We provide support through GitHub [Issues] and [Discussions] only.  There is no paid support channel for this tool.  You can also use [Stack Overflow] with the `azure-api-management-devops-resource-kit` tag for community support.
+
+Report bugs or submit feature requests in GitHub [Issues].  Please use one of the provided templates so that we can gather all appropriate information.
+
 ## Contributing
 
 This project welcomes contributions and suggestions and guidance can be found in our [contribution guidelines](https://github.com/Azure/azure-api-management-devops-resource-kit/blob/main/CONTRIBUTING.md). Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.microsoft.com.
@@ -74,3 +75,8 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+<!-- Links -->
+[Issues]: https://github.com/Azure/azure-api-management-devops-resource-kit/issues
+[Discussions]: https://github.com/Azure/azure-api-management-devops-resource-kit/discussions
+[Stack Overflow]: https://stackoverflow.com/questions/tagged/azure-api-management-devops-resource-kit
