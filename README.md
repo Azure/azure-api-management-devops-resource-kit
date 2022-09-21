@@ -63,11 +63,11 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ## Support
 
-Azure API Management DevOps resource kit has limited "assited support". You can use [GitHub Discussions](https://github.com/Azure/azure-api-management-devops-resource-kit/discussions/new) or [Stack Overflow](https://stackoverflow.com/questions/tagged/azure-api-management-devops-resource-kit) with the `azure-api-management-devops-resource-kit` tag.
+We provide support through GitHub [Issues] and [Discussions] only.  There is no paid support channel for this tool.  You can also use [Stack Overflow] with the `azure-api-management-devops-resource-kit` tag for community support.
+
+Report bugs or submit feature requests in GitHub [Issues].  Please use one of the provided templates so that we can gather all appropriate information.
 
 ## Contributing
-
-You can report bugs or submit feature requests in the [repository's Issues section](https://github.com/Azure/azure-api-management-devops-resource-kit/issues).  Please use one of the provided templates so that we can gather all appropriate information.
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.microsoft.com.
 
@@ -75,3 +75,8 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+<!-- Links -->
+[Issues]: https://github.com/Azure/azure-api-management-devops-resource-kit/issues
+[Discussions]: https://github.com/Azure/azure-api-management-devops-resource-kit/discussions
+[Stack Overflow]: https://stackoverflow.com/questions/tagged/azure-api-management-devops-resource-kit
