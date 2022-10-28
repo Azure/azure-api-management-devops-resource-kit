@@ -7,6 +7,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 {
     public class BackendServiceFabricCluster
     {
+        public string ClientCertificateId { get; set; }
         public string ClientCertificatethumbprint { get; set; }
         public int MaxPartitionResolutionRetries { get; set; }
         public string[] ManagementEndpoints { get; set; }

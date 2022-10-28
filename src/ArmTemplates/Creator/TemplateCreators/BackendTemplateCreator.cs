@@ -36,6 +36,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             List<TemplateResource> resources = new List<TemplateResource>();
             foreach (BackendTemplateProperties backendTemplatePropeties in creatorConfig.Backends)
             {
+                if (!string.IsNullOrWhiteSpace(backendTemplatePropeties.Properties?.ServiceFabricCluster?.ClientCertificateId)) {
+                    var clientCertId = backendTemplatePropeties.Properties.ServiceFabricCluster.ClientCertificateId;
+                    backendTemplatePropeties.Properties.ServiceFabricCluster.ClientCertificateId = $"[resourceId('{ResourceTypeConstants.Certificate}', parameters('{ParameterNames.ApimServiceName}'), '{clientCertId}')]";
+                }
                 // create backend resource with properties
                 BackendTemplateResource backendTemplateResource = new BackendTemplateResource()
                 {
