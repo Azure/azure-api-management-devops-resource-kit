@@ -40,10 +40,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockApiManagementServiceClient.Object;
         }
 
-        public static async Task<IApiManagementServiceClient> GetMockedHttpApiManagementServiceClient(string responseFileLocation)
+        public static async Task<IApiManagementServiceClient> GetMockedHttpApiManagementServiceClient(MockClientConfiguration mockClientConfiguration)
         {
             var dataProcessor = new TemplateResourceDataProcessor<ApiManagementServiceResource>();
-            var mockedClient = new Mock<ApiManagementServiceClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), dataProcessor);
+            var mockedClient = new Mock<ApiManagementServiceClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration), dataProcessor);
             mockedClient.Protected()
                 .Setup<AzureCliAuthenticator>("Auth").Returns(MockClientUtils.GetMockedAzureClient());
 

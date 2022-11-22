@@ -65,10 +65,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.Ident
             return mockServiceProviderApiClient.Object;
         }
 
-        public static async Task<IOpenIdConnectProvidersClient> GetMockedHttpOpenIdConnectProviderClient(string responseFileLocation)
+        public static async Task<IOpenIdConnectProvidersClient> GetMockedHttpOpenIdConnectProviderClient(MockClientConfiguration mockClientConfiguration)
         {
             var dataProcessor = new TemplateResourceDataProcessor<OpenIdConnectProviderResource>();
-            var mockedClient = new Mock<OpenIdConnectProviderClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), dataProcessor);
+            var mockedClient = new Mock<OpenIdConnectProviderClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration), dataProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;

@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,15 +40,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return fileContent.Deserialize<T>();
         }
 
-        public static async Task<IHttpClientFactory> GenerateMockedIHttpClientFactoryWithResponse(string fileLocation)
+        public static async Task<IHttpClientFactory> GenerateMockedIHttpClientFactoryWithResponse(MockClientConfiguration mockClientConfiguration)
         {
-            var jsonResponse = await GetFileContent(fileLocation);
+            var jsonResponse = await GetFileContent(mockClientConfiguration.ResponseFileLocation);
 
             var httpMessageHandlerMock = new Mock<HttpMessageHandler>();
 
             var response = new HttpResponseMessage
             {
-                Content = new StringContent(jsonResponse)
+                Content = new StringContent(jsonResponse),
+                StatusCode = mockClientConfiguration.ResponseStatusCode
             };
 
             httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(response);

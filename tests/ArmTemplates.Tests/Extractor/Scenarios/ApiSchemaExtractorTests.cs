@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            var mockedApiSchemaClient = await MockApiSchemaClient.GetMockedHttpApiSchemaClient(responseFileLocation);
+            var mockedApiSchemaClient = await MockApiSchemaClient.GetMockedHttpApiSchemaClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
             var mockedApiSchemaExtractor = new ApiSchemaExtractor(this.GetTestLogger<ApiSchemaExtractor>(), mockedApiSchemaClient);
 
             // act

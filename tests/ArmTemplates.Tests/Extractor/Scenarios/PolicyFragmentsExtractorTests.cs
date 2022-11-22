@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 apiName: "");
             var extractorParameters = new ExtractorParameters(extractorConfig);
             var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListPolicyFragments_success_response.json");
-            var mockedClient = await MockPolicyFragmentClient.GetMockedHttpPolicyFragmentClient(fileLocation);
+            var mockedClient = await MockPolicyFragmentClient.GetMockedHttpPolicyFragmentClient(new MockClientConfiguration(responseFileLocation: fileLocation));
             var policyFragmentExtractor = new PolicyFragmentsExtractor(this.GetTestLogger<PolicyFragmentsExtractor>(), new TemplateBuilder(), mockedClient, null);
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 apiName: "api");
             var extractorParameters = new ExtractorParameters(extractorConfig);
             var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListPolicyFragments_success_response.json");
-            var mockedClient = await MockPolicyFragmentClient.GetMockedHttpPolicyFragmentClient(fileLocation);
+            var mockedClient = await MockPolicyFragmentClient.GetMockedHttpPolicyFragmentClient(new MockClientConfiguration(responseFileLocation: fileLocation));
 
             var policExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), null, new TemplateBuilder());
             var policyFragmentExtractor = new PolicyFragmentsExtractor(this.GetTestLogger<PolicyFragmentsExtractor>(), new TemplateBuilder(), mockedClient, policExtractor);
@@ -121,10 +121,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorParameters = new ExtractorParameters(extractorConfig);
             
             var policyFragmentResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListPolicyFragments_success_response.json");
-            var mockedPolicyFragmentClient = await MockPolicyFragmentClient.GetMockedHttpPolicyFragmentClient(policyFragmentResponseFileLocation);
+            var mockedPolicyFragmentClient = await MockPolicyFragmentClient.GetMockedHttpPolicyFragmentClient(new MockClientConfiguration(responseFileLocation: policyFragmentResponseFileLocation));
 
-            var policyResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApiPolicies_success_response.json");
-            var mockedPolicyClient = await MockPolicyClient.GetMockedHttpPolicyFragmentClient(policyResponseFileLocation);
+            var policyResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementGetApiPolicy_success_response.json");
+            var mockedPolicyClient = await MockPolicyClient.GetMockedHttpPolicyClient(new MockClientConfiguration(responseFileLocation: policyResponseFileLocation));
 
             var policExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
             var policyFragmentExtractor = new PolicyFragmentsExtractor(this.GetTestLogger<PolicyFragmentsExtractor>(), new TemplateBuilder(), mockedPolicyFragmentClient, policExtractor);

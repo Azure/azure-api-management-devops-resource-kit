@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "ResourceNotFound",
+    "message": "PoliciesConfiguration not found.",
+    "details": null
+  }
+}

@@ -76,7 +76,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
             var extractorParameters = new ExtractorParameters(extractorConfig);
             var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListGroups_success_response.json");
-            var mockedGroupsClient = await MockGroupsClient.GetMockedHttpGroupClient(fileLocation);
+            var mockedGroupsClient = await MockGroupsClient.GetMockedHttpGroupClient(new MockClientConfiguration(responseFileLocation: fileLocation));
             var groupExtractor = new GroupExtractor(this.GetTestLogger<GroupExtractor>(), new TemplateBuilder(), mockedGroupsClient);
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
