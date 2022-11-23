@@ -98,7 +98,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             ExtractorParameters extractorParameters)
         {
             var apiOperationPolicy = await this.policyClient.GetPolicyLinkedToApiOperationAsync(apiName, operationName, extractorParameters);
-            
+
             if (apiOperationPolicy is null)
             {
                 this.logger.LogWarning("Policy for api '{0}' and operation '{1}' not found", apiName, operationName);
@@ -128,7 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             ExtractorParameters extractorParameters)
         {
             var apiPolicy = await this.policyClient.GetPolicyLinkedToApiAsync(apiName, extractorParameters);
-            
+
             if (apiPolicy is null)
             {
                 this.logger.LogWarning("Policy for api {0} not found", apiName);
@@ -160,7 +160,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string baseFilesGenerationDirectory)
         {
             var productPolicy = await this.policyClient.GetPolicyLinkedToProductAsync(productTemplateResource.OriginalName, extractorParameters);
-            
+
             if (productPolicy is null)
             {
                 this.logger.LogWarning($"Policy not found for product '{productTemplateResource.OriginalName}'");

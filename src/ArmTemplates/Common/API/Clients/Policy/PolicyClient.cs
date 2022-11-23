@@ -74,7 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             }
             catch (HttpRequestException ex)
             {
-                // It is expected that operation will not have policy if it was not set after creation
+                // It is expected that entity will not have policy if it was not set after creation
                 if (ex.StatusCode != HttpStatusCode.NotFound)
                 {
                     throw;
