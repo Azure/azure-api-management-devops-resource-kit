@@ -16,10 +16,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 {
     class MockSchemaClient
     {
-        public static async Task<ISchemasClient> GetMockedHttpSchemaClient(string responseFileLocation)
+        public static async Task<ISchemasClient> GetMockedHttpSchemaClient(MockClientConfiguration mockClientConfiguration)
         {
             var dataProcessor = new TemplateResourceDataProcessor<SchemaTemplateResource>();
-            var mockedClient = new Mock<SchemasClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation) , dataProcessor);
+            var mockedClient = new Mock<SchemasClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration) , dataProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;

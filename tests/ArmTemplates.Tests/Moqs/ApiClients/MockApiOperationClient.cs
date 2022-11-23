@@ -108,10 +108,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockApiOperationClient.Object;
         }
 
-        public static async Task<IApiOperationClient> GetMockedHttpApiOperationClient(string responseFileLocation)
+        public static async Task<IApiOperationClient> GetMockedHttpApiOperationClient(MockClientConfiguration mockClientConfiguration)
         {
             var dataProcessor = new ApiOperationDataProcessor();
-            var mockedClient = new Mock<ApiOperationClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), dataProcessor);
+            var mockedClient = new Mock<ApiOperationClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration), dataProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;

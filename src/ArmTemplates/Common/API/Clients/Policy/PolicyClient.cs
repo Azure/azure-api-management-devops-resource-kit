@@ -4,6 +4,7 @@
 // --------------------------------------------------------------------------
 
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
@@ -16,9 +17,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public class PolicyClient : ApiClientBase, IPolicyClient
     {
         const string GetGlobalServicePolicyRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/policies/policy?api-version={4}&format=rawxml";
-        const string GetPolicyLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies?api-version={5}&format=rawxml";
-        const string GetPolicyLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/policies?api-version={5}&format=rawxml";
-        const string GetPolicyLinkedToApiOperationRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/policies?api-version={6}&format=rawxml";
+        const string GetPolicyLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/policies/policy?api-version={5}&format=rawxml";
+        const string GetPolicyLinkedToApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/policies/policy?api-version={5}&format=rawxml";
+        const string GetPolicyLinkedToApiOperationRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}/operations/{5}/policies/policy?api-version={6}&format=rawxml";
 
         public PolicyClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
         {
@@ -41,8 +42,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetPolicyLinkedToProductRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, productName, GlobalConstants.ApiVersion);
 
-            var policies = await this.GetPagedResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
-            return policies.FirstOrDefault();
+            return await this.FetchResourcePolicyTemplateAsync(azToken, requestUrl);
         }
 
         public async Task<PolicyTemplateResource> GetPolicyLinkedToApiAsync(string apiName, ExtractorParameters extractorParameters)
@@ -52,8 +52,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetPolicyLinkedToApiRequest,
                 this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, GlobalConstants.ApiVersion);
 
-            var policies = await this.GetPagedResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
-            return policies.FirstOrDefault();
+            return await this.FetchResourcePolicyTemplateAsync(azToken, requestUrl);
         }
 
         public async Task<PolicyTemplateResource> GetPolicyLinkedToApiOperationAsync(string apiName, string operationName, ExtractorParameters extractorParameters)
@@ -63,8 +62,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             string requestUrl = string.Format(GetPolicyLinkedToApiOperationRequest,
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, apiName, operationName, GlobalConstants.ApiVersion);
 
-            var policies = await this.GetPagedResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
-            return policies.FirstOrDefault();
+            return await this.FetchResourcePolicyTemplateAsync(azToken, requestUrl);
+        }
+
+        async Task<PolicyTemplateResource> FetchResourcePolicyTemplateAsync(string azToken, string requestUrl)
+        {
+            PolicyTemplateResource policy = null;
+            try
+            {
+                policy = await this.GetResponseAsync<PolicyTemplateResource>(azToken, requestUrl);
+            }
+            catch (HttpRequestException ex)
+            {
+                // It is expected that entity will not have policy if it was not set after creation
+                if (ex.StatusCode != HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
+            }
+            return policy;
         }
     }
 }

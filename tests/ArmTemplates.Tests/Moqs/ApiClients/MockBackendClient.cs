@@ -48,9 +48,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockBackendClient.Object;
         }
 
-        public static async Task<IBackendClient> GetMockedHttpApiClient(string responseFileLocation)
+        public static async Task<IBackendClient> GetMockedHttpApiClient(MockClientConfiguration mockClientConfiguration)
         {
-            var mockedClient = new Mock<BackendClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation), new TemplateResourceDataProcessor<BackendTemplateResource>());
+            var mockedClient = new Mock<BackendClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration), new TemplateResourceDataProcessor<BackendTemplateResource>());
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;

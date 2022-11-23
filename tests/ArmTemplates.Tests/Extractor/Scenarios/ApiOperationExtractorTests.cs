@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 apiName: "apiName");
             var extractorParameters = new ExtractorParameters(extractorConfig);
             var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApiOperations_success_response.json");
-            var mockedClient = await MockApiOperationClient.GetMockedHttpApiOperationClient(fileLocation);
+            var mockedClient = await MockApiOperationClient.GetMockedHttpApiOperationClient(new MockClientConfiguration(responseFileLocation: fileLocation));
             var apiOperationExtractor = new ApiOperationExtractor(this.GetTestLogger<ApiOperationExtractor>(), mockedClient);
 
             // act

@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
             var extractorParameters = new ExtractorParameters(extractorConfig);
             var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListOpenIdConnectProviders_success_response.json");
-            var mockedOpenIdConnectProviderClient = await MockOpenIdConnectProviderClient.GetMockedHttpOpenIdConnectProviderClient(fileLocation);
+            var mockedOpenIdConnectProviderClient = await MockOpenIdConnectProviderClient.GetMockedHttpOpenIdConnectProviderClient(new MockClientConfiguration(responseFileLocation: fileLocation));
             var openIdConnectExtractor = new OpenIdConnectProviderExtractor(this.GetTestLogger<OpenIdConnectProviderExtractor>(), new TemplateBuilder(), mockedOpenIdConnectProviderClient);
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(

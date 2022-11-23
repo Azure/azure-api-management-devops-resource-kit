@@ -64,7 +64,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApis_success_response.json");
             var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateAllCurrentApiReleaseTemplateAsync_ProperlyCreatesTemplate));
 
-            var mockedApiClientAllCurrent = await MockApisClient.GetMockedHttpApiClient(responseFileLocation);
+            var mockedApiClientAllCurrent = await MockApisClient.GetMockedHttpApiClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
 
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 apiName: string.Empty);

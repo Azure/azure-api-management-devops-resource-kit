@@ -14,10 +14,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 {
     class MockPolicyFragmentClient
     {
-        public static async Task<IPolicyFragmentsClient> GetMockedHttpPolicyFragmentClient(string responseFileLocation)
+        public static async Task<IPolicyFragmentsClient> GetMockedHttpPolicyFragmentClient(MockClientConfiguration mockClientConfiguration)
         {
             var dataProcessor = new TemplateResourceDataProcessor<PolicyFragmentsResource>();
-            var mockedClient = new Mock<PolicyFragmentsClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(responseFileLocation) , dataProcessor);
+            var mockedClient = new Mock<PolicyFragmentsClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration) , dataProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
             
             return mockedClient.Object;
