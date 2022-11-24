@@ -3,6 +3,7 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -90,7 +91,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             {
                 var policyContent = this.policyExtractor.GetCachedPolicyContent(policyTemplateResource, baseFilesGenerationDirectory);
 
-                if (policyContent.Contains(policyFragmentReferenceString))
+                if (policyContent.Contains(policyFragmentReferenceString, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }

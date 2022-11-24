@@ -149,5 +149,50 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             policyFragment1.Should().NotBeNull();
             policyFragment1.Properties.Description.Should().Be("A policy fragment example 1");
         }
+
+        [Fact]
+        public async Task GeneratePolicyFragmentTemplates_GeneratesPolicyFragmentTemplateForSingleApi_GivenDifferentPolicyFragmentIdCases()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GeneratePolicyFragmentTemplates_GeneratesPolicyFragmentTemplateForSingleApi));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: "api");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListPolicyFragments_success_response.json");
+            var mockedClient = await MockPolicyFragmentClient.GetMockedHttpPolicyFragmentClient(new MockClientConfiguration(responseFileLocation: fileLocation));
+
+            var policExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), null, new TemplateBuilder());
+            var policyFragmentExtractor = new PolicyFragmentsExtractor(this.GetTestLogger<PolicyFragmentsExtractor>(), new TemplateBuilder(), mockedClient, policExtractor);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                policyFragmentsExtractor: policyFragmentExtractor,
+                policyExtractor: policExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            var apiPolicies = new List<PolicyTemplateResource>()
+            {
+                new PolicyTemplateResource()
+                {
+                    Properties = new PolicyTemplateProperties()
+                    {
+                        PolicyContent = "fragment-id=\"POLICYFRAGMENT1\""
+                    }
+                }
+            };
+            // act
+            var policyFragments = await extractorExecutor.GeneratePolicyFragmentsTemplateAsync(apiPolicies, currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.PolicyFragments)).Should().BeTrue();
+
+            policyFragments.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            policyFragments.TypedResources.PolicyFragments.Count().Should().Be(1);
+
+            var policyFragment1 = policyFragments.TypedResources.PolicyFragments.First(x => x.OriginalName.Equals("policyFragment1"));
+            policyFragment1.Should().NotBeNull();
+            policyFragment1.Properties.Description.Should().Be("A policy fragment example 1");
+        }
     }
 }
