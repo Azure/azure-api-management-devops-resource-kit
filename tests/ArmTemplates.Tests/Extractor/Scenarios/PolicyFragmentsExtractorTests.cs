@@ -154,7 +154,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         public async Task GeneratePolicyFragmentTemplates_GeneratesPolicyFragmentTemplateForSingleApi_GivenDifferentPolicyFragmentIdCases()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GeneratePolicyFragmentTemplates_GeneratesPolicyFragmentTemplateForSingleApi));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GeneratePolicyFragmentTemplates_GeneratesPolicyFragmentTemplateForSingleApi_GivenDifferentPolicyFragmentIdCases));
 
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 apiName: "api");
