@@ -74,6 +74,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates
             services.AddScoped<IProductApiDataProcessor, ProductApiDataProcessor>();
             services.AddScoped<IApiDataProcessor, ApiDataProcessor>();
             services.AddScoped<IApiOperationDataProcessor, ApiOperationDataProcessor>();
+            services.AddScoped<INamedValuesDataProcessor, NamedValuesDataProcessor>();
             services.AddScoped(typeof(ITemplateResourceDataProcessor<>), typeof(TemplateResourceDataProcessor<>));
         }
 

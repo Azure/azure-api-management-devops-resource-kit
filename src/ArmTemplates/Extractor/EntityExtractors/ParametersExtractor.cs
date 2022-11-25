@@ -28,6 +28,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly IApisClient apisClient;
         readonly IIdentityProviderClient identityProviderClient;
         readonly IOpenIdConnectProvidersClient openIdConnectProviderClient;
+        readonly INamedValuesClient namedValuesClient;
         readonly ILogger<ParametersExtractor> logger;
 
         public ParametersExtractor(
@@ -35,13 +36,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             ITemplateBuilder templateBuilder,
             IApisClient apisClient,
             IIdentityProviderClient identityProviderClient,
-            IOpenIdConnectProvidersClient openIdConnectProviderClient)
+            IOpenIdConnectProvidersClient openIdConnectProviderClient,
+            INamedValuesClient namedValuesClient)
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
             this.apisClient = apisClient;
             this.identityProviderClient = identityProviderClient;
             this.openIdConnectProviderClient = openIdConnectProviderClient;
+            this.namedValuesClient = namedValuesClient;
         }
 
         public async Task<Template> CreateMasterTemplateParameterValues(
@@ -65,7 +68,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             parameters.Add(ParameterNames.ApimServiceName, new() { Value = extractorParameters.DestinationApimName });
             AddLinkedUrlParameters();
             AddPolicyParameters();
-            AddNamedValuesParameters();
+            await AddNamedValuesParameters();
             await AddServiceUrlParameterAsync();
             await AddApiOauth2ScopeParameterAsync();
             await AddSecretValuesParameters();
@@ -173,7 +176,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 parameters.Add(ParameterNames.ApiOauth2ScopeSettings, new TemplateObjectParameterProperties() { Value = apiOauth2Scopes });
             }
 
-            void AddNamedValuesParameters()
+            async Task AddNamedValuesParameters()
             {
                 if (!extractorParameters.ParameterizeNamedValue &&
                     !extractorParameters.ParamNamedValuesKeyVaultSecrets)
@@ -185,18 +188,31 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var keyVaultNamedValues = new Dictionary<string, string>();
                 foreach (var namedValue in namedValuesResources.NamedValues)
                 {
+                    //secret or plain values
                     if (extractorParameters.ParameterizeNamedValue && namedValue?.Properties.KeyVault == null)
                     {
-                        var propertyValue = namedValue.Properties.Value;
                         var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
-                        namedValuesParameters.Add(validPName, propertyValue);
+                        if (!namedValue.Properties.Secret)
+                        {
+                            namedValuesParameters.Add(validPName, namedValue?.Properties.OriginalValue);
+                        }
+                        else 
+                        {
+                            var namedValueSecretValue = namedValue?.Properties.OriginalValue;
+                            if (extractorParameters.ExtractSecrets)
+                            {
+                                var namaedValueSecretData = await this.namedValuesClient.ListNamedValueSecretValueAsync(namedValue.OriginalName, extractorParameters);
+                                namedValueSecretValue = namaedValueSecretData?.Value;
+                            }
+                            namedValuesParameters.Add(validPName, namedValueSecretValue);
+                        }
                     }
 
+                    //key vault part
                     if (extractorParameters.ParamNamedValuesKeyVaultSecrets && namedValue?.Properties.KeyVault is not null)
                     {
-                        var propertyValue = namedValue.Properties.KeyVault.SecretIdentifier;
                         var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
-                        keyVaultNamedValues.Add(validPName, propertyValue);
+                        keyVaultNamedValues.Add(validPName, namedValue.Properties.OriginalKeyVaultSecretIdentifierValue);
                     }
                 }
 
