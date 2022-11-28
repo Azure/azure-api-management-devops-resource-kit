@@ -216,8 +216,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     }
                 }
 
-                parameters.Add(ParameterNames.NamedValues, new TemplateObjectParameterProperties() { Value = namedValuesParameters });
-                parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateObjectParameterProperties() { Value = keyVaultNamedValues });
+                if (extractorParameters.ParameterizeNamedValue)
+                {
+                    parameters.Add(ParameterNames.NamedValues, new TemplateObjectParameterProperties() { Value = namedValuesParameters });
+                }
+
+                if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
+                {
+                    parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateObjectParameterProperties() { Value = keyVaultNamedValues });
+                }
             }
 
             async Task AddSecretValuesParameters()
