@@ -228,7 +228,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                     this.creatorParameters.FileNames, 
                     this.creatorParameters.ApimServiceName);
 
-                FileWriter.WriteJSONToFile(masterTemplate, string.Concat(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.LinkedMaster));
+                FileWriter.WriteJSONToFile(masterTemplate, Path.Combine(this.creatorParameters.OutputLocation, this.creatorParameters.FileNames.LinkedMaster));
             }
 
             foreach (var apiTemplate in apiTemplates)
