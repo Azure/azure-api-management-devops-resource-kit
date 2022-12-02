@@ -40,10 +40,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockNamedValuesClient.Object;
         }
 
-        public static async Task<INamedValuesClient> GetMockedHttpNamedValuesClient(MockClientConfiguration mockClientConfiguration)
+        public static async Task<INamedValuesClient> GetMockedHttpNamedValuesClient(params MockClientConfiguration[] mockClientConfigurations)
         {
             var dataProcessor = new NamedValuesDataProcessor();
-            var mockedClient = new Mock<NamedValuesClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration), dataProcessor);
+            var mockedClient = new Mock<NamedValuesClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfigurations), dataProcessor);
             MockClientUtils.MockAuthOfApiClient(mockedClient);
 
             return mockedClient.Object;

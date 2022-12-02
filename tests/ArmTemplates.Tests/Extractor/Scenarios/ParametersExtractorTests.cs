@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         {
         }
 
-        ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null, IOpenIdConnectProvidersClient openIdConnectProviderClient = null, INamedValuesClient namedValuesClient = null) 
+        ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null, IOpenIdConnectProvidersClient openIdConnectProviderClient = null) 
         {
             var parametersExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient);
 

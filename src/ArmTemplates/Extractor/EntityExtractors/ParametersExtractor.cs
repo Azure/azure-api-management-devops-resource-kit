@@ -185,14 +185,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var keyVaultNamedValues = new Dictionary<string, string>();
                 foreach (var namedValue in namedValuesResources.NamedValues)
                 {
-                    //secret or plain values
+                    // secret/plain values
                     if (extractorParameters.ParameterizeNamedValue && namedValue?.Properties.KeyVault == null)
                     {
                         var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
                         namedValuesParameters.Add(validPName, namedValue?.Properties.OriginalValue);
                     }
 
-                    //key vault part
+                    //key vault values
                     if (extractorParameters.ParamNamedValuesKeyVaultSecrets && namedValue?.Properties.KeyVault is not null)
                     {
                         var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
