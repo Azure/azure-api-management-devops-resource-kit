@@ -192,20 +192,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     if (extractorParameters.ParameterizeNamedValue && namedValue?.Properties.KeyVault == null)
                     {
                         var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
-                        if (!namedValue.Properties.Secret)
-                        {
-                            namedValuesParameters.Add(validPName, namedValue?.Properties.OriginalValue);
-                        }
-                        else 
-                        {
-                            var namedValueSecretValue = namedValue?.Properties.OriginalValue;
-                            if (extractorParameters.ExtractSecrets)
-                            {
-                                var namaedValueSecretData = await this.namedValuesClient.ListNamedValueSecretValueAsync(namedValue.OriginalName, extractorParameters);
-                                namedValueSecretValue = namaedValueSecretData?.Value;
-                            }
-                            namedValuesParameters.Add(validPName, namedValueSecretValue);
-                        }
+                        namedValuesParameters.Add(validPName, namedValue?.Properties.OriginalValue);
                     }
 
                     //key vault part

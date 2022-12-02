@@ -35,6 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
             var namedValuesTemplateResources = await this.GetPagedResponseAsync<NamedValueTemplateResource>(azToken, requestUrl);
             this.namedValuesDataProcessor.ProcessData(namedValuesTemplateResources);
+            await this.FetchSecretsValue(namedValuesTemplateResources, extractorParameters);
             return namedValuesTemplateResources;
         }
 
@@ -46,6 +47,29 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, namedValueId, GlobalConstants.ApiVersion);
 
             return await this.GetResponseAsync<NamedValuesSecretValue>(azToken, requestUrl, useCache: false, method: ClientHttpMethod.POST);
+        }
+
+        async Task FetchSecretsValue(List<NamedValueTemplateResource> namedValues, ExtractorParameters extractorParameters)
+        {
+            if (namedValues == null || namedValues.Count== 0)
+            {
+                return ;
+            }
+
+            if (!extractorParameters.ExtractSecrets)
+            {
+                return ;
+            }
+
+            foreach(var namedValue in namedValues)
+            {
+                if (namedValue.Properties.Secret && namedValue.Properties.KeyVault == null)
+                {
+                    var namaedValueSecretData = await this.ListNamedValueSecretValueAsync(namedValue.OriginalName, extractorParameters);
+                    namedValue.Properties.OriginalValue = namaedValueSecretData?.Value;
+                    namedValue.Properties.Value = namaedValueSecretData?.Value;
+                }
+            }
         }
     }
 }
