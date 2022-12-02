@@ -28,7 +28,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly IApisClient apisClient;
         readonly IIdentityProviderClient identityProviderClient;
         readonly IOpenIdConnectProvidersClient openIdConnectProviderClient;
-        readonly INamedValuesClient namedValuesClient;
         readonly ILogger<ParametersExtractor> logger;
 
         public ParametersExtractor(
@@ -36,15 +35,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             ITemplateBuilder templateBuilder,
             IApisClient apisClient,
             IIdentityProviderClient identityProviderClient,
-            IOpenIdConnectProvidersClient openIdConnectProviderClient,
-            INamedValuesClient namedValuesClient)
+            IOpenIdConnectProvidersClient openIdConnectProviderClient)
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
             this.apisClient = apisClient;
             this.identityProviderClient = identityProviderClient;
             this.openIdConnectProviderClient = openIdConnectProviderClient;
-            this.namedValuesClient = namedValuesClient;
         }
 
         public async Task<Template> CreateMasterTemplateParameterValues(
@@ -68,7 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             parameters.Add(ParameterNames.ApimServiceName, new() { Value = extractorParameters.DestinationApimName });
             AddLinkedUrlParameters();
             AddPolicyParameters();
-            await AddNamedValuesParameters();
+            AddNamedValuesParameters();
             await AddServiceUrlParameterAsync();
             await AddApiOauth2ScopeParameterAsync();
             await AddSecretValuesParameters();
@@ -176,7 +173,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 parameters.Add(ParameterNames.ApiOauth2ScopeSettings, new TemplateObjectParameterProperties() { Value = apiOauth2Scopes });
             }
 
-            async Task AddNamedValuesParameters()
+            void AddNamedValuesParameters()
             {
                 if (!extractorParameters.ParameterizeNamedValue &&
                     !extractorParameters.ParamNamedValuesKeyVaultSecrets)

@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
         ExtractorExecutor GetExtractorInstance(ExtractorParameters extractorParameters, IApisClient apisClient = null, IIdentityProviderClient identityProviderClient = null, IOpenIdConnectProvidersClient openIdConnectProviderClient = null, INamedValuesClient namedValuesClient = null) 
         {
-            var parametersExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient, namedValuesClient);
+            var parametersExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), apisClient, identityProviderClient, openIdConnectProviderClient);
 
             var loggerExtractor = new LoggerExtractor(
                 this.GetTestLogger<LoggerExtractor>(),
@@ -406,7 +406,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         {
             // arrange
 
-            var parameterExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), default, default, default, default);
+            var parameterExtractor = new ParametersExtractor(this.GetTestLogger<ParametersExtractor>(), new TemplateBuilder(), default, default, default);
 
             var resourceTemplate = new Template<OpenIdConnectProviderResources>()
             {
@@ -580,11 +580,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(paramNamedValue: "true", extractSecrets: "true");
             var extractorParameters = new ExtractorParameters(extractorConfig);
 
-            //named value client
-            var namedValueSecretResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementNamedValueListValue_success_response.json");
-            var mockedNamedValuesClient = await MockNamedValuesClient.GetMockedHttpNamedValuesClient(new MockClientConfiguration(responseFileLocation: namedValueSecretResponseFileLocation));
-
-            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null, namedValuesClient: mockedNamedValuesClient);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
 
             var namedValuesResources = new NamedValuesResources()
             {
@@ -606,8 +602,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                         Properties = new NamedValueProperties()
                         {
                             Secret = true,
-                            Value = null,
-                            OriginalValue = null
+                            Value = "extracted-secret",
+                            OriginalValue = "extracted-secret"
                         },
                         Name = "named-value-name-2",
                         OriginalName = "named-value-name-2"
@@ -629,7 +625,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             namedValuesSettingsParametersValues.Count.Should().Be(2);
             namedValuesSettingsParametersValues[NamingHelper.GenerateValidParameterName("named-value-name-1", ParameterPrefix.Property)].Should().Be("named-value-1");
-            namedValuesSettingsParametersValues[NamingHelper.GenerateValidParameterName("named-value-name-2", ParameterPrefix.Property)].Should().Be("named-value-2");
+            namedValuesSettingsParametersValues[NamingHelper.GenerateValidParameterName("named-value-name-2", ParameterPrefix.Property)].Should().Be("extracted-secret");
         }
 
         [Fact]
