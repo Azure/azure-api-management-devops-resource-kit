@@ -21,6 +21,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Ide
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.IdentityProviderClients;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.OpenIdConnectProviders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.NamedValues;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -490,6 +492,212 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             backendSettingsParameterValues["key1"].Protocol.Should().Be("protocol");
             backendSettingsParameterValues["key1"].ResourceId.Should().Be("resourceId");
             backendSettingsParameterValues["key1"].Url.Should().Be("url");
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_DoesNotAddNamedValuesParameters_GivenParametrizeConfigNotPassed()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_DoesNotAddNamedValuesParameters_GivenParametrizeConfigNotPassed));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration();
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, null, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Count.Should().Be(1);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            parametersTemplate.Parameters.Should().NotContainKey(ParameterNames.NamedValues);
+            parametersTemplate.Parameters.Should().NotContainKey(ParameterNames.NamedValueKeyVaultSecrets);
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ContainsNamedValuesParameters_GivenParametrizeNamedValueConfigIsTrue()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ContainsNamedValuesParameters_GivenParametrizeNamedValueConfigIsTrue));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(paramNamedValue: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var namedValuesResources = new NamedValuesResources()
+            {
+                NamedValues = new List<NamedValueTemplateResource>()
+                {
+                    new NamedValueTemplateResource()
+                    {
+                        Properties = new NamedValueProperties() 
+                        {
+                            Secret = false,
+                            Value = "named-value-1",
+                            OriginalValue= "named-value-1"
+                        },
+                        Name = "named-value-name-1",
+                        OriginalName = "named-value-name-1"
+                    },
+                    new NamedValueTemplateResource()
+                    {
+                        Properties = new NamedValueProperties()
+                        {
+                            Secret = true,
+                            Value = null,
+                            OriginalValue= null
+                        },
+                        Name = "named-value-name-2",
+                        OriginalName = "named-value-name-2"
+                    }
+                }
+            };
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, namedValuesResources, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Count.Should().Be(2);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.NamedValues);
+
+            var namedValuesSettingsParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.NamedValues];
+            var namedValuesSettingsParametersValues = (Dictionary<string, string>)namedValuesSettingsParameters.Value;
+
+            namedValuesSettingsParametersValues.Count.Should().Be(2);
+            namedValuesSettingsParametersValues[NamingHelper.GenerateValidParameterName("named-value-name-1", ParameterPrefix.Property)].Should().Be("named-value-1");
+            namedValuesSettingsParametersValues[NamingHelper.GenerateValidParameterName("named-value-name-2", ParameterPrefix.Property)].Should().Be(null);
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ContainsNamedValuesParameters_GivenParametrizeNamedValueAndExtractSecretsConfigAreTrue()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ContainsNamedValuesParameters_GivenParametrizeNamedValueAndExtractSecretsConfigAreTrue));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(paramNamedValue: "true", extractSecrets: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var namedValuesResources = new NamedValuesResources()
+            {
+                NamedValues = new List<NamedValueTemplateResource>()
+                {
+                    new NamedValueTemplateResource()
+                    {
+                        Properties = new NamedValueProperties()
+                        {
+                            Secret = false,
+                            Value = "named-value-1",
+                            OriginalValue= "named-value-1"
+                        },
+                        Name = "named-value-name-1",
+                        OriginalName = "named-value-name-1"
+                    },
+                    new NamedValueTemplateResource()
+                    {
+                        Properties = new NamedValueProperties()
+                        {
+                            Secret = true,
+                            Value = "extracted-secret",
+                            OriginalValue = "extracted-secret"
+                        },
+                        Name = "named-value-name-2",
+                        OriginalName = "named-value-name-2"
+                    }
+                }
+            };
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, namedValuesResources, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Count.Should().Be(2);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.NamedValues);
+
+            var namedValuesSettingsParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.NamedValues];
+            var namedValuesSettingsParametersValues = (Dictionary<string, string>)namedValuesSettingsParameters.Value;
+
+            namedValuesSettingsParametersValues.Count.Should().Be(2);
+            namedValuesSettingsParametersValues[NamingHelper.GenerateValidParameterName("named-value-name-1", ParameterPrefix.Property)].Should().Be("named-value-1");
+            namedValuesSettingsParametersValues[NamingHelper.GenerateValidParameterName("named-value-name-2", ParameterPrefix.Property)].Should().Be("extracted-secret");
+        }
+
+        [Fact]
+        public async Task GenerateParametersTemplates_ContainsNamedValuesKeyVaultSecretParameters_GivenParametrizeNamedValueKeyVaultSecretsConfigIsTrue()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateParametersTemplates_ContainsNamedValuesKeyVaultSecretParameters_GivenParametrizeNamedValueKeyVaultSecretsConfigIsTrue));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(paramNamedValuesKeyVaultSecrets: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var extractorExecutor = this.GetExtractorInstance(extractorParameters, null);
+
+            var namedValuesResources = new NamedValuesResources()
+            {
+                NamedValues = new List<NamedValueTemplateResource>()
+                {
+                    new NamedValueTemplateResource()
+                    {
+                        Properties = new NamedValueProperties()
+                        {
+                            Secret = false,
+                            Value = "named-value-1",
+                            OriginalValue= "named-value-1"
+                        },
+                        Name = "named-value-name-1",
+                        OriginalName = "named-value-name-1"
+                    },
+                    new NamedValueTemplateResource()
+                    {
+                        Properties = new NamedValueProperties()
+                        {
+                            Secret = true,
+                            Value = null,
+                            OriginalValue = null
+                        },
+                        Name = "named-value-name-2",
+                        OriginalName = "named-value-name-2"
+                    },
+                    new NamedValueTemplateResource()
+                    {
+                        Properties = new NamedValueProperties()
+                        {
+                            Secret = true,
+                            Value = null,
+                            OriginalValue = null,
+                            OriginalKeyVaultSecretIdentifierValue = "secret-oidentifier-value-original",
+                            KeyVault = new NamedValueResourceKeyVaultProperties()
+                            {
+                                SecretIdentifier = "secret-oidentifier-value"
+                            }
+                        },
+                        Name = "key-vault-named-value-name-1",
+                        OriginalName = "key-vault-named-value-name-1"
+                    }
+                }
+            };
+
+            // act
+            var parametersTemplate = await extractorExecutor.GenerateParametersTemplateAsync(null, null, null, namedValuesResources, new IdentityProviderResources(), new OpenIdConnectProviderResources(), currentTestDirectory);
+
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Parameters)).Should().BeTrue();
+
+            parametersTemplate.Parameters.Count.Should().Be(2);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+            parametersTemplate.Parameters.Should().ContainKey(ParameterNames.NamedValueKeyVaultSecrets);
+
+            var namedValuesKeyVaultsSettingsParameters = (TemplateObjectParameterProperties)parametersTemplate.Parameters[ParameterNames.NamedValueKeyVaultSecrets];
+            var namedValuesKeyVaultSettingsParametersValues = (Dictionary<string, string>)namedValuesKeyVaultsSettingsParameters.Value;
+
+            namedValuesKeyVaultSettingsParametersValues.Count.Should().Be(1);
+            namedValuesKeyVaultSettingsParametersValues[NamingHelper.GenerateValidParameterName("key-vault-named-value-name-1", ParameterPrefix.Property)].Should().Be("secret-oidentifier-value-original");
         }
     }
 }

@@ -12,10 +12,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
         public string ResponseFileLocation { get; private set; }
         public HttpStatusCode ResponseStatusCode { get; private set; }
 
-        public MockClientConfiguration(string responseFileLocation, HttpStatusCode statusCode = HttpStatusCode.OK) 
+        public string UrlPath { get; private set; }
+
+        public MockClientConfiguration(string responseFileLocation, HttpStatusCode statusCode = HttpStatusCode.OK, string urlPath = null) 
         {
             this.ResponseFileLocation = responseFileLocation;
             this.ResponseStatusCode = statusCode;
+            this.UrlPath = urlPath;
         }
     }
 }

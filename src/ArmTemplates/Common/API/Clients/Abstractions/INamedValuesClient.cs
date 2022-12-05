@@ -13,5 +13,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public interface INamedValuesClient
     {
         Task<List<NamedValueTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
+
+        Task<NamedValuesSecretValue> ListNamedValueSecretValueAsync(string namedValueId, ExtractorParameters extractorParameters);
     }
 }

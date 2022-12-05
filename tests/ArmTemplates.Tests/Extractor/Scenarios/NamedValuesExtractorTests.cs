@@ -98,5 +98,56 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             namedValuesTemplate.TypedResources.NamedValues.First().Name.Should().Contain(MockNamedValuesClient.NamedValueName);
             namedValuesTemplate.TypedResources.NamedValues.First().Properties.DisplayName.Should().Contain(MockNamedValuesClient.NamedValueDisplayName);
         }
+
+        [Fact]
+        public async Task GenerateNamedValuesTemplates_ProperlyLaysTheInformation_GivenExtractSecretSetToTrue()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateNamedValuesTemplates_ProperlyLaysTheInformation_GivenExtractSecretSetToTrue));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(extractSecrets: "true");
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var fileLocationNamedValues = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListNamedValues_success_response.json");
+            var fileLocationSecretValues = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementNamedValueListValue_success_response.json");
+            var mockedNamedValuesClient = await MockNamedValuesClient.GetMockedHttpNamedValuesClient(
+                new MockClientConfiguration(responseFileLocation: fileLocationNamedValues, urlPath: $"/namedValues?api-version={GlobalConstants.ApiVersion}"),
+                new MockClientConfiguration(responseFileLocation: fileLocationSecretValues, urlPath: $"/namedValues/named-value-2/listValue?api-version={GlobalConstants.ApiVersion}"));
+
+            var namedValuesExtractor = new NamedValuesExtractor(
+                this.GetTestLogger<NamedValuesExtractor>(),
+                new TemplateBuilder(),
+                mockedNamedValuesClient,
+                default,
+                default);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                namedValuesExtractor: namedValuesExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var namedValuesTemplate = await extractorExecutor.GenerateNamedValuesTemplateAsync(
+                null,
+                new List<PolicyTemplateResource>(){},
+                It.IsAny<List<LoggerTemplateResource>>(),
+                currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.NamedValues)).Should().BeTrue();
+
+            namedValuesTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+
+            namedValuesTemplate.TypedResources.NamedValues.Should().HaveCount(2);
+            namedValuesTemplate.Resources.Should().HaveCount(2);
+
+            var plainNamedValue = namedValuesTemplate.TypedResources.NamedValues.First(x => x.OriginalName.Equals("named-value-1"));
+            plainNamedValue.Should().NotBe(null);
+            plainNamedValue.Properties.Value.Should().Be("named-value-1-value");
+
+            var secretNamedValue = namedValuesTemplate.TypedResources.NamedValues.First(x => x.OriginalName.Equals("named-value-2"));
+            secretNamedValue.Should().NotBe(null);
+            secretNamedValue.Properties.Value.Should().Be("named-value-2");
+        }
     }
 }

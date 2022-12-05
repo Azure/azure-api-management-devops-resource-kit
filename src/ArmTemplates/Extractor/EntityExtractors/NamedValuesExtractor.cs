@@ -77,21 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 namedValueResource.ApiVersion = GlobalConstants.ApiVersion;
                 namedValueResource.Scale = null;
 
-                if (extractorParameters.ParameterizeNamedValue)
-                {
-                    namedValueResource.Properties.Value = $"[parameters('{ParameterNames.NamedValues}').{NamingHelper.GenerateValidParameterName(namedValueResource.OriginalName, ParameterPrefix.Property)}]";
-                }
-
-                //Hide the value field if it is a keyvault named value
-                if (namedValueResource.Properties.KeyVault != null)
-                {
-                    namedValueResource.Properties.Value = null;
-                }
-
-                if (namedValueResource.Properties.KeyVault != null && extractorParameters.ParamNamedValuesKeyVaultSecrets)
-                {
-                    namedValueResource.Properties.KeyVault.SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{NamingHelper.GenerateValidParameterName(namedValueResource.OriginalName, ParameterPrefix.Property)}]";
-                }
+                this.ModifyNamedValuesOutput(namedValueResource, extractorParameters);
 
                 if (string.IsNullOrEmpty(singleApiName))
                 {
@@ -178,6 +164,25 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
             }
             return false;
+        }
+
+        void ModifyNamedValuesOutput(NamedValueTemplateResource namedValueResource, ExtractorParameters extractorParameters)
+        {
+            if (extractorParameters.ParameterizeNamedValue)
+            {
+                namedValueResource.Properties.Value = $"[parameters('{ParameterNames.NamedValues}').{NamingHelper.GenerateValidParameterName(namedValueResource.OriginalName, ParameterPrefix.Property)}]";
+            }
+
+            //Hide the value field if it is a keyvault named value
+            if (namedValueResource.Properties.KeyVault != null)
+            {
+                namedValueResource.Properties.Value = null;
+            }
+
+            if (namedValueResource.Properties.KeyVault != null && extractorParameters.ParamNamedValuesKeyVaultSecrets)
+            {
+                namedValueResource.Properties.KeyVault.SecretIdentifier = $"[parameters('{ParameterNames.NamedValueKeyVaultSecrets}').{NamingHelper.GenerateValidParameterName(namedValueResource.OriginalName, ParameterPrefix.Property)}]";
+            }
         }
     }
 }

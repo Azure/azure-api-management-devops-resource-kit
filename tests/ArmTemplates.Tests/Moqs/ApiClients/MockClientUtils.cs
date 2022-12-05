@@ -40,19 +40,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return fileContent.Deserialize<T>();
         }
 
-        public static async Task<IHttpClientFactory> GenerateMockedIHttpClientFactoryWithResponse(MockClientConfiguration mockClientConfiguration)
+        public static async Task<IHttpClientFactory> GenerateMockedIHttpClientFactoryWithResponse(params MockClientConfiguration[] mockClientConfigurations)
         {
-            var jsonResponse = await GetFileContent(mockClientConfiguration.ResponseFileLocation);
-
             var httpMessageHandlerMock = new Mock<HttpMessageHandler>();
 
-            var response = new HttpResponseMessage
+            foreach (var mockClientConfiguration in mockClientConfigurations)
             {
-                Content = new StringContent(jsonResponse),
-                StatusCode = mockClientConfiguration.ResponseStatusCode
-            };
+                var jsonResponse = await GetFileContent(mockClientConfiguration.ResponseFileLocation);
 
-            httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(response);
+                var response = new HttpResponseMessage
+                {
+                    Content = new StringContent(jsonResponse),
+                    StatusCode = mockClientConfiguration.ResponseStatusCode
+                };
+
+                if (!string.IsNullOrEmpty(mockClientConfiguration.UrlPath))
+                {
+                    httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(p => p.RequestUri.ToString().EndsWith(mockClientConfiguration.UrlPath)), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(response);
+                }
+                else
+                {
+                    httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(response);
+                }
+            }
+
             var httpClient = new HttpClient(httpMessageHandlerMock.Object);
 
             var httpClientFactory = new Mock<IHttpClientFactory>();

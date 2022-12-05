@@ -185,23 +185,30 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var keyVaultNamedValues = new Dictionary<string, string>();
                 foreach (var namedValue in namedValuesResources.NamedValues)
                 {
+                    // secret/plain values
                     if (extractorParameters.ParameterizeNamedValue && namedValue?.Properties.KeyVault == null)
                     {
-                        var propertyValue = namedValue.Properties.Value;
                         var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
-                        namedValuesParameters.Add(validPName, propertyValue);
+                        namedValuesParameters.Add(validPName, namedValue?.Properties.OriginalValue);
                     }
 
+                    //key vault values
                     if (extractorParameters.ParamNamedValuesKeyVaultSecrets && namedValue?.Properties.KeyVault is not null)
                     {
-                        var propertyValue = namedValue.Properties.KeyVault.SecretIdentifier;
                         var validPName = NamingHelper.GenerateValidParameterName(namedValue.OriginalName, ParameterPrefix.Property);
-                        keyVaultNamedValues.Add(validPName, propertyValue);
+                        keyVaultNamedValues.Add(validPName, namedValue.Properties.OriginalKeyVaultSecretIdentifierValue);
                     }
                 }
 
-                parameters.Add(ParameterNames.NamedValues, new TemplateObjectParameterProperties() { Value = namedValuesParameters });
-                parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateObjectParameterProperties() { Value = keyVaultNamedValues });
+                if (extractorParameters.ParameterizeNamedValue)
+                {
+                    parameters.Add(ParameterNames.NamedValues, new TemplateObjectParameterProperties() { Value = namedValuesParameters });
+                }
+
+                if (extractorParameters.ParamNamedValuesKeyVaultSecrets)
+                {
+                    parameters.Add(ParameterNames.NamedValueKeyVaultSecrets, new TemplateObjectParameterProperties() { Value = keyVaultNamedValues });
+                }
             }
 
             async Task AddSecretValuesParameters()
