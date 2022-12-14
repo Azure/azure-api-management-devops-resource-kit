@@ -1031,13 +1031,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// <summary>
         /// Generates master template for each API within this version set and an extra master template to link these apis
         /// </summary>
-        async Task GenerateAPIVersionSetTemplates()
+        public async Task GenerateAPIVersionSetTemplates()
         {
             // get api dictionary and check api version set
-            var apiDictionary = await this.GetAllAPIsDictionary(this.extractorParameters);
+            var apiDictionary = await this.GetAllAPIsDictionaryByVersionSetName(this.extractorParameters);
             if (!apiDictionary.ContainsKey(this.extractorParameters.ApiVersionSetName))
             {
-                throw new NoApiVersionSetWithSuchNameFoundException("API Version Set with this name doesn't exist");
+                throw new NoApiVersionSetWithSuchNameFoundException(ErrorMessages.ApiVersionDoesNotExistErrorMessage);
             }
             else
             {
@@ -1052,7 +1052,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 }
 
                 // create master templates for this apiVersionSet 
-                string versionSetFolder = string.Concat(this.extractorParameters.FilesGenerationRootDirectory, this.extractorParameters.FileNames.VersionSetMasterFolder);
+                string versionSetFolder = Path.Combine(this.extractorParameters.FilesGenerationRootDirectory, this.extractorParameters.FileNames.VersionSetMasterFolder);
                 Directory.CreateDirectory(versionSetFolder);
                 await this.GenerateTemplates(versionSetFolder, multipleApiNames: apiDictionary[this.extractorParameters.ApiVersionSetName]);
 
@@ -1276,6 +1276,40 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 else
                 {
                     apiDictionary[apiDisplayName].Add(api.Name);
+                }
+            }
+
+            return apiDictionary;
+        }
+
+        async Task<Dictionary<string, List<string>>> GetAllAPIsDictionaryByVersionSetName(ExtractorParameters extractorParameters)
+        {
+            // pull all apis from service
+            var apis = await this.apisClient.GetAllAsync(extractorParameters, expandVersionSet: true);
+
+            // Generate apis dictionary based on all apiversionset
+            var apiDictionary = new Dictionary<string, List<string>>();
+
+            foreach (var api in apis)
+            {
+                string apiVersionSetName = api.Properties.ApiVersionSet?.Name;
+
+                if (string.IsNullOrEmpty(apiVersionSetName))
+                {
+                    continue;
+                }
+
+                if (!apiDictionary.ContainsKey(apiVersionSetName))
+                {
+                    var apiVersionSet = new List<string>
+                    {
+                        api.Name
+                    };
+                    apiDictionary[apiVersionSetName] = apiVersionSet;
+                }
+                else
+                {
+                    apiDictionary[apiVersionSetName].Add(api.Name);
                 }
             }
 

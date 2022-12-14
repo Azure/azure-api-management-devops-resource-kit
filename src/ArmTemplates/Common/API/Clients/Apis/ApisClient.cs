@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public class ApisClient : ApiClientBase, IApisClient
     {
         const string GetSingleApiRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis/{4}?api-version={5}";
-        const string GetAllApisRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?api-version={4}";
+        const string GetAllApisRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?api-version={4}&expandApiVersionSet={5}";
         const string GetAllCurrentApisRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/apis?api-version={4}&$filter=isCurrent";
         const string GetAllApisLinkedToProductRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/products/{4}/apis?api-version={5}";
         const string GetApisLinkedToGatewayRequest = "{0}/subscriptions/{1}/resourceGroups/{2}/providers/Microsoft.ApiManagement/service/{3}/gateways/{4}/apis?api-version={5}";
@@ -41,12 +41,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             return api;
         }
 
-        public async Task<List<ApiTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters)
+        public async Task<List<ApiTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters, bool expandVersionSet = false)
         {
             var (azToken, azSubId) = await this.Auth.GetAccessToken();
             
             string requestUrl = string.Format(GetAllApisRequest,
-                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion);
+                this.BaseUrl, azSubId, extractorParameters.ResourceGroup, extractorParameters.SourceApimName, GlobalConstants.ApiVersion, expandVersionSet);
 
             var apis = await this.GetPagedResponseAsync<ApiTemplateResource>(azToken, requestUrl);
             this.apiDataProcessor.ProcessData(apis);

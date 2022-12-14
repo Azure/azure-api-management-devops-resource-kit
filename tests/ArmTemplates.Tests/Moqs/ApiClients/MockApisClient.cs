@@ -84,8 +84,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             var serviceProperties3 = GetMockedServiceApiPropertiesWebsocket();
 
             mockedApisClient
-                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
-                .ReturnsAsync((ExtractorParameters _) => new List<ApiTemplateResource>
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>(), It.IsAny<bool>()))
+                .ReturnsAsync((ExtractorParameters _, bool _) => new List<ApiTemplateResource>
                 {
                     new ApiTemplateResource
                     {
