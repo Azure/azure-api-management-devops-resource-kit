@@ -52,5 +52,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public ApiTemplateWSDLSelector WsdlSelector { get; set; }
 
         public string ApiType { get; set; }
+
+        public string TermsOfServiceUrl { get; set; }
+
+        public ApiTemplateContact Contact { get; set; }
     }
 }
