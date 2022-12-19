@@ -5,6 +5,7 @@
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
@@ -48,6 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
         readonly ILogger<ExtractorExecutor> logger;
         readonly IApisClient apisClient;
+        readonly IApiClientUtils apiClientUtils;
 
         readonly IApiExtractor apiExtractor;
         readonly IApiVersionSetExtractor apiVersionSetExtractor;
@@ -98,7 +100,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ISchemaExtractor schemaExtractor,
             IOpenIdConnectProviderExtractor openIdConnectProviderExtractor,
             IPolicyFragmentsExtractor policyFragmentsExtractor,
-            IApiReleaseExtractor apiReleaseExtractor)
+            IApiReleaseExtractor apiReleaseExtractor,
+            IApiClientUtils apiClientUtils)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -125,6 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.openIdConnectProviderExtractor = openIdConnectProviderExtractor;
             this.policyFragmentsExtractor = policyFragmentsExtractor;
             this.apiReleaseExtractor = apiReleaseExtractor;
+            this.apiClientUtils = apiClientUtils;
         }
 
         /// <summary>
@@ -156,7 +160,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ISchemaExtractor schemaExtractor = null,
             IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null,
             IPolicyFragmentsExtractor policyFragmentsExtractor = null,
-            IApiReleaseExtractor apiReleaseExtractor = null)
+            IApiReleaseExtractor apiReleaseExtractor = null,
+            IApiClientUtils apiClientUtils = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -182,7 +187,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 schemaExtractor,
                 openIdConnectProviderExtractor,
                 policyFragmentsExtractor,
-                apiReleaseExtractor);
+                apiReleaseExtractor,
+                apiClientUtils);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -1034,7 +1040,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         public async Task GenerateAPIVersionSetTemplates()
         {
             // get api dictionary and check api version set
-            var apiDictionary = await this.GetAllAPIsDictionaryByVersionSetName(this.extractorParameters);
+            var apiDictionary = await this.apiClientUtils.GetAllAPIsDictionaryByVersionSetName(this.extractorParameters);
             if (!apiDictionary.ContainsKey(this.extractorParameters.ApiVersionSetName))
             {
                 throw new NoApiVersionSetWithSuchNameFoundException(ErrorMessages.ApiVersionDoesNotExistErrorMessage);
@@ -1276,40 +1282,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 else
                 {
                     apiDictionary[apiDisplayName].Add(api.Name);
-                }
-            }
-
-            return apiDictionary;
-        }
-
-        async Task<Dictionary<string, List<string>>> GetAllAPIsDictionaryByVersionSetName(ExtractorParameters extractorParameters)
-        {
-            // pull all apis from service
-            var apis = await this.apisClient.GetAllAsync(extractorParameters, expandVersionSet: true);
-
-            // Generate apis dictionary based on all apiversionset
-            var apiDictionary = new Dictionary<string, List<string>>();
-
-            foreach (var api in apis)
-            {
-                string apiVersionSetName = api.Properties.ApiVersionSet?.Name;
-
-                if (string.IsNullOrEmpty(apiVersionSetName))
-                {
-                    continue;
-                }
-
-                if (!apiDictionary.ContainsKey(apiVersionSetName))
-                {
-                    var apiVersionSet = new List<string>
-                    {
-                        api.Name
-                    };
-                    apiDictionary[apiVersionSetName] = apiVersionSet;
-                }
-                else
-                {
-                    apiDictionary[apiVersionSetName].Add(api.Name);
                 }
             }
 

@@ -37,8 +37,8 @@ using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abst
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
 using Moq;
 using Xunit;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using System.Linq;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Scenarios
 {
@@ -63,9 +63,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApis_success_response.json");
             var mockedApisClient = await MockApisClient.GetMockedHttpApiClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
 
+            var apiClientUtils = new ApiClientUtils(mockedApisClient);
+
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
-                apisClient: mockedApisClient);
+                apiClientUtils: apiClientUtils);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act && assert
@@ -86,6 +88,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApis_ExpandVersionSet_success_response.json");
             var mockedApisClient = await MockApisClient.GetMockedHttpApiClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
+
+            var apiClientUtils = new ApiClientUtils(mockedApisClient);
 
             var mockapiExtractor = new Mock<IApiExtractor>(MockBehavior.Strict);
             mockapiExtractor
@@ -231,7 +235,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
                 policyFragmentsExtractor: mockedPolicyFragmentExtractor.Object,
                 apiReleaseExtractor: mockedApiReleasesExtractor.Object,
                 parametersExtractor: mockedParametersExtractor.Object,
-                apiManagementServiceExtractor: mockedApimServiceExtractor.Object
+                apiManagementServiceExtractor: mockedApimServiceExtractor.Object,
+                apiClientUtils: apiClientUtils
                 );
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
