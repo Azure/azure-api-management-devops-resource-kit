@@ -5,6 +5,7 @@
 
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Configurations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
@@ -48,6 +49,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
         readonly ILogger<ExtractorExecutor> logger;
         readonly IApisClient apisClient;
+        readonly IApiClientUtils apiClientUtils;
 
         readonly IApiExtractor apiExtractor;
         readonly IApiVersionSetExtractor apiVersionSetExtractor;
@@ -98,7 +100,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ISchemaExtractor schemaExtractor,
             IOpenIdConnectProviderExtractor openIdConnectProviderExtractor,
             IPolicyFragmentsExtractor policyFragmentsExtractor,
-            IApiReleaseExtractor apiReleaseExtractor)
+            IApiReleaseExtractor apiReleaseExtractor,
+            IApiClientUtils apiClientUtils)
         {
             this.logger = logger;
             this.apisClient = apisClient;
@@ -125,6 +128,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             this.openIdConnectProviderExtractor = openIdConnectProviderExtractor;
             this.policyFragmentsExtractor = policyFragmentsExtractor;
             this.apiReleaseExtractor = apiReleaseExtractor;
+            this.apiClientUtils = apiClientUtils;
         }
 
         /// <summary>
@@ -156,7 +160,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             ISchemaExtractor schemaExtractor = null,
             IOpenIdConnectProviderExtractor openIdConnectProviderExtractor = null,
             IPolicyFragmentsExtractor policyFragmentsExtractor = null,
-            IApiReleaseExtractor apiReleaseExtractor = null)
+            IApiReleaseExtractor apiReleaseExtractor = null,
+            IApiClientUtils apiClientUtils = null)
         => new ExtractorExecutor(
                 logger,
                 apisClient,
@@ -182,7 +187,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 schemaExtractor,
                 openIdConnectProviderExtractor,
                 policyFragmentsExtractor,
-                apiReleaseExtractor);
+                apiReleaseExtractor,
+                apiClientUtils);
 
         public void SetExtractorParameters(ExtractorParameters extractorParameters)
         {
@@ -1031,13 +1037,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// <summary>
         /// Generates master template for each API within this version set and an extra master template to link these apis
         /// </summary>
-        async Task GenerateAPIVersionSetTemplates()
+        public async Task GenerateAPIVersionSetTemplates()
         {
             // get api dictionary and check api version set
-            var apiDictionary = await this.GetAllAPIsDictionary(this.extractorParameters);
+            var apiDictionary = await this.apiClientUtils.GetAllAPIsDictionaryByVersionSetName(this.extractorParameters);
             if (!apiDictionary.ContainsKey(this.extractorParameters.ApiVersionSetName))
             {
-                throw new NoApiVersionSetWithSuchNameFoundException("API Version Set with this name doesn't exist");
+                throw new NoApiVersionSetWithSuchNameFoundException(ErrorMessages.ApiVersionDoesNotExistErrorMessage);
             }
             else
             {
@@ -1052,7 +1058,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 }
 
                 // create master templates for this apiVersionSet 
-                string versionSetFolder = string.Concat(this.extractorParameters.FilesGenerationRootDirectory, this.extractorParameters.FileNames.VersionSetMasterFolder);
+                string versionSetFolder = Path.Combine(this.extractorParameters.FilesGenerationRootDirectory, this.extractorParameters.FileNames.VersionSetMasterFolder);
                 Directory.CreateDirectory(versionSetFolder);
                 await this.GenerateTemplates(versionSetFolder, multipleApiNames: apiDictionary[this.extractorParameters.ApiVersionSetName]);
 

@@ -64,7 +64,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
                 LinkedMaster = $@"{baseFileName}master.template.json",
                 Apis = "/Apis",
                 SplitAPIs = "/SplitAPIs",
-                VersionSetMasterFolder = "/VersionSetMasterFolder",
+                VersionSetMasterFolder = "VersionSetMasterFolder",
                 RevisionMasterFolder = "/RevisionMasterFolder",
                 GroupAPIsMasterFolder = "/MultipleApisMasterFolder",
                 Groups = $"{baseFileName}groups.template.json",
