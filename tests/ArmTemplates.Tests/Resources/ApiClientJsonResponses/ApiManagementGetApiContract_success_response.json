@@ -1,0 +1,27 @@
+{
+  "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/apis/api-contract-and-terms",
+  "type": "Microsoft.ApiManagement/service/apis",
+  "name": "api-contract-and-terms",
+  "properties": {
+    "displayName": "Service",
+    "apiRevision": "1",
+    "serviceUrl": "https://api.plexonline.com/DataSource/Service.asmx",
+    "path": "schulte",
+    "protocols": [
+      "https"
+    ],
+    "subscriptionKeyParameterNames": {
+      "header": "Ocp-Apim-Subscription-Key",
+      "query": "subscription-key"
+    },
+    "type": "soap",
+    "isCurrent": true,
+    "isOnline": true,
+    "contact": {
+      "email": "email-value",
+      "name": "name-value",
+      "url": "url-value"
+    },
+    "termsOfServiceUrl": "test-url-value"
+  }
+}

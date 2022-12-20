@@ -11,8 +11,10 @@ using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandlers;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiOperations;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients;
@@ -297,6 +299,66 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiTemplate.TypedResources.ApiOperations.Any(x => x.Name.Contains("websocket-api")).Should().BeFalse();
             apiTemplate.TypedResources.ApiOperationsTags.Count().Should().Be(6);
             apiTemplate.TypedResources.ApiOperationsPolicies.Count().Should().Be(3);
+        }
+
+        [Fact]
+        public async Task GenerateApiTemplateAsync_ContainsContactAndTermOfService_Information()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateApiTemplateAsync_ContainsContactAndTermOfService_Information));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                multipleAPIs: string.Empty,
+                apiVersionSetName: string.Empty,
+                apiName: "apiName"
+            );
+
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            // mocked clients
+            var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementGetApiContract_success_response.json");
+            var mockedApiClientAllCurrent = await MockApisClient.GetMockedHttpApiClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
+
+            // mocked extractors
+            var mockedDiagnosticExtractor = new Mock<IDiagnosticExtractor>(MockBehavior.Loose);
+            var mockedApiSchemaExtractor = new Mock<IApiSchemaExtractor>(MockBehavior.Loose);
+            var mockedPolicyExtractor = new Mock<IPolicyExtractor>(MockBehavior.Loose);
+            var mockedProductApisExtractor = new Mock<IProductApisExtractor>(MockBehavior.Loose);
+            var mockedTagExtractor = new Mock<ITagExtractor>(MockBehavior.Loose);
+            var mockedApiOperationExtractor = new Mock<IApiOperationExtractor>(MockBehavior.Loose);
+            mockedApiOperationExtractor.Setup(
+                    x => x.GenerateApiOperationsResourcesAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>())
+                ).ReturnsAsync(new List<ApiOperationTemplateResource>());
+                
+
+            var apiExtractor = new ApiExtractor(
+                this.GetTestLogger<ApiExtractor>(),
+                new TemplateBuilder(),
+                mockedApiClientAllCurrent,
+                mockedDiagnosticExtractor.Object,
+                mockedApiSchemaExtractor.Object,
+                mockedPolicyExtractor.Object,
+                mockedProductApisExtractor.Object,
+                mockedTagExtractor.Object,
+                mockedApiOperationExtractor.Object,
+                null
+                );
+
+            // act
+            var apiTemplate = await apiExtractor.GenerateSingleApiTemplateResourcesAsync(
+                singleApiName: "api-contract-and-terms",
+                currentTestDirectory,
+                extractorParameters);
+
+            // assert
+            apiTemplate.Apis.Should().NotBeNull();
+            apiTemplate.Apis.Count.Should().Be(1);
+            apiTemplate.Apis[0].Name.Contains("api-contract-and-terms").Should().BeTrue();
+            apiTemplate.Apis[0].Properties.Contact.Should().NotBeNull();
+            apiTemplate.Apis[0].Properties.Contact.Name.Should().Be("name-value");
+            apiTemplate.Apis[0].Properties.Contact.Email.Should().Be("email-value");
+            apiTemplate.Apis[0].Properties.Contact.Url.Should().Be("url-value");
+            apiTemplate.Apis[0].Properties.TermsOfServiceUrl.Should().Be("test-url-value");
         }
     }
 }
