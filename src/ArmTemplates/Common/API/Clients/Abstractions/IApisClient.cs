@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     {
         Task<ApiTemplateResource> GetSingleAsync(string apiName, ExtractorParameters extractorParameters);
 
-        Task<List<ApiTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
+        Task<List<ApiTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters, bool expandVersionSet = false);
 
         Task<List<ApiTemplateResource>> GetAllCurrentAsync(ExtractorParameters extractorParameters);
 
