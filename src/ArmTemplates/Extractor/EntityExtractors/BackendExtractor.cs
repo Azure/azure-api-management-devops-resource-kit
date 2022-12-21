@@ -87,7 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     {
                         var policyContent = this.policyExtractor.GetCachedPolicyContent(policyTemplateResource, baseFilesGenerationDirectory);
 
-                        if (this.DoesPolicyReferenceBackend(policyContent, namedValues, backendResource.OriginalName, backendResource))
+                        if (this.DoesPolicyReferenceBackend(policyContent, backendResource.OriginalName, backendResource))
                         {
                             // backend was used in policy, extract it
                             backendTemplate.TypedResources.Backends.Add(backendResource);
@@ -161,13 +161,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         bool DoesPolicyReferenceBackend(
             string policyContent,
-            IEnumerable<NamedValueTemplateResource> namedValueResources,
             string backendName,
             BackendTemplateResource backendTemplateResource)
         {
-            // a policy is referenced by a backend with the set-backend-service policy, which will reference use the backends name or url, or through referencing a named value that applies to the backend
-            var namedValueResourcesUsedByBackend = namedValueResources.Where(resource => this.DoesBackendReferenceNamedValue(resource, backendTemplateResource));
-            
             if (backendName != null && policyContent.Contains(backendName) ||
                 backendTemplateResource.Properties.Url != null && policyContent.Contains(backendTemplateResource.Properties.Url) ||
                 backendTemplateResource.Properties.Title != null && policyContent.Contains(backendTemplateResource.Properties.Title) ||
@@ -176,18 +172,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 return true;
             }
 
-            return namedValueResourcesUsedByBackend.Any(x => 
-                    (x.Properties.DisplayName is not null && policyContent.Contains(x.Properties.DisplayName)) ||
-                    (x.Properties.Value is not null && policyContent.Contains(x.Properties.Value)));
-        }
-
-        public bool DoesBackendReferenceNamedValue(NamedValueTemplateResource namedValueResource, BackendTemplateResource backendTemplateResource)
-        {
-            var namedValue = namedValueResource.Properties.Value;
-            
-            return namedValue == backendTemplateResource.Properties.Url
-                || namedValue == backendTemplateResource.Properties.Description
-                || namedValue == backendTemplateResource.Properties.Title;
+            return false;
         }
 
         public async Task<bool> IsNamedValueUsedInBackends(
@@ -233,7 +218,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                         foreach (var policyTemplateResource in apiPolicies)
                         {
                             var policyContent = this.policyExtractor.GetCachedPolicyContent(policyTemplateResource, baseFilesGenerationDirectory);
-                            if (this.DoesPolicyReferenceBackend(policyContent, Array.Empty<NamedValueTemplateResource>(), backendName, backendResource))
+                            if (this.DoesPolicyReferenceBackend(policyContent, backendName, backendResource))
                             {
                                 // don't need to go through all policies and backends if the named values has already been found
                                 return true;
