@@ -64,7 +64,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(
                 singleApiName: null,
                 new List<PolicyTemplateResource>(),
-                new List<NamedValueTemplateResource>(),
                 currentTestDirectory);
 
             // assert
@@ -117,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act
-            var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(null, null, null, currentTestDirectory);
+            var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(null, null, currentTestDirectory);
 
             // assert
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Backends)).Should().BeTrue();

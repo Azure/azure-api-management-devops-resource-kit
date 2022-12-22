@@ -663,7 +663,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         public async Task<Template<BackendTemplateResources>> GenerateBackendTemplateAsync(
             string singleApiName,
             List<PolicyTemplateResource> apiPolicies,
-            List<NamedValueTemplateResource> namedValueResources,
             string baseFilesGenerationDirectory)
         {
             this.logger.LogInformation("Started generation of backend template...");
@@ -671,7 +670,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var backendTemplate = await this.backendExtractor.GenerateBackendsTemplateAsync(
                 singleApiName,
                 apiPolicies,
-                namedValueResources,
                 baseFilesGenerationDirectory,
                 this.extractorParameters);
 
@@ -1173,7 +1171,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var apiTagTemplate = await this.GenerateTagApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
             var loggerTemplate = await this.GenerateLoggerTemplateAsync(apisToExtract, apiTemplate.TypedResources.GetAllPolicies(), baseFilesGenerationDirectory);
             var namedValueTemplate = await this.GenerateNamedValuesTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), loggerTemplate.TypedResources.Loggers, baseFilesGenerationDirectory);
-            var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), namedValueTemplate.TypedResources.NamedValues, baseFilesGenerationDirectory);
+            var backendTemplate = await this.GenerateBackendTemplateAsync(singleApiName, apiTemplate.TypedResources.GetAllPolicies(), baseFilesGenerationDirectory);
             var groupTemplate = await this.GenerateGroupsTemplateAsync(baseFilesGenerationDirectory);
             var identityProviderTemplate = await this.GenerateIdentityProviderTemplateAsync(baseFilesGenerationDirectory);
             var openIdConnectProviderTemplate = await this.GenerateOpenIdConnectProviderTemplateAsync(baseFilesGenerationDirectory);
