@@ -159,7 +159,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             var mockedBackendExtractor = new Mock<IBackendExtractor>(MockBehavior.Strict);
             mockedBackendExtractor
-                .Setup(x => x.GenerateBackendsTemplateAsync(It.IsAny<string>(), It.IsAny<List<PolicyTemplateResource>>(), It.IsAny<List<NamedValueTemplateResource>>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .Setup(x => x.GenerateBackendsTemplateAsync(It.IsAny<string>(), It.IsAny<List<PolicyTemplateResource>>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new Template<BackendTemplateResources>()
                 {
                     TypedResources = new BackendTemplateResources()

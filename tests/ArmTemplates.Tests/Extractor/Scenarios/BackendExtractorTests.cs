@@ -64,7 +64,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(
                 singleApiName: null,
                 new List<PolicyTemplateResource>(),
-                new List<NamedValueTemplateResource>(),
                 currentTestDirectory);
 
             // assert
@@ -117,7 +116,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act
-            var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(null, null, null, currentTestDirectory);
+            var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(null, null, currentTestDirectory);
 
             // assert
             File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Backends)).Should().BeTrue();
@@ -139,6 +138,73 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             proxyBackend2.Properties.Proxy.Password.Should().Contain(ParameterNames.BackendProxy);
             proxyBackend2.Properties.Proxy.Username.Should().Contain(ParameterNames.BackendProxy);
             proxyBackend2.Properties.Proxy.Url.Should().Contain(ParameterNames.BackendProxy);
+        }
+
+        [Fact]
+        public async Task GenerateBackendTemplate_GeneratesOnlyReferencedBackendInPolicy()
+        {
+            // arrange
+            var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListBackends_success_response.json");
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateBackendTemplate_GeneratesOnlyReferencedBackendInPolicy));
+
+            var mockedClient = await MockBackendClient.GetMockedHttpApiClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
+            var apiName = "api-name-with-reference";
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: apiName);
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            // mocked extractors
+            var policyExtractor = new PolicyExtractor(
+                this.GetTestLogger<PolicyExtractor>(),
+                null,
+                new TemplateBuilder());
+            
+            var backendExtractor = new BackendExtractor(
+               this.GetTestLogger<BackendExtractor>(),
+               new TemplateBuilder(),
+               policyExtractor,
+               mockedClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                backendExtractor: backendExtractor,
+                policyExtractor: policyExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            var apiPolicies = new List<PolicyTemplateResource>()
+            {
+                new PolicyTemplateResource()
+                {
+                    Properties = new PolicyTemplateProperties
+                    {
+                        PolicyContent = "<set-backend-service backend-id=\"proxybackend1\" />"
+                    }
+                },
+                new PolicyTemplateResource()
+                {
+                    Properties = new PolicyTemplateProperties
+                    {
+                        PolicyContent = "<set-backend-service backend-id=\"proxybackend2\" />"
+                    }
+                }
+            };
+
+            // act
+            var backendTemplate = await extractorExecutor.GenerateBackendTemplateAsync(apiName, apiPolicies, currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Backends)).Should().BeTrue();
+
+            backendTemplate.Parameters.Should().ContainKey(ParameterNames.ApimServiceName);
+
+            backendTemplate.TypedResources.Backends.Count().Should().Be(2);
+            backendTemplate.TypedResources.Backends.All(x => x.Type.Equals(ResourceTypeConstants.Backend)).Should().BeTrue();
+
+            var proxyBackend1 = backendTemplate.TypedResources.Backends.First(x => x.Name.Contains("proxybackend1"));
+            proxyBackend1.Should().NotBeNull();
+            var proxyBackend2 = backendTemplate.TypedResources.Backends.First(x => x.Name.Contains("proxybackend2"));
+            proxyBackend2.Should().NotBeNull();
         }
     }
 }

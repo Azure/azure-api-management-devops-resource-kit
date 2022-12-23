@@ -18,7 +18,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         Task<Template<BackendTemplateResources>> GenerateBackendsTemplateAsync(
             string singleApiName,
             List<PolicyTemplateResource> apiPolicies,
-            List<NamedValueTemplateResource> namedValues,
             string baseFilesGenerationDirectory,
             ExtractorParameters extractorParameters);
 
