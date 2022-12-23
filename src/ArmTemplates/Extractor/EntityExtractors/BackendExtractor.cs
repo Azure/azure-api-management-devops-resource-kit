@@ -160,10 +160,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string backendName,
             BackendTemplateResource backendTemplateResource)
         {
-            if (backendName != null && policyContent.Contains(backendName) ||
-                backendTemplateResource.Properties.Url != null && policyContent.Contains(backendTemplateResource.Properties.Url) ||
-                backendTemplateResource.Properties.Title != null && policyContent.Contains(backendTemplateResource.Properties.Title) ||
-                backendTemplateResource.Properties.ResourceId != null && policyContent.Contains(backendTemplateResource.Properties.ResourceId))
+            if (!string.IsNullOrEmpty(backendName) && policyContent.Contains(backendName) ||
+                !string.IsNullOrEmpty(backendTemplateResource.Properties.Url) && policyContent.Contains(backendTemplateResource.Properties.Url) ||
+                !string.IsNullOrEmpty(backendTemplateResource.Properties.Title) && policyContent.Contains(backendTemplateResource.Properties.Title) ||
+                !string.IsNullOrEmpty(backendTemplateResource.Properties.ResourceId) && policyContent.Contains(backendTemplateResource.Properties.ResourceId))
             {
                 return true;
             }
