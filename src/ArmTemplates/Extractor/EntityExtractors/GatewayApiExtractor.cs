@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Exceptions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Apis;
@@ -26,17 +28,20 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly ITemplateBuilder templateBuilder;
         readonly IGatewayClient gatewayClient;
         readonly IApisClient apisClient;
+        readonly IApiClientUtils apiClientUtils;
 
         public GatewayApiExtractor(
             ILogger<GatewayApiExtractor> logger,
             ITemplateBuilder templateBuilder,
             IGatewayClient gatewayClient,
-            IApisClient apisClient)
+            IApisClient apisClient,
+            IApiClientUtils apiClientUtils)
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
             this.gatewayClient = gatewayClient;
             this.apisClient = apisClient;
+            this.apiClientUtils = apiClientUtils;
         }
 
         public async Task<Template<GatewayApiTemplateResources>> GenerateGatewayApiTemplateAsync(
@@ -67,10 +72,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (!string.IsNullOrEmpty(singleApiName))
                 {
-                    // inluding only apis with singleApiName
-                    var apis = gatewayApis.Where(x => x.Name == singleApiName);
+                    var serviceApi = await this.apiClientUtils.GetsingleApi(singleApiName, extractorParameters);
+
+                    // inluding only api with singleApiName
+                    var apis = gatewayApis.Where(x => x.Name == serviceApi.Name).ToList();
                     if (!apis.IsNullOrEmpty())
                     {
+                        //apis contains only one api
+                        apis[0].Name = singleApiName;
                         var gatewayApiResources = this.GenerateGatewayApiTemplateResources(gateway.Name, apis);
                         gatewayApiTemplate.TypedResources.GatewayApis.AddRange(gatewayApiResources);
                     }
@@ -98,7 +107,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         List<GatewayApiTemplateResource> GenerateGatewayApiTemplateResources(string gatewayName, IEnumerable<ApiTemplateResource> apis)
         {
-            string dependsOn = null;
             var templateResources = new List<GatewayApiTemplateResource>();
             foreach (var api in apis)
             {
@@ -108,13 +116,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 gatewayApiTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{gatewayName}/{api.Name}')]";
                 gatewayApiTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
                 gatewayApiTemplateResource.Scale = null;
-                gatewayApiTemplateResource.DependsOn = string.IsNullOrEmpty(dependsOn) ? Array.Empty<string>() : new[] { dependsOn };
                 gatewayApiTemplateResource.Properties = new GatewayApiProperties 
                 {
                     ProvisioningState = "created" 
                 };
-
-                dependsOn = $"[resourceId('Microsoft.ApiManagement/service/gateways/apis', parameters('{ParameterNames.ApimServiceName}'), '{gatewayName}', '{api.Name}')]";
 
                 templateResources.Add(gatewayApiTemplateResource);
             }

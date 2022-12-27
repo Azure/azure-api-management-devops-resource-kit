@@ -1,7 +1,7 @@
 {
-  "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/apis/api-contract-and-terms",
+  "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/apis/api-name",
   "type": "Microsoft.ApiManagement/service/apis",
-  "name": "api-contract-and-terms",
+  "name": "api-name",
   "properties": {
     "displayName": "Service",
     "apiRevision": "1",
