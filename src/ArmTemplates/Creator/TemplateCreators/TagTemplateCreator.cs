@@ -58,7 +58,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                 {
                     if (!api.Tags.IsNullOrEmpty())
                     {
-                        var apiTags = api.Tags.Split(",");
+                        var apiTags = api.Tags.Split(",", System.StringSplitOptions.TrimEntries);
                         
                         foreach (var apiTag in apiTags)
                         {

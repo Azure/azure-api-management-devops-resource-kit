@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
             // create a tag/apis association resource for each tag in the config file
             List<TagApiTemplateResource> tagAPITemplates = new List<TagApiTemplateResource>();
             // tags is comma seperated list pf tags
-            string[] tagIDs = api.Tags.Split(", ");
+            string[] tagIDs = api.Tags.Split(",", System.StringSplitOptions.TrimEntries);
             foreach (string tagID in tagIDs)
             {
                 TagApiTemplateResource tagAPITemplate = this.CreateTagAPITemplateResource(tagID, api.Name, dependsOn);
