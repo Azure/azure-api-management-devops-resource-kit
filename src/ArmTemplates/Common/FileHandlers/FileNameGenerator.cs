@@ -81,11 +81,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.FileHandl
 
             if (isSplitAPI == true)
             {
-                return isInitialAPI == true ? $@"/{sanitizedAPIName}-initial.api.template.json" : $@"/{sanitizedAPIName}-subsequent.api.template.json";
+                return isInitialAPI == true ? $@"{sanitizedAPIName}-initial.api.template.json" : $@"{sanitizedAPIName}-subsequent.api.template.json";
             }
             else
             {
-                return $@"/{sanitizedAPIName}.api.template.json";
+                return $@"{sanitizedAPIName}.api.template.json";
             }
         }
 
