@@ -13,7 +13,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
     public interface IGatewayClient
     {
         Task<List<GatewayTemplateResource>> GetAllAsync(ExtractorParameters extractorParameters);
-
-        Task<bool> DoesApiReferenceGatewayAsync(string singleApiName, string gatewayName, ExtractorParameters extractorParameters);
     }
 }

@@ -1,0 +1,27 @@
+{
+  "value": [
+    {
+      "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/gateways/gw-1",
+      "type": "Microsoft.ApiManagement/service/gateways",
+      "name": "gw-1",
+      "properties": {
+        "description": "my gateway 1",
+        "locationData": {
+          "name": "my location 1"
+        }
+      }
+    },
+    {
+      "id": "/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.ApiManagement/service/apimService1/gateways/gw-2",
+      "type": "Microsoft.ApiManagement/service/gateways",
+      "name": "gw-2",
+      "properties": {
+        "description": "my gateway 2",
+        "locationData": {
+          "name": "my location 2"
+        }
+      }
+    }
+  ],
+  "count": 2
+}
