@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils
             return apiDictionary;
         }
 
-        public async Task<ApiTemplateResource> GetsingleApi(string apiName, ExtractorParameters extractorParameters)
+        public async Task<ApiTemplateResource> GetSingleApi(string apiName, ExtractorParameters extractorParameters)
         {
             var serviceApi = await this.apisClient.GetSingleAsync(apiName, extractorParameters);
 
@@ -82,7 +82,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils
                 return false;
             }
 
-            var serviceApi = await this.GetsingleApi(singleApiName, extractorParameters);
+            var serviceApi = await this.GetSingleApi(singleApiName, extractorParameters);
 
             return gatewayApis.Any(gatewayApi => gatewayApi.Name == serviceApi.Name);
         }

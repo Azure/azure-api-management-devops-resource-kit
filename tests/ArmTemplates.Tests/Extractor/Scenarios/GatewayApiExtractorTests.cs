@@ -80,10 +80,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         }
 
         [Fact]
-        public async Task GenerateGatewayApisTemplates_ProperlyLaysTheInformation_GivenApiNameParameterIsGiven()
+        public async Task GenerateGatewayApisTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterIsGiven()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGatewayApisTemplates_ProperlyLaysTheInformation_GivenApiNameParameterIsGiven));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGatewayApisTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterIsGiven));
             var apiName = "api-name";
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 extractGateways: "true",
@@ -137,10 +137,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
         }
 
         [Fact]
-        public async Task GenerateGatewayApisTemplates_ProperlyLaysTheInformation_GivenApiNameParameterIsEmpty()
+        public async Task GenerateGatewayApisTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterIsEmpty()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGatewayApisTemplates_ProperlyLaysTheInformation_GivenApiNameParameterIsEmpty));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGatewayApisTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterIsEmpty));
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 extractGateways: "true",
                 apiName: string.Empty);

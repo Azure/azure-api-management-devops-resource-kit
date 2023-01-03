@@ -72,9 +72,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
                 if (!string.IsNullOrEmpty(singleApiName))
                 {
-                    var serviceApi = await this.apiClientUtils.GetsingleApi(singleApiName, extractorParameters);
+                    var serviceApi = await this.apiClientUtils.GetSingleApi(singleApiName, extractorParameters);
 
-                    // inluding only api with singleApiName
+                    // including  only api with singleApiName
                     var apis = gatewayApis.Where(x => x.Name == serviceApi.Name).ToList();
                     if (!apis.IsNullOrEmpty())
                     {

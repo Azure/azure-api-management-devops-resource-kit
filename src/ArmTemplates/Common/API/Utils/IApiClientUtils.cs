@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils
     {
         Task<Dictionary<string, List<string>>> GetAllAPIsDictionaryByVersionSetName(ExtractorParameters extractorParameters);
 
-        Task<ApiTemplateResource> GetsingleApi(string apiName, ExtractorParameters extractorParameters);
+        Task<ApiTemplateResource> GetSingleApi(string apiName, ExtractorParameters extractorParameters);
 
         Task<bool> DoesApiReferenceGatewayAsync(string singleApiName, string gatewayName, ExtractorParameters extractorParameters);
     }

@@ -75,10 +75,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
         
         [Fact]
-        public async Task GenerateGatewayTemplates_ProperlyLaysTheInformation_GivenApiNameParameterExists()
+        public async Task GenerateGatewayTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterExists()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGatewayTemplates_ProperlyLaysTheInformation_GivenApiNameParameterExists));
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGatewayTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterExists));
             var apiName = "api-name";
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
                 apiName: apiName,
