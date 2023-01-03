@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
     [Trait("Category", "Tag Template Creation")]
     public class TagTemplateCreatorTests
     {
-        CreatorParameters GenerateCreatorParameters(List<string> tagNames = null, List<string> apiTagNames = null)
+        CreatorParameters GenerateCreatorParameters(List<string> tagNames = null, string apiTagNames = null)
         {
             var creatorConfig = new CreatorParameters();
 
@@ -41,11 +41,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             if (!apiTagNames.IsNullOrEmpty())
             {
                 creatorConfig.Apis = new List<ApiConfig>();
-                var apiTagNamesString = string.Join(",", apiTagNames.ToArray());
 
                 var apiConfig = new ApiConfig
                 {
-                    Tags = apiTagNamesString
+                    Tags = apiTagNames
                 };
 
                 creatorConfig.Apis.Add(apiConfig);
@@ -54,8 +53,10 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             return creatorConfig;
         }
 
-        [Fact]
-        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenApiTagsAndConfigTags()
+        [Theory]
+        [InlineData("tag 1,tag2,api tag 3,api tag2")]
+        [InlineData("tag 1, tag2, api tag 3, api tag2")]
+        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenApiTagsAndConfigTags(string apiTagNames)
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
             
@@ -63,11 +64,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             {
                 "tag 1", "tag2", "tag 3", "tag2"
             };
-            var apiTagNames = new List<string>()
-            {
-                "tag 1", "tag2", "api tag 3", "api tag2"
-            };
-
             var creatorConfig = this.GenerateCreatorParameters(tagNames, apiTagNames);
 
             var expectedTagsDictionary = new Dictionary<string, string>()
@@ -102,15 +98,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             }
         }
 
-        [Fact]
-        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenOnlyApiTags()
+        [Theory]
+        [InlineData("tag 1,tag2,api tag 3,api tag2")]
+        [InlineData("tag 1, tag2, api tag 3, api tag2")]
+        public void CreateTagTemplate_ShouldCreateTemplateFromCreatorConfig_GivenOnlyApiTags(string apiTagNames)
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
-
-            var apiTagNames = new List<string>()
-            {
-                "tag 1", "tag2", "api tag 3", "api tag2"
-            };
             var creatorConfig = this.GenerateCreatorParameters(apiTagNames: apiTagNames);
 
             var expectedTagsDictionary = new Dictionary<string, string>()
@@ -164,16 +157,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
         {
             var tagTemplateCreator = new TagTemplateCreator(new TemplateBuilder());
 
-            var apiTagNames = new List<string>()
-            {
-                "tag 1", "tag2", "api tag 3", " "
-            };
+            var apiTagNames = "tag 1,tag2,api tag 3,";
             var creatorConfig = this.GenerateCreatorParameters(apiTagNames: apiTagNames);
 
 
             //act & assert
             Action act = () => tagTemplateCreator.CreateTagTemplate(creatorConfig);
-            act.Should().Throw<EmptyResourceNameException>().WithMessage(string.Format(ErrorMessages.EmptyResourceNameAfterSanitizingErrorMessage, " "));
+            act.Should().Throw<EmptyResourceNameException>().WithMessage(string.Format(ErrorMessages.EmptyResourceNameAfterSanitizingErrorMessage, string.Empty)); ;
         }
     }
 }
