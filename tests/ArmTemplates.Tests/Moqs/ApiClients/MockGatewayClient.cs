@@ -4,10 +4,16 @@
 // --------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Gateway;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Groups;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Backend;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Gateway;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Utilities.DataProcessors.Absctraction;
 using Moq;
 
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiClients
@@ -63,6 +69,14 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
                 });
 
             return mockGatewayClient.Object;
+        }
+
+        public static async Task<IGatewayClient> GetMockedHttpGatewaysClient(MockClientConfiguration mockClientConfiguration)
+        {
+            var mockedClient = new Mock<GatewayClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration), new TemplateResourceDataProcessor<GatewayTemplateResource>());
+            MockClientUtils.MockAuthOfApiClient(mockedClient);
+
+            return mockedClient.Object;
         }
     }
 }

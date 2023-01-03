@@ -5,6 +5,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clients.Abstractions;
+using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Utils;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Extensions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Abstractions;
@@ -21,15 +22,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         readonly ILogger<GatewayExtractor> logger;
         readonly ITemplateBuilder templateBuilder;
         readonly IGatewayClient gatewayClient;
+        readonly IApiClientUtils apiClientUtils;
 
         public GatewayExtractor(
             ILogger<GatewayExtractor> logger,
             ITemplateBuilder templateBuilder,
-            IGatewayClient gatewayClient)
+            IGatewayClient gatewayClient,
+            IApiClientUtils apiClientUtils)
         {
             this.logger = logger;
             this.templateBuilder = templateBuilder;
             this.gatewayClient = gatewayClient;
+            this.apiClientUtils = apiClientUtils;
         }
 
         public async Task<Template<GatewayTemplateResources>> GenerateGatewayTemplateAsync(string singleApiName, ExtractorParameters extractorParameters)
@@ -59,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 }
                 else
                 {
-                    var doesApiReferenceGateway = await this.gatewayClient.DoesApiReferenceGatewayAsync(singleApiName, gateway.OriginalName, extractorParameters);
+                    var doesApiReferenceGateway = await this.apiClientUtils.DoesApiReferenceGatewayAsync(singleApiName, gateway.OriginalName, extractorParameters);
                     if (doesApiReferenceGateway)
                     {
                         gatewayTemplate.TypedResources.Gateways.Add(gateway);

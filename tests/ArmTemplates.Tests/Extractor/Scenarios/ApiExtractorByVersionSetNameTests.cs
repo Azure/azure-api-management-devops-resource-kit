@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApis_success_response.json");
             var mockedApisClient = await MockApisClient.GetMockedHttpApiClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
 
-            var apiClientUtils = new ApiClientUtils(mockedApisClient);
+            var apiClientUtils = new ApiClientUtils(mockedApisClient, this.GetTestLogger<ApiClientUtils>());
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
@@ -89,7 +89,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             var responseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApis_ExpandVersionSet_success_response.json");
             var mockedApisClient = await MockApisClient.GetMockedHttpApiClient(new MockClientConfiguration(responseFileLocation: responseFileLocation));
 
-            var apiClientUtils = new ApiClientUtils(mockedApisClient);
+            var apiClientUtils = new ApiClientUtils(mockedApisClient, this.GetTestLogger<ApiClientUtils>());
 
             var mockapiExtractor = new Mock<IApiExtractor>(MockBehavior.Strict);
             mockapiExtractor
