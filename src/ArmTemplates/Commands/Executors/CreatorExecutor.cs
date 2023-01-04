@@ -237,7 +237,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
                 ApiConfig providedAPIConfiguration = this.creatorParameters.Apis.FirstOrDefault(api => string.Compare(apiResource.Name, ApiTemplateCreator.MakeResourceName(api), true) == 0);
                 // if the api version is not null the api is split into multiple templates. If the template is split and the content value has been set, then the template is for a subsequent api
                 string apiFileName = FileNameGenerator.GenerateCreatorAPIFileName(providedAPIConfiguration.Name, this.apiTemplateCreator.IsSplitAPI(providedAPIConfiguration), apiResource.Properties.Value != null);
-                FileWriter.WriteJSONToFile(apiTemplate, string.Concat(this.creatorParameters.OutputLocation, apiFileName));
+                FileWriter.WriteJSONToFile(apiTemplate, Path.Combine(this.creatorParameters.OutputLocation, apiFileName));
             }
             if (globalServicePolicyTemplate != null)
             {
