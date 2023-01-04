@@ -144,7 +144,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 this.logger.LogDebug("Adding products to master template");
                 const string ProductsTemplate = "productsTemplate";
 
-                apiDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{ProductsTemplate}')]");
                 productApiDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{ProductsTemplate}')]");
                 var productsUri = this.GenerateLinkedTemplateUri(fileNames.Products, extractorParameters);
 
