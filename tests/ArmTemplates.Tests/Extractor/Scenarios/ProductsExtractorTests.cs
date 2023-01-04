@@ -65,8 +65,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // act
             var productTemplate = await extractorExecutor.GenerateProductsTemplateAsync(
                 singleApiName: It.IsAny<string>(),
-                currentTestDirectory,
-                productApiResources: It.IsAny<List<ProductApiTemplateResource>>());
+                currentTestDirectory);
 
             // assert
 

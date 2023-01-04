@@ -52,7 +52,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public async Task<Template<ProductTemplateResources>> GenerateProductsTemplateAsync(
             string singleApiName,
-            List<ProductApiTemplateResource> productApiTemplateResources,
             string baseFilesGenerationDirectory,
             ExtractorParameters extractorParameters)
         {
