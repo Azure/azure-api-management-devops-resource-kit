@@ -17,10 +17,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             string singleApiName, 
             List<string> multipleApiNames, 
             ExtractorParameters extractorParameters);
-
-        Task<List<ProductApiTemplateResource>> GenerateSingleApiTemplateAsync(
-            string singleApiName,
-            ExtractorParameters extractorParameters,
-            bool addDependsOnParameter = false);
     }
 }

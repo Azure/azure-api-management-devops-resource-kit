@@ -140,7 +140,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     }
                     
                     productApiResources.Add(productApi);
-
                 }
             }
             catch (Exception ex) 
