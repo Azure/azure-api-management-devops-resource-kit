@@ -77,6 +77,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             // api dependsOn
             var apiDependsOn = new List<string>();
             var productApiDependsOn = new List<string>();
+            var productsDependsOn = new List<string>();
             var apiTagDependsOn = new List<string>();
             var globalPolicyDependsOn = new List<string>();
 
@@ -86,6 +87,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 const string NamedValuesTemplateName = "namedValuesTemplate";
 
                 dependsOnNamedValues = new string[] { $"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{NamedValuesTemplateName}')]" };
+                productsDependsOn.AddRange(dependsOnNamedValues);
                 globalPolicyDependsOn.AddRange(dependsOnNamedValues);
                 apiDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{NamedValuesTemplateName}')]");
                 var namedValuesUri = this.GenerateLinkedTemplateUri(fileNames.NamedValues, extractorParameters);
@@ -139,6 +141,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 masterResources.DeploymentResources.Add(apiVersionSetDeployment);
             }
 
+            if (groupTemplateResources?.HasContent() == true)
+            {
+                this.logger.LogDebug("Adding groups to master template");
+                const string GroupsTemplate = "groupsTemplate";
+                productsDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{GroupsTemplate}')]");
+
+                var groupsUri = this.GenerateLinkedTemplateUri(fileNames.Groups, extractorParameters);
+                var groupsDeployment = CreateLinkedMasterTemplateResource(GroupsTemplate, groupsUri, Array.Empty<string>());
+
+                masterResources.DeploymentResources.Add(groupsDeployment);
+            }
+
             if (productsTemplateResources?.HasContent() == true)
             {
                 this.logger.LogDebug("Adding products to master template");
@@ -147,7 +161,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 productApiDependsOn.Add($"[resourceId('{ResourceTypeConstants.ArmDeployments}', '{ProductsTemplate}')]");
                 var productsUri = this.GenerateLinkedTemplateUri(fileNames.Products, extractorParameters);
 
-                var productDeployment = CreateLinkedMasterTemplateResource(ProductsTemplate, productsUri, dependsOnNamedValues);
+                var productDeployment = CreateLinkedMasterTemplateResource(ProductsTemplate, productsUri, productsDependsOn.ToArray());
                 
                 if (extractorParameters.PolicyXMLBaseUrl is not null)
                 {
@@ -266,17 +280,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 var apiTagsDeployment = CreateLinkedMasterTemplateResource(ApiTagsTemplate, apiTagsUri, apiTagDependsOn.ToArray());
 
                 masterResources.DeploymentResources.Add(apiTagsDeployment);
-            }
-
-            if (groupTemplateResources?.HasContent() == true)
-            {
-                this.logger.LogDebug("Adding groups to master template");
-                const string GroupsTemplate = "groupsTemplate";
-
-                var groupsUri = this.GenerateLinkedTemplateUri(fileNames.Groups, extractorParameters);
-                var groupsDeployment = CreateLinkedMasterTemplateResource(GroupsTemplate, groupsUri, Array.Empty<string>());
-
-                masterResources.DeploymentResources.Add(groupsDeployment);
             }
 
             if (identityProviderTemplateResources?.HasContent() == true)
