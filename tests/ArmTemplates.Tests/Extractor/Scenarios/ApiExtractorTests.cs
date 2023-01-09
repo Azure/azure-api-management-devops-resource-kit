@@ -112,7 +112,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             apiTemplate.Parameters.Should().ContainKey(ParameterNames.ApiLoggerId);
             apiTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLBaseUrl);
             apiTemplate.Parameters.Should().ContainKey(ParameterNames.PolicyXMLSasToken);
-            apiTemplate.Resources.Count().Should().Be(33);
+            apiTemplate.Resources.Count().Should().Be(30);
 
             // apis
             apiTemplate.TypedResources.Apis.Count().Should().Be(3);
@@ -132,11 +132,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // tags
             apiTemplate.TypedResources.Tags.Count().Should().Be(6);
             apiTemplate.TypedResources.Tags.All(x => x.Type == ResourceTypeConstants.APITag).Should().BeTrue();
-
-            // api products
-            apiTemplate.TypedResources.ApiProducts.Count().Should().Be(3);
-            apiTemplate.TypedResources.ApiProducts.All(x => x.Type == ResourceTypeConstants.ProductApi).Should().BeTrue();
-            apiTemplate.TypedResources.ApiProducts.All(x => x.Properties is not null).Should().BeTrue();
 
             // api policies
             apiTemplate.TypedResources.ApiPolicies.Count().Should().Be(3);

@@ -113,5 +113,28 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
 
             return mockTagsClient.Object;
         }
+
+        public static ITagClient GetMockedApiClientWithEmptytValues()
+        {
+            var mockTagsClient = new Mock<ITagClient>(MockBehavior.Strict);
+
+            mockTagsClient
+                .Setup(x => x.GetTagsLinkedToApiOperationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<TagTemplateResource>());
+
+            mockTagsClient
+                .Setup(x => x.GetAllTagsLinkedToApiAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<TagTemplateResource>());
+
+            mockTagsClient
+                .Setup(x => x.GetAllTagsLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<TagTemplateResource>());
+
+            mockTagsClient
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>(), It.IsAny<int>()))
+                .ReturnsAsync(new List<TagTemplateResource>());
+
+            return mockTagsClient.Object;
+        }
     }
 }

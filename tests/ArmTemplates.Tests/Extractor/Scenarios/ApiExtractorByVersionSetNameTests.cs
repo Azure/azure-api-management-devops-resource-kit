@@ -111,7 +111,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             var mockedProductExtractor = new Mock<IProductExtractor>(MockBehavior.Strict);
             mockedProductExtractor
-                .Setup(x => x.GenerateProductsTemplateAsync(It.IsAny<string>(), It.IsAny<List<ProductApiTemplateResource>>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .Setup(x => x.GenerateProductsTemplateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
                 .ReturnsAsync(new Template<ProductTemplateResources>()
                 {
                 });

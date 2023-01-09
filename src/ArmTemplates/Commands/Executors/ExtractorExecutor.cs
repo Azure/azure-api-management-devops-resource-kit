@@ -323,13 +323,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
         /// <returns>generated products template</returns>
         public async Task<Template<ProductTemplateResources>> GenerateProductsTemplateAsync(
             string singleApiName,
-            string baseFilesGenerationDirectory,
-            List<ProductApiTemplateResource> productApiResources)
+            string baseFilesGenerationDirectory)
         {
             this.logger.LogInformation("Started generation of products template...");
 
             var productTemplate = await this.productExtractor.GenerateProductsTemplateAsync(
-                singleApiName, productApiResources, baseFilesGenerationDirectory, this.extractorParameters);
+                singleApiName, baseFilesGenerationDirectory, this.extractorParameters);
 
             if (productTemplate?.HasResources() == true)
             {
@@ -1164,7 +1163,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             
             var globalServicePolicyTemplate = await this.GeneratePolicyTemplateAsync(baseFilesGenerationDirectory);
             var productApiTemplate = await this.GenerateProductApisTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
-            var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.ApiProducts);
+            var productTemplate = await this.GenerateProductsTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             var apiVersionSetTemplate = await this.GenerateApiVersionSetTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
             var authorizationServerTemplate = await this.GenerateAuthorizationServerTemplateAsync(singleApiName, baseFilesGenerationDirectory, apiTemplate.TypedResources.Apis);
             var tagTemplate = await this.GenerateTagTemplateAsync(singleApiName, apiTemplate.TypedResources, productTemplate.TypedResources, baseFilesGenerationDirectory);

@@ -3,7 +3,6 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +10,6 @@ using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Constants;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.Builders;
-using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ProductApis;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.EntityExtractors;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.Abstractions;
@@ -65,8 +63,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             // act
             var productTemplate = await extractorExecutor.GenerateProductsTemplateAsync(
                 singleApiName: It.IsAny<string>(),
-                currentTestDirectory,
-                productApiResources: It.IsAny<List<ProductApiTemplateResource>>());
+                currentTestDirectory);
 
             // assert
 
@@ -103,6 +100,118 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             tagResources.Should().HaveCount(2);
             (tagResources[0].Name.Contains(MockTagClient.TagName1) || tagResources[1].Name.Contains(MockTagClient.TagName1)).Should().BeTrue();
             (tagResources[0].Name.Contains(MockTagClient.TagName2) || tagResources[1].Name.Contains(MockTagClient.TagName2)).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GenerateProductsTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterProvided()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateProductsTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterProvided));
+            var apiName = "api-name";
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: apiName
+            );
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            
+            var getRelatedProductsResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListApiProducts_success_response.json");
+            var getAlldProductsResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListProducts_success_response.json");
+            var mockedProductsClient = await MockProductsClient.GetMockedHttpProductClient(
+                new MockClientConfiguration(responseFileLocation: getRelatedProductsResponseFileLocation, urlPath: $"apis/{apiName}/products?api-version={GlobalConstants.ApiVersion}"),
+                new MockClientConfiguration(responseFileLocation: getAlldProductsResponseFileLocation, urlPath: $"{MockSourceApimName}/products?api-version={GlobalConstants.ApiVersion}")
+            );
+            
+            //default values
+            var mockedGroupsClient = MockGroupsClient.GetMockedApiClientWithEmptyValues();
+            var mockedTagClient = MockTagClient.GetMockedApiClientWithEmptytValues();
+
+            var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithEmptyValues();
+            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
+
+            var productExtractor = new ProductExtractor(
+                this.GetTestLogger<ProductExtractor>(),
+                mockedPolicyExtractor,
+                mockedProductsClient,
+                mockedGroupsClient,
+                mockedTagClient,
+                new TemplateBuilder());
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                productExtractor: productExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var productTemplate = await extractorExecutor.GenerateProductsTemplateAsync(
+                singleApiName: apiName,
+                currentTestDirectory);
+
+            // assert
+            // generated product template files
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Products)).Should().BeTrue();
+
+            var templateParameters = productTemplate.Parameters;
+            templateParameters.Should().ContainKey(ParameterNames.ApimServiceName);
+
+            var templateResources = productTemplate.Resources;
+            // product resource
+            var productResources = templateResources.Where(x => x.Type == ResourceTypeConstants.Product).ToList();
+            productResources.Count.Should().Be(1);
+            productResources.Any(x => x.OriginalName == "unlimited").Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GenerateProductsTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterIsEmpty()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateProductsTemplates_GeneratesTemplatesCorrectly_GivenApiNameParameterIsEmpty));
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: null
+            );
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var getAlldProductsResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListProducts_success_response.json");
+            var mockedProductsClient = await MockProductsClient.GetMockedHttpProductClient(
+                new MockClientConfiguration(responseFileLocation: getAlldProductsResponseFileLocation, urlPath: $"{MockSourceApimName}/products?api-version={GlobalConstants.ApiVersion}")
+            );
+
+            //default values
+            var mockedGroupsClient = MockGroupsClient.GetMockedApiClientWithEmptyValues();
+            var mockedTagClient = MockTagClient.GetMockedApiClientWithEmptytValues();
+
+            var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithEmptyValues();
+            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
+
+            var productExtractor = new ProductExtractor(
+                this.GetTestLogger<ProductExtractor>(),
+                mockedPolicyExtractor,
+                mockedProductsClient,
+                mockedGroupsClient,
+                mockedTagClient,
+                new TemplateBuilder());
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                productExtractor: productExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var productTemplate = await extractorExecutor.GenerateProductsTemplateAsync(
+                singleApiName: null,
+                currentTestDirectory);
+
+            // assert
+            // generated product template files
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Products)).Should().BeTrue();
+
+            var templateParameters = productTemplate.Parameters;
+            templateParameters.Should().ContainKey(ParameterNames.ApimServiceName);
+
+            var templateResources = productTemplate.Resources;
+            // product resource
+            var productResources = templateResources.Where(x => x.Type == ResourceTypeConstants.Product).ToList();
+            productResources.Count.Should().Be(2);
+            productResources.Any(x => x.OriginalName == "unlimited").Should().BeTrue();
+            productResources.Any(x => x.OriginalName == "starter").Should().BeTrue();
         }
     }
 }

@@ -206,12 +206,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 apiTemplateResources.ApiPolicies.Add(apiPolicyResource);
             }
 
-            var apiProducts = await this.productApisExtractor.GenerateSingleApiTemplateAsync(apiName, extractorParameters, addDependsOnParameter: true);
-            if (!apiProducts.IsNullOrEmpty())
-            {
-                apiTemplateResources.ApiProducts = apiProducts;
-            }
-
             var apiTags = await this.tagExtractor.GenerateTagResourcesLinkedToApiAsync(apiName, extractorParameters);
             if (!apiTags.IsNullOrEmpty())
             {

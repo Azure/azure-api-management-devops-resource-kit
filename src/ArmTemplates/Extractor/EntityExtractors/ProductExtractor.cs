@@ -52,7 +52,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
 
         public async Task<Template<ProductTemplateResources>> GenerateProductsTemplateAsync(
             string singleApiName,
-            List<ProductApiTemplateResource> productApiTemplateResources,
             string baseFilesGenerationDirectory,
             ExtractorParameters extractorParameters)
         {
@@ -61,15 +60,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                                         .AddPolicyProperties(extractorParameters)
                                         .Build<ProductTemplateResources>();
 
-            var products = await this.productsClient.GetAllAsync(extractorParameters);
+            var allProducts = await this.productsClient.GetAllAsync(extractorParameters);
 
-            foreach (var productTemplateResource in products)
+            List<ProductApiTemplateResource> apiProducts = new List<ProductApiTemplateResource>();
+            if (!singleApiName.IsNullOrEmpty())
+            {
+                apiProducts = await this.productsClient.GetAllLinkedToApiAsync(singleApiName, extractorParameters);
+            }
+
+            foreach (var productTemplateResource in allProducts)
             {
                 productTemplateResource.Name = $"[concat(parameters('{ParameterNames.ApimServiceName}'), '/{productTemplateResource.NewName}')]";
                 productTemplateResource.ApiVersion = GlobalConstants.ApiVersion;
 
                 // only extract the product if this is a full extraction, or in the case of a single api, if it is found in products associated with the api
-                if (singleApiName == null || productApiTemplateResources.Any(p => p.Name.Contains($"/{productTemplateResource.NewName}/")))
+                if (singleApiName == null || apiProducts.Any(p => p.Name.Equals(productTemplateResource.NewName)))
                 {
                     this.logger.LogDebug("'{0}' product found", productTemplateResource.OriginalName);
                     productsTemplate.TypedResources.Products.Add(productTemplateResource);

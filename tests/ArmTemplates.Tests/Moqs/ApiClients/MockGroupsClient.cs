@@ -89,6 +89,21 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockGroupsClient.Object;
         }
 
+        public static IGroupsClient GetMockedApiClientWithEmptyValues()
+        {
+            var mockGroupsClient = new Mock<IGroupsClient>(MockBehavior.Strict);
+
+            mockGroupsClient
+                .Setup(x => x.GetAllLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<GroupTemplateResource>());
+
+            mockGroupsClient
+                .Setup(x => x.GetAllAsync(It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new List<GroupTemplateResource>());
+
+            return mockGroupsClient.Object;
+        }
+
         public static async Task<IGroupsClient> GetMockedHttpGroupClient(MockClientConfiguration mockClientConfiguration)
         {
             var mockedProcessor = new Mock<IGroupDataProcessor>(MockBehavior.Loose).Object;
