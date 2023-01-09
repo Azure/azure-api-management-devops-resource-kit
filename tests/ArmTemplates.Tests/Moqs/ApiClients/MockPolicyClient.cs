@@ -78,7 +78,39 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Moqs.ApiCl
             return mockPolicyApiClient.Object;
         }
 
-        public static async Task<IPolicyClient> GetMockedHttpPolicyClient(MockClientConfiguration mockClientConfiguration)
+        public static IPolicyClient GetMockedApiClientWithEmptyValues()
+        {
+            var mockPolicyApiClient = new Mock<IPolicyClient>(MockBehavior.Strict);
+
+            mockPolicyApiClient
+                .Setup(x => x.GetGlobalServicePolicyAsync(It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync(new PolicyTemplateResource
+                {
+                    Name = TemplateName,
+                    Type = ResourceTypeConstants.GlobalServicePolicy,
+                    Properties = new PolicyTemplateProperties
+                    {
+                        Format = "rawxml",
+                        PolicyContent = GlobalPolicyContent
+                    }
+                });
+
+            mockPolicyApiClient
+                .Setup(x => x.GetPolicyLinkedToProductAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string productName, ExtractorParameters _) => null);
+
+            mockPolicyApiClient
+                .Setup(x => x.GetPolicyLinkedToApiAsync(It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string apiName, ExtractorParameters _) => null);
+
+            mockPolicyApiClient
+                .Setup(x => x.GetPolicyLinkedToApiOperationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExtractorParameters>()))
+                .ReturnsAsync((string apiName, string apiOperation, ExtractorParameters _) => null);
+
+            return mockPolicyApiClient.Object;
+        }
+
+        public static async Task<IPolicyClient> GetMockedHttpPolicyClient(params MockClientConfiguration[] mockClientConfiguration)
         {
             var mockedClient = new Mock<PolicyClient>(MockBehavior.Strict, await MockClientUtils.GenerateMockedIHttpClientFactoryWithResponse(mockClientConfiguration));
             MockClientUtils.MockAuthOfApiClient(mockedClient);
