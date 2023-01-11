@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "ResourceNotFound",
+    "message": "resource not found.",
+    "details": null
+  }
+}

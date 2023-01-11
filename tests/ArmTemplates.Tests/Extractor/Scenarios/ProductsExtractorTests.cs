@@ -5,6 +5,7 @@
 
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executors;
@@ -213,5 +214,58 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             productResources.Any(x => x.OriginalName == "unlimited").Should().BeTrue();
             productResources.Any(x => x.OriginalName == "starter").Should().BeTrue();
         }
+
+        //new one
+        /*[Fact]
+        public async Task GenerateGroupsTemplates_DoesNotGenerateTemplate_GivenGroupListMethod_IsNotAllowed()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGroupsTemplates_DoesNotGenerateTemplate_GivenGroupListMethod_IsNotAllowed));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: null);
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagement_methodnotallowed_response.json");
+            var mockedGroupsClient = await MockGroupsClient.GetMockedHttpGroupClient(new MockClientConfiguration(responseFileLocation: fileLocation, statusCode: System.Net.HttpStatusCode.BadRequest));
+            var groupExtractor = new GroupExtractor(this.GetTestLogger<GroupExtractor>(), new TemplateBuilder(), mockedGroupsClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                groupExtractor: groupExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var groupTemplate = await extractorExecutor.GenerateGroupsTemplateAsync(currentTestDirectory);
+
+            // assert
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Groups)).Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task GenerateGroupsTemplates_RaisesError_GivenGroupListMethod_ReturnsNotFound()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGroupsTemplates_RaisesError_GivenGroupListMethod_ReturnsNotFound));
+
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: null);
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagement_notfound_response.json");
+            var mockedGroupsClient = await MockGroupsClient.GetMockedHttpGroupClient(new MockClientConfiguration(responseFileLocation: fileLocation, statusCode: System.Net.HttpStatusCode.NotFound));
+            var groupExtractor = new GroupExtractor(this.GetTestLogger<GroupExtractor>(), new TemplateBuilder(), mockedGroupsClient);
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                groupExtractor: groupExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act & assert
+            var asyncFunction = async () =>
+            {
+                await extractorExecutor.GenerateGroupsTemplateAsync(currentTestDirectory);
+            };
+
+            var results = await asyncFunction.Should().ThrowAsync<HttpRequestException>().Where(e => e.Message.Contains("404"));
+        }*/
     }
 }

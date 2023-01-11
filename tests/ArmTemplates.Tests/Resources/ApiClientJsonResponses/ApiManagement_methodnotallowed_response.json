@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "MethodNotAllowedInPricingTier",
+    "message": "Method not allowed in pricing tier",
+    "details": null
+  }
+}

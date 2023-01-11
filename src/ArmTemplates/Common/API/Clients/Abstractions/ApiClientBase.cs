@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -30,11 +31,11 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             this.httpClient = httpClientFactory.CreateClient();
         }
 
-        protected async Task<string> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
+        protected async Task<(string,bool)> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET, bool catchMethodNotAllowed = false)
         {
             if (useCache && this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
             {
-                return cachedResponseBody;
+                return (cachedResponseBody, false);
             }
 
             var httpMethod = method switch
@@ -49,26 +50,52 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             request.Headers.UserAgent.TryParseAdd($"{Application.Name}/{Application.BuildVersion}");
 
             HttpResponseMessage response = await this.httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch(HttpRequestException ex)
+            {
+                if (!catchMethodNotAllowed)
+                {
+                    throw;
+                }
+                if (ex.StatusCode != HttpStatusCode.BadRequest)
+                {
+                    throw;
+                }
+
+                var errorData = responseBody.Deserialize<ApiErrorResponse>();
+                if (errorData != null)
+                {
+                    if (errorData.Error.Code == ApiErrorCodes.MethodNotAllowed)
+                    {
+                        return (null, true);
+                    }
+                }
+
+                throw;
+            }
+            
             if (useCache)
             {
                 this.cache.Set(requestUrl, responseBody);
             }
 
-            return responseBody;
+            return (responseBody, false);
         }
 
         protected async Task<TResponse> GetResponseAsync<TResponse>(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET)
         {
-            var stringResponse = await this.CallApiManagementAsync(azToken, requestUrl, useCache, method);
+            var (stringResponse, _) = await this.CallApiManagementAsync(azToken, requestUrl, useCache, method);
             return stringResponse.Deserialize<TResponse>();
         }
 
-        protected async Task<List<TResponse>> GetPagedResponseAsync<TResponse>(string azToken, string requestUrl)
+        protected async Task<List<TResponse>> GetPagedResponseAsync<TResponse>(string azToken, string requestUrl, bool catchMethodNotAllowed = false)
         {
-            var pageResponse = await MakePagedRequestAsync(requestUrl);
+            var pageResponse = await MakePagedRequestAsync(requestUrl, catchMethodNotAllowed);
 
             var responseItems = new List<TResponse>(pageResponse.Items);
             while (pageResponse?.NextLink is not null)
@@ -79,11 +106,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
 
             return responseItems;
 
-            async Task<AzurePagedResponse<TResponse>> MakePagedRequestAsync(string requestUrl)
+            async Task<AzurePagedResponse<TResponse>> MakePagedRequestAsync(string requestUrl, bool catchMethodNotAllowed = false)
             {
-                var stringResponse = await this.CallApiManagementAsync(azToken, requestUrl);
+                var (stringResponse, returnDefault) = await this.CallApiManagementAsync(azToken, requestUrl, catchMethodNotAllowed: catchMethodNotAllowed);
+                if (returnDefault)
+                {
+                    return this.GetEmptyPagedResponseAsync<TResponse>();
+                }
                 return stringResponse.Deserialize<AzurePagedResponse<TResponse>>();
             }
+        }
+
+        AzurePagedResponse<TResponse> GetEmptyPagedResponseAsync<TResponse>()
+        {
+            return new AzurePagedResponse<TResponse>()
+            {
+                Count = 0,
+                Items = new List<TResponse>()
+            };
         }
     }
 }
