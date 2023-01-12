@@ -31,6 +31,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.API.Clien
             this.httpClient = httpClientFactory.CreateClient();
         }
 
+        /// <summary>
+        ///  Main method to call trigger api management emdpoint.
+        /// </summary>
+        /// <returns>
+        /// string containing response body
+        /// bool indicating if empty default response of the requested resource should be returned
+        /// </returns>
         protected async Task<(string,bool)> CallApiManagementAsync(string azToken, string requestUrl, bool useCache = true, ClientHttpMethod method = ClientHttpMethod.GET, bool catchMethodNotAllowed = false)
         {
             if (useCache && this.cache.TryGetValue(requestUrl, out string cachedResponseBody))
