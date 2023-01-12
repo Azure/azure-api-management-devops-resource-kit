@@ -215,57 +215,109 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             productResources.Any(x => x.OriginalName == "starter").Should().BeTrue();
         }
 
-        //new one
-        /*[Fact]
-        public async Task GenerateGroupsTemplates_DoesNotGenerateTemplate_GivenGroupListMethod_IsNotAllowed()
+        [Fact]
+        public async Task GenerateProductsTemplates_GeneratesTemplatesCorrectly_ListProductreturnsMethodNotAllowed()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGroupsTemplates_DoesNotGenerateTemplate_GivenGroupListMethod_IsNotAllowed));
-
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateProductsTemplates_GeneratesTemplatesCorrectly_ListProductreturnsMethodNotAllowed));
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
-                apiName: null);
+                apiName: null
+            );
             var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var getAlldProductsResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListProducts_success_response.json");
+            var mockedProductsClient = await MockProductsClient.GetMockedHttpProductClient(
+                new MockClientConfiguration(responseFileLocation: getAlldProductsResponseFileLocation, urlPath: $"{MockSourceApimName}/products?api-version={GlobalConstants.ApiVersion}")
+            );
+
+            //default values
             var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagement_methodnotallowed_response.json");
             var mockedGroupsClient = await MockGroupsClient.GetMockedHttpGroupClient(new MockClientConfiguration(responseFileLocation: fileLocation, statusCode: System.Net.HttpStatusCode.BadRequest));
-            var groupExtractor = new GroupExtractor(this.GetTestLogger<GroupExtractor>(), new TemplateBuilder(), mockedGroupsClient);
+
+            var mockedTagClient = MockTagClient.GetMockedApiClientWithEmptytValues();
+
+            var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithEmptyValues();
+            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
+
+            var productExtractor = new ProductExtractor(
+                this.GetTestLogger<ProductExtractor>(),
+                mockedPolicyExtractor,
+                mockedProductsClient,
+                mockedGroupsClient,
+                mockedTagClient,
+                new TemplateBuilder());
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
-                groupExtractor: groupExtractor);
+                productExtractor: productExtractor);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
             // act
-            var groupTemplate = await extractorExecutor.GenerateGroupsTemplateAsync(currentTestDirectory);
+            var productTemplate = await extractorExecutor.GenerateProductsTemplateAsync(
+                singleApiName: null,
+                currentTestDirectory);
 
             // assert
-            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Groups)).Should().BeFalse();
+            // generated product template files
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Products)).Should().BeTrue();
+
+            var templateParameters = productTemplate.Parameters;
+            templateParameters.Should().ContainKey(ParameterNames.ApimServiceName);
+
+            var templateResources = productTemplate.Resources;
+            // product resource
+            var productResources = templateResources.Where(x => x.Type == ResourceTypeConstants.Product).ToList();
+            productResources.Count.Should().Be(2);
+            productResources.Any(x => x.OriginalName == "unlimited").Should().BeTrue();
+            productResources.Any(x => x.OriginalName == "starter").Should().BeTrue();
         }
 
         [Fact]
-        public async Task GenerateGroupsTemplates_RaisesError_GivenGroupListMethod_ReturnsNotFound()
+        public async Task GenerateProductsTemplates_RaisesError_GivenGroupListMethod_ReturnsNotFound()
         {
             // arrange
-            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateGroupsTemplates_RaisesError_GivenGroupListMethod_ReturnsNotFound));
-
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateProductsTemplates_RaisesError_GivenGroupListMethod_ReturnsNotFound));
             var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
-                apiName: null);
+                apiName: null
+            );
             var extractorParameters = new ExtractorParameters(extractorConfig);
+
+            var getAlldProductsResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListProducts_success_response.json");
+            var mockedProductsClient = await MockProductsClient.GetMockedHttpProductClient(
+                new MockClientConfiguration(responseFileLocation: getAlldProductsResponseFileLocation, urlPath: $"{MockSourceApimName}/products?api-version={GlobalConstants.ApiVersion}")
+            );
+
+            //default values
             var fileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagement_notfound_response.json");
             var mockedGroupsClient = await MockGroupsClient.GetMockedHttpGroupClient(new MockClientConfiguration(responseFileLocation: fileLocation, statusCode: System.Net.HttpStatusCode.NotFound));
-            var groupExtractor = new GroupExtractor(this.GetTestLogger<GroupExtractor>(), new TemplateBuilder(), mockedGroupsClient);
+
+            var mockedTagClient = MockTagClient.GetMockedApiClientWithEmptytValues();
+
+            var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithEmptyValues();
+            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
+
+            var productExtractor = new ProductExtractor(
+                this.GetTestLogger<ProductExtractor>(),
+                mockedPolicyExtractor,
+                mockedProductsClient,
+                mockedGroupsClient,
+                mockedTagClient,
+                new TemplateBuilder());
 
             var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
                 this.GetTestLogger<ExtractorExecutor>(),
-                groupExtractor: groupExtractor);
+                productExtractor: productExtractor);
             extractorExecutor.SetExtractorParameters(extractorParameters);
 
-            // act & assert
+            // act
             var asyncFunction = async () =>
             {
-                await extractorExecutor.GenerateGroupsTemplateAsync(currentTestDirectory);
+                await extractorExecutor.GenerateProductsTemplateAsync(
+                singleApiName: null,
+                currentTestDirectory);
             };
 
-            var results = await asyncFunction.Should().ThrowAsync<HttpRequestException>().Where(e => e.Message.Contains("404"));
-        }*/
+            await asyncFunction.Should().ThrowAsync<HttpRequestException>().Where(e => e.Message.Contains("404"));
+        }
     }
 }
