@@ -39,8 +39,8 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | products                   | Array<[ProductConfiguration](#ProductConfiguration)>      | No                   | List of Product configurations.                                |
 | namedValues               | Array<[PropertyConfiguration](#PropertyConfiguration)>     | No                   | List of Named Values
 | loggers                   | Array<[LoggerConfiguration](#LoggerConfiguration)>      | No                   | List of Logger configurations.                                |
-| authorizationServers                   | Array<[AuthorizationServerContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/authorizationservers#AuthorizationServerContractProperties)>      | No                   | List of Authorization Server configurations.                                |
-| backends                   | Array<[BackendContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/backends#BackendContractProperties)>      | No                   | List of Backend configurations.                                |
+| authorizationServers                   | Array<[AuthorizationServerContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/authorizationservers#AuthorizationServerContractProperties)>      | No                   | List of Authorization Server configurations.                                |
+| backends                   | Array<[BackendContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/backends#BackendContractProperties)>      | No                   | List of Backend configurations.                                |
 | outputLocation        | string                | Yes                   | Local folder the utility will write templates to. |
 | linked                | boolean               | No                    | Determines whether the utility should create a master template that links to all generated templates. |
 | linkedTemplatesBaseUrl| string                | No                    | Location that stores linked templates. Required if 'linked' is set to true. |
@@ -89,7 +89,6 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                  | enum                  | No                    | Name of API Diagnostic - azureEventHub or applicationInsights       |
 
-
 _Additional properties found in [DiagnosticContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/apis/diagnostics#DiagnosticContractProperties)_
 
 #### APIVersionSetConfiguration
@@ -98,7 +97,7 @@ _Additional properties found in [DiagnosticContractProperties](https://docs.micr
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | id                    | string                | No                    | ID of the API Version Set.                        |
 
-_Additional properties found in [ApiVersionSetContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/apiversionsets#ApiVersionSetContractProperties)_
+_Additional properties found in [ApiVersionSetContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/apiversionsets#ApiVersionSetContractProperties)_
 
 #### ProductConfiguration
 
@@ -108,7 +107,7 @@ _Additional properties found in [ApiVersionSetContractProperties](https://docs.m
 | policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          
 | subscriptions                | Array<[SubscriptionConfiguration](#SubscriptionConfiguration)>                | No                    | List of Subscriptions
 
-_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/products#ProductContractProperties)_
 
 #### SubscriptionConfiguration
 
@@ -116,7 +115,7 @@ _Additional properties found in [ProductContractProperties](https://docs.microso
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                | string                | No                    | Name of the subscription resource. If omitted, the display name is used.                          |
 
-_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/products#ProductContractProperties)_
 
 #### PropertyConfiguration
 
@@ -128,7 +127,7 @@ _Additional properties found in [ProductContractProperties](https://docs.microso
 | value                | string                | No                    | Value of the property. Can contain policy expressions. It can be empty or consist only of whitespace only if the keyvault parameter is set.                          |
 | keyvault                | [PropertyKeyVaultConfiguration](#PropertyKeyVaultConfiguration)                 | No                    | The keyvault settings for the property.                          |
 
-_Additional properties found in [PropertyContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/properties#propertycontractproperties-object)_
+_Additional properties found in [PropertyContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/properties#propertycontractproperties-object)_
 
 #### PropertyKeyVaultConfiguration
 
@@ -142,7 +141,7 @@ _Additional properties found in [PropertyContractProperties](https://docs.micros
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                  | string                | Yes                   | Name of the Logger                         |
 
-_Additional properties found in [LoggerContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/loggers#LoggerContractProperties)_
+_Additional properties found in [LoggerContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/loggers#LoggerContractProperties)_
 
 #### TagConfiguration
 
@@ -150,7 +149,7 @@ _Additional properties found in [LoggerContractProperties](https://docs.microsof
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | displayName           | string                | Yes                   | DisplayName and name of the tag                  |
 
-_Additional properties found in [TagContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/tags)_
+_Additional properties found in [TagContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/tags)_
 
 #### APITemplateSubscriptionKeyParameterNames
 
@@ -159,7 +158,7 @@ _Additional properties found in [TagContractProperties](https://docs.microsoft.c
 | header                | string                | Yes                   | header name of the subscription.                 |
 | query                 | string                | Yes                   | query parameter name of the subscription.        |
 
-_Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions)_
+_Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/subscriptions)_
 
 #### ServiceUrlProperty
 
