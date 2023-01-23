@@ -26,7 +26,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Creator.Template
                     Sampling = api.Diagnostic.Sampling,
                     Frontend = api.Diagnostic.Frontend,
                     Backend = api.Diagnostic.Backend,
-                    EnableHttpCorrelationHeaders = api.Diagnostic.EnableHttpCorrelationHeaders
+                    EnableHttpCorrelationHeaders = api.Diagnostic.EnableHttpCorrelationHeaders,
+                    HttpCorrelationProtocol = api.Diagnostic.HttpCorrelationProtocol,
                 },
                 DependsOn = dependsOn
             };

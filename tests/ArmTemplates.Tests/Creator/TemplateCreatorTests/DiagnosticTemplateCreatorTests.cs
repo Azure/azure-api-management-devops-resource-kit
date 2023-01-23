@@ -70,7 +70,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
                             }
                         }
                     },
-                    EnableHttpCorrelationHeaders = true
+                    EnableHttpCorrelationHeaders = true,
+                    HttpCorrelationProtocol = "W3C",
                 }
             };
             creatorConfig.Apis.Add(api);
@@ -95,6 +96,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Creator.Te
             Assert.Equal(api.Diagnostic.Backend.Request.Body.Bytes, diagnosticTemplateResource.Properties.Backend.Request.Body.Bytes);
             Assert.Equal(api.Diagnostic.Backend.Response.Headers, diagnosticTemplateResource.Properties.Backend.Response.Headers);
             Assert.Equal(api.Diagnostic.Backend.Response.Body.Bytes, diagnosticTemplateResource.Properties.Backend.Response.Body.Bytes);
+            Assert.Equal(api.Diagnostic.HttpCorrelationProtocol, diagnosticTemplateResource.Properties.HttpCorrelationProtocol);
         }
     }
 }

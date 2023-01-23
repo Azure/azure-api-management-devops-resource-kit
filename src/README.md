@@ -87,9 +87,10 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
-| name                  | enum                | No                    | Name of API Diagnostic - azureEventHub or applicationInsights       |
+| name                  | enum                  | No                    | Name of API Diagnostic - azureEventHub or applicationInsights       |
 
-_Additional properties found in [DiagnosticContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/apis/diagnostics#DiagnosticContractProperties)_
+
+_Additional properties found in [DiagnosticContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2021-08-01/service/apis/diagnostics#DiagnosticContractProperties)_
 
 #### APIVersionSetConfiguration
 
@@ -269,6 +270,7 @@ apis:
             body: 
               bytes: 512
         enableHttpCorrelationHeaders: true
+        httpCorrelationProtocol: W3C
 products:
     - name: platinum
       displayName: Platinum
