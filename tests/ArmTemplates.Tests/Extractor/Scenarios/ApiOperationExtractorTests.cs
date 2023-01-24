@@ -17,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 {
     [Trait("Category", "Api operations Extraction")]
     public class ApiOperationExtractorTests : ExtractorMockerWithOutputTestsBase
-    {        
+    {
         public ApiOperationExtractorTests() : base("api-operations-tests")
         {
         }
@@ -43,6 +43,24 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
 
             var exampleDefault = submitOrderOperation.Properties.Request.Representations[0].Examples["default"];
             exampleDefault.Value.Should().Be("[[{\"key\":\"value\"}]");
+
+            var preferHeader = submitOrderOperation.Properties.Request.Headers.First(h => h.Name == "Prefer");
+            preferHeader.Values.Should().Equal(new[] { "return=minimal", "return=representation" });
+            preferHeader.DefaultValue.Should().Be("return=minimal");
+            preferHeader.Type.Should().Be("string");
+            preferHeader.Required.Should().BeFalse();
+
+            var authorizationHeader = submitOrderOperation.Properties.Request.Headers.First(h => h.Name == "Authorization");
+            authorizationHeader.Values.Should().BeEmpty();
+            authorizationHeader.DefaultValue.Should().BeNull();
+            authorizationHeader.Type.Should().Be("string");
+            authorizationHeader.Required.Should().BeTrue();
+
+            var maxCountHeader = submitOrderOperation.Properties.Request.Headers.First(h => h.Name == "MaxCount");
+            maxCountHeader.Values.Should().BeEmpty();
+            maxCountHeader.DefaultValue.Should().Be("100");
+            maxCountHeader.Type.Should().Be("integer");
+            maxCountHeader.Required.Should().BeFalse();
         }
     }
 }
