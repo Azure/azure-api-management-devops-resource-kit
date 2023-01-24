@@ -3,6 +3,8 @@
 //  Licensed under the MIT License.
 // --------------------------------------------------------------------------
 
+using System;
+
 namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates.ApiOperations
 {
     public class ApiOperationHeader
@@ -15,7 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
 
         public string Type { get; set; }
 
-        public string[] Values { get; set; }
+        public string[] Values { get; set; } = Array.Empty<string>();
 
         public bool Required { get; set; }
     }

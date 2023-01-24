@@ -63,6 +63,31 @@
         "urlTemplate": "/?soapAction=http://tempuri.org/IFazioService/submitOrder",
         "request": {
           "description": "description",
+          "headers": [
+            {
+              "name": "Prefer",
+              "description": "Indicates a level of details in the response. This operation supports 'return=representation' and 'return=minimal' preferences.",
+              "type": "string",
+              "defaultValue": "return=minimal",
+              "values": [
+                "return=minimal",
+                "return=representation"
+              ]
+            },
+            {
+              "name": "Authorization",
+              "description": "OAuth access token",
+              "type": "string",
+              "required": true,
+              "values": []
+            },
+            {
+              "name": "MaxCount",
+              "description": "Max number of items",
+              "type": "integer",
+              "defaultValue": "100"
+            }
+          ],
           "representations": [
             {
               "contentType": "application/json",
