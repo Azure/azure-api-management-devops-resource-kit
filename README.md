@@ -9,12 +9,12 @@ With the strategic value of APIs, a continuous integration (CI) and continuous d
 This repository provides [guidance](./README.md), [examples](./example/), and [tools](./src/README.md) to help you achieve API DevOps with Azure API Management.
 
 > **WARNING**
-> This project is entering "maintenance" mode and will soon be retired.  We recommend the following
-> actions:
-> * If you are using `creator`, switch over to using Bicep templates.  [Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview) is a descriptive language for describing infrastructure.  You can find bicep modules for handling API Management APIs at [https://github.com/azure-samples/api-management-sample-apis](https://github.com/azure-samples/api-management-sample-apis).
-> * If you are using `extractor`, switch your pipelines over to using [APIOps](https://github.com/azure/apiops).  APIOps applies the concepts of GitOps to API deployments.  It is faster and more flexible than the DevOps Resource Kit.
+> This project is now in "maintenance" mode.  This means that no new features will be accepted and fixes will be limited to security fixes.  We expect to retire the DevOps Resource Kit by the end of 2023.  At that time, the DevOps Resource Kit repository will be archived and there will be no further updates.
 >
-> You are welcome to fork and maintain the DevOps Resource Kit yourself.  However, we will not be doing additional feature releases of the DevOps Resource Kit.
+> While you are free to fork the DevOps Resource Kit yourself, we recommend that you migrate to the following products:
+>
+> * If you are using `creator`, switch over to using Bicep templates.  [Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview) is a descriptive language for describing infrastructure, fully supports all features of Azure API Management, and is covered in any support agreement that you have with Azure.  You can find bicep modules and examples for handling API Management APIs at [https://github.com/azure-samples/api-management-sample-apis](https://github.com/azure-samples/api-management-sample-apis).  
+> * If you are using `extractor`, switch your pipelines to use [APIOps](https://github.com/azure/apiops).  APIOps applies the concepts of GitOps to API deployments.  It is faster and more flexible than the DevOps Resource Kit.
 
 ## The Problem
 
