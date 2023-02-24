@@ -8,6 +8,14 @@ With the strategic value of APIs, a continuous integration (CI) and continuous d
 
 This repository provides [guidance](./README.md), [examples](./example/), and [tools](./src/README.md) to help you achieve API DevOps with Azure API Management.
 
+> **WARNING**
+> This project is now in "maintenance" mode.  This means that no new features will be accepted and fixes will be limited to security fixes.  We expect to retire the DevOps Resource Kit by the end of 2023.  At that time, the DevOps Resource Kit repository will be archived and there will be no further updates.
+>
+> While you are free to fork the DevOps Resource Kit yourself, we recommend that you migrate to the following products:
+>
+> * If you are using `creator`, switch over to using Bicep templates.  [Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview) is a descriptive language for describing infrastructure, fully supports all features of Azure API Management, and is covered in any support agreement that you have with Azure.  You can find bicep modules and examples for handling API Management APIs at [https://github.com/azure-samples/api-management-sample-apis](https://github.com/azure-samples/api-management-sample-apis).  
+> * If you are using `extractor`, switch your pipelines to use [APIOps](https://github.com/azure/apiops).  APIOps applies the concepts of GitOps to API deployments.  It is faster and more flexible than the DevOps Resource Kit.
+
 ## The Problem
 
 Organizations today normally have multiple deployment environments (e.g., Development, Testing, Production) and use separate API Management instances for each environment. Some of these instances are shared by multiple development teams, who are responsible for different APIs with different release cadence.
