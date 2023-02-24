@@ -159,6 +159,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
         {
             var productResourceId = new string[] { $"[resourceId('Microsoft.ApiManagement/service/products', parameters('{ParameterNames.ApimServiceName}'), '{productTemplateResource.NewName}')]" };
 
+            if (SKUTypes.IsConsumption(extractorParameters.CurrentSKU))
+            {
+                this.logger.LogInformation("Skipping generation of groups resources attached to groups for consumption sku...");
+                return ;
+            }
+
             try
             {
                 var groupsLinkedToProduct = await this.groupsClient.GetAllLinkedToProductAsync(productTemplateResource.OriginalName, extractorParameters);
@@ -178,6 +184,5 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                 throw;
             }
         }
-
     }
 }

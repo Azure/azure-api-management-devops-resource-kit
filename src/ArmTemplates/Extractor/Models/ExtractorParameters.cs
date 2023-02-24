@@ -96,6 +96,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Models
 
         public Dictionary<string, ApiParameterProperty> ApiParameters { get; private set; }
 
+        public string CurrentSKU { get; private set; }
+
+        public void SetSkuType(string sku)
+        {
+            this.CurrentSKU = sku;
+        }
+
         public ExtractorParameters(ExtractorConsoleAppConfiguration extractorConfig)
         {
             this.SourceApimName = extractorConfig.SourceApimName;
