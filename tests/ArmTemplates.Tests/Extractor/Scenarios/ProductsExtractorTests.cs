@@ -175,7 +175,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             );
 
             //default values
-            var mockedGroupsClient = MockGroupsClient.GetMockedApiClientWithEmptyValues();
+            var mockedGroupsClient = MockGroupsClient.GetMockedApiClientWithDefaultValues();
             var mockedTagClient = MockTagClient.GetMockedApiClientWithEmptytValues();
 
             var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithEmptyValues();
@@ -212,6 +212,68 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Tests.Extractor.
             productResources.Count.Should().Be(2);
             productResources.Any(x => x.OriginalName == "unlimited").Should().BeTrue();
             productResources.Any(x => x.OriginalName == "starter").Should().BeTrue();
+
+            var attachedGroups = templateResources.Where(x => x.Type == ResourceTypeConstants.ProductGroup).ToList();
+            attachedGroups.Count.Should().Be(4);
+        }
+
+        [Fact]
+        public async Task GenerateProductsTemplates_GeneratesTemplatesCorrectly_GivenConsumptionSku()
+        {
+            // arrange
+            var currentTestDirectory = Path.Combine(this.OutputDirectory, nameof(GenerateProductsTemplates_GeneratesTemplatesCorrectly_GivenConsumptionSku));
+            var extractorConfig = this.GetDefaultExtractorConsoleAppConfiguration(
+                apiName: null
+            );
+            var extractorParameters = new ExtractorParameters(extractorConfig);
+            extractorParameters.SetSkuType(SKUTypes.Consumption);
+
+            var getAlldProductsResponseFileLocation = Path.Combine(MockClientUtils.ApiClientJsonResponsesPath, "ApiManagementListProducts_success_response.json");
+            var mockedProductsClient = await MockProductsClient.GetMockedHttpProductClient(
+                new MockClientConfiguration(responseFileLocation: getAlldProductsResponseFileLocation, urlPath: $"{MockSourceApimName}/products?api-version={GlobalConstants.ApiVersion}")
+            );
+
+            //default values
+            var mockedGroupsClient = MockGroupsClient.GetMockedApiClientWithDefaultValues();
+            var mockedTagClient = MockTagClient.GetMockedApiClientWithEmptytValues();
+
+            var mockedPolicyClient = MockPolicyClient.GetMockedApiClientWithEmptyValues();
+            var mockedPolicyExtractor = new PolicyExtractor(this.GetTestLogger<PolicyExtractor>(), mockedPolicyClient, new TemplateBuilder());
+
+            var productExtractor = new ProductExtractor(
+                this.GetTestLogger<ProductExtractor>(),
+                mockedPolicyExtractor,
+                mockedProductsClient,
+                mockedGroupsClient,
+                mockedTagClient,
+                new TemplateBuilder());
+
+            var extractorExecutor = ExtractorExecutor.BuildExtractorExecutor(
+                this.GetTestLogger<ExtractorExecutor>(),
+                productExtractor: productExtractor);
+            extractorExecutor.SetExtractorParameters(extractorParameters);
+
+            // act
+            var productTemplate = await extractorExecutor.GenerateProductsTemplateAsync(
+                singleApiName: null,
+                currentTestDirectory);
+
+            // assert
+            // generated product template files
+            File.Exists(Path.Combine(currentTestDirectory, extractorParameters.FileNames.Products)).Should().BeTrue();
+
+            var templateParameters = productTemplate.Parameters;
+            templateParameters.Should().ContainKey(ParameterNames.ApimServiceName);
+
+            var templateResources = productTemplate.Resources;
+            // product resource
+            var productResources = templateResources.Where(x => x.Type == ResourceTypeConstants.Product).ToList();
+            productResources.Count.Should().Be(2);
+            productResources.Any(x => x.OriginalName == "unlimited").Should().BeTrue();
+            productResources.Any(x => x.OriginalName == "starter").Should().BeTrue();
+
+            var attachedGroups = templateResources.Where(x => x.Type == ResourceTypeConstants.ProductGroup).ToList();
+            attachedGroups.Count.Should().Be(0);
         }
     }
 }

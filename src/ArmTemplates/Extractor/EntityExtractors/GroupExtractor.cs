@@ -40,6 +40,12 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                                         .GenerateTemplateWithApimServiceNameProperty()
                                         .Build<GroupTemplateResources>();
 
+            if (SKUTypes.IsConsumption(extractorParameters.CurrentSKU))
+            {
+                this.logger.LogInformation("Skipping generation of groups template for consumption sku...");
+                return groupsTemplate;
+            }
+
             var allGroups = await this.groupsClient.GetAllAsync(extractorParameters);
             if (allGroups.IsNullOrEmpty())
             {

@@ -878,6 +878,13 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
 
             if (apiManagementServiceTemplate?.HasResources() == true)
             {
+
+                var typedService = apiManagementServiceTemplate.TypedResources.ApiManagementServices.FirstOrDefault();
+                if (typedService.Sku is not null)
+                {
+                    this.extractorParameters.SetSkuType(typedService.Sku.Name);
+                }
+                
                 await FileWriter.SaveAsJsonAsync(
                     apiManagementServiceTemplate,
                     directory: baseFilesGenerationDirectory,
@@ -1156,6 +1163,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             {
                 throw new SingleAndMultipleApisCanNotExistTogetherException("Can't specify single API and multiple APIs to extract at the same time");
             }
+            
+            // Fetch ApiManagement Service instance template 
+            await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
 
             var apisToExtract = await this.GetApiNamesToExtract(singleApiName, multipleApiNames);
             // generate different templates using extractors and write to output
@@ -1179,7 +1189,6 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Commands.Executo
             var apiReleasesTemplate = await this.GenerateApiReleasesTemplateAsync(baseFilesGenerationDirectory);
             await this.GenerateGatewayTemplateAsync(singleApiName, baseFilesGenerationDirectory);
             await this.GenerateGatewayApiTemplateAsync(singleApiName, multipleApiNames, baseFilesGenerationDirectory);
-            await this.GenerateApiManagementServiceTemplate(baseFilesGenerationDirectory);
             
             var parametersTemplate = await this.GenerateParametersTemplateAsync(apisToExtract, loggerTemplate.TypedResources, backendTemplate.TypedResources, namedValueTemplate.TypedResources, identityProviderTemplate.TypedResources, openIdConnectProviderTemplate.TypedResources, baseFilesGenerationDirectory);
             
