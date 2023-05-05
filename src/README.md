@@ -39,8 +39,8 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 | products                   | Array<[ProductConfiguration](#ProductConfiguration)>      | No                   | List of Product configurations.                                |
 | namedValues               | Array<[PropertyConfiguration](#PropertyConfiguration)>     | No                   | List of Named Values
 | loggers                   | Array<[LoggerConfiguration](#LoggerConfiguration)>      | No                   | List of Logger configurations.                                |
-| authorizationServers                   | Array<[AuthorizationServerContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/authorizationservers#AuthorizationServerContractProperties)>      | No                   | List of Authorization Server configurations.                                |
-| backends                   | Array<[BackendContractProperties](#https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/backends#BackendContractProperties)>      | No                   | List of Backend configurations.                                |
+| authorizationServers                   | Array<[AuthorizationServerContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/authorizationservers#authorizationservercontractproperties-1)>      | No                   | List of Authorization Server configurations.                                |
+| backends                   | Array<[BackendContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/backends#backendcontractproperties-1)>      | No                   | List of Backend configurations.                                |
 | outputLocation        | string                | Yes                   | Local folder the utility will write templates to. |
 | linked                | boolean               | No                    | Determines whether the utility should create a master template that links to all generated templates. |
 | linkedTemplatesBaseUrl| string                | No                    | Location that stores linked templates. Required if 'linked' is set to true. |
@@ -89,7 +89,7 @@ The utility requires one argument, --configFile, which points to a yaml file tha
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                  | enum                | No                    | Name of API Diagnostic - azureEventHub or applicationInsights       |
 
-_Additional properties found in [DiagnosticContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/apis/diagnostics#DiagnosticContractProperties)_
+_Additional properties found in [DiagnosticContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/diagnostics#diagnosticcontractproperties-1)_
 
 #### APIVersionSetConfiguration
 
@@ -97,17 +97,17 @@ _Additional properties found in [DiagnosticContractProperties](https://docs.micr
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | id                    | string                | No                    | ID of the API Version Set.                        |
 
-_Additional properties found in [ApiVersionSetContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/apiversionsets#ApiVersionSetContractProperties)_
+_Additional properties found in [ApiVersionSetContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/apiversionsets#apiversionsetcontractproperties-1)_
 
 #### ProductConfiguration
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                | string                | No                    | Name of the product resource. If omitted, the display name is used.                          |
-| policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.                          
+| policy                | string                | No                    | Location of the Product policy XML file. Can be url or local file.
 | subscriptions                | Array<[SubscriptionConfiguration](#SubscriptionConfiguration)>                | No                    | List of Subscriptions
 
-_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+_Additional properties found in [ProductContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/products#productcontractproperties-1)_
 
 #### SubscriptionConfiguration
 
@@ -115,7 +115,7 @@ _Additional properties found in [ProductContractProperties](https://docs.microso
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                | string                | No                    | Name of the subscription resource. If omitted, the display name is used.                          |
 
-_Additional properties found in [ProductContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/products#ProductContractProperties)_
+_Additional properties found in [SubscriptionContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/subscriptions#subscriptioncreateparameterpropertiesorsubscriptionc-1)_
 
 #### PropertyConfiguration
 
@@ -133,7 +133,7 @@ _Additional properties found in [PropertyContractProperties](https://docs.micros
 
 | Property              | Type                  | Required              | Value                                            |
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
-| secretIdentifier                | string                | Yes                    | KeyVault secret id which will map to the property.   
+| secretIdentifier                | string                | Yes                    | KeyVault secret id which will map to the property.
 
 #### LoggerConfiguration
 
@@ -141,7 +141,7 @@ _Additional properties found in [PropertyContractProperties](https://docs.micros
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | name                  | string                | Yes                   | Name of the Logger                         |
 
-_Additional properties found in [LoggerContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/loggers#LoggerContractProperties)_
+_Additional properties found in [LoggerContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/loggers#loggercontractproperties-1)_
 
 #### TagConfiguration
 
@@ -149,7 +149,7 @@ _Additional properties found in [LoggerContractProperties](https://docs.microsof
 |-----------------------|-----------------------|-----------------------|--------------------------------------------------|
 | displayName           | string                | Yes                   | DisplayName and name of the tag                  |
 
-_Additional properties found in [TagContractProperties](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/tags)_
+_Additional properties found in [TagContractProperties](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/tags#tagcontractproperties-1)_
 
 #### APITemplateSubscriptionKeyParameterNames
 
@@ -158,7 +158,7 @@ _Additional properties found in [TagContractProperties](https://docs.microsoft.c
 | header                | string                | Yes                   | header name of the subscription.                 |
 | query                 | string                | Yes                   | query parameter name of the subscription.        |
 
-_Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://docs.microsoft.com/en-us/azure/templates/microsoft.apimanagement/2019-01-01/service/subscriptions)_
+_Additional properties found in [APITemplateSubscriptionKeyParameterNames](https://learn.microsoft.com/en-us/azure/templates/microsoft.apimanagement/service/subscriptions)_
 
 #### ServiceUrlProperty
 
@@ -176,7 +176,7 @@ While creating config file, please keep in mind that the tag resource name will 
 For example config:
 
 ```
-tags: 
+tags:
  - displayName: tag 1
  - displayName: tag 2
 ```
@@ -191,7 +191,7 @@ Tag 2:
   display name = tag 2
 ```
 
-In case there are two different tags which result the same sanitized tag's name program will throw an **exception** with conflicting tags.  
+In case there are two different tags which result the same sanitized tag's name program will throw an **exception** with conflicting tags.
 
 ### Sample Config File
 
@@ -230,8 +230,8 @@ apis:
       apiVersionDescription: My first version
       apiVersionSetId: myAPIVersionSetID
       apiRevision: 1
-      apiRevisionDescription: My first revision 
-      products: myProduct   
+      apiRevisionDescription: My first revision
+      products: myProduct
       tags: Universe, myTag
       operations:
         addPet:
@@ -250,23 +250,23 @@ apis:
         sampling:
           samplingType: fixed
           percentage: 50
-        frontend: 
+        frontend:
           request:
             headers:
-            body: 
+            body:
               bytes: 512
-          response: 
+          response:
             headers:
-            body: 
+            body:
               bytes: 512
-        backend: 
+        backend:
           request:
             headers:
-            body: 
+            body:
               bytes: 512
-          response: 
+          response:
             headers:
-            body: 
+            body:
               bytes: 512
         enableHttpCorrelationHeaders: true
 products:
@@ -284,7 +284,7 @@ products:
             primaryKey: a240691f-03fd-4557-a5cb-6e0f65cd976a
             secondaryKey: 032338aa-0076-4379-910c-32ddd42f38a1
             state: active
-            allowTracing: true 
+            allowTracing: true
 tags:
     - displayName: Universe
 loggers:
@@ -319,15 +319,15 @@ backends:
       url: https://backendname2644/
       protocol: http
       credentials:
-        query: 
-          sv: 
+        query:
+          sv:
             - xx
             - bb
-        header: 
+        header:
           x-my-1:
             - val1
             - val2
-        authorization: 
+        authorization:
           scheme: Basic
           parameter: opensesma
       proxy:
@@ -342,7 +342,7 @@ linked: false
 linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
 linkedTemplatesUrlQueryString : ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-22T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFTldJEYPH888QVzKb7q7eLq0Xt%2Bu35UTqpFGUYo6uc%3D
 baseFileName: baseName
-serviceUrlParameters: 
+serviceUrlParameters:
   - apiName: myAPI
     serviceUrl: httpbin.com/myAPI
 ```
@@ -387,7 +387,7 @@ The Creator tool is now available anywhere on the command-line:
 
 # Extractor
 
-This utility generates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) by extracting existing configurations of one or more APIs in an API Management instance. 
+This utility generates [Resource Manager templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) by extracting existing configurations of one or more APIs in an API Management instance.
 
 <a name="prerequisite"></a>
 
@@ -401,7 +401,7 @@ To be able to run the Extractor, you would first need to [install the Azure CLI]
 Below are the steps to run the Extractor from the source code:
 - Clone this repository and navigate to {repo root}/src/ARMTemplates
 - Restore its packages using ```dotnet restore```
-- Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted. 
+- Make sure you have signed in using Azure CLI and have switched to the subscription containing the API Management instance from which the configurations will be extracted.
 ```
 az login
 az account set --subscription <subscription_id>
@@ -458,8 +458,8 @@ You have two choices when specifying your settings:
 
 <a name="extractorParameterFileExamples"></a>
 ### Extractor Parameter File Example
- 
-Executing **a single API extraction with linked templates and policy file** generation, use the following parameters: 
+
+Executing **a single API extraction with linked templates and policy file** generation, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -471,7 +471,7 @@ Executing **a single API extraction with linked templates and policy file** gene
     "policyXMLBaseUrl": "<policies_remote_location>"
 }
 ```
-Extract **all APIs with linked templates linking all apis and policy file**, use the following parameters: 
+Extract **all APIs with linked templates linking all apis and policy file**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -482,7 +482,7 @@ Extract **all APIs with linked templates linking all apis and policy file**, use
     "policyXMLBaseUrl": "<policies_remote_location>"
 }
 ```
-Extract **all APIs with seperated api folders**, use the following parameters: 
+Extract **all APIs with seperated api folders**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -494,7 +494,7 @@ Extract **all APIs with seperated api folders**, use the following parameters:
     "splitAPIs": "true"
 }
 ```
-Extract **all APIs within an apiversionset**, use the following parameters: 
+Extract **all APIs within an apiversionset**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -506,7 +506,7 @@ Extract **all APIs within an apiversionset**, use the following parameters:
     "apiVersionSetName": "<api-version-set-name>"
 }
 ```
-Extract **single API with all revisions**, use the following parameters: 
+Extract **single API with all revisions**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -519,7 +519,7 @@ Extract **single API with all revisions**, use the following parameters:
     "includeAllRevisions": "true"
 }
 ```
-Extract **multiple APIs**, use the following parameters: 
+Extract **multiple APIs**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -531,7 +531,7 @@ Extract **multiple APIs**, use the following parameters:
     "multipleAPIs": "api1, api2, api3"
 }
 ```
-Extract **single API with baseFileName**, use the following parameters: 
+Extract **single API with baseFileName**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -545,7 +545,7 @@ Extract **single API with baseFileName**, use the following parameters:
 }
 ```
 
-Extract **all APIs within paramServiceUrl**, use the following parameters: 
+Extract **all APIs within paramServiceUrl**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
@@ -557,7 +557,7 @@ Extract **all APIs within paramServiceUrl**, use the following parameters:
     "paramServiceUrl": "true"
 }
 ```
-Extract **all APIs within paramNamedValue**, use the following parameters: 
+Extract **all APIs within paramNamedValue**, use the following parameters:
 ```
 {
     "sourceApimName": "<source-apim-name>",
