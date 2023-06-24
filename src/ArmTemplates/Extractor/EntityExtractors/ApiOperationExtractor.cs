@@ -54,6 +54,15 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
                     }
                 }
 
+                if (apiOperation.Properties?.Request?.QueryParameters?.IsNullOrEmpty() == false)
+                {
+                    foreach (var requestQueryParams in apiOperation.Properties.Request.QueryParameters)
+                    {
+                        if (requestQueryParams.SchemaId?.IsNullOrEmpty() == false)
+                        { AddSchemaDependencyToOperationIfNecessary(apiName, operationDependsOn, requestQueryParams); }
+                    }
+                }
+
                 if (apiOperation.Properties?.Responses?.IsNullOrEmpty() == false)
                 {
                     foreach (var operationResponse in apiOperation.Properties?.Responses)
@@ -79,6 +88,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extractor.Entity
             if (operationRepresentation.SchemaId is not null)
             {
                 string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{operationRepresentation.SchemaId}')]";
+                // add value to list if schema has not already been added
+                if (!operationDependsOn.Exists(o => o == dependsOn))
+                {
+                    operationDependsOn.Add(dependsOn);
+                }
+            }
+        }
+        static void AddSchemaDependencyToOperationIfNecessary(string apiName, List<string> operationDependsOn, ApiOperationQueryParameter queryParameter)
+        {
+            if (queryParameter.SchemaId is not null)
+            {
+                string dependsOn = $"[resourceId('Microsoft.ApiManagement/service/apis/schemas', parameters('{ParameterNames.ApimServiceName}'), '{apiName}', '{queryParameter.SchemaId}')]";
                 // add value to list if schema has not already been added
                 if (!operationDependsOn.Exists(o => o == dependsOn))
                 {
