@@ -20,5 +20,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common.Templates
         public string Type { get; set; }
 
         public string TypeName { get; set; }
+
+        public string[] Values { get; set; }
     }
 }
